@@ -498,4 +498,17 @@ mod tests {
             sightline_engine_free(e);
         }
     }
+    #[test]
+    fn test_misaligned_pointer_rejected() {
+        let c = cfg();
+        let d = [det(), det()];
+        let (mut out, mut n) = ([SightlineTrackC::default(); 2], 0usize);
+        unsafe {
+            let e = sightline_engine_new(&c);
+            let bad = (d.as_ptr() as *const u8).add(1) as *const SightlineDetectionC;
+            let rc = sightline_engine_step(e, 0.1, bad, 1, out.as_mut_ptr(), 2, &mut n);
+            assert_eq!(rc, SIGHTLINE_ERR_INVALID);
+            sightline_engine_free(e);
+        }
+    }
 }
