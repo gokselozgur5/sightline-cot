@@ -341,3 +341,19 @@ pub struct CotUdpDispatcher {
     socket: UdpSocket,
     target: SocketAddr,
 }
+impl CotUdpDispatcher {
+    /// Create a new non-blocking UDP dispatcher bound to an ephemeral port.
+    pub fn new(bind_addr: &str, target: SocketAddr) -> Result<Self, CotError> {
+        let socket =
+            UdpSocket::bind(bind_addr).map_err(|e| CotError::NetworkError(e.to_string()))?;
+        socket
+            .set_nonblocking(true)
+            .map_err(|e| CotError::NetworkError(e.to_string()))?;
+        Ok(Self { socket, target })
+    }
+
+    /// Access underlying socket reference.
+    pub fn socket(&self) -> &UdpSocket {
+        &self.socket
+    }
+}
