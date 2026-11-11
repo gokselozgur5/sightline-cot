@@ -113,3 +113,31 @@ fn step_and_dispatch(
         .collect();
     dispatch_tracks(disp, &confirmed, t_ms)
 }
+
+fn run_simulation(
+    tracker: &mut MultiTargetTracker,
+    disp: &CotUdpDispatcher,
+    intr: &Intrinsics,
+    pose: &CameraPose,
+) -> usize {
+    let mut dispatched = 0;
+    for f in 0..10 {
+        let t_ms = 1771234500000 + f as i64 * 100;
+        let d1 = make_detection(
+            960.0 + f as f64 * 2.0,
+            540.0 + f as f64 * 1.5,
+            intr,
+            pose,
+            0,
+        );
+        let d2 = make_detection(
+            800.0 - f as f64 * 1.0,
+            400.0 + f as f64 * 2.0,
+            intr,
+            pose,
+            1,
+        );
+        dispatched += step_and_dispatch(tracker, disp, &[d1, d2], t_ms);
+    }
+    dispatched
+}
