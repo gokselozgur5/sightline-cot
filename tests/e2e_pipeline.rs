@@ -87,3 +87,13 @@ fn convert_track_to_cot(
         speed_mps,
     }
 }
+
+fn dispatch_tracks(dispatcher: &CotUdpDispatcher, tracks: &[Track], t_ms: i64) -> usize {
+    let mut count = 0;
+    for trk in tracks {
+        let cot = convert_track_to_cot(trk, 37.7749, -122.4194, 0.0, t_ms);
+        dispatcher.send_event(&cot).expect("dispatch");
+        count += 1;
+    }
+    count
+}
