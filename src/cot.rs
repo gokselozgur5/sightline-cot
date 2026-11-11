@@ -473,3 +473,23 @@ mod tests_udp_rt {
         }
     }
 }
+#[test]
+fn test_udp_dispatcher_full_roundtrip() {
+    let receiver = UdpSocket::bind("127.0.0.1:0").expect("bind receiver");
+    let recv_addr = receiver.local_addr().expect("receiver local addr");
+    receiver
+        .set_read_timeout(Some(std::time::Duration::from_secs(2)))
+        .expect("timeout");
+    let dispatcher = CotUdpDispatcher::new("127.0.0.1:0", recv_addr).expect("create dispatcher");
+    let evt = tests_udp_rt::sample_drone();
+    dispatcher.send_event(&evt).expect("send event");
+    let mut buf = [0u8; 2048];
+    let (len, _) = receiver.recv_from(&mut buf).expect("recv udp");
+    let decoded = CotEvent::from_xml(std::str::from_utf8(&buf[..len]).unwrap()).unwrap();
+    assert_eq!(decoded.uid, "DRONE-99");
+    assert_eq!(decoded.cot_type, "a-f-A-M-F");
+    assert_eq!(decoded.time_ms, 1771234567890);
+    assert!((decoded.lat_deg - 37.7749).abs() < 1e-6);
+    assert!((decoded.lon_deg - (-122.4194)).abs() < 1e-6);
+    assert!((decoded.speed_mps - 18.5).abs() < 1e-2);
+}
