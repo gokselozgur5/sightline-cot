@@ -355,4 +355,25 @@ mod tests {
             embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         }
     }
+
+    #[test]
+    fn test_full_lifecycle_and_cot_output() {
+        let c = cfg();
+        unsafe {
+            let e = sightline_engine_new(&c);
+            assert!(!e.is_null());
+            let mut out = [SightlineTrackC::default(); 4];
+            let mut n = 0usize;
+            let d = det();
+            let rc = sightline_engine_step(e, 0.1, &d, 1, out.as_mut_ptr(), 4, &mut n);
+            assert_eq!(rc, SIGHTLINE_OK);
+            assert_eq!(n, 1);
+            let mut buf = vec![0 as c_char; 1024];
+            let rc = sightline_track_to_cot_xml(&out[0], 1_700_000_000_000, buf.as_mut_ptr(), 1024);
+            assert_eq!(rc, SIGHTLINE_OK);
+            let s = std::ffi::CStr::from_ptr(buf.as_ptr()).to_str().unwrap();
+            assert!(s.starts_with("<event") && s.contains("version=\"2.0\""));
+            sightline_engine_free(e);
+        }
+    }
 }
