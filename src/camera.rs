@@ -213,7 +213,7 @@ fn diff_ground_attitude(
     pose: &CameraPose,
     p0: [f64; 3],
     g_up: f64,
-) -> Result<([f64; 2], [f64; 2]), CameraError> {
+) -> Result<([f64; 2], [f64; 2], [f64; 2]), CameraError> {
     let eps = 1e-4;
     let mut p_p = *pose;
     p_p.pitch_rad += eps;
@@ -221,9 +221,13 @@ fn diff_ground_attitude(
     let mut p_r = *pose;
     p_r.roll_rad += eps;
     let pt_r = intersect_ground(ray, &p_r, g_up)?;
+    let mut p_y = *pose;
+    p_y.yaw_rad += eps;
+    let pt_y = intersect_ground(ray, &p_y, g_up)?;
     Ok((
         [(pt_p[0] - p0[0]) / eps, (pt_p[1] - p0[1]) / eps],
         [(pt_r[0] - p0[0]) / eps, (pt_r[1] - p0[1]) / eps],
+        [(pt_y[0] - p0[0]) / eps, (pt_y[1] - p0[1]) / eps],
     ))
 }
 
@@ -240,15 +244,20 @@ pub fn estimate_covariance_ce_le(
     let ray = cam.pixel_to_ray(u, v)?;
     let p0 = intersect_ground(ray, pose, g_up)?;
     let (d_u, d_v) = diff_ground_u_v(cam, pose, u, v, p0, g_up)?;
-    let (d_p, d_r) = diff_ground_attitude(ray, pose, p0, g_up)?;
+    let (d_p, d_r, d_y) = diff_ground_attitude(ray, pose, p0, g_up)?;
     let (v_px, v_att) = (px_sig * px_sig, att_sig * att_sig);
-    let var_e =
-        (d_u[0].powi(2) + d_v[0].powi(2)) * v_px + (d_p[0].powi(2) + d_r[0].powi(2)) * v_att;
-    let var_n =
-        (d_u[1].powi(2) + d_v[1].powi(2)) * v_px + (d_p[1].powi(2) + d_r[1].powi(2)) * v_att;
+    let var_e = (d_u[0].powi(2) + d_v[0].powi(2)) * v_px
+        + (d_p[0].powi(2) + d_r[0].powi(2) + d_y[0].powi(2)) * v_att;
+    let var_n = (d_u[1].powi(2) + d_v[1].powi(2)) * v_px
+        + (d_p[1].powi(2) + d_r[1].powi(2) + d_y[1].powi(2)) * v_att;
     let ce90 = 2.146 * (0.5 * (var_e + var_n)).sqrt();
-    let slant = (p0[0].powi(2) + p0[1].powi(2) + (pose.cam_up_m - g_up).powi(2)).sqrt();
-    let le90 = (1.6449 * 0.01 * slant).max(0.5);
+    let r_enu = pose.transform_ray(ray);
+    let var_u = ((pose.cam_up_m - g_up) * (d_u[1].abs() * px_sig + d_p[1].abs() * att_sig)
+        / (-r_enu[2]).max(1e-3))
+    .powi(2)
+        * 1e-4
+        + 0.25;
+    let le90 = 1.6449 * var_u.sqrt();
     Ok((ce90, le90))
 }
 
