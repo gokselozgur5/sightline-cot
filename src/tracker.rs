@@ -166,3 +166,27 @@ impl Track {
         self.time_since_update += 1;
     }
 }
+
+impl Track {
+    /// Compute 2x2 innovation covariance matrix S = H P H^T + R and its determinant.
+    fn compute_s_matrix(&self, r_var: f64) -> ([[f64; 2]; 2], f64) {
+        let s00 = self.p[0][0] + r_var;
+        let s01 = self.p[0][1];
+        let s10 = self.p[1][0];
+        let s11 = self.p[1][1] + r_var;
+        let det = s00 * s11 - s01 * s10;
+        ([[s00, s01], [s10, s11]], det)
+    }
+
+    /// Invert 2x2 innovation matrix S with guard against singularity.
+    fn invert_s(s: [[f64; 2]; 2], det: f64) -> Option<[[f64; 2]; 2]> {
+        if !det.is_finite() || det.abs() < 1e-12 {
+            return None;
+        }
+        let inv_det = 1.0 / det;
+        Some([
+            [s[1][1] * inv_det, -s[0][1] * inv_det],
+            [-s[1][0] * inv_det, s[0][0] * inv_det],
+        ])
+    }
+}
