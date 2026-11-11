@@ -94,7 +94,7 @@ pub struct Track {
 impl Track {
     /// Create a new tentative track initialized from a detection.
     pub fn new(id: u64, det: &Detection) -> Self {
-        let var_xy = (det.ce90_m / 2.146).powi(2).max(1.0);
+        let var_xy = (det.ce90_m / 2.146).powi(2).max(1e-6);
         let mut p = [[0.0; 4]; 4];
         p[0][0] = var_xy;
         p[1][1] = var_xy;
