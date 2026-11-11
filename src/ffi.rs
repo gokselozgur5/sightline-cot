@@ -13,6 +13,12 @@ pub const SIGHTLINE_ERR_BUFFER: i32 = -3;
 pub const SIGHTLINE_ERR_PANIC: i32 = -4;
 pub const SIGHTLINE_ERR_CAMERA: i32 = -5;
 pub const SIGHTLINE_ERR_TRACKER: i32 = -6;
+/// CoT sentinel for an unknown error value.
+pub const SIGHTLINE_UNKNOWN_ERROR_M: f64 = 9_999_999.0;
+pub const SIGHTLINE_STATUS_TENTATIVE: u32 = 0;
+pub const SIGHTLINE_STATUS_CONFIRMED: u32 = 1;
+pub const SIGHTLINE_STATUS_COASTING: u32 = 2;
+pub const SIGHTLINE_STATUS_DELETED: u32 = 3;
 
 fn guard<F: FnOnce() -> i32>(f: F) -> i32 {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).unwrap_or(SIGHTLINE_ERR_PANIC)
