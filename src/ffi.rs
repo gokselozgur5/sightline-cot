@@ -520,8 +520,8 @@ mod tests {
         let (d, mut out, mut n) = (det(), [SightlineTrackC::default(); 2], 0usize);
         unsafe {
             let e = sightline_engine_new(&c);
-            sightline_engine_step(e, 0.1, &d, 1, std::ptr::null_mut(), 0, &mut n);
-            assert_eq!(n, 1);
+            let rc = sightline_engine_step(e, 0.1, &d, 1, std::ptr::null_mut(), 0, &mut n);
+            assert_eq!((rc, n), (SIGHTLINE_ERR_BUFFER, 1));
             let rc = sightline_engine_step(e, 0.1, &d, 1, out.as_mut_ptr(), 2, &mut n);
             assert_eq!((rc, n, out[0].id), (SIGHTLINE_OK, 1, 1));
             assert!((out[0].lat_deg - 37.0).abs() < 0.01 && (out[0].lon_deg + 122.0).abs() < 0.01);
