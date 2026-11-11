@@ -399,3 +399,31 @@ mod tests_calendar {
         assert_eq!(parse_iso8601_utc(&neg_ts).unwrap(), neg_ms);
     }
 }
+#[cfg(test)]
+mod tests_escape {
+    use super::*;
+
+    #[test]
+    fn test_xml_injection_escaping() {
+        let event = CotEvent {
+            uid: "TARGET-1&<>'\"".into(),
+            cot_type: "a-f-G-U-C\"".into(),
+            how: "m-g&".into(),
+            time_ms: 1000,
+            stale_ms: 2000,
+            lat_deg: 41.0123456,
+            lon_deg: 28.9765432,
+            hae_m: 100.5,
+            ce_m: 10.0,
+            le_m: 15.0,
+            course_deg: 180.0,
+            speed_mps: 25.0,
+        };
+        let xml = event.to_xml();
+        assert!(xml.contains("&amp;&lt;&gt;&apos;&quot;"));
+        let parsed = CotEvent::from_xml(&xml).expect("roundtrip parse");
+        assert_eq!(parsed.uid, "TARGET-1&<>'\"");
+        assert_eq!(parsed.cot_type, "a-f-G-U-C\"");
+        assert_eq!(parsed.how, "m-g&");
+    }
+}
