@@ -530,4 +530,16 @@ mod tests {
             sightline_engine_free(e);
         }
     }
+    #[test]
+    fn test_misaligned_cfg_and_track_rejected() {
+        let words = [0u64; 40];
+        let bad = (words.as_ptr() as *const u8).wrapping_add(1);
+        let mut buf = [0 as c_char; 8];
+        unsafe {
+            assert!(sightline_engine_new(bad as *const SightlineCameraCfg).is_null());
+            let rc =
+                sightline_track_to_cot_xml(bad as *const SightlineTrackC, 0, buf.as_mut_ptr(), 8);
+            assert_eq!(rc, SIGHTLINE_ERR_INVALID);
+        }
+    }
 }
