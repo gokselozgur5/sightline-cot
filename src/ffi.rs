@@ -134,6 +134,18 @@ fn all_finite(c: &SightlineCameraCfg) -> bool {
     f.iter().all(|x| x.is_finite())
 }
 
+fn cfg_valid(c: &SightlineCameraCfg) -> bool {
+    let ranges = c.ref_lat_deg.abs() <= 90.0 && c.ref_lon_deg.abs() <= 180.0;
+    let signs = c.pixel_sigma_px >= 0.0 && c.attitude_sigma_rad >= 0.0 && c.q_acc >= 0.0;
+    all_finite(c)
+        && ranges
+        && signs
+        && c.fx > 0.0
+        && c.fy > 0.0
+        && c.min_hits > 0
+        && (c.is_fisheye == 0 || c.is_fisheye == 1)
+}
+
 fn build_engine(c: &SightlineCameraCfg) -> Option<SightlineEngine> {
     let ok = c.fx.is_finite() && c.fy.is_finite() && c.fx > 0.0 && c.fy > 0.0;
     if !ok || c.min_hits == 0 || !c.q_acc.is_finite() || c.q_acc < 0.0 {
