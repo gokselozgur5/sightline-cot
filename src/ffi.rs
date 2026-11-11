@@ -211,3 +211,23 @@ fn to_track_c(eng: &SightlineEngine, t: &Track) -> SightlineTrackC {
         status: t.status as u32,
     }
 }
+
+fn engine_step(
+    eng: &mut SightlineEngine,
+    dt_s: f64,
+    dets: &[SightlineDetectionC],
+) -> Result<Vec<SightlineTrackC>, i32> {
+    let mut v = Vec::with_capacity(dets.len());
+    for d in dets {
+        v.push(to_detection(eng, d)?);
+    }
+    eng.tracker
+        .step(dt_s, &v)
+        .map_err(|_| SIGHTLINE_ERR_TRACKER)?;
+    Ok(eng
+        .tracker
+        .tracks
+        .iter()
+        .map(|t| to_track_c(eng, t))
+        .collect())
+}
