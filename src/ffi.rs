@@ -170,7 +170,7 @@ pub unsafe extern "C" fn sightline_engine_new(
     cfg: *const SightlineCameraCfg,
 ) -> *mut SightlineEngine {
     let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        if cfg.is_null() {
+        if cfg.is_null() || !cfg.is_aligned() {
             return std::ptr::null_mut();
         }
         match build_engine(&*cfg) {
