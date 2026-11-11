@@ -268,3 +268,19 @@ impl Track {
         Ok(())
     }
 }
+
+/// Multi-target 3D tracker managing track lifecycle and data association.
+#[derive(Debug, Clone)]
+pub struct MultiTargetTracker {
+    next_id: u64,
+    pub tracks: Vec<Track>,
+    pub min_hits: usize,
+    pub max_age: usize,
+    pub q_acc: f64,
+}
+
+impl Default for MultiTargetTracker {
+    fn default() -> Self {
+        Self::new(3, 5, 2.0)
+    }
+}
