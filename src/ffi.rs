@@ -147,8 +147,7 @@ fn cfg_valid(c: &SightlineCameraCfg) -> bool {
 }
 
 fn build_engine(c: &SightlineCameraCfg) -> Option<SightlineEngine> {
-    let ok = c.fx.is_finite() && c.fy.is_finite() && c.fx > 0.0 && c.fy > 0.0;
-    if !ok || c.min_hits == 0 || !c.q_acc.is_finite() || c.q_acc < 0.0 {
+    if !cfg_valid(c) {
         return None;
     }
     let tracker = MultiTargetTracker::new(c.min_hits as usize, c.max_age as usize, c.q_acc);
