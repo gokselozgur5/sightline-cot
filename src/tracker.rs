@@ -173,6 +173,7 @@ impl Track {
         self.p[1][3] += dt3 * q_acc;
         self.p[3][1] += dt3 * q_acc;
         self.p[3][3] += dt2 * q_acc;
+        self.symmetrize_p();
         self.age += 1;
         self.time_since_update += 1;
     }
