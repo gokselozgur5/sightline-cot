@@ -17,3 +17,29 @@ pub const SIGHTLINE_ERR_TRACKER: i32 = -6;
 fn guard<F: FnOnce() -> i32>(f: F) -> i32 {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).unwrap_or(SIGHTLINE_ERR_PANIC)
 }
+
+/// Camera, pose, geodetic origin and tracker parameters.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct SightlineCameraCfg {
+    pub fx: f64,
+    pub fy: f64,
+    pub cx: f64,
+    pub cy: f64,
+    pub k1: f64,
+    pub k2: f64,
+    pub is_fisheye: i32,
+    pub roll_rad: f64,
+    pub pitch_rad: f64,
+    pub yaw_rad: f64,
+    pub cam_up_m: f64,
+    pub ground_up_m: f64,
+    pub pixel_sigma_px: f64,
+    pub attitude_sigma_rad: f64,
+    pub ref_lat_deg: f64,
+    pub ref_lon_deg: f64,
+    pub ref_hae_m: f64,
+    pub min_hits: u32,
+    pub max_age: u32,
+    pub q_acc: f64,
+}
