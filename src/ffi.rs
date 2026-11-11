@@ -376,4 +376,26 @@ mod tests {
             sightline_engine_free(e);
         }
     }
+
+    #[test]
+    fn test_null_and_invalid_rejection() {
+        unsafe {
+            assert!(sightline_engine_new(std::ptr::null()).is_null());
+            let mut bad = cfg();
+            bad.fx = f64::NAN;
+            assert!(sightline_engine_new(&bad).is_null());
+            let mut n = 0usize;
+            let rc = sightline_engine_step(
+                std::ptr::null_mut(),
+                0.1,
+                std::ptr::null(),
+                0,
+                std::ptr::null_mut(),
+                0,
+                &mut n,
+            );
+            assert_eq!(rc, SIGHTLINE_ERR_NULL);
+            sightline_engine_free(std::ptr::null_mut());
+        }
+    }
 }
