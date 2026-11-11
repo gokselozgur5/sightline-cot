@@ -2,6 +2,7 @@
 
 pub mod camera;
 pub mod cot;
+pub mod ffi;
 pub mod tracker;
 
 pub const VERSION: &str = "0.1.0";
