@@ -69,3 +69,29 @@ impl SyntheticTarget {
     }
 }
 
+fn init_scenario() -> Vec<SyntheticTarget> {
+    vec![
+        SyntheticTarget {
+            east_m: 100.0,
+            north_m: 150.0,
+            vel_e: 12.0,
+            vel_n: 8.0,
+            raw_emb: [1.0, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
+        },
+        SyntheticTarget {
+            east_m: -80.0,
+            north_m: 100.0,
+            vel_e: -5.0,
+            vel_n: 15.0,
+            raw_emb: [0.0, 1.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0],
+        },
+        SyntheticTarget {
+            east_m: 50.0,
+            north_m: -100.0,
+            vel_e: 2.0,
+            vel_n: -10.0,
+            raw_emb: [0.2, 0.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.0],
+        },
+    ]
+}
+
