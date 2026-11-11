@@ -465,4 +465,19 @@ mod tests {
         assert!((cosine_distance(&e1, &e1) - 0.0).abs() < 1e-6);
         assert!((cosine_distance(&e1, &e2) - 1.0).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_velocity_convergence_on_linear_trajectory() {
+        let mut tracker = MultiTargetTracker::new(2, 3, 0.5);
+        let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        for i in 0..10 {
+            let det = dummy_det(i as f64 * 5.0, i as f64 * 10.0, emb);
+            tracker.step(1.0, &[det]).unwrap();
+        }
+        assert_eq!(tracker.tracks.len(), 1);
+        let trk = &tracker.tracks[0];
+        assert_eq!(trk.status, TrackStatus::Confirmed);
+        assert!((trk.x[2] - 5.0).abs() < 0.5);
+        assert!((trk.x[3] - 10.0).abs() < 0.5);
+    }
 }
