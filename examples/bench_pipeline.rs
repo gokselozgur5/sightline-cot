@@ -226,3 +226,20 @@ fn main() {
     verify_tracks(&tracker, &targets);
 }
 
+fn verify_tracks(tracker: &MultiTargetTracker, targets: &[SyntheticTarget]) {
+    let confirmed: Vec<&Track> = tracker
+        .tracks
+        .iter()
+        .filter(|t| t.status == TrackStatus::Confirmed)
+        .collect();
+    println!("Confirmed tracks : {}", confirmed.len());
+    assert_eq!(confirmed.len(), targets.len(), "confirmed track count");
+    for tgt in targets {
+        let err = confirmed
+            .iter()
+            .map(|t| (t.x[0] - tgt.east_m).hypot(t.x[1] - tgt.north_m))
+            .fold(f64::MAX, f64::min);
+        println!("Final track error: {err:.3} m");
+        assert!(err < 2.0, "track diverged from synthetic truth: {err} m");
+    }
+}
