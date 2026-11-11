@@ -59,3 +59,31 @@ fn make_detection(
         embedding,
     }
 }
+
+fn convert_track_to_cot(
+    trk: &Track,
+    ref_lat: f64,
+    ref_lon: f64,
+    ref_alt: f64,
+    time_ms: i64,
+) -> CotEvent {
+    let (lat_deg, lon_deg, hae_m) =
+        enu_to_geodetic([trk.x[0], trk.x[1], trk.hae_m], ref_lat, ref_lon, ref_alt);
+    let speed_mps = (trk.x[2].powi(2) + trk.x[3].powi(2)).sqrt();
+    let course_deg = trk.x[2].atan2(trk.x[3]).to_degrees().rem_euclid(360.0);
+
+    CotEvent {
+        uid: format!("TRACK-{}", trk.id),
+        cot_type: "a-f-G-E-V".into(),
+        how: "m-g".into(),
+        time_ms,
+        stale_ms: time_ms + 10_000,
+        lat_deg,
+        lon_deg,
+        hae_m,
+        ce_m: (trk.p[0][0].sqrt() * 2.146).max(1.0),
+        le_m: 5.0,
+        course_deg,
+        speed_mps,
+    }
+}
