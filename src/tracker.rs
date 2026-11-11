@@ -491,4 +491,24 @@ mod tests {
         tracker.step(1.0, &[outlier]).unwrap();
         assert_eq!(tracker.tracks.len(), 2);
     }
+
+    #[test]
+    fn test_reid_coasting_recovery() {
+        let mut tracker = MultiTargetTracker::new(2, 4, 0.5);
+        let emb = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        tracker.step(1.0, &[dummy_det(0.0, 0.0, emb)]).unwrap();
+        tracker.step(1.0, &[dummy_det(5.0, 5.0, emb)]).unwrap();
+        tracker.step(1.0, &[]).unwrap();
+        assert_eq!(tracker.tracks[0].status, TrackStatus::Coasting);
+        let mut det_jump = dummy_det(15.0, 15.0, emb);
+        det_jump.bbox = BoundingBox {
+            x1: 200.0,
+            y1: 200.0,
+            x2: 240.0,
+            y2: 240.0,
+        };
+        tracker.step(1.0, &[det_jump]).unwrap();
+        assert_eq!(tracker.tracks.len(), 1);
+        assert_eq!(tracker.tracks[0].status, TrackStatus::Confirmed);
+    }
 }
