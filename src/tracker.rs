@@ -19,3 +19,12 @@ impl std::fmt::Display for TrackerError {
 }
 
 impl std::error::Error for TrackerError {}
+
+/// 2D bounding box in pixel coordinates.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BoundingBox {
+    pub x1: f64,
+    pub y1: f64,
+    pub x2: f64,
+    pub y2: f64,
+}
