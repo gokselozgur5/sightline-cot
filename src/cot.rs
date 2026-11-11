@@ -188,3 +188,16 @@ pub fn parse_iso8601_utc(s: &str) -> Result<i64, CotError> {
     let total_secs = days * 86400 + h as i64 * 3600 + min as i64 * 60 + sec as i64;
     Ok(total_secs * 1000 + ms as i64)
 }
+fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
+    let open_pat = format!("<{tag}");
+    let start = xml.find(&open_pat)?;
+    let end = xml[start..].find('>')? + start;
+    Some(&xml[start..=end])
+}
+
+fn find_attr_in_tag<'a>(tag_str: &'a str, attr: &str) -> Option<&'a str> {
+    let needle = format!(" {attr}=\"");
+    let start = tag_str.find(&needle)? + needle.len();
+    let end = tag_str[start..].find('"')? + start;
+    Some(&tag_str[start..end])
+}
