@@ -251,3 +251,19 @@ fn parse_opt_f64_attr(
         }
     }
 }
+fn parse_event_header(ev_tag: &str) -> Result<(String, String, String, i64, i64), CotError> {
+    let uid = unescape_xml_attr(
+        find_attr_in_tag(ev_tag, "uid").ok_or(CotError::MissingAttribute("uid"))?,
+    );
+    let cot_type = unescape_xml_attr(
+        find_attr_in_tag(ev_tag, "type").ok_or(CotError::MissingAttribute("type"))?,
+    );
+    let how = unescape_xml_attr(
+        find_attr_in_tag(ev_tag, "how").ok_or(CotError::MissingAttribute("how"))?,
+    );
+    let time_str = find_attr_in_tag(ev_tag, "time").ok_or(CotError::MissingAttribute("time"))?;
+    let stale_str = find_attr_in_tag(ev_tag, "stale").ok_or(CotError::MissingAttribute("stale"))?;
+    let time_ms = parse_iso8601_utc(time_str)?;
+    let stale_ms = parse_iso8601_utc(stale_str)?;
+    Ok((uid, cot_type, how, time_ms, stale_ms))
+}
