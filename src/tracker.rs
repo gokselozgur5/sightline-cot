@@ -181,7 +181,7 @@ impl Track {
 
     /// Invert 2x2 innovation matrix S with guard against singularity.
     fn invert_s(s: [[f64; 2]; 2], det: f64) -> Option<[[f64; 2]; 2]> {
-        if !det.is_finite() || det.abs() < 1e-12 {
+        if !det.is_finite() || det <= 1e-12 || s[0][0] <= 0.0 || s[1][1] <= 0.0 {
             return None;
         }
         let inv_det = 1.0 / det;
