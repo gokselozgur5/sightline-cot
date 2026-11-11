@@ -79,6 +79,7 @@ impl Intrinsics {
 }
 
 impl Intrinsics {
+    #[allow(clippy::too_many_arguments)]
     fn unproject_fisheye(
         u: f64,
         v: f64,
@@ -130,6 +131,7 @@ pub struct CameraPose {
     pub cam_up_m: f64,
 }
 
+#[allow(clippy::needless_range_loop)]
 fn mat3_mult(a: [[f64; 3]; 3], b: [[f64; 3]; 3]) -> [[f64; 3]; 3] {
     let mut out = [[0.0; 3]; 3];
     for i in 0..3 {
