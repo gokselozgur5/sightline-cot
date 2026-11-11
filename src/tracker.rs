@@ -247,3 +247,24 @@ impl Track {
         self.p = p_new;
     }
 }
+
+impl Track {
+    /// Perform Joseph-form stabilized covariance and state update.
+    pub fn update(&mut self, det: &Detection) -> Result<(), TrackerError> {
+        let r_var = (det.ce90_m / 2.146).powi(2).max(1.0);
+        let (s, det_s) = self.compute_s_matrix(r_var);
+        let s_inv = Self::invert_s(s, det_s).ok_or(TrackerError::NonFiniteInput)?;
+        let k = self.compute_kalman_gain(s_inv);
+        let y = [det.east_m - self.x[0], det.north_m - self.x[1]];
+        for i in 0..4 {
+            self.x[i] += k[i][0] * y[0] + k[i][1] * y[1];
+        }
+        self.apply_joseph_update(k, r_var);
+        self.hae_m = 0.8 * self.hae_m + 0.2 * det.hae_m;
+        self.bbox = det.bbox;
+        self.embedding = det.embedding;
+        self.hits += 1;
+        self.time_since_update = 0;
+        Ok(())
+    }
+}
