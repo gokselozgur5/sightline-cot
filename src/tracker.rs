@@ -477,7 +477,10 @@ impl MultiTargetTracker {
         let (matches, unmatched_tracks, unmatched_dets) = self.associate(detections);
         self.update_tracks(matches, unmatched_tracks, detections)?;
         for d_idx in unmatched_dets {
-            let trk = Track::new(self.next_id, &detections[d_idx]);
+            let mut trk = Track::new(self.next_id, &detections[d_idx]);
+            if trk.hits >= self.min_hits {
+                trk.status = TrackStatus::Confirmed;
+            }
             self.next_id += 1;
             self.tracks.push(trk);
         }
