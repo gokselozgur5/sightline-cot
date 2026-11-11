@@ -103,3 +103,20 @@ impl Intrinsics {
         Ok([x_d * scale, y_d * scale, theta.cos()])
     }
 }
+
+impl Intrinsics {
+    /// Back-project a pixel coordinate (u, v) into a unit camera-frame ray.
+    pub fn pixel_to_ray(&self, u: f64, v: f64) -> Result<[f64; 3], CameraError> {
+        match *self {
+            Self::Pinhole { fx, fy, cx, cy } => Self::unproject_pinhole(u, v, fx, fy, cx, cy),
+            Self::EquidistantFisheye {
+                fx,
+                fy,
+                cx,
+                cy,
+                k1,
+                k2,
+            } => Self::unproject_fisheye(u, v, fx, fy, cx, cy, k1, k2),
+        }
+    }
+}
