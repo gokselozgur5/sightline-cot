@@ -338,4 +338,19 @@ mod tests {
         let len = (ray_off[0].powi(2) + ray_off[1].powi(2) + ray_off[2].powi(2)).sqrt();
         assert!((len - 1.0).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_nadir_ground_intersection() {
+        let pose = CameraPose {
+            roll_rad: 0.0,
+            pitch_rad: 0.0,
+            yaw_rad: 0.0,
+            cam_up_m: 100.0,
+        };
+        let ray_cam = [0.0, 0.0, 1.0];
+        let pt = intersect_ground(ray_cam, &pose, 0.0).unwrap();
+        assert!(pt[0].abs() < 1e-9);
+        assert!(pt[1].abs() < 1e-9);
+        assert!(pt[2].abs() < 1e-9);
+    }
 }
