@@ -381,4 +381,32 @@ mod tests {
         .sqrt();
         assert!(err < 1e-4);
     }
+
+    #[test]
+    fn test_ce90_le90_growth_with_slant_range() {
+        let cam = Intrinsics::Pinhole {
+            fx: 1000.0,
+            fy: 1000.0,
+            cx: 500.0,
+            cy: 500.0,
+        };
+        let pose1 = CameraPose {
+            roll_rad: 0.0,
+            pitch_rad: 0.2,
+            yaw_rad: 0.0,
+            cam_up_m: 50.0,
+        };
+        let pose2 = CameraPose {
+            roll_rad: 0.0,
+            pitch_rad: 0.2,
+            yaw_rad: 0.0,
+            cam_up_m: 200.0,
+        };
+        let (ce1, le1) =
+            estimate_covariance_ce_le(&cam, &pose1, 500.0, 500.0, 0.0, 1.0, 0.001).unwrap();
+        let (ce2, le2) =
+            estimate_covariance_ce_le(&cam, &pose2, 500.0, 500.0, 0.0, 1.0, 0.001).unwrap();
+        assert!(ce2 > ce1);
+        assert!(le2 > le1);
+    }
 }
