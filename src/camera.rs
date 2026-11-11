@@ -205,3 +205,22 @@ fn diff_ground_u_v(
         [2.0 * (p_v[0] - p0[0]), 2.0 * (p_v[1] - p0[1])],
     ))
 }
+
+fn diff_ground_attitude(
+    ray: [f64; 3],
+    pose: &CameraPose,
+    p0: [f64; 3],
+    g_up: f64,
+) -> Result<([f64; 2], [f64; 2]), CameraError> {
+    let eps = 1e-4;
+    let mut p_p = *pose;
+    p_p.pitch_rad += eps;
+    let pt_p = intersect_ground(ray, &p_p, g_up)?;
+    let mut p_r = *pose;
+    p_r.roll_rad += eps;
+    let pt_r = intersect_ground(ray, &p_r, g_up)?;
+    Ok((
+        [(pt_p[0] - p0[0]) / eps, (pt_p[1] - p0[1]) / eps],
+        [(pt_r[0] - p0[0]) / eps, (pt_r[1] - p0[1]) / eps],
+    ))
+}
