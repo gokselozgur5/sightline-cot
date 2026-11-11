@@ -128,3 +128,15 @@ fn mat4_mul(a: [[f64; 4]; 4], b: [[f64; 4]; 4]) -> [[f64; 4]; 4] {
     }
     out
 }
+
+impl Track {
+    fn transition_matrix(dt_s: f64) -> [[f64; 4]; 4] {
+        let mut f = [[0.0; 4]; 4];
+        for i in 0..4 {
+            f[i][i] = 1.0;
+        }
+        f[0][2] = dt_s;
+        f[1][3] = dt_s;
+        f
+    }
+}
