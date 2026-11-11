@@ -603,6 +603,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(clippy::needless_range_loop)]
     fn test_covariance_symmetry_after_cycles() {
         let mut tracker = MultiTargetTracker::default();
         let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
