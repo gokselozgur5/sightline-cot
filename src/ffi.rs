@@ -485,4 +485,17 @@ mod tests {
         c.is_fisheye = 2;
         assert!(unsafe { sightline_engine_new(&c) }.is_null());
     }
+    #[test]
+    fn test_nan_pixel_is_skipped_not_fatal() {
+        let c = cfg();
+        let mut d = det();
+        d.u = f64::NAN;
+        let (mut out, mut n) = ([SightlineTrackC::default(); 2], 9usize);
+        unsafe {
+            let e = sightline_engine_new(&c);
+            let rc = sightline_engine_step(e, 0.1, &d, 1, out.as_mut_ptr(), 2, &mut n);
+            assert_eq!((rc, n), (SIGHTLINE_OK, 0));
+            sightline_engine_free(e);
+        }
+    }
 }
