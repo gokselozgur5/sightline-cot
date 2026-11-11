@@ -201,3 +201,28 @@ fn find_attr_in_tag<'a>(tag_str: &'a str, attr: &str) -> Option<&'a str> {
     let end = tag_str[start..].find('"')? + start;
     Some(&tag_str[start..end])
 }
+impl CotEvent {
+    /// Serialize CotEvent into canonical CoT 2.0 XML.
+    pub fn to_xml(&self) -> String {
+        let time_str = format_iso8601_utc(self.time_ms);
+        let stale_str = format_iso8601_utc(self.stale_ms);
+        format!(
+            "<event version=\"2.0\" uid=\"{}\" type=\"{}\" how=\"{}\" time=\"{}\" start=\"{}\" stale=\"{}\">\
+<point lat=\"{:.7}\" lon=\"{:.7}\" hae=\"{:.2}\" ce=\"{:.2}\" le=\"{:.2}\"/>\
+<detail><track course=\"{:.2}\" speed=\"{:.2}\"/></detail></event>",
+            escape_xml_attr(&self.uid),
+            escape_xml_attr(&self.cot_type),
+            escape_xml_attr(&self.how),
+            time_str,
+            time_str,
+            stale_str,
+            self.lat_deg,
+            self.lon_deg,
+            self.hae_m,
+            self.ce_m,
+            self.le_m,
+            self.course_deg,
+            self.speed_mps,
+        )
+    }
+}
