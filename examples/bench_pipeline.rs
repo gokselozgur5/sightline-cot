@@ -130,3 +130,23 @@ fn pregenerate(targets: &mut [SyntheticTarget], cam: &Intrinsics) -> Vec<Vec<Obs
     frames
 }
 
+fn detect(o: &Observation, cam: &Intrinsics, pose: &CameraPose) -> Option<Detection> {
+    let ray = cam.pixel_to_ray(o.u, o.v).ok()?;
+    let ground_pt = intersect_ground(ray, pose, 0.0).ok()?;
+    let (ce90, le90) = estimate_covariance_ce_le(cam, pose, o.u, o.v, 0.0, 1.0, 0.001).ok()?;
+    Some(Detection {
+        east_m: ground_pt[0],
+        north_m: ground_pt[1],
+        hae_m: ground_pt[2],
+        ce90_m: ce90,
+        le90_m: le90,
+        bbox: BoundingBox {
+            x1: o.u - 16.0,
+            y1: o.v - 16.0,
+            x2: o.u + 16.0,
+            y2: o.v + 16.0,
+        },
+        embedding: o.emb,
+    })
+}
+
