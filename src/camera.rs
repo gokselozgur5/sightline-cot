@@ -196,8 +196,17 @@ pub fn intersect_ground(
     pose: &CameraPose,
     ground_up_m: f64,
 ) -> Result<[f64; 3], CameraError> {
+    if !ray_cam.iter().all(|x| x.is_finite())
+        || !pose.roll_rad.is_finite()
+        || !pose.pitch_rad.is_finite()
+        || !pose.yaw_rad.is_finite()
+        || !pose.cam_up_m.is_finite()
+        || !ground_up_m.is_finite()
+    {
+        return Err(CameraError::InvalidParameters);
+    }
     let ray_enu = pose.transform_ray(ray_cam);
-    if ray_enu[2] >= -1e-6 {
+    if !ray_enu[2].is_finite() || ray_enu[2] >= -1e-6 {
         return Err(CameraError::RayAboveHorizon);
     }
     let delta_h = ground_up_m - pose.cam_up_m;
