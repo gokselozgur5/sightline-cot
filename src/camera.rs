@@ -224,3 +224,28 @@ fn diff_ground_attitude(
         [(pt_r[0] - p0[0]) / eps, (pt_r[1] - p0[1]) / eps],
     ))
 }
+
+/// Estimate 90% Circular Error (CE90) and Linear Error (LE90) in meters.
+pub fn estimate_covariance_ce_le(
+    cam: &Intrinsics,
+    pose: &CameraPose,
+    u: f64,
+    v: f64,
+    g_up: f64,
+    px_sig: f64,
+    att_sig: f64,
+) -> Result<(f64, f64), CameraError> {
+    let ray = cam.pixel_to_ray(u, v)?;
+    let p0 = intersect_ground(ray, pose, g_up)?;
+    let (d_u, d_v) = diff_ground_u_v(cam, pose, u, v, p0, g_up)?;
+    let (d_p, d_r) = diff_ground_attitude(ray, pose, p0, g_up)?;
+    let (v_px, v_att) = (px_sig * px_sig, att_sig * att_sig);
+    let var_e =
+        (d_u[0].powi(2) + d_v[0].powi(2)) * v_px + (d_p[0].powi(2) + d_r[0].powi(2)) * v_att;
+    let var_n =
+        (d_u[1].powi(2) + d_v[1].powi(2)) * v_px + (d_p[1].powi(2) + d_r[1].powi(2)) * v_att;
+    let ce90 = 2.146 * (0.5 * (var_e + var_n)).sqrt();
+    let slant = (p0[0].powi(2) + p0[1].powi(2) + (pose.cam_up_m - g_up).powi(2)).sqrt();
+    let le90 = (1.6449 * 0.01 * slant).max(0.5);
+    Ok((ce90, le90))
+}
