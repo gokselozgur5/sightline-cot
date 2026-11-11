@@ -226,3 +226,28 @@ impl CotEvent {
         )
     }
 }
+fn parse_f64_attr(tag_str: &str, attr: &'static str) -> Result<f64, CotError> {
+    let val = find_attr_in_tag(tag_str, attr).ok_or(CotError::MissingAttribute(attr))?;
+    let num: f64 = val.parse().map_err(|_| CotError::InvalidNumber(attr))?;
+    if !num.is_finite() {
+        return Err(CotError::InvalidNumber(attr));
+    }
+    Ok(num)
+}
+
+fn parse_opt_f64_attr(
+    tag_str: Option<&str>,
+    attr: &'static str,
+    def: f64,
+) -> Result<f64, CotError> {
+    match tag_str.and_then(|t| find_attr_in_tag(t, attr)) {
+        None => Ok(def),
+        Some(val) => {
+            let num: f64 = val.parse().map_err(|_| CotError::InvalidNumber(attr))?;
+            if !num.is_finite() {
+                return Err(CotError::InvalidNumber(attr));
+            }
+            Ok(num)
+        }
+    }
+}
