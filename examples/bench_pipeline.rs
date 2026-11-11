@@ -117,3 +117,16 @@ fn observe(tgt: &SyntheticTarget, cam: &Intrinsics) -> Option<Observation> {
     })
 }
 
+fn pregenerate(targets: &mut [SyntheticTarget], cam: &Intrinsics) -> Vec<Vec<Observation>> {
+    let mut frames = Vec::with_capacity(NUM_FRAMES);
+    for _ in 0..NUM_FRAMES {
+        let mut obs = Vec::with_capacity(targets.len());
+        for tgt in targets.iter_mut() {
+            tgt.step(DT_S);
+            obs.extend(observe(tgt, cam));
+        }
+        frames.push(obs);
+    }
+    frames
+}
+
