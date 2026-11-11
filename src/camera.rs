@@ -77,3 +77,29 @@ impl Intrinsics {
         Ok([x / norm, y / norm, 1.0 / norm])
     }
 }
+
+impl Intrinsics {
+    fn unproject_fisheye(
+        u: f64,
+        v: f64,
+        fx: f64,
+        fy: f64,
+        cx: f64,
+        cy: f64,
+        k1: f64,
+        k2: f64,
+    ) -> Result<[f64; 3], CameraError> {
+        if fx <= 0.0 || fy <= 0.0 {
+            return Err(CameraError::InvalidParameters);
+        }
+        let x_d = (u - cx) / fx;
+        let y_d = (v - cy) / fy;
+        let r_d = (x_d * x_d + y_d * y_d).sqrt();
+        if r_d < 1e-12 {
+            return Ok([0.0, 0.0, 1.0]);
+        }
+        let theta = Self::invert_equidistant(r_d, k1, k2)?;
+        let scale = theta.sin() / r_d;
+        Ok([x_d * scale, y_d * scale, theta.cos()])
+    }
+}
