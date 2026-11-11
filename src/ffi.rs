@@ -145,3 +145,11 @@ pub unsafe extern "C" fn sightline_engine_free(e: *mut SightlineEngine) {
         let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| drop(Box::from_raw(e))));
     }
 }
+
+fn locate(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<[f64; 3], i32> {
+    let ray = eng
+        .cam
+        .pixel_to_ray(d.u, d.v)
+        .map_err(|_| SIGHTLINE_ERR_CAMERA)?;
+    intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m).map_err(|_| SIGHTLINE_ERR_CAMERA)
+}
