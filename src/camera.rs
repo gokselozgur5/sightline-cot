@@ -292,3 +292,14 @@ fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
     let hae_m = p / lat_rad.cos() - n;
     (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
 }
+
+/// Convert local ENU offset from reference WGS84 origin to Geodetic (lat, lon, hae).
+pub fn enu_to_geodetic(
+    enu_m: [f64; 3],
+    ref_lat_deg: f64,
+    ref_lon_deg: f64,
+    ref_hae_m: f64,
+) -> (f64, f64, f64) {
+    let ecef = enu_to_ecef(enu_m, ref_lat_deg, ref_lon_deg, ref_hae_m);
+    ecef_to_geodetic(ecef[0], ecef[1], ecef[2])
+}
