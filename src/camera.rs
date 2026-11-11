@@ -267,3 +267,14 @@ fn geodetic_to_ecef(lat_deg: f64, lon_deg: f64, hae_m: f64) -> [f64; 3] {
     let z = (n * (1.0 - WGS84_E2) + hae_m) * s_lat;
     [x, y, z]
 }
+
+fn enu_to_ecef(enu_m: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f64; 3] {
+    let ref_ecef = geodetic_to_ecef(ref_lat, ref_lon, ref_hae);
+    let (s_lat, c_lat) = (ref_lat.to_radians().sin(), ref_lat.to_radians().cos());
+    let (s_lon, c_lon) = (ref_lon.to_radians().sin(), ref_lon.to_radians().cos());
+    let (e, n, u) = (enu_m[0], enu_m[1], enu_m[2]);
+    let dx = -s_lon * e - s_lat * c_lon * n + c_lat * c_lon * u;
+    let dy = c_lon * e - s_lat * s_lon * n + c_lat * s_lon * u;
+    let dz = c_lat * n + s_lat * u;
+    [ref_ecef[0] + dx, ref_ecef[1] + dy, ref_ecef[2] + dz]
+}
