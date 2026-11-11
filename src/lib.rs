@@ -1,6 +1,7 @@
 //! Sightline CoT core library
 
 pub mod camera;
+pub mod cot;
 pub mod tracker;
 
 pub const VERSION: &str = "0.1.0";
