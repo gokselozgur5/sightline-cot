@@ -180,3 +180,21 @@ fn verify_single_target(
     assert!((t.speed_mps - exp_speed).abs() < 5.0);
     assert!((t.course_deg - exp_course).abs() < 15.0);
 }
+
+fn verify_target_geometry(
+    last_per_uid: &HashMap<String, CotEvent>,
+    intr: &Intrinsics,
+    pose: &CameraPose,
+) {
+    assert_eq!(
+        last_per_uid.len(),
+        2,
+        "exactly two confirmed tracks received"
+    );
+
+    let geo1 = compute_expected_geo(960.0 + 9.0 * 2.0, 540.0 + 9.0 * 1.5, intr, pose);
+    verify_single_target(last_per_uid, geo1, 25.0, 126.9);
+
+    let geo2 = compute_expected_geo(800.0 - 9.0 * 1.0, 400.0 + 9.0 * 2.0, intr, pose);
+    verify_single_target(last_per_uid, geo2, 22.4, 206.6);
+}
