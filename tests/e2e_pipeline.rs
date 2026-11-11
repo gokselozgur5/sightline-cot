@@ -156,3 +156,9 @@ fn collect_received_packets(
     }
     last_per_uid
 }
+
+fn compute_expected_geo(px: f64, py: f64, intr: &Intrinsics, pose: &CameraPose) -> (f64, f64, f64) {
+    let ray = intr.pixel_to_ray(px, py).unwrap();
+    let enu = intersect_ground(ray, pose, 0.0).unwrap();
+    enu_to_geodetic([enu[0], enu[1], 10.0], 37.7749, -122.4194, 0.0)
+}
