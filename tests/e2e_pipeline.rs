@@ -225,3 +225,31 @@ fn test_e2e_pixel_to_cot_pipeline() {
         "no residual packets in socket"
     );
 }
+
+fn verify_coasting_and_outlier(
+    tracker: &mut MultiTargetTracker,
+    intr: &Intrinsics,
+    pose: &CameraPose,
+    init_id: u64,
+) {
+    tracker.step(0.1, &[]).expect("missed frame");
+    assert_eq!(tracker.tracks[0].id, init_id);
+    assert_eq!(tracker.tracks[0].status, TrackStatus::Coasting);
+    assert_eq!(tracker.tracks[0].time_since_update, 1);
+    let coasting_snapshot = tracker.tracks[0].clone();
+
+    let outlier = make_detection(100.0, 100.0, intr, pose, 3);
+    tracker
+        .step(0.1, std::slice::from_ref(&outlier))
+        .expect("outlier frame");
+    assert_eq!(
+        tracker.tracks.len(),
+        2,
+        "outlier creates distinct tentative track"
+    );
+    assert_eq!(
+        tracker.tracks[0].hits, coasting_snapshot.hits,
+        "coasting track hits unchanged"
+    );
+    assert_eq!(tracker.tracks[0].time_since_update, 2);
+}
