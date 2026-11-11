@@ -141,3 +141,18 @@ fn run_simulation(
     }
     dispatched
 }
+
+fn collect_received_packets(
+    receiver: &UdpSocket,
+    expected_count: usize,
+) -> HashMap<String, CotEvent> {
+    let mut last_per_uid: HashMap<String, CotEvent> = HashMap::new();
+    let mut buf = [0u8; 2048];
+    for _ in 0..expected_count {
+        let (len, _) = receiver.recv_from(&mut buf).expect("receive udp packet");
+        let xml_str = std::str::from_utf8(&buf[..len]).expect("valid utf8");
+        let parsed = CotEvent::from_xml(xml_str).expect("valid CoT XML");
+        last_per_uid.insert(parsed.uid.clone(), parsed);
+    }
+    last_per_uid
+}
