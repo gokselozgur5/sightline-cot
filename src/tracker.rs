@@ -28,3 +28,20 @@ pub struct BoundingBox {
     pub x2: f64,
     pub y2: f64,
 }
+
+impl BoundingBox {
+    /// Compute Intersection-over-Union (IoU) between two bounding boxes.
+    pub fn iou(&self, other: &BoundingBox) -> f64 {
+        let (ix1, iy1) = (self.x1.max(other.x1), self.y1.max(other.y1));
+        let (ix2, iy2) = (self.x2.min(other.x2), self.y2.min(other.y2));
+        let inter = (ix2 - ix1).max(0.0) * (iy2 - iy1).max(0.0);
+        let a1 = (self.x2 - self.x1).max(0.0) * (self.y2 - self.y1).max(0.0);
+        let a2 = (other.x2 - other.x1).max(0.0) * (other.y2 - other.y1).max(0.0);
+        let union = a1 + a2 - inter;
+        if union > 1e-12 {
+            inter / union
+        } else {
+            0.0
+        }
+    }
+}
