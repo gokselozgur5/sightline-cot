@@ -46,7 +46,7 @@ cargo run --release --example bench_pipeline
 
 The C interface exports `sightline_engine_new`, `sightline_engine_free`, `sightline_engine_step` and `sightline_track_to_cot_xml`, declared in `include/sightline.h`.
 
-Every entry point validates pointers and catches panics, returning `SIGHTLINE_OK` (0) or a negative error code.
+Every entry point validates pointers, alignment, and buffer bounds, catches panics, and returns `SIGHTLINE_OK` (0) or a negative error code.
 
 ## Benchmark
 
