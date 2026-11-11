@@ -48,6 +48,20 @@ The C interface exports `sightline_engine_new`, `sightline_engine_free`, `sightl
 
 Every entry point validates pointers, alignment, and buffer bounds, catches panics, and returns `SIGHTLINE_OK` (0) or a negative error code.
 
+```c
+#include "sightline.h"
+
+int run(void) {
+    SightlineCameraCfg cfg = {
+        .fx = 1000.0, .fy = 1000.0, .cx = 960.0, .cy = 540.0,
+        .cam_up_m = 100.0, .ground_up_m = 0.0,
+        .ref_lat_deg = 37.7749, .ref_lon_deg = -122.4194,
+        .min_hits = 3, .max_age = 5, .q_acc = 1.0
+    };
+    SightlineEngine *e = sightline_engine_new(&cfg);
+    if (!e) return -1;
+
+
 ## Benchmark
 
 Deterministic 10,000-frame, 3-target scenario (pixel, bbox and Re-ID to ground ray, WGS84, Kalman tracker, CoT XML). Scenario synthesis runs outside the timer. Measured with `cargo run --release --example bench_pipeline` on macOS arm64, three consecutive runs.
