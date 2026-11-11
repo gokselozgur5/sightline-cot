@@ -266,6 +266,9 @@ pub fn estimate_covariance_ce_le(
     px_sig: f64,
     att_sig: f64,
 ) -> Result<(f64, f64), CameraError> {
+    if !px_sig.is_finite() || px_sig < 0.0 || !att_sig.is_finite() || att_sig < 0.0 {
+        return Err(CameraError::InvalidParameters);
+    }
     let ray = cam.pixel_to_ray(u, v)?;
     let p0 = intersect_ground(ray, pose, g_up)?;
     let (d_u, d_v) = diff_ground_u_v(cam, pose, u, v, p0, g_up)?;
