@@ -457,4 +457,12 @@ mod tests {
         assert!((b1.iou(&b2) - (50.0 / 150.0)).abs() < 1e-9);
         assert!((b1.iou(&b1) - 1.0).abs() < 1e-9);
     }
+
+    #[test]
+    fn test_cosine_distance() {
+        let e1 = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        let e2 = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        assert!((cosine_distance(&e1, &e1) - 0.0).abs() < 1e-6);
+        assert!((cosine_distance(&e1, &e2) - 1.0).abs() < 1e-6);
+    }
 }
