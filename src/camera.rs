@@ -120,3 +120,12 @@ impl Intrinsics {
         }
     }
 }
+
+/// Camera attitude angles in radians (Tait-Bryan Z-X-Y / ENU frame).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CameraPose {
+    pub roll_rad: f64,
+    pub pitch_rad: f64,
+    pub yaw_rad: f64,
+    pub cam_up_m: f64,
+}
