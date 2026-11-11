@@ -1,5 +1,7 @@
 //! Sightline CoT core library
 
+pub mod camera;
+
 pub const VERSION: &str = "0.1.0";
 
 #[cfg(test)]
