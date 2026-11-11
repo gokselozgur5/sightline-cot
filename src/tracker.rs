@@ -452,6 +452,8 @@ impl MultiTargetTracker {
             self.tracks[t_idx].update(&dets[d_idx])?;
             if self.tracks[t_idx].hits >= self.min_hits {
                 self.tracks[t_idx].status = TrackStatus::Confirmed;
+            } else {
+                self.tracks[t_idx].status = TrackStatus::Tentative;
             }
         }
         for t_idx in unmatched {
