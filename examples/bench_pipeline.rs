@@ -213,3 +213,16 @@ fn main() {
     for (frame_idx, obs) in frames.iter().enumerate() {
         let t0 = Instant::now();
         total_bytes += process_frame(frame_idx, obs, &cam, &pose, &mut tracker);
+        stats.record(t0.elapsed().as_secs_f64() * 1_000_000.0);
+    }
+    let (p50, p99, mean, fps) = stats.compute_metrics();
+    println!("=== Sightline CoT End-to-End Pipeline Benchmark ===");
+    println!("Frames processed : {NUM_FRAMES}");
+    println!("Total CoT output : {total_bytes} bytes");
+    println!("Latency p50      : {p50:.2} us");
+    println!("Latency p99      : {p99:.2} us");
+    println!("Latency Mean     : {mean:.2} us");
+    println!("Throughput       : {fps:.1} fps");
+    verify_tracks(&tracker, &targets);
+}
+
