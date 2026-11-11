@@ -233,6 +233,7 @@ fn diff_ground_u_v(
     ))
 }
 
+#[allow(clippy::type_complexity)]
 fn diff_ground_attitude(
     ray: [f64; 3],
     pose: &CameraPose,
@@ -520,7 +521,7 @@ mod tests {
         let res_nan = cam.pixel_to_ray(f64::NAN, 500.0);
         assert_eq!(res_nan, Err(CameraError::InvalidParameters));
 
-        let (lat_p, lon_p, hae_p) = enu_to_geodetic([0.0, 0.0, 10.0], 90.0, 0.0, 0.0);
+        let (lat_p, _lon_p, hae_p) = enu_to_geodetic([0.0, 0.0, 10.0], 90.0, 0.0, 0.0);
         assert!((lat_p - 90.0).abs() < 1e-4);
         assert!((hae_p - 10.0).abs() < 1e-3);
     }
