@@ -209,3 +209,14 @@ impl Track {
         }
     }
 }
+
+impl Track {
+    fn compute_kalman_gain(&self, s_inv: [[f64; 2]; 2]) -> [[f64; 2]; 4] {
+        let mut k = [[0.0; 2]; 4];
+        for i in 0..4 {
+            k[i][0] = self.p[i][0] * s_inv[0][0] + self.p[i][1] * s_inv[1][0];
+            k[i][1] = self.p[i][0] * s_inv[0][1] + self.p[i][1] * s_inv[1][1];
+        }
+        k
+    }
+}
