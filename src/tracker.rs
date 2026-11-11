@@ -32,6 +32,17 @@ pub struct BoundingBox {
 impl BoundingBox {
     /// Compute Intersection-over-Union (IoU) between two bounding boxes.
     pub fn iou(&self, other: &BoundingBox) -> f64 {
+        if !self.x1.is_finite()
+            || !self.y1.is_finite()
+            || !self.x2.is_finite()
+            || !self.y2.is_finite()
+            || !other.x1.is_finite()
+            || !other.y1.is_finite()
+            || !other.x2.is_finite()
+            || !other.y2.is_finite()
+        {
+            return 0.0;
+        }
         let (ix1, iy1) = (self.x1.max(other.x1), self.y1.max(other.y1));
         let (ix2, iy2) = (self.x2.min(other.x2), self.y2.min(other.y2));
         let inter = (ix2 - ix1).max(0.0) * (iy2 - iy1).max(0.0);
