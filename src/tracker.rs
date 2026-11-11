@@ -75,3 +75,18 @@ pub enum TrackStatus {
     Coasting,
     Deleted,
 }
+
+/// Active 3D Kalman track representation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Track {
+    pub id: u64,
+    pub x: [f64; 4],
+    pub p: [[f64; 4]; 4],
+    pub hae_m: f64,
+    pub bbox: BoundingBox,
+    pub embedding: [f32; 8],
+    pub hits: usize,
+    pub age: usize,
+    pub time_since_update: usize,
+    pub status: TrackStatus,
+}
