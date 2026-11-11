@@ -118,3 +118,30 @@ fn build_engine(c: &SightlineCameraCfg) -> Option<SightlineEngine> {
         tracker,
     })
 }
+
+/// # Safety
+/// `cfg` must be null or point to a valid `SightlineCameraCfg`.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_engine_new(
+    cfg: *const SightlineCameraCfg,
+) -> *mut SightlineEngine {
+    let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        if cfg.is_null() {
+            return std::ptr::null_mut();
+        }
+        match build_engine(&*cfg) {
+            Some(e) => Box::into_raw(Box::new(e)),
+            None => std::ptr::null_mut(),
+        }
+    }));
+    r.unwrap_or(std::ptr::null_mut())
+}
+
+/// # Safety
+/// `e` must be null or a pointer returned by `sightline_engine_new`, freed once.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_engine_free(e: *mut SightlineEngine) {
+    if !e.is_null() {
+        let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| drop(Box::from_raw(e))));
+    }
+}
