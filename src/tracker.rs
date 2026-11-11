@@ -54,3 +54,15 @@ pub fn cosine_distance(a: &[f32; 8], b: &[f32; 8]) -> f64 {
     }
     (1.0 - dot).clamp(0.0, 2.0)
 }
+
+/// Single 3D detection input to the multi-target tracker.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Detection {
+    pub east_m: f64,
+    pub north_m: f64,
+    pub hae_m: f64,
+    pub ce90_m: f64,
+    pub le90_m: f64,
+    pub bbox: BoundingBox,
+    pub embedding: [f32; 8],
+}
