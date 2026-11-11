@@ -328,7 +328,11 @@ fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
     let lat_rad = num.atan2(den);
     let s_lat = lat_rad.sin();
     let n = WGS84_A / (1.0 - WGS84_E2 * s_lat * s_lat).sqrt();
-    let hae_m = p / lat_rad.cos() - n;
+    let hae_m = if p > 1e-6 {
+        p / lat_rad.cos() - n
+    } else {
+        z.abs() - WGS84_B
+    };
     (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
 }
 
