@@ -426,4 +426,22 @@ mod tests {
             + r[0][2] * (r[1][0] * r[2][1] - r[1][1] * r[2][0]);
         assert!((det - 1.0).abs() < 1e-9);
     }
+
+    #[test]
+    fn test_so3_orthogonality() {
+        let pose = CameraPose {
+            roll_rad: -0.2,
+            pitch_rad: 0.4,
+            yaw_rad: 1.1,
+            cam_up_m: 80.0,
+        };
+        let r = pose.rotation_matrix();
+        for i in 0..3 {
+            for j in 0..3 {
+                let dot = (0..3).fold(0.0, |acc, k| acc + r[i][k] * r[j][k]);
+                let exp = if i == j { 1.0 } else { 0.0 };
+                assert!((dot - exp).abs() < 1e-9);
+            }
+        }
+    }
 }
