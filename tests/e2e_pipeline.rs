@@ -7,3 +7,21 @@ use sightline_cot::tracker::{BoundingBox, Detection, MultiTargetTracker, Track, 
 use std::collections::HashMap;
 use std::net::UdpSocket;
 use std::time::Duration;
+
+fn setup_camera() -> (Intrinsics, CameraPose) {
+    let intrinsics = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 960.0,
+        cy: 540.0,
+    };
+
+    let pose = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: 1000.0,
+    };
+
+    (intrinsics, pose)
+}
