@@ -94,3 +94,15 @@ fn days_to_ymd(days_since_epoch: i64) -> (i64, u8, u8) {
     let y = if m <= 2 { y + 1 } else { y };
     (y, m, d)
 }
+/// Format epoch milliseconds into ISO-8601 UTC timestamp `YYYY-MM-DDTHH:MM:SS.mmmZ`.
+pub fn format_iso8601_utc(ms: i64) -> String {
+    let secs = ms.div_euclid(1000);
+    let millis = ms.rem_euclid(1000) as u16;
+    let days = secs.div_euclid(86400);
+    let day_secs = secs.rem_euclid(86400) as u32;
+    let hour = day_secs / 3600;
+    let minute = (day_secs % 3600) / 60;
+    let second = day_secs % 60;
+    let (y, m, d) = days_to_ymd(days);
+    format!("{y:04}-{m:02}-{d:02}T{hour:02}:{minute:02}:{second:02}.{millis:03}Z")
+}
