@@ -315,3 +315,24 @@ impl MultiTargetTracker {
         }
     }
 }
+
+impl MultiTargetTracker {
+    fn find_best_detection(
+        trk: &Track,
+        detections: &[Detection],
+        matched_dets: &[bool],
+    ) -> Option<(usize, f64)> {
+        let mut best: Option<(usize, f64)> = None;
+        for (d_idx, det) in detections.iter().enumerate() {
+            if matched_dets[d_idx] {
+                continue;
+            }
+            if let Some(cost) = Self::score_candidate(trk, det) {
+                if best.is_none() || cost < best.unwrap().1 {
+                    best = Some((d_idx, cost));
+                }
+            }
+        }
+        best
+    }
+}
