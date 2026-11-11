@@ -20,6 +20,10 @@ pub const SIGHTLINE_STATUS_CONFIRMED: u32 = 1;
 pub const SIGHTLINE_STATUS_COASTING: u32 = 2;
 pub const SIGHTLINE_STATUS_DELETED: u32 = 3;
 
+const _: () = assert!(std::mem::size_of::<SightlineCameraCfg>() == 152);
+const _: () = assert!(std::mem::size_of::<SightlineDetectionC>() == 80);
+const _: () = assert!(std::mem::size_of::<SightlineTrackC>() == 72);
+
 fn guard<F: FnOnce() -> i32>(f: F) -> i32 {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).unwrap_or(SIGHTLINE_ERR_PANIC)
 }
