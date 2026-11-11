@@ -257,3 +257,18 @@ unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *
     }
     SIGHTLINE_OK
 }
+
+/// # Safety
+/// Pointers must be null (with zero length) or valid for the stated lengths.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_engine_step(
+    e: *mut SightlineEngine,
+    dt_s: f64,
+    dets: *const SightlineDetectionC,
+    n: usize,
+    out: *mut SightlineTrackC,
+    cap: usize,
+    out_n: *mut usize,
+) -> i32 {
+    guard(|| step_impl((e, dets, n), dt_s, (out, cap, out_n)))
+}
