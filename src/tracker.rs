@@ -297,3 +297,21 @@ impl MultiTargetTracker {
         }
     }
 }
+
+impl MultiTargetTracker {
+    fn score_candidate(trk: &Track, det: &Detection) -> Option<f64> {
+        let d2 = match trk.mahalanobis_d2(det) {
+            Some(v) if v <= 5.991 => v,
+            _ => return None,
+        };
+        let (iou_val, cos_dist) = (
+            trk.bbox.iou(&det.bbox),
+            cosine_distance(&trk.embedding, &det.embedding),
+        );
+        if iou_val >= 0.1 || cos_dist <= 0.4 {
+            Some(d2 + cos_dist)
+        } else {
+            None
+        }
+    }
+}
