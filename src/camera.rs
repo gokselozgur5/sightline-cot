@@ -159,3 +159,15 @@ impl CameraPose {
         mat3_mult(mat3_mult(mat3_mult(r_z, r_x), r_base), r_roll)
     }
 }
+
+impl CameraPose {
+    /// Transform a unit camera-frame ray into ENU coordinates.
+    pub fn transform_ray(&self, ray_cam: [f64; 3]) -> [f64; 3] {
+        let r = self.rotation_matrix();
+        [
+            r[0][0] * ray_cam[0] + r[0][1] * ray_cam[1] + r[0][2] * ray_cam[2],
+            r[1][0] * ray_cam[0] + r[1][1] * ray_cam[1] + r[1][2] * ray_cam[2],
+            r[2][0] * ray_cam[0] + r[2][1] * ray_cam[1] + r[2][2] * ray_cam[2],
+        ]
+    }
+}
