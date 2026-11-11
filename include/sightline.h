@@ -55,6 +55,10 @@ typedef char sightline_assert_trk[(sizeof(SightlineTrackC) == 72) ? 1 : -1];
 
 SightlineEngine *sightline_engine_new(const SightlineCameraCfg *cfg);
 void sightline_engine_free(SightlineEngine *e);
+/* Not thread-safe: use one caller per engine; free exactly once.
+ * step advances the tracker even when SIGHTLINE_ERR_BUFFER is returned;
+ * *out_n then holds the full track count and min(cap, count) reports are
+ * written. Detections that cannot be located are skipped individually. */
 int32_t sightline_engine_step(SightlineEngine *e, double dt_s,
                               const SightlineDetectionC *dets, size_t n,
                               SightlineTrackC *out, size_t cap, size_t *out_n);
