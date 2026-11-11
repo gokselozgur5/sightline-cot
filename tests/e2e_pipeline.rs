@@ -198,3 +198,30 @@ fn verify_target_geometry(
     let geo2 = compute_expected_geo(800.0 - 9.0 * 1.0, 400.0 + 9.0 * 2.0, intr, pose);
     verify_single_target(last_per_uid, geo2, 22.4, 206.6);
 }
+
+#[test]
+fn test_e2e_pixel_to_cot_pipeline() {
+    let (intrinsics, pose) = setup_camera();
+    let mut tracker = MultiTargetTracker::new(2, 5, 1.0);
+    let receiver = UdpSocket::bind("127.0.0.1:0").expect("bind receiver");
+    let recv_addr = receiver.local_addr().expect("receiver addr");
+    receiver
+        .set_read_timeout(Some(Duration::from_secs(2)))
+        .expect("timeout");
+    let dispatcher = CotUdpDispatcher::new("127.0.0.1:0", recv_addr).expect("dispatcher");
+
+    let dispatched = run_simulation(&mut tracker, &dispatcher, &intrinsics, &pose);
+    assert_eq!(
+        dispatched, 18,
+        "expected 2 tracks * 9 confirmed frames = 18 packets"
+    );
+
+    let last_per_uid = collect_received_packets(&receiver, dispatched);
+    verify_target_geometry(&last_per_uid, &intrinsics, &pose);
+
+    let mut buf = [0u8; 128];
+    assert!(
+        receiver.recv_from(&mut buf).is_err(),
+        "no residual packets in socket"
+    );
+}
