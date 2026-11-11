@@ -456,7 +456,7 @@ impl MultiTargetTracker {
 impl MultiTargetTracker {
     /// Execute one prediction, association, update, and pruning cycle.
     pub fn step(&mut self, dt_s: f64, detections: &[Detection]) -> Result<(), TrackerError> {
-        Self::validate_step_inputs(dt_s, detections)?;
+        self.validate_step_inputs(dt_s, detections)?;
         for trk in &mut self.tracks {
             trk.predict(dt_s, self.q_acc);
         }
