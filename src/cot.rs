@@ -115,3 +115,22 @@ fn ymd_to_days(y: i64, m: u8, d: u8) -> i64 {
     let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
     era * 146097 + doe as i64 - 719468
 }
+fn parse_date_part(s: &str) -> Result<(i64, u8, u8), CotError> {
+    let p: Vec<&str> = s.split('-').collect();
+    if p.len() != 3 {
+        return Err(CotError::InvalidXml(format!("invalid date component: {s}")));
+    }
+    let y: i64 = p[0].parse().map_err(|_| CotError::InvalidNumber("year"))?;
+    let m: u8 = p[1].parse().map_err(|_| CotError::InvalidNumber("month"))?;
+    let d: u8 = p[2].parse().map_err(|_| CotError::InvalidNumber("day"))?;
+    if !(1..=12).contains(&m) || !(1..=31).contains(&d) {
+        return Err(CotError::CoordinateOutOfBounds(
+            "month or day out of bounds",
+        ));
+    }
+    let days = ymd_to_days(y, m, d);
+    if days_to_ymd(days) != (y, m, d) {
+        return Err(CotError::InvalidXml(format!("invalid calendar date: {s}")));
+    }
+    Ok((y, m, d))
+}
