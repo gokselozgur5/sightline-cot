@@ -285,6 +285,9 @@ unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *
     if e.is_null() || out_n.is_null() || (n > 0 && dets.is_null()) || (cap > 0 && out.is_null()) {
         return SIGHTLINE_ERR_NULL;
     }
+    if !layout_ok(dets, n) || !layout_ok(out, cap) || !out_n.is_aligned() {
+        return SIGHTLINE_ERR_INVALID;
+    }
     let ds: &[SightlineDetectionC] = if n == 0 {
         &[]
     } else {
