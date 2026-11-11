@@ -472,4 +472,8 @@ mod tests {
             sightline_engine_free(e);
         }
     }
+    #[test]
+    fn test_panic_is_caught() {
+        assert_eq!(guard(|| -> i32 { panic!("boom") }), SIGHTLINE_ERR_PANIC);
+    }
 }
