@@ -439,4 +439,22 @@ mod tests {
             embedding: emb,
         }
     }
+
+    #[test]
+    fn test_iou_exactness() {
+        let b1 = BoundingBox {
+            x1: 0.0,
+            y1: 0.0,
+            x2: 10.0,
+            y2: 10.0,
+        };
+        let b2 = BoundingBox {
+            x1: 5.0,
+            y1: 0.0,
+            x2: 15.0,
+            y2: 10.0,
+        };
+        assert!((b1.iou(&b2) - (50.0 / 150.0)).abs() < 1e-9);
+        assert!((b1.iou(&b1) - 1.0).abs() < 1e-9);
+    }
 }
