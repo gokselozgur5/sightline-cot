@@ -298,13 +298,14 @@ unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *
         Err(code) => return code,
     };
     *out_n = tracks.len();
-    if tracks.len() > cap {
-        return SIGHTLINE_ERR_BUFFER;
-    }
-    for (i, t) in tracks.iter().enumerate() {
+    for (i, t) in tracks.iter().take(cap).enumerate() {
         *out.add(i) = *t;
     }
-    SIGHTLINE_OK
+    if tracks.len() > cap {
+        SIGHTLINE_ERR_BUFFER
+    } else {
+        SIGHTLINE_OK
+    }
 }
 
 /// # Safety
