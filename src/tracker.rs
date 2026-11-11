@@ -46,11 +46,27 @@ impl BoundingBox {
     }
 }
 
-/// Cosine distance between two 8-dimensional L2-normalized embeddings.
+pub fn normalize_embedding(emb: &[f32; 8]) -> [f32; 8] {
+    let sum_sq: f32 = emb.iter().map(|x| x * x).sum();
+    let norm = sum_sq.sqrt();
+    if !norm.is_finite() || norm < 1e-9 {
+        [0.0; 8]
+    } else {
+        let mut out = [0.0; 8];
+        for i in 0..8 {
+            out[i] = emb[i] / norm;
+        }
+        out
+    }
+}
+
+/// Cosine distance between two 8-dimensional embeddings.
 pub fn cosine_distance(a: &[f32; 8], b: &[f32; 8]) -> f64 {
+    let na = normalize_embedding(a);
+    let nb = normalize_embedding(b);
     let mut dot = 0.0f64;
     for i in 0..8 {
-        dot += (a[i] as f64) * (b[i] as f64);
+        dot += (na[i] as f64) * (nb[i] as f64);
     }
     (1.0 - dot).clamp(0.0, 2.0)
 }
