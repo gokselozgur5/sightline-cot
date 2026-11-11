@@ -34,3 +34,28 @@ fn make_bbox(px: f64, py: f64) -> BoundingBox {
         y2: py + 10.0,
     }
 }
+
+fn make_detection(
+    px: f64,
+    py: f64,
+    intr: &Intrinsics,
+    pose: &CameraPose,
+    emb_idx: usize,
+) -> Detection {
+    let ray = intr.pixel_to_ray(px, py).expect("ray");
+    let enu = intersect_ground(ray, pose, 0.0).expect("ground intersection");
+    let (ce90_m, le90_m) =
+        estimate_covariance_ce_le(intr, pose, px, py, 0.0, 1.0, 0.001).expect("cov");
+    let mut embedding = [0.0f32; 8];
+    embedding[emb_idx] = 1.0;
+
+    Detection {
+        east_m: enu[0],
+        north_m: enu[1],
+        hae_m: 10.0,
+        ce90_m,
+        le90_m,
+        bbox: make_bbox(px, py),
+        embedding,
+    }
+}
