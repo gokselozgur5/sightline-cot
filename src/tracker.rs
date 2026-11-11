@@ -356,3 +356,22 @@ impl MultiTargetTracker {
         (matches, unmatched_trks, unmatched_dets)
     }
 }
+
+impl MultiTargetTracker {
+    fn validate_step_inputs(dt_s: f64, detections: &[Detection]) -> Result<(), TrackerError> {
+        if !dt_s.is_finite() || dt_s <= 0.0 {
+            return Err(TrackerError::InvalidDeltaTime);
+        }
+        for d in detections {
+            if !d.east_m.is_finite()
+                || !d.north_m.is_finite()
+                || !d.hae_m.is_finite()
+                || !d.ce90_m.is_finite()
+                || !d.le90_m.is_finite()
+            {
+                return Err(TrackerError::NonFiniteInput);
+            }
+        }
+        Ok(())
+    }
+}
