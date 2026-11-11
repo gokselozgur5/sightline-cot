@@ -160,3 +160,24 @@ fn test_grazing_angle_above_horizon() {
         Err(CameraError::RayAboveHorizon)
     );
 }
+
+#[test]
+fn test_grazing_angle_rejection_boundary() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 500.0,
+        cy: 500.0,
+    };
+    let ray = cam.pixel_to_ray(500.0, 500.0).unwrap();
+    let p_inside = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: PI / 2.0 - 5e-7,
+        yaw_rad: 0.0,
+        cam_up_m: 100.0,
+    };
+    assert_eq!(
+        intersect_ground(ray, &p_inside, 0.0),
+        Err(CameraError::RayAboveHorizon)
+    );
+}
