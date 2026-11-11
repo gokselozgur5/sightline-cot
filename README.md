@@ -50,15 +50,14 @@ Every entry point validates pointers and catches panics, returning `SIGHTLINE_OK
 
 ## Benchmark
 
-Deterministic 10,000-frame multi-target scenario (pixel, bbox and Re-ID to ground ray, WGS84, Kalman tracker, CoT XML). Measured with `cargo run --release --example bench_pipeline` on macOS arm64, two consecutive runs.
+Deterministic 10,000-frame, 3-target scenario (pixel, bbox and Re-ID to ground ray, WGS84, Kalman tracker, CoT XML). Scenario synthesis runs outside the timer. Measured with `cargo run --release --example bench_pipeline` on macOS arm64, three consecutive runs.
 
-| Metric | Run 1 | Run 2 |
-|---|---|---|
-| Frames | 10000 | 10000 |
-| CoT output (bytes) | 8958194 | 8958194 |
-| Latency p50 (us) | 4.62 | 4.75 |
-| Latency p99 (us) | 10.88 | 7.92 |
-| Latency mean (us) | 4.94 | 5.15 |
-| Throughput (frames/s) | 202299.9 | 194097.4 |
+| Metric | Run 1 | Run 2 | Run 3 |
+|---|---|---|---|
+| Frames | 10000 | 10000 | 10000 |
+| Latency p50 (us) | 5.46 | 5.00 | 4.83 |
+| Latency p99 (us) | 9.71 | 7.67 | 7.42 |
+| Latency mean (us) | 5.94 | 5.22 | 5.20 |
+| Throughput (frames/s) | 168226.1 | 191732.4 | 192274.7 |
 
-Timings vary between runs; the output size is deterministic.
+Timings vary between runs. The example also prints 3 confirmed tracks and a final position error under 1 mm against the synthetic truth.
