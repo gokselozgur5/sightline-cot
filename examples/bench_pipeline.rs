@@ -173,3 +173,22 @@ fn track_to_cot(track: &Track, frame_idx: usize, le_m: f64) -> CotEvent {
     }
 }
 
+fn process_frame(
+    frame_idx: usize,
+    obs: &[Observation],
+    cam: &Intrinsics,
+    pose: &CameraPose,
+    tracker: &mut MultiTargetTracker,
+) -> usize {
+    let dets: Vec<Detection> = obs.iter().filter_map(|o| detect(o, cam, pose)).collect();
+    let le_m = dets.iter().map(|d| d.le90_m).fold(0.0, f64::max);
+    tracker.step(DT_S, &dets).expect("tracker step failed");
+    let mut bytes = 0;
+    for trk in &tracker.tracks {
+        if trk.status == TrackStatus::Confirmed {
+            bytes += track_to_cot(trk, frame_idx, le_m).to_xml().len();
+        }
+    }
+    bytes
+}
+
