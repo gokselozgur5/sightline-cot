@@ -11,3 +11,14 @@ use sightline_cot::tracker::{
     normalize_embedding, BoundingBox, Detection, MultiTargetTracker, Track, TrackStatus,
 };
 
+const NUM_FRAMES: usize = 10_000;
+const DT_S: f64 = 0.033;
+const CAM_ALT_M: f64 = 500.0;
+const REF_LAT: f64 = 37.7749;
+const REF_LON: f64 = -122.4194;
+const REF_HAE: f64 = 50.0;
+const BOUND_E_M: f64 = 400.0;
+const BOUND_N_M: f64 = 200.0;
+const IMG_W: f64 = 1920.0;
+const IMG_H: f64 = 1080.0;
+
