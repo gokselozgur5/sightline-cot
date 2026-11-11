@@ -508,4 +508,20 @@ mod tests {
         assert!((u_out - u_in).abs() < 1e-9);
         assert!((v_out - v_in).abs() < 1e-9);
     }
+
+    #[test]
+    fn test_nan_and_pole_rejection() {
+        let cam = Intrinsics::Pinhole {
+            fx: 1000.0,
+            fy: 1000.0,
+            cx: 500.0,
+            cy: 500.0,
+        };
+        let res_nan = cam.pixel_to_ray(f64::NAN, 500.0);
+        assert_eq!(res_nan, Err(CameraError::InvalidParameters));
+
+        let (lat_p, lon_p, hae_p) = enu_to_geodetic([0.0, 0.0, 10.0], 90.0, 0.0, 0.0);
+        assert!((lat_p - 90.0).abs() < 1e-4);
+        assert!((hae_p - 10.0).abs() < 1e-3);
+    }
 }
