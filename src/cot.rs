@@ -371,3 +371,16 @@ impl CotUdpDispatcher {
         self.send_xml(&xml)
     }
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_iso8601_roundtrip() {
+        let ms = 1731312345678_i64;
+        let ts = format_iso8601_utc(ms);
+        assert!(ts.ends_with('Z'));
+        let parsed = parse_iso8601_utc(&ts).expect("valid timestamp");
+        assert_eq!(ms, parsed);
+    }
+}
