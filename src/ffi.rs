@@ -231,3 +231,29 @@ fn engine_step(
         .map(|t| to_track_c(eng, t))
         .collect())
 }
+
+type StepArgs = (*mut SightlineEngine, *const SightlineDetectionC, usize);
+
+unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *mut usize)) -> i32 {
+    let ((e, dets, n), (out, cap, out_n)) = (a, out);
+    if e.is_null() || out_n.is_null() || (n > 0 && dets.is_null()) || (cap > 0 && out.is_null()) {
+        return SIGHTLINE_ERR_NULL;
+    }
+    let ds: &[SightlineDetectionC] = if n == 0 {
+        &[]
+    } else {
+        std::slice::from_raw_parts(dets, n)
+    };
+    let tracks = match engine_step(&mut *e, dt_s, ds) {
+        Ok(t) => t,
+        Err(code) => return code,
+    };
+    *out_n = tracks.len();
+    if tracks.len() > cap {
+        return SIGHTLINE_ERR_BUFFER;
+    }
+    for (i, t) in tracks.iter().enumerate() {
+        *out.add(i) = *t;
+    }
+    SIGHTLINE_OK
+}
