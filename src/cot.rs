@@ -302,3 +302,14 @@ fn parse_point_and_track(pt: &str, tr: Option<&str>) -> Result<PointTrack, CotEr
     validate_cot_bounds(lat, lon, ce, le, spd)?;
     Ok(PointTrack(lat, lon, hae, ce, le, crs, spd))
 }
+fn extract_core_elements(xml: &str) -> Result<(&str, &str, Option<&str>), CotError> {
+    if !xml.contains("</event>") {
+        return Err(CotError::InvalidXml("missing </event> closing tag".into()));
+    }
+    let ev = extract_tag_content(xml, "event")
+        .ok_or_else(|| CotError::InvalidXml("missing event tag".into()))?;
+    let pt = extract_tag_content(xml, "point")
+        .ok_or_else(|| CotError::InvalidXml("missing point tag".into()))?;
+    let tr = extract_tag_content(xml, "track");
+    Ok((ev, pt, tr))
+}
