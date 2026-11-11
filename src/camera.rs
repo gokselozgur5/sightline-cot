@@ -278,3 +278,17 @@ fn enu_to_ecef(enu_m: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f6
     let dz = c_lat * n + s_lat * u;
     [ref_ecef[0] + dx, ref_ecef[1] + dy, ref_ecef[2] + dz]
 }
+
+fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
+    let p = (x * x + y * y).sqrt();
+    let lon_rad = y.atan2(x);
+    let theta = (z * WGS84_A).atan2(p * WGS84_B);
+    let (s_th, c_th) = (theta.sin(), theta.cos());
+    let num = z + WGS84_E_PRIME2 * WGS84_B * s_th * s_th * s_th;
+    let den = p - WGS84_E2 * WGS84_A * c_th * c_th * c_th;
+    let lat_rad = num.atan2(den);
+    let s_lat = lat_rad.sin();
+    let n = WGS84_A / (1.0 - WGS84_E2 * s_lat * s_lat).sqrt();
+    let hae_m = p / lat_rad.cos() - n;
+    (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
+}
