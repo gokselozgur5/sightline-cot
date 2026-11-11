@@ -32,3 +32,18 @@ flowchart LR
 - Association: squared Mahalanobis distance gated at the 95% chi-square value `5.991`, then either a bbox IoU or a cosine Re-ID threshold.
 - Lifecycle: tracks confirm at `hits >= min_hits`, coast without updates, and are pruned when `time_since_update > max_age`.
 - CoT: events serialize to CoT 2.0 XML (`<event version="2.0">`) with strict attribute escaping, and ship over a non-blocking `std::net::UdpSocket`.
+
+## Build and test
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --all-targets -- -D warnings
+cargo test --all-targets
+cargo run --release --example bench_pipeline
+```
+
+## C-ABI
+
+The C interface exports `sightline_engine_new`, `sightline_engine_free`, `sightline_engine_step` and `sightline_track_to_cot_xml`, declared in `include/sightline.h`.
+
+Every entry point validates pointers and catches panics, returning `SIGHTLINE_OK` (0) or a negative error code.
