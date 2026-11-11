@@ -171,3 +171,21 @@ impl CameraPose {
         ]
     }
 }
+
+/// Intersect camera-frame ray with horizontal ground plane at `ground_up_m`.
+pub fn intersect_ground(
+    ray_cam: [f64; 3],
+    pose: &CameraPose,
+    ground_up_m: f64,
+) -> Result<[f64; 3], CameraError> {
+    let ray_enu = pose.transform_ray(ray_cam);
+    if ray_enu[2] >= -1e-6 {
+        return Err(CameraError::RayAboveHorizon);
+    }
+    let delta_h = ground_up_m - pose.cam_up_m;
+    if delta_h >= 0.0 {
+        return Err(CameraError::InvalidParameters);
+    }
+    let t = delta_h / ray_enu[2];
+    Ok([t * ray_enu[0], t * ray_enu[1], ground_up_m])
+}
