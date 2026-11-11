@@ -17,6 +17,14 @@ extern "C" {
 #define SIGHTLINE_ERR_CAMERA (-5)
 #define SIGHTLINE_ERR_TRACKER (-6)
 
+#define SIGHTLINE_STATUS_TENTATIVE 0
+#define SIGHTLINE_STATUS_CONFIRMED 1
+#define SIGHTLINE_STATUS_COASTING 2
+#define SIGHTLINE_STATUS_DELETED 3
+
+/* CoT sentinel for an unknown error value (reported in le90_m). */
+#define SIGHTLINE_UNKNOWN_ERROR_M 9999999.0
+
 typedef struct SightlineEngine SightlineEngine;
 
 typedef struct {
