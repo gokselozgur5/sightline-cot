@@ -58,3 +58,22 @@ impl Intrinsics {
         Err(CameraError::DistortionSolverFailed)
     }
 }
+
+impl Intrinsics {
+    fn unproject_pinhole(
+        u: f64,
+        v: f64,
+        fx: f64,
+        fy: f64,
+        cx: f64,
+        cy: f64,
+    ) -> Result<[f64; 3], CameraError> {
+        if fx <= 0.0 || fy <= 0.0 {
+            return Err(CameraError::InvalidParameters);
+        }
+        let x = (u - cx) / fx;
+        let y = (v - cy) / fy;
+        let norm = (x * x + y * y + 1.0).sqrt();
+        Ok([x / norm, y / norm, 1.0 / norm])
+    }
+}
