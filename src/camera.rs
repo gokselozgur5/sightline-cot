@@ -38,3 +38,23 @@ pub enum Intrinsics {
         k2: f64,
     },
 }
+
+impl Intrinsics {
+    fn invert_equidistant(r_d: f64, k1: f64, k2: f64) -> Result<f64, CameraError> {
+        let mut theta = r_d;
+        for _ in 0..15 {
+            let t2 = theta * theta;
+            let f = theta * (1.0 + k1 * t2 + k2 * t2 * t2) - r_d;
+            let df = 1.0 + 3.0 * k1 * t2 + 5.0 * k2 * t2 * t2;
+            if df.abs() < 1e-12 {
+                return Err(CameraError::DistortionSolverFailed);
+            }
+            let step = f / df;
+            theta -= step;
+            if step.abs() < 1e-12 {
+                return Ok(theta);
+            }
+        }
+        Err(CameraError::DistortionSolverFailed)
+    }
+}
