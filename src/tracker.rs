@@ -220,3 +220,30 @@ impl Track {
         k
     }
 }
+
+impl Track {
+    #[allow(clippy::needless_range_loop)]
+    fn apply_joseph_update(&mut self, k: [[f64; 2]; 4], r_var: f64) {
+        let mut ikh = [[0.0; 4]; 4];
+        for i in 0..4 {
+            ikh[i][i] = 1.0;
+            ikh[i][0] -= k[i][0];
+            ikh[i][1] -= k[i][1];
+        }
+        let mut p_new = mat4_mul(mat4_mul(ikh, self.p), {
+            let mut ikht = [[0.0; 4]; 4];
+            for i in 0..4 {
+                for j in 0..4 {
+                    ikht[i][j] = ikh[j][i];
+                }
+            }
+            ikht
+        });
+        for i in 0..4 {
+            for j in 0..4 {
+                p_new[i][j] += (k[i][0] * k[j][0] + k[i][1] * k[j][1]) * r_var;
+            }
+        }
+        self.p = p_new;
+    }
+}
