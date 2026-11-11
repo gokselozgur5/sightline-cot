@@ -382,20 +382,32 @@ impl MultiTargetTracker {
 impl MultiTargetTracker {
     /// Associate detections with existing tracks using gated minimum cost.
     fn associate(&self, detections: &[Detection]) -> (Vec<(usize, usize)>, Vec<usize>, Vec<usize>) {
-        let (mut matches, mut unmatched_trks) = (Vec::new(), Vec::new());
-        let mut matched_dets = vec![false; detections.len()];
+        let mut candidates = Vec::new();
         for (t_idx, trk) in self.tracks.iter().enumerate() {
-            if let Some((d_idx, _)) = Self::find_best_detection(trk, detections, &matched_dets) {
-                matches.push((t_idx, d_idx));
-                matched_dets[d_idx] = true;
-            } else {
-                unmatched_trks.push(t_idx);
+            for (d_idx, det) in detections.iter().enumerate() {
+                if let Some(cost) = Self::score_candidate(trk, det) {
+                    candidates.push((cost, t_idx, d_idx));
+                }
             }
         }
+        candidates.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+        let mut matches = Vec::new();
+        let mut matched_tracks = vec![false; self.tracks.len()];
+        let mut matched_dets = vec![false; detections.len()];
+        for (_, t_idx, d_idx) in candidates {
+            if !matched_tracks[t_idx] && !matched_dets[d_idx] {
+                matches.push((t_idx, d_idx));
+                matched_tracks[t_idx] = true;
+                matched_dets[d_idx] = true;
+            }
+        }
+        let unmatched_tracks = (0..self.tracks.len())
+            .filter(|&i| !matched_tracks[i])
+            .collect();
         let unmatched_dets = (0..detections.len())
             .filter(|&i| !matched_dets[i])
             .collect();
-        (matches, unmatched_trks, unmatched_dets)
+        (matches, unmatched_tracks, unmatched_dets)
     }
 }
 
