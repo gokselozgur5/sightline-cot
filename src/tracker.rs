@@ -168,6 +168,7 @@ impl Track {
         }
     }
 
+    #[allow(clippy::needless_range_loop)]
     fn transition_matrix(dt_s: f64) -> [[f64; 4]; 4] {
         let mut f = [[0.0; 4]; 4];
         for i in 0..4 {
@@ -359,6 +360,7 @@ impl MultiTargetTracker {
 }
 
 impl MultiTargetTracker {
+    #[allow(dead_code)]
     fn find_best_detection(
         trk: &Track,
         detections: &[Detection],
@@ -586,11 +588,11 @@ mod tests {
         let mut tracker = MultiTargetTracker::default();
         let det = dummy_det(0.0, 0.0, [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
         assert_eq!(
-            tracker.step(-1.0, &[det.clone()]),
+            tracker.step(-1.0, std::slice::from_ref(&det)),
             Err(TrackerError::InvalidDeltaTime)
         );
         assert_eq!(
-            tracker.step(f64::NAN, &[det.clone()]),
+            tracker.step(f64::NAN, std::slice::from_ref(&det)),
             Err(TrackerError::InvalidDeltaTime)
         );
         let mut bad_det = det;
