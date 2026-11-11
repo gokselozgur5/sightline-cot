@@ -353,4 +353,18 @@ mod tests {
         assert!(pt[1].abs() < 1e-9);
         assert!(pt[2].abs() < 1e-9);
     }
+
+    #[test]
+    fn test_oblique_and_horizon_rejection() {
+        let pose = CameraPose {
+            roll_rad: 0.0,
+            pitch_rad: std::f64::consts::FRAC_PI_4,
+            yaw_rad: 0.0,
+            cam_up_m: 100.0,
+        };
+        let pt = intersect_ground([0.0, 0.0, 1.0], &pose, 0.0).unwrap();
+        assert!((pt[1] - 100.0).abs() < 1e-4);
+        let res_up = intersect_ground([0.0, 1.0, 0.0], &pose, 0.0);
+        assert_eq!(res_up, Err(CameraError::RayAboveHorizon));
+    }
 }
