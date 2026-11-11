@@ -400,8 +400,12 @@ impl MultiTargetTracker {
 }
 
 impl MultiTargetTracker {
-    fn validate_step_inputs(dt_s: f64, detections: &[Detection]) -> Result<(), TrackerError> {
-        if !dt_s.is_finite() || dt_s <= 0.0 {
+    fn validate_step_inputs(
+        &self,
+        dt_s: f64,
+        detections: &[Detection],
+    ) -> Result<(), TrackerError> {
+        if !dt_s.is_finite() || dt_s <= 0.0 || !self.q_acc.is_finite() || self.q_acc < 0.0 {
             return Err(TrackerError::InvalidDeltaTime);
         }
         for d in detections {
@@ -410,6 +414,13 @@ impl MultiTargetTracker {
                 || !d.hae_m.is_finite()
                 || !d.ce90_m.is_finite()
                 || !d.le90_m.is_finite()
+                || d.ce90_m < 0.0
+                || d.le90_m < 0.0
+                || !d.bbox.x1.is_finite()
+                || !d.bbox.y1.is_finite()
+                || !d.bbox.x2.is_finite()
+                || !d.bbox.y2.is_finite()
+                || !d.embedding.iter().all(|e| e.is_finite())
             {
                 return Err(TrackerError::NonFiniteInput);
             }
