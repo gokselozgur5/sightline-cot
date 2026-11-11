@@ -117,3 +117,25 @@ fn test_so3_fisheye_yaw_sweep() {
     };
     check_yaw_norm(&fisheye, (750.0, 450.0), -0.05, 0.55);
 }
+
+#[test]
+fn test_grazing_angle_horizon_boundary() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 500.0,
+        cy: 500.0,
+    };
+    let ray = cam.pixel_to_ray(500.0, 500.0).unwrap();
+    let eps = 1e-4;
+    let p_below = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: PI / 2.0 - eps,
+        yaw_rad: 0.0,
+        cam_up_m: 100.0,
+    };
+    let pt = intersect_ground(ray, &p_below, 0.0).unwrap();
+    let expected = 100.0 / eps.tan();
+    let computed = (pt[0].powi(2) + pt[1].powi(2)).sqrt();
+    assert!(((computed - expected) / expected).abs() < 1e-4);
+}
