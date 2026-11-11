@@ -48,3 +48,24 @@ impl LatencyStats {
     }
 }
 
+struct SyntheticTarget {
+    east_m: f64,
+    north_m: f64,
+    vel_e: f64,
+    vel_n: f64,
+    raw_emb: [f32; 8],
+}
+
+impl SyntheticTarget {
+    fn step(&mut self, dt: f64) {
+        self.east_m += self.vel_e * dt;
+        self.north_m += self.vel_n * dt;
+        if self.east_m.abs() > BOUND_E_M {
+            self.vel_e = -self.vel_e;
+        }
+        if self.north_m.abs() > BOUND_N_M {
+            self.vel_n = -self.vel_n;
+        }
+    }
+}
+
