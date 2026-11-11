@@ -384,3 +384,18 @@ mod tests {
         assert_eq!(ms, parsed);
     }
 }
+#[cfg(test)]
+mod tests_calendar {
+    use super::*;
+
+    #[test]
+    fn test_leap_years_and_negative_epoch() {
+        assert!(parse_iso8601_utc("2000-02-29T12:00:00.000Z").is_ok());
+        assert!(parse_iso8601_utc("2024-02-29T12:00:00.000Z").is_ok());
+        assert!(parse_iso8601_utc("2023-02-29T12:00:00.000Z").is_err());
+        let neg_ms = -1_i64;
+        let neg_ts = format_iso8601_utc(neg_ms);
+        assert_eq!(neg_ts, "1969-12-31T23:59:59.999Z");
+        assert_eq!(parse_iso8601_utc(&neg_ts).unwrap(), neg_ms);
+    }
+}
