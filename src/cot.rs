@@ -286,3 +286,19 @@ fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, spd: f64) -> Result
     }
     Ok(())
 }
+struct PointTrack(f64, f64, f64, f64, f64, f64, f64);
+
+fn parse_point_and_track(pt: &str, tr: Option<&str>) -> Result<PointTrack, CotError> {
+    let (lat, lon) = (parse_f64_attr(pt, "lat")?, parse_f64_attr(pt, "lon")?);
+    let (hae, ce, le) = (
+        parse_f64_attr(pt, "hae")?,
+        parse_f64_attr(pt, "ce")?,
+        parse_f64_attr(pt, "le")?,
+    );
+    let (crs, spd) = (
+        parse_opt_f64_attr(tr, "course", 0.0)?,
+        parse_opt_f64_attr(tr, "speed", 0.0)?,
+    );
+    validate_cot_bounds(lat, lon, ce, le, spd)?;
+    Ok(PointTrack(lat, lon, hae, ce, le, crs, spd))
+}
