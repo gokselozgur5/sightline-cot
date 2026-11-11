@@ -314,3 +314,8 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         SIGHTLINE_OK
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+}
