@@ -452,3 +452,24 @@ mod tests_bounds {
         assert!(CotEvent::from_xml("not xml").is_err());
     }
 }
+#[cfg(test)]
+mod tests_udp_rt {
+    use super::*;
+
+    pub(crate) fn sample_drone() -> CotEvent {
+        CotEvent {
+            uid: "DRONE-99".into(),
+            cot_type: "a-f-A-M-F".into(),
+            how: "m-g".into(),
+            time_ms: 1771234567890,
+            stale_ms: 1771234597890,
+            lat_deg: 37.7749,
+            lon_deg: -122.4194,
+            hae_m: 125.5,
+            ce_m: 4.2,
+            le_m: 6.8,
+            course_deg: 135.0,
+            speed_mps: 18.5,
+        }
+    }
+}
