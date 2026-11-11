@@ -111,6 +111,29 @@ fn make_pose(c: &SightlineCameraCfg) -> CameraPose {
     }
 }
 
+fn all_finite(c: &SightlineCameraCfg) -> bool {
+    let f = [
+        c.fx,
+        c.fy,
+        c.cx,
+        c.cy,
+        c.k1,
+        c.k2,
+        c.roll_rad,
+        c.pitch_rad,
+        c.yaw_rad,
+        c.cam_up_m,
+        c.ground_up_m,
+        c.pixel_sigma_px,
+        c.attitude_sigma_rad,
+        c.ref_lat_deg,
+        c.ref_lon_deg,
+        c.ref_hae_m,
+        c.q_acc,
+    ];
+    f.iter().all(|x| x.is_finite())
+}
+
 fn build_engine(c: &SightlineCameraCfg) -> Option<SightlineEngine> {
     let ok = c.fx.is_finite() && c.fy.is_finite() && c.fx > 0.0 && c.fy > 0.0;
     if !ok || c.min_hits == 0 || !c.q_acc.is_finite() || c.q_acc < 0.0 {
