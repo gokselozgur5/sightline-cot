@@ -153,3 +153,17 @@ fn locate(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<[f64; 3], i3
         .map_err(|_| SIGHTLINE_ERR_CAMERA)?;
     intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m).map_err(|_| SIGHTLINE_ERR_CAMERA)
 }
+
+fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<(f64, f64), i32> {
+    let c = &eng.cfg;
+    estimate_covariance_ce_le(
+        &eng.cam,
+        &eng.pose,
+        d.u,
+        d.v,
+        c.ground_up_m,
+        c.pixel_sigma_px,
+        c.attitude_sigma_rad,
+    )
+    .map_err(|_| SIGHTLINE_ERR_CAMERA)
+}
