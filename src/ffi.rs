@@ -258,9 +258,8 @@ fn engine_step(
     dets: &[SightlineDetectionC],
 ) -> Result<Vec<SightlineTrackC>, i32> {
     let mut v = Vec::with_capacity(dets.len());
-    for d in dets {
-        v.push(to_detection(eng, d)?);
-    }
+    // Detections that cannot be located (NaN pixel, above horizon) are skipped individually.
+    v.extend(dets.iter().filter_map(|d| to_detection(eng, d).ok()));
     eng.tracker
         .step(dt_s, &v)
         .map_err(|_| SIGHTLINE_ERR_TRACKER)?;
