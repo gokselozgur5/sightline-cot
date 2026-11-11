@@ -148,3 +148,25 @@ fn parse_fraction_ms(s: &str) -> Result<u32, CotError> {
         .parse()
         .map_err(|_| CotError::InvalidNumber("sec_fraction"))
 }
+fn parse_time_part(s: &str) -> Result<(u32, u32, u32, u32), CotError> {
+    let p: Vec<&str> = s.split(':').collect();
+    if p.len() != 3 {
+        return Err(CotError::InvalidXml(format!("invalid time component: {s}")));
+    }
+    let h: u32 = p[0].parse().map_err(|_| CotError::InvalidNumber("hour"))?;
+    let min: u32 = p[1].parse().map_err(|_| CotError::InvalidNumber("min"))?;
+    let sp: Vec<&str> = p[2].split('.').collect();
+    if sp.len() > 2 {
+        return Err(CotError::InvalidNumber("seconds"));
+    }
+    let sec: u32 = sp[0].parse().map_err(|_| CotError::InvalidNumber("sec"))?;
+    if h >= 24 || min >= 60 || sec >= 60 {
+        return Err(CotError::CoordinateOutOfBounds("time value out of range"));
+    }
+    let ms: u32 = if sp.len() == 2 {
+        parse_fraction_ms(sp[1])?
+    } else {
+        0
+    };
+    Ok((h, min, sec, ms))
+}
