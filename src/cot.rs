@@ -170,3 +170,21 @@ fn parse_time_part(s: &str) -> Result<(u32, u32, u32, u32), CotError> {
     };
     Ok((h, min, sec, ms))
 }
+/// Parse ISO-8601 UTC timestamp `YYYY-MM-DDTHH:MM:SS.mmmZ` to epoch milliseconds.
+pub fn parse_iso8601_utc(s: &str) -> Result<i64, CotError> {
+    let s = s.trim();
+    if s.len() < 20 || !s.ends_with('Z') {
+        return Err(CotError::InvalidXml(format!(
+            "invalid timestamp format: {s}"
+        )));
+    }
+    let p: Vec<&str> = s[..s.len() - 1].split('T').collect();
+    if p.len() != 2 {
+        return Err(CotError::InvalidXml(format!("missing T in timestamp: {s}")));
+    }
+    let (y, m, d) = parse_date_part(p[0])?;
+    let (h, min, sec, ms) = parse_time_part(p[1])?;
+    let days = ymd_to_days(y, m, d);
+    let total_secs = days * 86400 + h as i64 * 3600 + min as i64 * 60 + sec as i64;
+    Ok(total_secs * 1000 + ms as i64)
+}
