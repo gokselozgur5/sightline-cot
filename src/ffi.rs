@@ -398,4 +398,22 @@ mod tests {
             sightline_engine_free(std::ptr::null_mut());
         }
     }
+
+    #[test]
+    fn test_small_buffers_are_rejected() {
+        let c = cfg();
+        unsafe {
+            let e = sightline_engine_new(&c);
+            let mut n = 0usize;
+            let d = det();
+            let rc = sightline_engine_step(e, 0.1, &d, 1, std::ptr::null_mut(), 0, &mut n);
+            assert_eq!(rc, SIGHTLINE_ERR_BUFFER);
+            assert_eq!(n, 1);
+            let t = SightlineTrackC::default();
+            let mut tiny = [0 as c_char; 8];
+            let rc = sightline_track_to_cot_xml(&t, 0, tiny.as_mut_ptr(), 8);
+            assert_eq!(rc, SIGHTLINE_ERR_BUFFER);
+            sightline_engine_free(e);
+        }
+    }
 }
