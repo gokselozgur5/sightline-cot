@@ -52,7 +52,11 @@ impl Intrinsics {
             let step = f / df;
             theta -= step;
             if step.abs() < 1e-12 {
-                return Ok(theta);
+                if theta.is_finite() && (0.0..std::f64::consts::PI).contains(&theta) {
+                    return Ok(theta);
+                } else {
+                    return Err(CameraError::DistortionSolverFailed);
+                }
             }
         }
         Err(CameraError::DistortionSolverFailed)
