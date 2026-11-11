@@ -129,3 +129,15 @@ pub struct CameraPose {
     pub yaw_rad: f64,
     pub cam_up_m: f64,
 }
+
+fn mat3_mult(a: [[f64; 3]; 3], b: [[f64; 3]; 3]) -> [[f64; 3]; 3] {
+    let mut out = [[0.0; 3]; 3];
+    for i in 0..3 {
+        for j in 0..3 {
+            for k in 0..3 {
+                out[i][j] += a[i][k] * b[k][j];
+            }
+        }
+    }
+    out
+}
