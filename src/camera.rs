@@ -367,4 +367,18 @@ mod tests {
         let res_up = intersect_ground([0.0, 1.0, 0.0], &pose, 0.0);
         assert_eq!(res_up, Err(CameraError::RayAboveHorizon));
     }
+
+    #[test]
+    fn test_wgs84_round_trip() {
+        let (lat0, lon0, hae0) = (37.7749, -122.4194, 50.0);
+        let enu_in = [150.0, -200.0, 10.0];
+        let (lat, lon, hae) = enu_to_geodetic(enu_in, lat0, lon0, hae0);
+        let ecef_orig = enu_to_ecef(enu_in, lat0, lon0, hae0);
+        let ecef_rt = geodetic_to_ecef(lat, lon, hae);
+        let err = ((ecef_orig[0] - ecef_rt[0]).powi(2)
+            + (ecef_orig[1] - ecef_rt[1]).powi(2)
+            + (ecef_orig[2] - ecef_rt[2]).powi(2))
+        .sqrt();
+        assert!(err < 1e-4);
+    }
 }
