@@ -28,3 +28,28 @@ typedef struct {
     uint32_t min_hits, max_age;
     double q_acc;
 } SightlineCameraCfg;
+
+typedef struct {
+    double u, v, x1, y1, x2, y2;
+    float embedding[8];
+} SightlineDetectionC;
+
+typedef struct {
+    uint64_t id;
+    double lat_deg, lon_deg, hae_m, ce90_m, le90_m, course_deg, speed_mps;
+    uint32_t status;
+} SightlineTrackC;
+
+SightlineEngine *sightline_engine_new(const SightlineCameraCfg *cfg);
+void sightline_engine_free(SightlineEngine *e);
+int32_t sightline_engine_step(SightlineEngine *e, double dt_s,
+                              const SightlineDetectionC *dets, size_t n,
+                              SightlineTrackC *out, size_t cap, size_t *out_n);
+int32_t sightline_track_to_cot_xml(const SightlineTrackC *t, int64_t time_ms,
+                                   char *buf, size_t cap);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SIGHTLINE_H */
