@@ -258,6 +258,7 @@ impl Track {
             }
         }
         self.p = p_new;
+        self.symmetrize_p();
     }
 }
 
