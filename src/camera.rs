@@ -141,3 +141,21 @@ fn mat3_mult(a: [[f64; 3]; 3], b: [[f64; 3]; 3]) -> [[f64; 3]; 3] {
     }
     out
 }
+
+impl CameraPose {
+    /// Compute 3x3 rotation matrix mapping camera frame to ENU frame.
+    /// Camera frame: X right, Y down, Z optical axis forward.
+    /// At roll=0, pitch=0, yaw=0: camera points nadir (Z -> Down [0, 0, -1]).
+    pub fn rotation_matrix(&self) -> [[f64; 3]; 3] {
+        let (sr, cr) = (self.roll_rad.sin(), self.roll_rad.cos());
+        let (sp, cp) = (self.pitch_rad.sin(), self.pitch_rad.cos());
+        let (sy, cy) = (self.yaw_rad.sin(), self.yaw_rad.cos());
+
+        let r_z = [[cy, -sy, 0.0], [sy, cy, 0.0], [0.0, 0.0, 1.0]];
+        let r_x = [[1.0, 0.0, 0.0], [0.0, cp, -sp], [0.0, sp, cp]];
+        let r_base = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, -1.0]];
+        let r_roll = [[cr, -sr, 0.0], [sr, cr, 0.0], [0.0, 0.0, 1.0]];
+
+        mat3_mult(mat3_mult(mat3_mult(r_z, r_x), r_base), r_roll)
+    }
+}
