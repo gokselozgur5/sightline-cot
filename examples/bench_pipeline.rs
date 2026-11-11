@@ -192,3 +192,24 @@ fn process_frame(
     bytes
 }
 
+fn main() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 960.0,
+        cy: 540.0,
+    };
+    let pose = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: CAM_ALT_M,
+    };
+    let mut targets = init_scenario();
+    let frames = pregenerate(&mut targets, &cam);
+    let mut tracker = MultiTargetTracker::default();
+    let mut stats = LatencyStats::with_capacity(NUM_FRAMES);
+    let mut total_bytes = 0usize;
+    for (frame_idx, obs) in frames.iter().enumerate() {
+        let t0 = Instant::now();
+        total_bytes += process_frame(frame_idx, obs, &cam, &pose, &mut tracker);
