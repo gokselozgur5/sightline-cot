@@ -47,3 +47,18 @@ cargo run --release --example bench_pipeline
 The C interface exports `sightline_engine_new`, `sightline_engine_free`, `sightline_engine_step` and `sightline_track_to_cot_xml`, declared in `include/sightline.h`.
 
 Every entry point validates pointers and catches panics, returning `SIGHTLINE_OK` (0) or a negative error code.
+
+## Benchmark
+
+Deterministic 10,000-frame multi-target scenario (pixel, bbox and Re-ID to ground ray, WGS84, Kalman tracker, CoT XML). Measured with `cargo run --release --example bench_pipeline` on macOS arm64, two consecutive runs.
+
+| Metric | Run 1 | Run 2 |
+|---|---|---|
+| Frames | 10000 | 10000 |
+| CoT output (bytes) | 8958194 | 8958194 |
+| Latency p50 (us) | 4.62 | 4.75 |
+| Latency p99 (us) | 10.88 | 7.92 |
+| Latency mean (us) | 4.94 | 5.15 |
+| Throughput (frames/s) | 202299.9 | 194097.4 |
+
+Timings vary between runs; the output size is deterministic.
