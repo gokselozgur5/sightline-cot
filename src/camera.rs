@@ -100,7 +100,13 @@ impl Intrinsics {
         k1: f64,
         k2: f64,
     ) -> Result<[f64; 3], CameraError> {
-        if fx <= 0.0 || fy <= 0.0 {
+        if !u.is_finite()
+            || !v.is_finite()
+            || !fx.is_finite()
+            || !fy.is_finite()
+            || fx <= 0.0
+            || fy <= 0.0
+        {
             return Err(CameraError::InvalidParameters);
         }
         let x_d = (u - cx) / fx;
