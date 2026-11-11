@@ -289,3 +289,28 @@ fn to_cot(t: &SightlineTrackC) -> CotEvent {
         speed_mps: t.speed_mps,
     }
 }
+
+/// # Safety
+/// `t` must be valid; `buf` must be writable for `cap` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_track_to_cot_xml(
+    t: *const SightlineTrackC,
+    time_ms: i64,
+    buf: *mut c_char,
+    cap: usize,
+) -> i32 {
+    guard(|| {
+        if t.is_null() || buf.is_null() {
+            return SIGHTLINE_ERR_NULL;
+        }
+        let mut ev = to_cot(&*t);
+        ev.time_ms = time_ms;
+        let xml = ev.to_xml();
+        if xml.len() + 1 > cap {
+            return SIGHTLINE_ERR_BUFFER;
+        }
+        std::ptr::copy_nonoverlapping(xml.as_ptr(), buf as *mut u8, xml.len());
+        *buf.add(xml.len()) = 0;
+        SIGHTLINE_OK
+    })
+}
