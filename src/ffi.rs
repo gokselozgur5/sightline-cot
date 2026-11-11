@@ -359,6 +359,9 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         if t.is_null() || buf.is_null() {
             return SIGHTLINE_ERR_NULL;
         }
+        if !t.is_aligned() {
+            return SIGHTLINE_ERR_INVALID;
+        }
         let mut ev = to_cot(&*t);
         ev.time_ms = time_ms;
         let xml = ev.to_xml();
