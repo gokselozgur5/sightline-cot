@@ -45,3 +45,12 @@ impl BoundingBox {
         }
     }
 }
+
+/// Cosine distance between two 8-dimensional L2-normalized embeddings.
+pub fn cosine_distance(a: &[f32; 8], b: &[f32; 8]) -> f64 {
+    let mut dot = 0.0f64;
+    for i in 0..8 {
+        dot += (a[i] as f64) * (b[i] as f64);
+    }
+    (1.0 - dot).clamp(0.0, 2.0)
+}
