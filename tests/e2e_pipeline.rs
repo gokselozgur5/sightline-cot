@@ -162,3 +162,21 @@ fn compute_expected_geo(px: f64, py: f64, intr: &Intrinsics, pose: &CameraPose) 
     let enu = intersect_ground(ray, pose, 0.0).unwrap();
     enu_to_geodetic([enu[0], enu[1], 10.0], 37.7749, -122.4194, 0.0)
 }
+
+fn verify_single_target(
+    last_per_uid: &HashMap<String, CotEvent>,
+    expected_geo: (f64, f64, f64),
+    exp_speed: f64,
+    exp_course: f64,
+) {
+    let (exp_lat, exp_lon, exp_hae) = expected_geo;
+    let t = last_per_uid
+        .values()
+        .find(|e| (e.lat_deg - exp_lat).abs() < 1e-5)
+        .expect("target match");
+
+    assert!((t.lon_deg - exp_lon).abs() < 1e-5);
+    assert!((t.hae_m - exp_hae).abs() < 1e-2);
+    assert!((t.speed_mps - exp_speed).abs() < 5.0);
+    assert!((t.course_deg - exp_course).abs() < 15.0);
+}
