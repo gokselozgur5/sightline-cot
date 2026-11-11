@@ -273,6 +273,13 @@ fn engine_step(
 
 type StepArgs = (*mut SightlineEngine, *const SightlineDetectionC, usize);
 
+fn layout_ok<T>(p: *const T, n: usize) -> bool {
+    let fits = n
+        .checked_mul(std::mem::size_of::<T>())
+        .is_some_and(|b| b <= isize::MAX as usize);
+    fits && p.is_aligned()
+}
+
 unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *mut usize)) -> i32 {
     let ((e, dets, n), (out, cap, out_n)) = (a, out);
     if e.is_null() || out_n.is_null() || (n > 0 && dets.is_null()) || (cap > 0 && out.is_null()) {
