@@ -485,4 +485,27 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_fisheye_forward_inverse_round_trip() {
+        let (fx, fy, cx, cy) = (800.0, 800.0, 400.0, 400.0);
+        let (k1, k2) = (0.05, -0.01);
+        let fish = Intrinsics::EquidistantFisheye {
+            fx,
+            fy,
+            cx,
+            cy,
+            k1,
+            k2,
+        };
+        let (u_in, v_in) = (450.0, 430.0);
+        let ray = fish.pixel_to_ray(u_in, v_in).unwrap();
+        let theta = ray[2].acos();
+        let sin_th = theta.sin();
+        let r_d = theta * (1.0 + k1 * theta.powi(2) + k2 * theta.powi(4));
+        let u_out = cx + fx * (ray[0] / sin_th) * r_d;
+        let v_out = cy + fy * (ray[1] / sin_th) * r_d;
+        assert!((u_out - u_in).abs() < 1e-9);
+        assert!((v_out - v_in).abs() < 1e-9);
+    }
 }
