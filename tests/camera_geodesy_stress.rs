@@ -56,3 +56,13 @@ fn test_polar_singularity_offsets() {
         assert!((lat_drop - expected_drop).abs() < 1e-5);
     }
 }
+
+fn angle_diff(a: f64, b: f64) -> f64 {
+    let mut d = (a - b) % (2.0 * PI);
+    if d > PI {
+        d -= 2.0 * PI;
+    } else if d < -PI {
+        d += 2.0 * PI;
+    }
+    d
+}
