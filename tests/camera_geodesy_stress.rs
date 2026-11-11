@@ -66,3 +66,29 @@ fn angle_diff(a: f64, b: f64) -> f64 {
     }
     d
 }
+
+fn check_yaw_norm(cam: &Intrinsics, uv: (f64, f64), roll: f64, pitch: f64) {
+    let ray = cam.pixel_to_ray(uv.0, uv.1).unwrap();
+    let p0 = CameraPose {
+        roll_rad: roll,
+        pitch_rad: pitch,
+        yaw_rad: 0.0,
+        cam_up_m: 100.0,
+    };
+    let b_pt = intersect_ground(ray, &p0, 0.0).unwrap();
+    let b_rng = (b_pt[0].powi(2) + b_pt[1].powi(2)).sqrt();
+    let b_brg = b_pt[0].atan2(b_pt[1]);
+    for s in 1..36 {
+        let y = (s as f64) * (PI / 18.0);
+        let p = CameraPose {
+            roll_rad: roll,
+            pitch_rad: pitch,
+            yaw_rad: y,
+            cam_up_m: 100.0,
+        };
+        let pt = intersect_ground(ray, &p, 0.0).unwrap();
+        let rng = (pt[0].powi(2) + pt[1].powi(2)).sqrt();
+        assert!((rng - b_rng).abs() < 1e-5);
+        assert!(angle_diff(pt[0].atan2(pt[1]), b_brg - y).abs() < 1e-5);
+    }
+}
