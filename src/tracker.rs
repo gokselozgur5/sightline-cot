@@ -293,7 +293,7 @@ impl Track {
         self.apply_joseph_update(k, r_var);
         self.hae_m = 0.8 * self.hae_m + 0.2 * det.hae_m;
         self.bbox = det.bbox;
-        self.embedding = det.embedding;
+        self.embedding = normalize_embedding(&det.embedding);
         self.hits += 1;
         self.time_since_update = 0;
         Ok(())
