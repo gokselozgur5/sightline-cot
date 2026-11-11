@@ -22,3 +22,29 @@ const BOUND_N_M: f64 = 200.0;
 const IMG_W: f64 = 1920.0;
 const IMG_H: f64 = 1080.0;
 
+#[derive(Debug, Default)]
+struct LatencyStats {
+    micros: Vec<f64>,
+}
+
+impl LatencyStats {
+    fn with_capacity(cap: usize) -> Self {
+        Self {
+            micros: Vec::with_capacity(cap),
+        }
+    }
+
+    fn record(&mut self, us: f64) {
+        self.micros.push(us);
+    }
+
+    fn compute_metrics(&mut self) -> (f64, f64, f64, f64) {
+        self.micros.sort_by(|a, b| a.total_cmp(b));
+        let len = self.micros.len();
+        let p50 = self.micros[len * 50 / 100];
+        let p99 = self.micros[len * 99 / 100];
+        let mean = self.micros.iter().sum::<f64>() / (len as f64);
+        (p50, p99, mean, 1_000_000.0 / mean)
+    }
+}
+
