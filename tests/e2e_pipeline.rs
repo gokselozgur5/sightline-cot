@@ -253,3 +253,27 @@ fn verify_coasting_and_outlier(
     );
     assert_eq!(tracker.tracks[0].time_since_update, 2);
 }
+
+#[test]
+fn test_e2e_coasting_and_outlier_rejection() {
+    let (intrinsics, pose) = setup_camera();
+    let mut tracker = MultiTargetTracker::new(2, 5, 1.0);
+    let d1 = make_detection(960.0, 540.0, &intrinsics, &pose, 0);
+    tracker.step(0.1, std::slice::from_ref(&d1)).expect("f1");
+    tracker.step(0.1, std::slice::from_ref(&d1)).expect("f2");
+    let init_id = tracker.tracks[0].id;
+    assert_eq!(tracker.tracks[0].status, TrackStatus::Confirmed);
+
+    verify_coasting_and_outlier(&mut tracker, &intrinsics, &pose, init_id);
+
+    let d_recover = make_detection(960.0, 540.0, &intrinsics, &pose, 0);
+    tracker
+        .step(0.1, std::slice::from_ref(&d_recover))
+        .expect("recovery frame");
+    assert_eq!(
+        tracker.tracks[0].id, init_id,
+        "track recovers with same uid"
+    );
+    assert_eq!(tracker.tracks[0].status, TrackStatus::Confirmed);
+    assert_eq!(tracker.tracks[0].time_since_update, 0);
+}
