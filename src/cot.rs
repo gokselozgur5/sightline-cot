@@ -25,3 +25,19 @@ impl fmt::Display for CotError {
 }
 
 impl std::error::Error for CotError {}
+/// Strongly-typed Cursor-on-Target 2.0 event payload.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CotEvent {
+    pub uid: String,
+    pub cot_type: String,
+    pub how: String,
+    pub time_ms: i64,
+    pub stale_ms: i64,
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+    pub hae_m: f64,
+    pub ce_m: f64,
+    pub le_m: f64,
+    pub course_deg: f64,
+    pub speed_mps: f64,
+}
