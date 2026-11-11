@@ -60,6 +60,17 @@ int run(void) {
     };
     SightlineEngine *e = sightline_engine_new(&cfg);
     if (!e) return -1;
+    SightlineDetectionC det = {.u = 960.0, .v = 540.0};
+    SightlineTrackC tracks[16];
+    size_t n = 0;
+    if (sightline_engine_step(e, 0.033, &det, 1, tracks, 16, &n) == 0 && n > 0) {
+        char buf[2048];
+        sightline_track_to_cot_xml(&tracks[0], 1700000000000LL, buf, sizeof(buf));
+    }
+    sightline_engine_free(e);
+    return 0;
+}
+```
 
 
 ## Benchmark
