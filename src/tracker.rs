@@ -336,3 +336,23 @@ impl MultiTargetTracker {
         best
     }
 }
+
+impl MultiTargetTracker {
+    /// Associate detections with existing tracks using gated minimum cost.
+    fn associate(&self, detections: &[Detection]) -> (Vec<(usize, usize)>, Vec<usize>, Vec<usize>) {
+        let (mut matches, mut unmatched_trks) = (Vec::new(), Vec::new());
+        let mut matched_dets = vec![false; detections.len()];
+        for (t_idx, trk) in self.tracks.iter().enumerate() {
+            if let Some((d_idx, _)) = Self::find_best_detection(trk, detections, &matched_dets) {
+                matches.push((t_idx, d_idx));
+                matched_dets[d_idx] = true;
+            } else {
+                unmatched_trks.push(t_idx);
+            }
+        }
+        let unmatched_dets = (0..detections.len())
+            .filter(|&i| !matched_dets[i])
+            .collect();
+        (matches, unmatched_trks, unmatched_dets)
+    }
+}
