@@ -187,3 +187,27 @@ fn to_detection(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<Detect
         embedding: d.embedding,
     })
 }
+
+fn to_track_c(eng: &SightlineEngine, t: &Track) -> SightlineTrackC {
+    let c = &eng.cfg;
+    let (lat, lon, hae) = enu_to_geodetic(
+        [t.x[0], t.x[1], t.hae_m],
+        c.ref_lat_deg,
+        c.ref_lon_deg,
+        c.ref_hae_m,
+    );
+    let speed = t.x[2].hypot(t.x[3]);
+    let course = t.x[2].atan2(t.x[3]).to_degrees().rem_euclid(360.0);
+    let ce = (t.p[0][0] + t.p[1][1]).max(0.0).sqrt() * 1.073;
+    SightlineTrackC {
+        id: t.id,
+        lat_deg: lat,
+        lon_deg: lon,
+        hae_m: hae,
+        ce90_m: ce * 2.0,
+        le90_m: 0.0,
+        course_deg: course,
+        speed_mps: speed,
+        status: t.status as u32,
+    }
+}
