@@ -190,3 +190,22 @@ impl Track {
         ])
     }
 }
+
+impl Track {
+    /// Compute squared Mahalanobis distance d2 = y^T S^-1 y for gated association.
+    pub fn mahalanobis_d2(&self, det: &Detection) -> Option<f64> {
+        let r_var = (det.ce90_m / 2.146).powi(2).max(1.0);
+        let (s, det_s) = self.compute_s_matrix(r_var);
+        let s_inv = Self::invert_s(s, det_s)?;
+
+        let y = [det.east_m - self.x[0], det.north_m - self.x[1]];
+        let d2 = y[0] * (s_inv[0][0] * y[0] + s_inv[0][1] * y[1])
+            + y[1] * (s_inv[1][0] * y[0] + s_inv[1][1] * y[1]);
+
+        if d2.is_finite() && d2 >= 0.0 {
+            Some(d2)
+        } else {
+            None
+        }
+    }
+}
