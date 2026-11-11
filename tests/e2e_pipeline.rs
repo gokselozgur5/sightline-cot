@@ -25,3 +25,12 @@ fn setup_camera() -> (Intrinsics, CameraPose) {
 
     (intrinsics, pose)
 }
+
+fn make_bbox(px: f64, py: f64) -> BoundingBox {
+    BoundingBox {
+        x1: px - 10.0,
+        y1: py - 10.0,
+        x2: px + 10.0,
+        y2: py + 10.0,
+    }
+}
