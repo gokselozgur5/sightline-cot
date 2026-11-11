@@ -40,3 +40,19 @@ fn test_wgs84_antimeridian_wrap_and_equator_oracle() {
     assert!(lat_ds.is_finite() && lon_ds.is_finite());
     assert!((hae_ds - -430.0).abs() < 0.1);
 }
+
+#[test]
+fn test_polar_singularity_offsets() {
+    for pole_lat in [90.0, -90.0] {
+        let (lat, lon, hae) = enu_to_geodetic([0.0, 0.0, 50.0], pole_lat, 0.0, 0.0);
+        assert!((lat - pole_lat).abs() < 1e-5);
+        assert!(lon.is_finite());
+        assert!((hae - 50.0).abs() < 1e-3);
+
+        let (lat_off, lon_off, hae_off) = enu_to_geodetic([100.0, 100.0, 0.0], pole_lat, 0.0, 0.0);
+        assert!(lat_off.is_finite() && lon_off.is_finite() && hae_off.is_finite());
+        let lat_drop = (pole_lat.abs() - lat_off.abs()).abs();
+        let expected_drop = 2.0_f64.sqrt() * 100.0 / 111133.0;
+        assert!((lat_drop - expected_drop).abs() < 1e-5);
+    }
+}
