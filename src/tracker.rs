@@ -195,7 +195,7 @@ impl Track {
 impl Track {
     /// Compute squared Mahalanobis distance d2 = y^T S^-1 y for gated association.
     pub fn mahalanobis_d2(&self, det: &Detection) -> Option<f64> {
-        let r_var = (det.ce90_m / 2.146).powi(2).max(1.0);
+        let r_var = (det.ce90_m / 2.146).powi(2).max(1e-6);
         let (s, det_s) = self.compute_s_matrix(r_var);
         let s_inv = Self::invert_s(s, det_s)?;
 
