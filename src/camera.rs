@@ -321,4 +321,21 @@ mod tests {
         assert!((ray[1]).abs() < 1e-9);
         assert!((ray[2] - 1.0).abs() < 1e-9);
     }
+
+    #[test]
+    fn test_fisheye_inversion_and_center() {
+        let fish = Intrinsics::EquidistantFisheye {
+            fx: 800.0,
+            fy: 800.0,
+            cx: 400.0,
+            cy: 400.0,
+            k1: 0.05,
+            k2: -0.01,
+        };
+        let ray_c = fish.pixel_to_ray(400.0, 400.0).unwrap();
+        assert!((ray_c[2] - 1.0).abs() < 1e-9);
+        let ray_off = fish.pixel_to_ray(500.0, 500.0).unwrap();
+        let len = (ray_off[0].powi(2) + ray_off[1].powi(2) + ray_off[2].powi(2)).sqrt();
+        assert!((len - 1.0).abs() < 1e-6);
+    }
 }
