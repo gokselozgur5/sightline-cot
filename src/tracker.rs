@@ -131,6 +131,16 @@ fn mat4_mul(a: [[f64; 4]; 4], b: [[f64; 4]; 4]) -> [[f64; 4]; 4] {
 
 impl Track {
     #[allow(clippy::needless_range_loop)]
+    fn symmetrize_p(&mut self) {
+        for i in 0..4 {
+            for j in (i + 1)..4 {
+                let avg = 0.5 * (self.p[i][j] + self.p[j][i]);
+                self.p[i][j] = avg;
+                self.p[j][i] = avg;
+            }
+        }
+    }
+
     fn transition_matrix(dt_s: f64) -> [[f64; 4]; 4] {
         let mut f = [[0.0; 4]; 4];
         for i in 0..4 {
