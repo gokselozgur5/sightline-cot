@@ -254,7 +254,7 @@ impl Track {
     /// Perform Joseph-form stabilized covariance and state update.
     #[allow(clippy::needless_range_loop)]
     pub fn update(&mut self, det: &Detection) -> Result<(), TrackerError> {
-        let r_var = (det.ce90_m / 2.146).powi(2).max(1.0);
+        let r_var = (det.ce90_m / 2.146).powi(2).max(1e-6);
         let (s, det_s) = self.compute_s_matrix(r_var);
         let s_inv = Self::invert_s(s, det_s).ok_or(TrackerError::NonFiniteInput)?;
         let k = self.compute_kalman_gain(s_inv);
