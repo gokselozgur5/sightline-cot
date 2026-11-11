@@ -476,4 +476,13 @@ mod tests {
     fn test_panic_is_caught() {
         assert_eq!(guard(|| -> i32 { panic!("boom") }), SIGHTLINE_ERR_PANIC);
     }
+    #[test]
+    fn test_invalid_config_fields_rejected() {
+        let mut c = cfg();
+        c.ref_lat_deg = 95.0;
+        assert!(unsafe { sightline_engine_new(&c) }.is_null());
+        let mut c = cfg();
+        c.is_fisheye = 2;
+        assert!(unsafe { sightline_engine_new(&c) }.is_null());
+    }
 }
