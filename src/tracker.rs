@@ -375,3 +375,27 @@ impl MultiTargetTracker {
         Ok(())
     }
 }
+
+impl MultiTargetTracker {
+    fn update_tracks(
+        &mut self,
+        matches: Vec<(usize, usize)>,
+        unmatched: Vec<usize>,
+        dets: &[Detection],
+    ) -> Result<(), TrackerError> {
+        for (t_idx, d_idx) in matches {
+            self.tracks[t_idx].update(&dets[d_idx])?;
+            if self.tracks[t_idx].hits >= self.min_hits {
+                self.tracks[t_idx].status = TrackStatus::Confirmed;
+            }
+        }
+        for t_idx in unmatched {
+            if self.tracks[t_idx].time_since_update > self.max_age {
+                self.tracks[t_idx].status = TrackStatus::Deleted;
+            } else {
+                self.tracks[t_idx].status = TrackStatus::Coasting;
+            }
+        }
+        Ok(())
+    }
+}
