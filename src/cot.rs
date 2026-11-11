@@ -357,3 +357,17 @@ impl CotUdpDispatcher {
         &self.socket
     }
 }
+impl CotUdpDispatcher {
+    /// Send raw XML string to target address.
+    pub fn send_xml(&self, xml: &str) -> Result<usize, CotError> {
+        self.socket
+            .send_to(xml.as_bytes(), self.target)
+            .map_err(|e| CotError::NetworkError(e.to_string()))
+    }
+
+    /// Serialize and dispatch a CotEvent over UDP.
+    pub fn send_event(&self, event: &CotEvent) -> Result<usize, CotError> {
+        let xml = event.to_xml();
+        self.send_xml(&xml)
+    }
+}
