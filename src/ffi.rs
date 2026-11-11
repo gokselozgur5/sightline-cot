@@ -71,3 +71,11 @@ pub struct SightlineTrackC {
     pub speed_mps: f64,
     pub status: u32,
 }
+
+/// Opaque engine handle owned by the caller.
+pub struct SightlineEngine {
+    cam: Intrinsics,
+    pose: CameraPose,
+    cfg: SightlineCameraCfg,
+    tracker: MultiTargetTracker,
+}
