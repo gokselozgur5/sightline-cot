@@ -167,3 +167,23 @@ fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<(f64, f6
     )
     .map_err(|_| SIGHTLINE_ERR_CAMERA)
 }
+
+fn to_detection(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<Detection, i32> {
+    let p = locate(eng, d)?;
+    let (ce, le) = covariance(eng, d)?;
+    let bbox = BoundingBox {
+        x1: d.x1,
+        y1: d.y1,
+        x2: d.x2,
+        y2: d.y2,
+    };
+    Ok(Detection {
+        east_m: p[0],
+        north_m: p[1],
+        hae_m: eng.cfg.ground_up_m,
+        ce90_m: ce,
+        le90_m: le,
+        bbox,
+        embedding: d.embedding,
+    })
+}
