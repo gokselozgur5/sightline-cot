@@ -581,4 +581,23 @@ mod tests {
         assert_eq!(tracker.tracks.len(), 1);
         assert_eq!(tracker.tracks[0].status, TrackStatus::Confirmed);
     }
+    #[test]
+    fn test_nan_and_negative_dt_rejection() {
+        let mut tracker = MultiTargetTracker::default();
+        let det = dummy_det(0.0, 0.0, [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+        assert_eq!(
+            tracker.step(-1.0, &[det.clone()]),
+            Err(TrackerError::InvalidDeltaTime)
+        );
+        assert_eq!(
+            tracker.step(f64::NAN, &[det.clone()]),
+            Err(TrackerError::InvalidDeltaTime)
+        );
+        let mut bad_det = det;
+        bad_det.east_m = f64::NAN;
+        assert_eq!(
+            tracker.step(1.0, &[bad_det]),
+            Err(TrackerError::NonFiniteInput)
+        );
+    }
 }
