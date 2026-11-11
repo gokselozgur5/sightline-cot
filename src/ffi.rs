@@ -272,3 +272,20 @@ pub unsafe extern "C" fn sightline_engine_step(
 ) -> i32 {
     guard(|| step_impl((e, dets, n), dt_s, (out, cap, out_n)))
 }
+
+fn to_cot(t: &SightlineTrackC) -> CotEvent {
+    CotEvent {
+        uid: format!("sightline-{}", t.id),
+        cot_type: "a-u-G".to_string(),
+        how: "m-g".to_string(),
+        time_ms: 0,
+        stale_ms: 30_000,
+        lat_deg: t.lat_deg,
+        lon_deg: t.lon_deg,
+        hae_m: t.hae_m,
+        ce_m: t.ce90_m,
+        le_m: t.le90_m,
+        course_deg: t.course_deg,
+        speed_mps: t.speed_mps,
+    }
+}
