@@ -303,3 +303,22 @@ pub fn enu_to_geodetic(
     let ecef = enu_to_ecef(enu_m, ref_lat_deg, ref_lon_deg, ref_hae_m);
     ecef_to_geodetic(ecef[0], ecef[1], ecef[2])
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pinhole_nadir_projection() {
+        let cam = Intrinsics::Pinhole {
+            fx: 1000.0,
+            fy: 1000.0,
+            cx: 500.0,
+            cy: 500.0,
+        };
+        let ray = cam.pixel_to_ray(500.0, 500.0).unwrap();
+        assert!((ray[0]).abs() < 1e-9);
+        assert!((ray[1]).abs() < 1e-9);
+        assert!((ray[2] - 1.0).abs() < 1e-9);
+    }
+}
