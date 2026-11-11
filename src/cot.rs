@@ -313,3 +313,26 @@ fn extract_core_elements(xml: &str) -> Result<(&str, &str, Option<&str>), CotErr
     let tr = extract_tag_content(xml, "track");
     Ok((ev, pt, tr))
 }
+impl CotEvent {
+    /// Parse and validate a CoT 2.0 XML string.
+    pub fn from_xml(xml: &str) -> Result<Self, CotError> {
+        let (ev, pt, tr) = extract_core_elements(xml)?;
+        let (uid, cot_type, how, time_ms, stale_ms) = parse_event_header(ev)?;
+        let PointTrack(lat_deg, lon_deg, hae_m, ce_m, le_m, course_deg, speed_mps) =
+            parse_point_and_track(pt, tr)?;
+        Ok(Self {
+            uid,
+            cot_type,
+            how,
+            time_ms,
+            stale_ms,
+            lat_deg,
+            lon_deg,
+            hae_m,
+            ce_m,
+            le_m,
+            course_deg,
+            speed_mps,
+        })
+    }
+}
