@@ -25,3 +25,10 @@ flowchart LR
 - Ground range: `t = (ground_up_m - cam_up_m) / ray_enu.z` gives the ENU ground point.
 - Uncertainty: `J * Sigma * J^T` propagates pixel and attitude variance into `ce90_m = 2.146 * sqrt(0.5 * (var_e + var_n))` and `le90_m = 1.6449 * sqrt(var_u)`.
 - Geodesy: ENU offsets convert to WGS84 (`a = 6378137.0`, `f = 1/298.257223563`) through ECEF.
+
+## Tracking and CoT
+
+- Tracker: 4-state constant-velocity Kalman filter over `[east, north, vel_e, vel_n]` with Joseph-stabilized covariance update.
+- Association: squared Mahalanobis distance gated at the 95% chi-square value `5.991`, then either a bbox IoU or a cosine Re-ID threshold.
+- Lifecycle: tracks confirm at `hits >= min_hits`, coast without updates, and are pruned when `time_since_update > max_age`.
+- CoT: events serialize to CoT 2.0 XML (`<event version="2.0">`) with strict attribute escaping, and ship over a non-blocking `std::net::UdpSocket`.
