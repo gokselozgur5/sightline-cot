@@ -427,3 +427,28 @@ mod tests_escape {
         assert_eq!(parsed.how, "m-g&");
     }
 }
+#[cfg(test)]
+mod tests_bounds {
+    use super::*;
+
+    #[test]
+    fn test_validation_out_of_bounds() {
+        let base_xml = |lat: &str, lon: &str, ce: &str, le: &str, crs: &str, spd: &str| {
+            format!(
+                "<event version=\"2.0\" uid=\"t1\" type=\"a-f-G\" how=\"m-g\" \
+                time=\"2026-02-16T12:00:00.000Z\" start=\"2026-02-16T12:00:00.000Z\" \
+                stale=\"2026-02-16T12:01:00.000Z\">\
+                <point lat=\"{lat}\" lon=\"{lon}\" hae=\"10.0\" ce=\"{ce}\" le=\"{le}\"/>\
+                <detail><track course=\"{crs}\" speed=\"{spd}\"/></detail></event>"
+            )
+        };
+        assert!(CotEvent::from_xml(&base_xml("91.0", "0.0", "1.0", "1.0", "0.0", "0.0")).is_err());
+        assert!(CotEvent::from_xml(&base_xml("-91.0", "0.0", "1.0", "1.0", "0.0", "0.0")).is_err());
+        assert!(CotEvent::from_xml(&base_xml("0.0", "181.0", "1.0", "1.0", "0.0", "0.0")).is_err());
+        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "-0.1", "1.0", "0.0", "0.0")).is_err());
+        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "-0.1", "0.0", "0.0")).is_err());
+        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "1.0", "NaN", "0.0")).is_err());
+        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "1.0", "0.0", "-1.0")).is_err());
+        assert!(CotEvent::from_xml("not xml").is_err());
+    }
+}
