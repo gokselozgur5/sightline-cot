@@ -189,3 +189,19 @@ pub fn intersect_ground(
     let t = delta_h / ray_enu[2];
     Ok([t * ray_enu[0], t * ray_enu[1], ground_up_m])
 }
+
+fn diff_ground_u_v(
+    cam: &Intrinsics,
+    pose: &CameraPose,
+    u: f64,
+    v: f64,
+    p0: [f64; 3],
+    g_up: f64,
+) -> Result<([f64; 2], [f64; 2]), CameraError> {
+    let p_u = intersect_ground(cam.pixel_to_ray(u + 0.5, v)?, pose, g_up)?;
+    let p_v = intersect_ground(cam.pixel_to_ray(u, v + 0.5)?, pose, g_up)?;
+    Ok((
+        [2.0 * (p_u[0] - p0[0]), 2.0 * (p_u[1] - p0[1])],
+        [2.0 * (p_v[0] - p0[0]), 2.0 * (p_v[1] - p0[1])],
+    ))
+}
