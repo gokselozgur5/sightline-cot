@@ -600,4 +600,19 @@ mod tests {
             Err(TrackerError::NonFiniteInput)
         );
     }
+    #[test]
+    fn test_covariance_symmetry_after_cycles() {
+        let mut tracker = MultiTargetTracker::default();
+        let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        for i in 0..5 {
+            let det = dummy_det(i as f64 * 2.0, i as f64 * 3.0, emb);
+            tracker.step(0.5, &[det]).unwrap();
+        }
+        let p = tracker.tracks[0].p;
+        for i in 0..4 {
+            for j in 0..4 {
+                assert!((p[i][j] - p[j][i]).abs() < 1e-9);
+            }
+        }
+    }
 }
