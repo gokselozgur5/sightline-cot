@@ -66,3 +66,12 @@ pub struct Detection {
     pub bbox: BoundingBox,
     pub embedding: [f32; 8],
 }
+
+/// Track state enumeration.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TrackStatus {
+    Tentative,
+    Confirmed,
+    Coasting,
+    Deleted,
+}
