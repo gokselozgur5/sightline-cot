@@ -130,6 +130,7 @@ fn mat4_mul(a: [[f64; 4]; 4], b: [[f64; 4]; 4]) -> [[f64; 4]; 4] {
 }
 
 impl Track {
+    #[allow(clippy::needless_range_loop)]
     fn transition_matrix(dt_s: f64) -> [[f64; 4]; 4] {
         let mut f = [[0.0; 4]; 4];
         for i in 0..4 {
@@ -211,6 +212,7 @@ impl Track {
 }
 
 impl Track {
+    #[allow(clippy::needless_range_loop)]
     fn compute_kalman_gain(&self, s_inv: [[f64; 2]; 2]) -> [[f64; 2]; 4] {
         let mut k = [[0.0; 2]; 4];
         for i in 0..4 {
@@ -250,6 +252,7 @@ impl Track {
 
 impl Track {
     /// Perform Joseph-form stabilized covariance and state update.
+    #[allow(clippy::needless_range_loop)]
     pub fn update(&mut self, det: &Detection) -> Result<(), TrackerError> {
         let r_var = (det.ce90_m / 2.146).powi(2).max(1.0);
         let (s, det_s) = self.compute_s_matrix(r_var);
