@@ -1,0 +1,7 @@
+# Ignore build artifacts
+/target/
+Cargo.lock
+# IDE files
+.idea/
+*.swp
+.DS_Store
