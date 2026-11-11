@@ -198,7 +198,7 @@ fn to_track_c(eng: &SightlineEngine, t: &Track) -> SightlineTrackC {
     );
     let speed = t.x[2].hypot(t.x[3]);
     let course = t.x[2].atan2(t.x[3]).to_degrees().rem_euclid(360.0);
-    let ce = (t.p[0][0] + t.p[1][1]).max(0.0).sqrt() * 1.073;
+    let ce = 2.146 * (0.5 * (t.p[0][0] + t.p[1][1])).max(0.0).sqrt();
     SightlineTrackC {
         id: t.id,
         lat_deg: lat,
