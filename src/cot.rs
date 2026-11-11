@@ -336,3 +336,8 @@ impl CotEvent {
         })
     }
 }
+/// Non-blocking UDP dispatcher for CoT XML messages.
+pub struct CotUdpDispatcher {
+    socket: UdpSocket,
+    target: SocketAddr,
+}
