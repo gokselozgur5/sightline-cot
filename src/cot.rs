@@ -134,3 +134,17 @@ fn parse_date_part(s: &str) -> Result<(i64, u8, u8), CotError> {
     }
     Ok((y, m, d))
 }
+fn parse_fraction_ms(s: &str) -> Result<u32, CotError> {
+    if s.is_empty() || s.len() > 9 || !s.chars().all(|c| c.is_ascii_digit()) {
+        return Err(CotError::InvalidNumber("sec_fraction"));
+    }
+    let mut padded = [b'0'; 3];
+    for (i, b) in s.bytes().take(3).enumerate() {
+        padded[i] = b;
+    }
+    let num_str =
+        std::str::from_utf8(&padded).map_err(|_| CotError::InvalidNumber("sec_fraction"))?;
+    num_str
+        .parse()
+        .map_err(|_| CotError::InvalidNumber("sec_fraction"))
+}
