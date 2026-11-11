@@ -90,3 +90,28 @@ pub struct Track {
     pub time_since_update: usize,
     pub status: TrackStatus,
 }
+
+impl Track {
+    /// Create a new tentative track initialized from a detection.
+    pub fn new(id: u64, det: &Detection) -> Self {
+        let var_xy = (det.ce90_m / 2.146).powi(2).max(1.0);
+        let mut p = [[0.0; 4]; 4];
+        p[0][0] = var_xy;
+        p[1][1] = var_xy;
+        p[2][2] = 100.0;
+        p[3][3] = 100.0;
+
+        Self {
+            id,
+            x: [det.east_m, det.north_m, 0.0, 0.0],
+            p,
+            hae_m: det.hae_m,
+            bbox: det.bbox,
+            embedding: det.embedding,
+            hits: 1,
+            age: 1,
+            time_since_update: 0,
+            status: TrackStatus::Tentative,
+        }
+    }
+}
