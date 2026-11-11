@@ -308,6 +308,8 @@ unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *
     }
 }
 
+/// Advances the tracker by `dt_s` even when `ERR_BUFFER` is returned; `*out_n` holds the full count.
+/// Not thread-safe: one caller per engine.
 /// # Safety
 /// Pointers must be null (with zero length) or valid for the stated lengths.
 #[no_mangle]
