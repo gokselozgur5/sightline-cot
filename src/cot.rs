@@ -267,3 +267,22 @@ fn parse_event_header(ev_tag: &str) -> Result<(String, String, String, i64, i64)
     let stale_ms = parse_iso8601_utc(stale_str)?;
     Ok((uid, cot_type, how, time_ms, stale_ms))
 }
+fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, spd: f64) -> Result<(), CotError> {
+    if !(-90.0..=90.0).contains(&lat) {
+        return Err(CotError::CoordinateOutOfBounds(
+            "lat must be in [-90.0, 90.0]",
+        ));
+    }
+    if !(-180.0..=180.0).contains(&lon) {
+        return Err(CotError::CoordinateOutOfBounds(
+            "lon must be in [-180.0, 180.0]",
+        ));
+    }
+    if ce < 0.0 || le < 0.0 {
+        return Err(CotError::CoordinateOutOfBounds("ce and le must be >= 0.0"));
+    }
+    if spd < 0.0 {
+        return Err(CotError::CoordinateOutOfBounds("speed must be >= 0.0"));
+    }
+    Ok(())
+}
