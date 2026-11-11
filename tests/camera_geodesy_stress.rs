@@ -104,3 +104,16 @@ fn test_so3_yaw_sweep_horizontal_norm_invariance() {
     check_yaw_norm(&pinhole, (640.0, 360.0), 0.0, 0.5);
     check_yaw_norm(&pinhole, (900.0, 200.0), 0.1, 0.6);
 }
+
+#[test]
+fn test_so3_fisheye_yaw_sweep() {
+    let fisheye = Intrinsics::EquidistantFisheye {
+        fx: 600.0,
+        fy: 600.0,
+        cx: 640.0,
+        cy: 360.0,
+        k1: 0.01,
+        k2: -0.001,
+    };
+    check_yaw_norm(&fisheye, (750.0, 450.0), -0.05, 0.55);
+}
