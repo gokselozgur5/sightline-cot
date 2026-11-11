@@ -43,3 +43,31 @@ pub struct SightlineCameraCfg {
     pub max_age: u32,
     pub q_acc: f64,
 }
+
+/// Pixel detection with bounding box and Re-ID embedding.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct SightlineDetectionC {
+    pub u: f64,
+    pub v: f64,
+    pub x1: f64,
+    pub y1: f64,
+    pub x2: f64,
+    pub y2: f64,
+    pub embedding: [f32; 8],
+}
+
+/// Geodetic track report.
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SightlineTrackC {
+    pub id: u64,
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+    pub hae_m: f64,
+    pub ce90_m: f64,
+    pub le90_m: f64,
+    pub course_deg: f64,
+    pub speed_mps: f64,
+    pub status: u32,
+}
