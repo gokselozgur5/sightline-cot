@@ -418,3 +418,25 @@ impl MultiTargetTracker {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn dummy_det(x: f64, y: f64, emb: [f32; 8]) -> Detection {
+        Detection {
+            east_m: x,
+            north_m: y,
+            hae_m: 10.0,
+            ce90_m: 1.5,
+            le90_m: 1.0,
+            bbox: BoundingBox {
+                x1: 10.0,
+                y1: 10.0,
+                x2: 50.0,
+                y2: 50.0,
+            },
+            embedding: emb,
+        }
+    }
+}
