@@ -22,3 +22,19 @@ impl std::fmt::Display for CameraError {
 }
 
 impl std::error::Error for CameraError {}
+
+/// Camera intrinsic calibration model.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Intrinsics {
+    /// Standard rectilinear pinhole camera.
+    Pinhole { fx: f64, fy: f64, cx: f64, cy: f64 },
+    /// Equidistant fisheye model with radial polynomial distortion.
+    EquidistantFisheye {
+        fx: f64,
+        fy: f64,
+        cx: f64,
+        cy: f64,
+        k1: f64,
+        k2: f64,
+    },
+}
