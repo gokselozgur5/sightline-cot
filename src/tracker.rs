@@ -140,3 +140,29 @@ impl Track {
         f
     }
 }
+
+impl Track {
+    /// Predict track state forward by dt_s seconds.
+    pub fn predict(&mut self, dt_s: f64, q_acc: f64) {
+        self.x[0] += self.x[2] * dt_s;
+        self.x[1] += self.x[3] * dt_s;
+        let f = Self::transition_matrix(dt_s);
+        let mut ft = f;
+        ft[0][2] = 0.0;
+        ft[2][0] = dt_s;
+        ft[1][3] = 0.0;
+        ft[3][1] = dt_s;
+        self.p = mat4_mul(mat4_mul(f, self.p), ft);
+        let (dt2, dt3, dt4) = (dt_s * dt_s, dt_s.powi(3) / 2.0, dt_s.powi(4) / 4.0);
+        self.p[0][0] += dt4 * q_acc;
+        self.p[0][2] += dt3 * q_acc;
+        self.p[2][0] += dt3 * q_acc;
+        self.p[2][2] += dt2 * q_acc;
+        self.p[1][1] += dt4 * q_acc;
+        self.p[1][3] += dt3 * q_acc;
+        self.p[3][1] += dt3 * q_acc;
+        self.p[3][3] += dt2 * q_acc;
+        self.age += 1;
+        self.time_since_update += 1;
+    }
+}
