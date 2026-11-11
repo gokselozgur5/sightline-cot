@@ -615,4 +615,13 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn test_degenerate_s_inversion_guard() {
+        let s_singular = [[1.0, 2.0], [2.0, 4.0]];
+        let det = s_singular[0][0] * s_singular[1][1] - s_singular[0][1] * s_singular[1][0];
+        assert_eq!(Track::invert_s(s_singular, det), None);
+        let s_neg_det = [[1.0, 3.0], [2.0, 1.0]];
+        let det_neg = s_neg_det[0][0] * s_neg_det[1][1] - s_neg_det[0][1] * s_neg_det[1][0];
+        assert_eq!(Track::invert_s(s_neg_det, det_neg), None);
+    }
 }
