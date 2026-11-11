@@ -408,7 +408,7 @@ mod tests {
         };
         let pt = intersect_ground([0.0, 0.0, 1.0], &pose, 0.0).unwrap();
         assert!((pt[1] - 100.0).abs() < 1e-4);
-        let res_up = intersect_ground([0.0, 1.0, 0.0], &pose, 0.0);
+        let res_up = intersect_ground([0.0, -1.0, 0.0], &pose, 0.0);
         assert_eq!(res_up, Err(CameraError::RayAboveHorizon));
     }
 
