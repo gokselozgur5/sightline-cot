@@ -97,3 +97,19 @@ fn dispatch_tracks(dispatcher: &CotUdpDispatcher, tracks: &[Track], t_ms: i64) -
     }
     count
 }
+
+fn step_and_dispatch(
+    tracker: &mut MultiTargetTracker,
+    disp: &CotUdpDispatcher,
+    dets: &[Detection],
+    t_ms: i64,
+) -> usize {
+    tracker.step(0.1, dets).expect("tracker step");
+    let confirmed: Vec<Track> = tracker
+        .tracks
+        .iter()
+        .filter(|t| t.status == TrackStatus::Confirmed)
+        .cloned()
+        .collect();
+    dispatch_tracks(disp, &confirmed, t_ms)
+}
