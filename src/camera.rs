@@ -411,4 +411,19 @@ mod tests {
         assert!(ce2 > ce1);
         assert!(le2 > le1);
     }
+
+    #[test]
+    fn test_so3_determinant() {
+        let pose = CameraPose {
+            roll_rad: 0.15,
+            pitch_rad: 0.35,
+            yaw_rad: -0.7,
+            cam_up_m: 120.0,
+        };
+        let r = pose.rotation_matrix();
+        let det = r[0][0] * (r[1][1] * r[2][2] - r[1][2] * r[2][1])
+            - r[0][1] * (r[1][0] * r[2][2] - r[1][2] * r[2][0])
+            + r[0][2] * (r[1][0] * r[2][1] - r[1][1] * r[2][0]);
+        assert!((det - 1.0).abs() < 1e-9);
+    }
 }
