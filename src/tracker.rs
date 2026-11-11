@@ -480,4 +480,15 @@ mod tests {
         assert!((trk.x[2] - 5.0).abs() < 0.5);
         assert!((trk.x[3] - 10.0).abs() < 0.5);
     }
+
+    #[test]
+    fn test_mahalanobis_outlier_rejection() {
+        let mut tracker = MultiTargetTracker::new(2, 3, 0.5);
+        let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        tracker.step(1.0, &[dummy_det(0.0, 0.0, emb)]).unwrap();
+        tracker.step(1.0, &[dummy_det(1.0, 1.0, emb)]).unwrap();
+        let outlier = dummy_det(500.0, 500.0, emb);
+        tracker.step(1.0, &[outlier]).unwrap();
+        assert_eq!(tracker.tracks.len(), 2);
+    }
 }
