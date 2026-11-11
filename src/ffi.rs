@@ -79,3 +79,28 @@ pub struct SightlineEngine {
     cfg: SightlineCameraCfg,
     tracker: MultiTargetTracker,
 }
+
+fn make_intrinsics(c: &SightlineCameraCfg) -> Intrinsics {
+    let (fx, fy, cx, cy, k1, k2) = (c.fx, c.fy, c.cx, c.cy, c.k1, c.k2);
+    if c.is_fisheye != 0 {
+        Intrinsics::EquidistantFisheye {
+            fx,
+            fy,
+            cx,
+            cy,
+            k1,
+            k2,
+        }
+    } else {
+        Intrinsics::Pinhole { fx, fy, cx, cy }
+    }
+}
+
+fn make_pose(c: &SightlineCameraCfg) -> CameraPose {
+    CameraPose {
+        roll_rad: c.roll_rad,
+        pitch_rad: c.pitch_rad,
+        yaw_rad: c.yaw_rad,
+        cam_up_m: c.cam_up_m,
+    }
+}
