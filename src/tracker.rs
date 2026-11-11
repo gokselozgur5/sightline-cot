@@ -123,7 +123,7 @@ impl Track {
             p,
             hae_m: det.hae_m,
             bbox: det.bbox,
-            embedding: det.embedding,
+            embedding: normalize_embedding(&det.embedding),
             hits: 1,
             age: 1,
             time_since_update: 0,
