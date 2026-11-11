@@ -48,6 +48,11 @@ typedef struct {
     uint32_t status;
 } SightlineTrackC;
 
+/* Layout guards (C99): size mismatch yields a negative array size. */
+typedef char sightline_assert_cfg[(sizeof(SightlineCameraCfg) == 152) ? 1 : -1];
+typedef char sightline_assert_det[(sizeof(SightlineDetectionC) == 80) ? 1 : -1];
+typedef char sightline_assert_trk[(sizeof(SightlineTrackC) == 72) ? 1 : -1];
+
 SightlineEngine *sightline_engine_new(const SightlineCameraCfg *cfg);
 void sightline_engine_free(SightlineEngine *e);
 int32_t sightline_engine_step(SightlineEngine *e, double dt_s,
