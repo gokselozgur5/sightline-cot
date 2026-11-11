@@ -181,3 +181,28 @@ fn test_grazing_angle_rejection_boundary() {
         Err(CameraError::RayAboveHorizon)
     );
 }
+
+#[test]
+fn test_extreme_fisheye_fov_round_trip() {
+    let (fx, fy, cx, cy) = (300.0, 300.0, 500.0, 500.0);
+    let (k1, k2) = (0.01, -0.001);
+    let fish = Intrinsics::EquidistantFisheye {
+        fx,
+        fy,
+        cx,
+        cy,
+        k1,
+        k2,
+    };
+    for deg in [60.0, 70.0, 75.0, 80.0, 85.0] {
+        let th = deg * (PI / 180.0);
+        let rd = th * (1.0 + k1 * th.powi(2) + k2 * th.powi(4));
+        let u_in = cx + fx * (1.0 / 2.0_f64.sqrt()) * rd;
+        let v_in = cy + fy * (1.0 / 2.0_f64.sqrt()) * rd;
+        let ray = fish.pixel_to_ray(u_in, v_in).unwrap();
+        let norm = (ray[0].powi(2) + ray[1].powi(2) + ray[2].powi(2)).sqrt();
+        assert!((norm - 1.0).abs() < 1e-12);
+        let th_meas = ray[2].acos();
+        assert!((th_meas - th).abs() < 1e-9);
+    }
+}
