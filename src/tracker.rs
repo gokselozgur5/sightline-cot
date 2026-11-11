@@ -284,3 +284,16 @@ impl Default for MultiTargetTracker {
         Self::new(3, 5, 2.0)
     }
 }
+
+impl MultiTargetTracker {
+    /// Create a new MultiTargetTracker with tracking parameters.
+    pub fn new(min_hits: usize, max_age: usize, q_acc: f64) -> Self {
+        Self {
+            next_id: 1,
+            tracks: Vec::new(),
+            min_hits,
+            max_age,
+            q_acc,
+        }
+    }
+}
