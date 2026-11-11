@@ -249,3 +249,9 @@ pub fn estimate_covariance_ce_le(
     let le90 = (1.6449 * 0.01 * slant).max(0.5);
     Ok((ce90, le90))
 }
+
+const WGS84_A: f64 = 6378137.0;
+const WGS84_F: f64 = 1.0 / 298.257223563;
+const WGS84_B: f64 = WGS84_A * (1.0 - WGS84_F);
+const WGS84_E2: f64 = 2.0 * WGS84_F - WGS84_F * WGS84_F;
+const WGS84_E_PRIME2: f64 = (WGS84_A * WGS84_A - WGS84_B * WGS84_B) / (WGS84_B * WGS84_B);
