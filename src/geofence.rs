@@ -135,3 +135,20 @@ impl Geofence {
     pub fn evaluate_breach(
         &self,
         lat_deg: f64,
+        lon_deg: f64,
+        alt_m: f64,
+        prev_inside: Option<bool>,
+    ) -> GeofenceBreach {
+        let curr_inside = self.contains_3d(lat_deg, lon_deg, alt_m);
+        let pt = GeofencePoint { lat_deg, lon_deg };
+        let distance_to_boundary_m = self.distance_to_boundary_m(pt);
+        let status = match prev_inside {
+            None => {
+                if curr_inside {
+                    GeofenceStatus::Inside
+                } else {
+                    GeofenceStatus::Outside
+                }
+            }
+            Some(prev) => match (prev, curr_inside) {
+                (false, true) => GeofenceStatus::Entered,
