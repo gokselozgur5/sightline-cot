@@ -24,3 +24,16 @@ pub enum TargetCategory {
     #[default]
     Unknown,
 }
+
+impl TacticalAffiliation {
+    /// Returns the single-letter CoT affiliation code character.
+    #[inline]
+    pub const fn cot_char(&self) -> char {
+        match self {
+            Self::Friendly => 'f',
+            Self::Hostile => 'h',
+            Self::Neutral => 'n',
+            Self::Unknown => 'u',
+        }
+    }
+}
