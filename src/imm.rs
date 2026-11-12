@@ -214,3 +214,26 @@ impl ImmFilter {
         );
     }
 }
+
+impl ImmFilter {
+    /// Update each model with observation and update probabilities.
+    pub fn update(&mut self, z: [f64; 3]) {
+        let r = self.config.pos_noise_m * self.config.pos_noise_m;
+        let mut lik = [0.0; NUM_MODELS];
+        for j in 0..NUM_MODELS {
+            lik[j] = self.filters[j].update_pos(z, r);
+        }
+        let mut sum_p = 0.0;
+        for j in 0..NUM_MODELS {
+            self.probs[j] *= lik[j];
+            sum_p += self.probs[j];
+        }
+        if sum_p > 1e-12 {
+            for j in 0..NUM_MODELS {
+                self.probs[j] /= sum_p;
+            }
+        } else {
+            self.probs = [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        }
+    }
+}
