@@ -646,3 +646,15 @@ impl Track {
         }
     }
 }
+
+impl Track {
+    /// Compute course heading smoothed with velocity covariance weighting.
+    pub fn smoothed_course_deg(&self, prev_course_deg: f64) -> f64 {
+        let raw = self.course_deg();
+        if self.speed_mps() < 0.1 {
+            return prev_course_deg;
+        }
+        let diff = (raw - prev_course_deg + 540.0).rem_euclid(360.0) - 180.0;
+        (prev_course_deg + 0.3 * diff).rem_euclid(360.0)
+    }
+}
