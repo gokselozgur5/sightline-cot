@@ -365,3 +365,24 @@ mod tests {
         assert_eq!(parsed.domain, SidcDomain::Air);
     }
 }
+
+#[cfg(test)]
+mod tests_c {
+    use super::*;
+
+    #[test]
+    fn test_2525c_generation_and_parsing() {
+        let sym = TacticalSymbol {
+            version: SidcVersion::Legacy2525C,
+            affiliation: SidcAffiliation::Hostile,
+            domain: SidcDomain::Surface,
+            entity_code: 0,
+            modifier: 0,
+        };
+        let buf = sym.to_2525c();
+        assert_eq!(buf.len(), 15);
+        let parsed = TacticalSymbol::from_sidc(buf.as_str()).unwrap();
+        assert_eq!(parsed.affiliation, SidcAffiliation::Hostile);
+        assert_eq!(parsed.domain, SidcDomain::Surface);
+    }
+}
