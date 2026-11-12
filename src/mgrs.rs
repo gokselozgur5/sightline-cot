@@ -25,3 +25,12 @@ const WGS84_F: f64 = 1.0 / 298.257223563;
 const UTM_K0: f64 = 0.9996;
 const FALSE_EASTING: f64 = 500000.0;
 const FALSE_NORTHING_SOUTH: f64 = 10000000.0;
+
+/// Determine standard UTM zone from longitude in degrees.
+pub fn lon_to_utm_zone(lon_deg: f64) -> Result<u8, GridError> {
+    if !(-180.0..=180.0).contains(&lon_deg) {
+        return Err(GridError::InvalidLongitude);
+    }
+    let zone = ((lon_deg + 180.0) / 6.0).floor() as u8 + 1;
+    Ok(zone.clamp(1, 60))
+}
