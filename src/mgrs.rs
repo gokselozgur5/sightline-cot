@@ -292,4 +292,12 @@ mod tests {
         assert_eq!(s.len, 15);
         assert!(s.as_str().starts_with("10S"));
     }
+
+    #[test]
+    fn test_zone_boundaries() {
+        assert_eq!(lon_to_utm_zone(-180.0).unwrap(), 1);
+        assert_eq!(lon_to_utm_zone(180.0).unwrap(), 60);
+        assert_eq!(lon_to_utm_zone(-174.0).unwrap(), 2);
+        assert_eq!(lon_to_utm_zone(-174.0001).unwrap(), 1);
+    }
 }
