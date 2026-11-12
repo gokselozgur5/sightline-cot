@@ -79,3 +79,25 @@ pub fn check_los(dem: &DemGrid, obs: Position3D, tgt: Position3D, n: usize) -> L
         min_clearance_m: min_clr,
     }
 }
+
+pub fn compute_horizon_elevation_angle(
+    dem: &DemGrid,
+    obs: Position3D,
+    az: f64,
+    r: f64,
+    n: usize,
+) -> f64 {
+    let (mut max_ang, steps) = (-core::f64::consts::FRAC_PI_2, n.max(2));
+    let step_d = r / steps as f64;
+    for i in 1..=steps {
+        let d = i as f64 * step_d;
+        let (e, nr) = (obs.east_m + d * az.sin(), obs.north_m + d * az.cos());
+        if let Some(h) = dem.elevation_at(e, nr) {
+            let ang = (h - earth_curvature_drop(d) - obs.up_m).atan2(d);
+            if ang > max_ang {
+                max_ang = ang;
+            }
+        }
+    }
+    max_ang
+}
