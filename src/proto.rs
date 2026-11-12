@@ -74,3 +74,10 @@ pub fn decode_varint(buf: &[u8]) -> Result<(u64, usize), ProtoError> {
     }
     Err(ProtoError::UnexpectedEof)
 }
+
+/// Encodes a protobuf field tag (field_number << 3 | wire_type).
+#[inline]
+pub fn encode_tag(field_num: u32, wire_type: WireType, buf: &mut [u8]) -> Result<usize, ProtoError> {
+    let key = ((field_num as u64) << 3) | (wire_type as u64);
+    encode_varint(key, buf)
+}
