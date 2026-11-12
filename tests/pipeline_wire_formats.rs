@@ -23,3 +23,23 @@ fn det(east_m: f64, north_m: f64, idx: usize) -> Detection {
         embedding,
     }
 }
+fn confirmed_events() -> Vec<CotEvent> {
+    let mut tracker = MultiTargetTracker::new(2, 5, 1.0);
+    for f in 0..4 {
+        let d = f as f64;
+        tracker
+            .step(0.1, &[det(10.0 + d, 20.0, 0), det(300.0, 400.0 - d, 1)])
+            .expect("step");
+    }
+    let t0 = 1_771_234_500_000;
+    let mut out = Vec::new();
+    for t in tracker
+        .tracks
+        .iter()
+        .filter(|t| t.status == TrackStatus::Confirmed)
+    {
+        let (lat, lon) = (37.7749 + t.x[1] * 9e-6, -122.4194 + t.x[0] * 1.1e-5);
+        out.push(t.to_cot_event("TRK", "a-f-G-E-V", lat, lon, t0, t0 + 10_000));
+    }
+    out
+}
