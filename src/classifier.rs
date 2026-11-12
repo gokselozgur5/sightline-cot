@@ -67,3 +67,12 @@ fn match_category(s: &str) -> TargetCategory {
         TargetCategory::Unknown
     }
 }
+
+impl MilStdClassifier {
+    pub fn from_label(label: &str) -> Self {
+        Self {
+            affiliation: TacticalAffiliation::Unknown,
+            category: match_category(label.trim()),
+        }
+    }
+}
