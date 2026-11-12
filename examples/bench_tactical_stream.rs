@@ -58,3 +58,23 @@ struct SyntheticTarget {
     raw_emb: [f32; 8],
     cot_type: &'static str,
 }
+
+impl SyntheticTarget {
+    fn step(&mut self, dt: f64) {
+        self.east_m += self.vel_e * dt;
+        self.north_m += self.vel_n * dt;
+        if self.east_m.abs() > BOUND_E_M {
+            self.vel_e = -self.vel_e;
+        }
+        if self.north_m.abs() > BOUND_N_M {
+            self.vel_n = -self.vel_n;
+        }
+    }
+}
+
+fn init_scenario() -> Vec<SyntheticTarget> {
+    vec![
+        SyntheticTarget {
+            east_m: 100.0,
+            north_m: 150.0,
+            vel_e: 12.0,
