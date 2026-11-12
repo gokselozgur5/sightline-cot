@@ -67,3 +67,12 @@ fn hysteresis_without_history_matches_plain_evaluation() {
     let b = gf.evaluate_breach_hysteresis(0.0001, 0.0001, 10.0, None, 50.0);
     assert_eq!(b.state, GeofenceState::Inside);
 }
+
+#[test]
+fn antimeridian_polygon_containment() {
+    let poly = [[0.0, 179.0], [0.0, -179.0], [1.0, -179.0], [1.0, 179.0]];
+    let gf = Geofence::new(&poly, 0.0, 1000.0).unwrap();
+    assert!(gf.is_point_inside_polygon(0.5, 179.5));
+    assert!(gf.is_point_inside_polygon(0.5, -179.5));
+    assert!(!gf.is_point_inside_polygon(0.5, 0.0));
+}
