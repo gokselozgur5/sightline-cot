@@ -26,3 +26,9 @@ pub fn encode_varint(mut val: u64, buf: &mut [u8]) -> Result<usize, ProtoError> 
         val >>= 7;
         i += 1;
     }
+    if i >= buf.len() {
+        return Err(ProtoError::BufferTooShort);
+    }
+    buf[i] = (val & 0x7F) as u8;
+    Ok(i + 1)
+}
