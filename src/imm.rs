@@ -128,8 +128,17 @@ impl SubFilter {
         self.state[0] += sin_w * vx - cos_w * vy;
         self.state[1] += cos_w * vx + sin_w * vy;
         self.state[2] += self.state[5] * dt;
-        self.state[3] = (omega * dt).cos() * vx - (omega * dt).sin() * vy;
-        self.state[4] = (omega * dt).sin() * vx + (omega * dt).cos() * vy;
+        let (s, c) = (omega * dt).sin_cos();
+        self.state[3] = c * vx - s * vy;
+        self.state[4] = s * vx + c * vy;
+        let mut f = [[0.0; 6]; 6];
+        for i in 0..6 {
+            f[i][i] = 1.0;
+        }
+        (f[0][3], f[0][4], f[1][3], f[1][4]) = (sin_w, -cos_w, cos_w, sin_w);
+        (f[3][3], f[3][4], f[4][3], f[4][4]) = (c, -s, s, c);
+        f[2][5] = dt;
+        self.cov = propagate_cov(&f, &self.cov);
         for i in 0..6 {
             self.cov[i][i] += q * dt;
         }
