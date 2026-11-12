@@ -620,3 +620,24 @@ mod test_tcp_helper {
         })
     }
 }
+
+#[test]
+fn test_tcp_streamer_loopback_roundtrip() {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind tcp");
+    let addr = listener.local_addr().expect("local addr");
+    let mut streamer = CotTcpStreamer::new(addr).expect("new streamer");
+    let handle = test_tcp_helper::spawn_mock_server(listener);
+    let hb = CotTcpStreamer::generate_sa_heartbeat(
+        "TEST-SA",
+        1700000000000,
+        35.0,
+        -120.0,
+        200.0,
+        5.0,
+        45.0,
+    );
+    streamer.send_event(&hb).expect("send event");
+    let received = handle.join().expect("join");
+    let received_str = std::str::from_utf8(&received).expect("utf8");
+    assert!(received_str.contains("a-f-G-U-C") && received_str.contains("TEST-SA"));
+}
