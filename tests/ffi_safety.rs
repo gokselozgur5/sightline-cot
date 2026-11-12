@@ -67,3 +67,16 @@ fn step_rejects_null_out_count_and_null_detections() {
         sightline_engine_free(e);
     }
 }
+
+#[test]
+fn step_rejects_null_output_with_nonzero_capacity() {
+    let c = cfg();
+    let mut n = 0usize;
+    unsafe {
+        let e = sightline_engine_new(&c);
+        let out = std::ptr::null_mut();
+        let rc = sightline_engine_step(e, 0.1, std::ptr::null(), 0, out, 4, &mut n);
+        assert_eq!(rc, SIGHTLINE_ERR_NULL);
+        sightline_engine_free(e);
+    }
+}
