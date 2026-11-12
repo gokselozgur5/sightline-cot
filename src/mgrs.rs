@@ -53,6 +53,26 @@ pub fn lon_to_utm_zone(lon_deg: f64) -> Result<u8, GridError> {
 }
 
 /// Forward UTM projection from WGS84 lat/lon.
+///
+/// The zone comes from the longitude and the hemisphere from the sign of the
+/// latitude. Valid latitudes are `-80` to `84` degrees.
+///
+/// # Errors
+///
+/// Returns [`GridError::InvalidLatitude`] or [`GridError::InvalidLongitude`]
+/// when an input is outside its range.
+///
+/// # Examples
+///
+/// ```
+/// use sightline_cot::wgs84_to_utm;
+///
+/// let utm = wgs84_to_utm(0.0, 3.0).unwrap();
+/// assert_eq!(utm.zone, 31);
+/// assert_eq!(utm.hemisphere, 'N');
+/// assert_eq!(utm.easting, 500000.0);
+/// assert_eq!(utm.northing, 0.0);
+/// ```
 pub fn wgs84_to_utm(lat_deg: f64, lon_deg: f64) -> Result<UtmCoord, GridError> {
     if !(-80.0..=84.0).contains(&lat_deg) {
         return Err(GridError::InvalidLatitude);
