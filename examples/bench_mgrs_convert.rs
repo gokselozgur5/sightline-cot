@@ -44,3 +44,14 @@ fn main() {
             black_box(wgs84_to_utm(lat, lon).ok());
         }
     });
+    let inv_s = best_seconds(|| {
+        for utm in &utms {
+            black_box(utm_to_wgs84(black_box(utm)).ok());
+        }
+    });
+    let mgrs_s = best_seconds(|| {
+        for &(lat, lon) in &points {
+            black_box(format_mgrs(lat, lon, MGRS_DIGITS).ok());
+        }
+    });
+
