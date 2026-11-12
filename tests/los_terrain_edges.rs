@@ -16,3 +16,16 @@ fn path_fully_outside_grid_is_visible_with_max_clearance() {
     assert!(r.is_visible);
     assert_eq!(r.min_clearance_m, f64::MAX);
 }
+// Add grid-leaving path and edge endpoint tests
+#[test]
+fn only_in_grid_samples_can_block_a_leaving_path() {
+    let r = check_los(&flat(), p(500.0, 500.0, 10.0), p(5000.0, 500.0, 10.0), 50);
+    assert!(r.is_visible);
+    assert!(r.min_clearance_m > 0.0 && r.min_clearance_m < f64::MAX);
+}
+
+#[test]
+fn endpoint_on_grid_edge_is_handled() {
+    let r = check_los(&flat(), p(0.0, 0.0, 10.0), p(1000.0, 1000.0, 10.0), 10);
+    assert!(r.is_visible);
+}
