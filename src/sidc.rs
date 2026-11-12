@@ -133,3 +133,19 @@ impl SidcAffiliation {
         }
     }
 }
+
+impl SidcAffiliation {
+    pub fn to_2525c_char(&self) -> char {
+        match self {
+            Self::Pending => 'P',
+            Self::Unknown => 'U',
+            Self::AssumedFriend => 'A',
+            Self::Friend => 'F',
+            Self::Neutral => 'N',
+            Self::Suspect => 'S',
+            Self::Hostile => 'H',
+            Self::Joker => 'J',
+            Self::Faker => 'K',
+        }
+    }
+}
