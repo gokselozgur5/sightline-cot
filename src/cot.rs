@@ -478,6 +478,27 @@ impl CotTcpStreamer {
     }
 }
 
+impl CotTcpStreamer {
+    pub fn is_connected(&self) -> bool {
+        self.stream.is_some()
+    }
+
+    pub fn connect(&mut self) -> Result<(), CotError> {
+        match TcpStream::connect_timeout(&self.server_addr, std::time::Duration::from_millis(500)) {
+            Ok(s) => {
+                let _ = s.set_nonblocking(false);
+                let _ = s.set_nodelay(true);
+                self.stream = Some(s);
+                Ok(())
+            }
+            Err(e) => {
+                self.stream = None;
+                Err(CotError::NetworkError(e.to_string()))
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests_udp_rt {
     use super::*;
