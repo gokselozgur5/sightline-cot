@@ -102,3 +102,13 @@ impl Geofence {
         let k_lon = 111412.84 * mean_lat_rad.cos();
         let ax = (a.lon_deg - p.lon_deg) * k_lon;
         let ay = (a.lat_deg - p.lat_deg) * k_lat;
+        let bx = (b.lon_deg - p.lon_deg) * k_lon;
+        let by = (b.lat_deg - p.lat_deg) * k_lat;
+        let dx = bx - ax;
+        let dy = by - ay;
+        let seg_len_sq = dx * dx + dy * dy;
+        if seg_len_sq < 1e-6 {
+            return (ax * ax + ay * ay).sqrt();
+        }
+        let t = ((-ax * dx - ay * dy) / seg_len_sq).clamp(0.0, 1.0);
+        let px = ax + t * dx;
