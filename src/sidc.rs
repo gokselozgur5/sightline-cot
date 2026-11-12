@@ -179,3 +179,17 @@ impl SidcDomain {
         }
     }
 }
+
+impl SidcDomain {
+    pub fn from_2525d_code(code: &str) -> Result<Self, SidcError> {
+        match code {
+            "01" => Ok(Self::Air),
+            "05" => Ok(Self::Space),
+            "10" => Ok(Self::Land),
+            "30" => Ok(Self::Surface),
+            "35" => Ok(Self::Subsurface),
+            "40" => Ok(Self::Activity),
+            _ => Err(SidcError::InvalidDomain),
+        }
+    }
+}
