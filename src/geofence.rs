@@ -112,3 +112,26 @@ impl Geofence {
         }
         let t = ((-ax * dx - ay * dy) / seg_len_sq).clamp(0.0, 1.0);
         let px = ax + t * dx;
+        let py = ay + t * dy;
+        (px * px + py * py).sqrt()
+    }
+
+    /// Compute minimum horizontal distance in meters to polygon boundary.
+    pub fn distance_to_boundary_m(&self, pt: GeofencePoint) -> f64 {
+        let n = self.vertex_count;
+        let mut min_d = f64::MAX;
+        for i in 0..n {
+            let a = self.vertices[i];
+            let b = self.vertices[(i + 1) % n];
+            let d = Self::dist_to_segment_m(pt, a, b);
+            if d < min_d {
+                min_d = d;
+            }
+        }
+        min_d
+    }
+
+    /// Evaluate status and transitions between consecutive track points.
+    pub fn evaluate_breach(
+        &self,
+        lat_deg: f64,
