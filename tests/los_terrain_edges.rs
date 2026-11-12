@@ -7,12 +7,21 @@ fn flat() -> DemGrid {
 }
 
 fn p(e: f64, n: f64, u: f64) -> Position3D {
-    Position3D { east_m: e, north_m: n, up_m: u }
+    Position3D {
+        east_m: e,
+        north_m: n,
+        up_m: u,
+    }
 }
 
 #[test]
 fn path_fully_outside_grid_is_visible_with_max_clearance() {
-    let r = check_los(&flat(), p(2000.0, 2000.0, -50.0), p(3000.0, 2000.0, -50.0), 10);
+    let r = check_los(
+        &flat(),
+        p(2000.0, 2000.0, -50.0),
+        p(3000.0, 2000.0, -50.0),
+        10,
+    );
     assert!(r.is_visible);
     assert_eq!(r.min_clearance_m, f64::MAX);
 }
@@ -44,6 +53,12 @@ fn horizon_ray_running_off_grid_still_sees_edge_terrain() {
 
 #[test]
 fn horizon_ray_pointing_away_from_grid_is_straight_down() {
-    let ang = compute_horizon_elevation_angle(&flat(), p(0.0, 500.0, 5.0), -core::f64::consts::FRAC_PI_2, 500.0, 5);
+    let ang = compute_horizon_elevation_angle(
+        &flat(),
+        p(0.0, 500.0, 5.0),
+        -core::f64::consts::FRAC_PI_2,
+        500.0,
+        5,
+    );
     assert_eq!(ang, -core::f64::consts::FRAC_PI_2);
 }
