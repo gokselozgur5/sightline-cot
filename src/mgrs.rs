@@ -156,3 +156,10 @@ fn mgrs_100k_col_letter(zone: u8, easting: f64) -> char {
     const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
     COLS[(base_idx + col_idx) % COLS.len()] as char
 }
+
+fn mgrs_100k_row_letter(zone: u8, northing: f64) -> char {
+    let row_offset = if (zone % 2) == 1 { 0 } else { 5 };
+    let row_idx = ((northing / 100000.0).floor() as usize) % 20;
+    const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
+    ROWS[(row_offset + row_idx) % ROWS.len()] as char
+}
