@@ -129,4 +129,23 @@ mod tests {
         assert!(res.obstruction.is_none());
         assert!(res.min_clearance_m > 25.0);
     }
+
+    #[test]
+    fn test_los_blocked_by_ridge() {
+        let dem = create_test_dem();
+        let obs = Position3D {
+            east_m: 0.0,
+            north_m: 10.0,
+            up_m: 5.0,
+        };
+        let tgt = Position3D {
+            east_m: 20.0,
+            north_m: 10.0,
+            up_m: 5.0,
+        };
+        let res = check_los(&dem, obs, tgt, 10);
+        assert!(!res.is_visible);
+        assert!(res.obstruction.is_some());
+        assert!(res.min_clearance_m < 0.0);
+    }
 }
