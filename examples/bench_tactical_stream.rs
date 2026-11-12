@@ -218,3 +218,23 @@ fn main() {
         cy: 540.0,
     };
     let pose = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: CAM_ALT_M,
+    };
+    let mut targets = init_scenario();
+    let frames = pregenerate(&mut targets, &cam);
+    let mut tracker = MultiTargetTracker::default();
+    let mut stats = LatencyStats::with_capacity(NUM_FRAMES);
+    let mut total_bytes = 0usize;
+    for (frame_idx, obs) in frames.iter().enumerate() {
+        let t0 = Instant::now();
+        total_bytes += process_frame(frame_idx, obs, &cam, &pose, &mut tracker);
+        stats.record(t0.elapsed().as_secs_f64() * 1_000_000.0);
+    }
+    let (p50, p99, max, mean, fps) = stats.compute_metrics();
+    println!("=== Sightline CoT Tactical Mission Benchmark ===");
+    println!("Frames processed : {NUM_FRAMES}");
+    println!("Total CoT output : {total_bytes} bytes");
+    println!("Latency p50      : {p50:.2} us");
