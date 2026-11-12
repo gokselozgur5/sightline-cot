@@ -34,3 +34,20 @@ fn roundtrip_unusual_identifiers() {
         assert_eq!(back.uid, uid, "uid {uid:?}");
     }
 }
+
+#[test]
+fn roundtrip_extreme_coordinates() {
+    for (lat, lon) in [
+        (90.0, 180.0),
+        (-90.0, -180.0),
+        (0.0, 0.0),
+        (-0.0000001, 0.0000001),
+    ] {
+        let mut ev = event("X", 1000);
+        ev.lat_deg = lat;
+        ev.lon_deg = lon;
+        let back = CotEvent::from_xml(&ev.to_xml()).expect("parse");
+        assert!((back.lat_deg - lat).abs() < 1e-7);
+        assert!((back.lon_deg - lon).abs() < 1e-7);
+    }
+}
