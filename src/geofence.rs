@@ -152,3 +152,28 @@ impl Geofence {
             }
             Some(prev) => match (prev, curr_inside) {
                 (false, true) => GeofenceStatus::Entered,
+                (true, false) => GeofenceStatus::Exited,
+                (true, true) => GeofenceStatus::Inside,
+                (false, false) => GeofenceStatus::Outside,
+            },
+        };
+        GeofenceBreach {
+            status,
+            distance_to_boundary_m,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_geofence_validation_and_bounds() {
+        let poly = [
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
