@@ -97,3 +97,8 @@ Deterministic 10,000-frame tactical stream benchmark running through DEM elevati
 | Total CoT output | ~9.0 MB |
 | Latency p50 | 4.54 us |
 | Latency p99 | 6.38 us |
+
+| Latency Max | 35.29 us |
+| Latency Mean | 4.61 us |
+| Throughput | >216,000 fps |
+| Track error | <0.55 m |
