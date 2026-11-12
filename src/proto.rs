@@ -148,3 +148,21 @@ impl From<&CotEvent> for TakCotEvent {
         }
     }
 }
+
+impl TakCotEvent {
+    /// Converts TakCotEvent into strongly-typed CotEvent.
+    pub fn to_cot_event(&self) -> CotEvent {
+        CotEvent {
+            uid: self.uid.clone(),
+            cot_type: self.r#type.clone(),
+            how: self.how.clone(),
+            time_ms: self.send_time as i64,
+            stale_ms: self.stale_time as i64,
+            lat_deg: self.lat,
+            lon_deg: self.lon,
+            hae_m: self.hae,
+            ce_m: self.ce,
+            le_m: self.le,
+        }
+    }
+}
