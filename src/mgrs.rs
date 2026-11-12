@@ -133,3 +133,17 @@ fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
     let lon = lon0 + (d - (1.0 + 2.0 * t1 + eta1_2) * d3 / 6.0 + (5.0 - 2.0 * eta1_2 + 28.0 * t1 - 3.0 * eta1_2 * eta1_2 + 8.0 * ep2 + 24.0 * t1 * t1) * d5 / 120.0) / cos_phi1;
     (lat.to_degrees(), lon.to_degrees())
 }
+
+/// Latitude band letter determination according to MGRS.
+pub fn lat_to_mgrs_band(lat_deg: f64) -> Result<char, GridError> {
+    if !(-80.0..=84.0).contains(&lat_deg) {
+        return Err(GridError::InvalidLatitude);
+    }
+    const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
+    let idx = if lat_deg >= 80.0 {
+        19
+    } else {
+        ((lat_deg + 80.0) / 8.0).floor() as usize
+    };
+    Ok(BANDS[idx.min(BANDS.len() - 1)] as char)
+}
