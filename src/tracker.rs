@@ -140,6 +140,33 @@ impl Track {
         }
     }
 
+    /// Convert confirmed or coasting track to Cursor-on-Target event.
+    pub fn to_cot_event(
+        &self,
+        uid_prefix: &str,
+        cot_type: &str,
+        lat_deg: f64,
+        lon_deg: f64,
+        time_ms: i64,
+        stale_ms: i64,
+    ) -> crate::cot::CotEvent {
+        let ce = 2.146 * (0.5 * (self.p[0][0] + self.p[1][1])).max(0.0).sqrt();
+        crate::cot::CotEvent {
+            uid: format!("{}-{}", uid_prefix, self.id),
+            cot_type: cot_type.to_string(),
+            how: "m-g".to_string(),
+            time_ms,
+            stale_ms,
+            lat_deg,
+            lon_deg,
+            hae_m: self.hae_m,
+            ce_m: ce,
+            le_m: 10.0,
+            course_deg: self.course_deg(),
+            speed_mps: self.speed_mps(),
+        }
+    }
+
     pub fn new(id: u64, det: &Detection) -> Self {
         let var_xy = (det.ce90_m / 2.146).powi(2).max(1e-6);
         let mut p = [[0.0; 4]; 4];
