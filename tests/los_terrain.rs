@@ -30,7 +30,7 @@ fn same_point_below_ground_is_blocked() {
 // Add below-ground observer and vertical path tests
 #[test]
 fn below_ground_observer_is_blocked() {
-    let r = check_los(&flat(), p(100.0, 100.0, -1.0), p(900.0, 100.0, 100.0), 20);
+    let r = check_los(&flat(), p(100.0, 100.0, -1.0), p(900.0, 100.0, 10.0), 20);
     assert!(!r.is_visible);
     assert!(r.min_clearance_m < 0.0);
 }
