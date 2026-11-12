@@ -178,3 +178,23 @@ fn track_to_cot(track: &Track, frame_idx: usize, le_m: f64, cot_type: &str) -> C
         uid: format!("track-{}", track.id),
         cot_type: cot_type.to_string(),
         how: "m-g".to_string(),
+        time_ms: now_ms,
+        stale_ms: now_ms + 10_000,
+        lat_deg: lat,
+        lon_deg: lon,
+        hae_m: hae,
+        ce_m,
+        le_m,
+        course_deg: course,
+        speed_mps: speed,
+    }
+}
+
+fn process_frame(
+    frame_idx: usize,
+    obs: &[Observation],
+    cam: &Intrinsics,
+    pose: &CameraPose,
+    tracker: &mut MultiTargetTracker,
+) -> usize {
+    let dets: Vec<Detection> = obs.iter().filter_map(|o| detect(o, cam, pose)).collect();
