@@ -128,3 +128,15 @@ impl TargetCategory {
         }
     }
 }
+
+impl TargetCategory {
+    const fn match_air_sea_label(s: &str) -> Option<Self> {
+        let b = s.as_bytes();
+        match b {
+            b"drone" | b"uav" | b"quadcopter" | b"uas" => Some(Self::Drone),
+            b"airplane" | b"aeroplane" | b"aircraft" | b"helicopter" => Some(Self::Aircraft),
+            b"boat" | b"ship" | b"vessel" => Some(Self::Vessel),
+            _ => None,
+        }
+    }
+}
