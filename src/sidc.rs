@@ -20,3 +20,17 @@ impl core::fmt::Display for SidcError {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SidcAffiliation {
+    Pending,
+    #[default]
+    Unknown,
+    Friend,
+    Neutral,
+    Hostile,
+    AssumedFriend,
+    Suspect,
+    Joker,
+    Faker,
+}
