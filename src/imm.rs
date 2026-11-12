@@ -223,6 +223,9 @@ impl ImmFilter {
 impl ImmFilter {
     /// Update each model with observation and update probabilities.
     pub fn update(&mut self, z: [f64; 3]) {
+        if z.iter().any(|v| !v.is_finite()) {
+            return;
+        }
         let r = self.config.pos_noise_m * self.config.pos_noise_m;
         let mut lik = [0.0; NUM_MODELS];
         for j in 0..NUM_MODELS {
