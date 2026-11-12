@@ -114,9 +114,9 @@ impl SubFilter {
 }
 
 impl SubFilter {
-    /// Measurement update with 3D position.
+    /// Measurement update with 3D position; returns the log-likelihood.
     pub fn update_pos(&mut self, z: [f64; 3], r: f64) -> f64 {
-        let mut likelihood = 1.0;
+        let mut log_lik = 0.0;
         for i in 0..3 {
             let y = z[i] - self.state[i];
             let s = self.cov[i][i] + r;
@@ -129,11 +129,9 @@ impl SubFilter {
             self.cov[i + 3][i + 3] -= (pv * pv) / s;
             self.cov[i][i + 3] -= k * pv;
             self.cov[i + 3][i] = self.cov[i][i + 3];
-            let exponent = -0.5 * (y * y) / s;
-            let norm = 1.0 / (core::f64::consts::TAU * s).sqrt();
-            likelihood *= norm * exponent.exp();
+            log_lik -= 0.5 * ((y * y) / s + (core::f64::consts::TAU * s).ln());
         }
-        likelihood.max(1e-12)
+        log_lik
     }
 }
 
@@ -280,18 +278,8 @@ impl ImmFilter {
             lik[j] = self.filters[j].update_pos(z, r);
         }
         let c_bar = self.compute_c_bar();
-        let mut sum_p = 0.0;
-        for j in 0..NUM_MODELS {
-            self.probs[j] = c_bar[j] * lik[j];
-            sum_p += self.probs[j];
-        }
-        if sum_p > 1e-12 {
-            for j in 0..NUM_MODELS {
-                self.probs[j] /= sum_p;
-            }
-        } else {
-            self.probs = [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
-        }
+        let log_w: [f64; NUM_MODELS] = core::array::from_fn(|j| c_bar[j].ln() + lik[j]);
+        self.probs = normalize_log_probs(log_w).unwrap_or([1.0 / 3.0; NUM_MODELS]);
     }
 }
 
