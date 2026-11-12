@@ -52,3 +52,18 @@ impl TacticalClassification {
         Self { affiliation, category }
     }
 }
+
+impl TargetCategory {
+    /// Returns the ground/air/sea CoT domain component string.
+    #[inline]
+    pub const fn cot_domain(&self) -> &'static str {
+        match self {
+            Self::Vehicle => "G-E-V-C",
+            Self::Person => "G-U-C",
+            Self::Drone => "A-M-F-Q",
+            Self::Aircraft => "A",
+            Self::Vessel => "S",
+            Self::Unknown => "G",
+        }
+    }
+}
