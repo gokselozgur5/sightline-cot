@@ -228,9 +228,10 @@ impl ImmFilter {
         for j in 0..NUM_MODELS {
             lik[j] = self.filters[j].update_pos(z, r);
         }
+        let c_bar = self.compute_c_bar();
         let mut sum_p = 0.0;
         for j in 0..NUM_MODELS {
-            self.probs[j] *= lik[j];
+            self.probs[j] = c_bar[j] * lik[j];
             sum_p += self.probs[j];
         }
         if sum_p > 1e-12 {
