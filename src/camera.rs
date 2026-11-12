@@ -23,6 +23,27 @@ impl std::fmt::Display for CameraError {
 
 impl std::error::Error for CameraError {}
 
+/// Brown-Conrady lens distortion with radial (k1, k2, k3) and tangential (p1, p2) terms.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BrownConrady {
+    pub k1: f64,
+    pub k2: f64,
+    pub k3: f64,
+    pub p1: f64,
+    pub p2: f64,
+}
+
+impl BrownConrady {
+    /// Apply distortion to normalized image coordinates (x, y).
+    pub fn distort(&self, x: f64, y: f64) -> (f64, f64) {
+        let r2 = x * x + y * y;
+        let radial = 1.0 + r2 * (self.k1 + r2 * (self.k2 + r2 * self.k3));
+        let xd = x * radial + 2.0 * self.p1 * x * y + self.p2 * (r2 + 2.0 * x * x);
+        let yd = y * radial + self.p1 * (r2 + 2.0 * y * y) + 2.0 * self.p2 * x * y;
+        (xd, yd)
+    }
+}
+
 /// Camera intrinsic calibration model.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Intrinsics {
