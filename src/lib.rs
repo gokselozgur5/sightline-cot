@@ -5,6 +5,8 @@ pub mod classifier;
 pub mod cot;
 pub mod ffi;
 pub mod los;
+pub mod sidc;
+pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub mod tracker;
 
 pub const VERSION: &str = "0.1.0";
