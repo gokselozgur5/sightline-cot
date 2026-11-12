@@ -42,3 +42,13 @@ fn run_crossing(frames: usize) -> Vec<[Option<u64>; 2]> {
     }
     out
 }
+
+#[test]
+fn crossing_targets_have_zero_id_switches() {
+    let hist = run_crossing(50);
+    for k in 0..2 {
+        let ids: Vec<u64> = hist.iter().filter_map(|f| f[k]).collect();
+        let switches = ids.windows(2).filter(|w| w[0] != w[1]).count();
+        assert_eq!(switches, 0, "target {k} switched ids");
+    }
+}
