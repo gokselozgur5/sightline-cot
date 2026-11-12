@@ -91,3 +91,14 @@ pub fn decode_tag(buf: &[u8]) -> Result<(u32, WireType, usize), ProtoError> {
     let wire_type = WireType::from_u8(wire_raw)?;
     Ok((field_num, wire_type, n))
 }
+
+/// Decodes a 64-bit IEEE-754 float from little-endian bytes.
+#[inline]
+pub fn decode_fixed64(buf: &[u8]) -> Result<(f64, usize), ProtoError> {
+    if buf.len() < 8 {
+        return Err(ProtoError::UnexpectedEof);
+    }
+    let mut bytes = [0u8; 8];
+    bytes.copy_from_slice(&buf[..8]);
+    Ok((f64::from_le_bytes(bytes), 8))
+}
