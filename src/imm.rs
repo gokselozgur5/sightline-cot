@@ -37,3 +37,19 @@ pub struct SubFilter {
     pub state: [f64; 6],
     pub cov: [[f64; 6]; 6],
 }
+
+impl SubFilter {
+    pub fn new(init_pos: [f64; 3], pos_var: f64, vel_var: f64) -> Self {
+        let mut cov = [[0.0; 6]; 6];
+        cov[0][0] = pos_var;
+        cov[1][1] = pos_var;
+        cov[2][2] = pos_var;
+        cov[3][3] = vel_var;
+        cov[4][4] = vel_var;
+        cov[5][5] = vel_var;
+        Self {
+            state: [init_pos[0], init_pos[1], init_pos[2], 0.0, 0.0, 0.0],
+            cov,
+        }
+    }
+}
