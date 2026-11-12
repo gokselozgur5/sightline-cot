@@ -12,3 +12,28 @@ fn curvature_drop_scales_quadratically() {
     let d = earth_curvature_drop(3_000.0);
     assert!((earth_curvature_drop(6_000.0) - 4.0 * d).abs() < 1e-9);
 }
+// Add curvature blocking test for flat long paths
+use sightline_cot::camera::DemGrid;
+use sightline_cot::los::{check_los, Position3D};
+
+fn flat() -> DemGrid {
+    DemGrid::new(0.0, 0.0, 1000.0, 11, 11, vec![0.0; 121]).unwrap()
+}
+
+fn p(e: f64, n: f64, u: f64) -> Position3D {
+    Position3D { east_m: e, north_m: n, up_m: u }
+}
+
+#[test]
+fn low_endpoints_over_10km_are_blocked_by_curvature() {
+    let r = check_los(&flat(), p(0.0, 5000.0, 5.0), p(10_000.0, 5000.0, 5.0), 10);
+    assert!(!r.is_visible);
+}
+
+#[test]
+fn higher_endpoints_clear_curvature_with_expected_margin() {
+    let r = check_los(&flat(), p(0.0, 5000.0, 10.0), p(10_000.0, 5000.0, 10.0), 10);
+    let expect = 10.0 - earth_curvature_drop(9_000.0);
+    assert!(r.is_visible);
+    assert!((r.min_clearance_m - expect).abs() < 1e-6);
+}
