@@ -40,3 +40,24 @@ fn grid_rays(intr: &Intrinsics, pose: &CameraPose, ground_up_m: Option<f64>) -> 
     count
 }
 
+fn main() {
+    let pinhole = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 960.0,
+        cy: 540.0,
+    };
+    let fisheye = Intrinsics::EquidistantFisheye {
+        fx: 800.0,
+        fy: 800.0,
+        cx: 960.0,
+        cy: 540.0,
+        k1: 0.05,
+        k2: 0.01,
+    };
+    let pose = CameraPose {
+        roll_rad: 0.02,
+        pitch_rad: -0.6,
+        yaw_rad: 0.3,
+        cam_up_m: 500.0,
+    };
