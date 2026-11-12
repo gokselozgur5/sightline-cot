@@ -354,6 +354,17 @@ pub fn enu_to_geodetic(
     ecef_to_geodetic(ecef[0], ecef[1], ecef[2])
 }
 
+/// Regular 2D Digital Elevation Model (DEM) grid with continuous bilinear lookup.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DemGrid {
+    pub origin_e_m: f64,
+    pub origin_n_m: f64,
+    pub cell_step_m: f64,
+    pub cols: usize,
+    pub rows: usize,
+    pub elevations: Vec<f64>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
