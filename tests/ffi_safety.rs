@@ -37,3 +37,17 @@ fn det() -> SightlineDetectionC {
         embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     }
 }
+
+#[test]
+fn step_with_zero_detections_and_zero_capacity_succeeds() {
+    let c = cfg();
+    let mut n = 99usize;
+    unsafe {
+        let e = sightline_engine_new(&c);
+        assert!(!e.is_null());
+        let rc =
+            sightline_engine_step(e, 0.1, std::ptr::null(), 0, std::ptr::null_mut(), 0, &mut n);
+        assert_eq!((rc, n), (SIGHTLINE_OK, 0));
+        sightline_engine_free(e);
+    }
+}
