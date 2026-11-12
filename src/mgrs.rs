@@ -52,9 +52,26 @@ pub fn lon_to_utm_zone(lon_deg: f64) -> Result<u8, GridError> {
     Ok(zone.clamp(1, 60))
 }
 
+/// Zone selection with the 32V (Norway) and X band (Svalbard) exceptions.
+fn utm_zone_with_exceptions(lat_deg: f64, lon_deg: f64) -> Result<u8, GridError> {
+    let zone = lon_to_utm_zone(lon_deg)?;
+    if (56.0..64.0).contains(&lat_deg) && (3.0..12.0).contains(&lon_deg) {
+        return Ok(32);
+    }
+    if lat_deg >= 72.0 && (0.0..42.0).contains(&lon_deg) {
+        return Ok(match lon_deg {
+            l if l < 9.0 => 31,
+            l if l < 21.0 => 33,
+            l if l < 33.0 => 35,
+            _ => 37,
+        });
+    }
+    Ok(zone)
+}
+
 /// Forward UTM projection from WGS84 lat/lon.
 ///
-/// The zone comes from the longitude and the hemisphere from the sign of the
+/// The zone comes from the longitude (with the 32V and Svalbard exceptions) and the hemisphere from the sign of the
 /// latitude. Valid latitudes are `-80` to `84` degrees.
 ///
 /// # Errors
@@ -77,7 +94,7 @@ pub fn wgs84_to_utm(lat_deg: f64, lon_deg: f64) -> Result<UtmCoord, GridError> {
     if !(-80.0..=84.0).contains(&lat_deg) {
         return Err(GridError::InvalidLatitude);
     }
-    let zone = lon_to_utm_zone(lon_deg)?;
+    let zone = utm_zone_with_exceptions(lat_deg, lon_deg)?;
     let hemisphere = if lat_deg >= 0.0 { 'N' } else { 'S' };
     let (east, north) = utm_project_point(lat_deg, lon_deg, zone, hemisphere);
     Ok(UtmCoord {
