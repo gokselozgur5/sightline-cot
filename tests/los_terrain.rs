@@ -37,3 +37,11 @@ fn vertical_path_above_ground_is_visible() {
     assert!(r.is_visible);
     assert!(r.min_clearance_m >= 10.0);
 }
+// Add step clamp equivalence test for check_los
+#[test]
+fn tiny_step_counts_clamp_to_two() {
+    let (a, b) = (p(100.0, 100.0, 20.0), p(900.0, 700.0, 30.0));
+    let base = check_los(&flat(), a, b, 2);
+    assert_eq!(check_los(&flat(), a, b, 0), base);
+    assert_eq!(check_los(&flat(), a, b, 1), base);
+}
