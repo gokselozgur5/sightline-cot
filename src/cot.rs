@@ -190,6 +190,12 @@ pub fn parse_iso8601_utc(s: &str) -> Result<i64, CotError> {
     if p.len() != 2 {
         return Err(CotError::InvalidXml(format!("missing T in timestamp: {s}")));
     }
+    let clean = |t: &str, extra: &[u8]| {
+        t.bytes().all(|b| b.is_ascii_digit() || extra.contains(&b))
+    };
+    if !clean(p[0], b"-") || !clean(p[1], b":.") {
+        return Err(CotError::InvalidXml(format!("invalid timestamp: {s}")));
+    }
     let (y, m, d) = parse_date_part(p[0])?;
     let (h, min, sec, ms) = parse_time_part(p[1])?;
     let days = ymd_to_days(y, m, d);
