@@ -4,6 +4,8 @@ pub mod camera;
 pub mod classifier;
 pub mod cot;
 pub mod ffi;
+pub mod geofence;
+pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod los;
 pub mod tracker;
 
