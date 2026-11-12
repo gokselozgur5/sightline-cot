@@ -42,3 +42,19 @@ fn nonfinite_detection_is_rejected_without_state_change() {
     assert_eq!(r, Err(TrackerError::NonFiniteInput));
     assert_eq!(t.tracks[0].age, before);
 }
+
+#[test]
+fn invalid_dt_is_rejected() {
+    let mut t = MultiTargetTracker::new(1, 4, 0.5);
+    for dt in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+        assert_eq!(t.step(dt, &[]), Err(TrackerError::InvalidDeltaTime));
+    }
+}
+
+#[test]
+fn negative_ce90_is_rejected() {
+    let mut t = MultiTargetTracker::new(1, 4, 0.5);
+    let mut d = det(0.0, 0.0, 0);
+    d.ce90_m = -1.0;
+    assert_eq!(t.step(1.0, &[d]), Err(TrackerError::NonFiniteInput));
+}
