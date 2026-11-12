@@ -18,3 +18,21 @@ pub struct GeofenceBreach {
     pub distance_to_boundary_m: f64,
 }
 
+/// 2D geographic vertex (lat/lon in degrees).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct GeofencePoint {
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+}
+
+/// 3D polygonal tactical geofence with altitude limits.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Geofence {
+    pub vertices: [GeofencePoint; MAX_GEOFENCE_VERTICES],
+    pub vertex_count: usize,
+    pub min_alt_m: f64,
+    pub max_alt_m: f64,
+}
+
+impl Geofence {
+    /// Construct a 3D tactical geofence from vertices and altitude bounds.
