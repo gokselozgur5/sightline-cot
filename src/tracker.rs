@@ -635,3 +635,14 @@ impl Track {
         self.x[2].hypot(self.x[3])
     }
 }
+
+impl Track {
+    /// Compute filtered ground course heading in degrees [0, 360).
+    pub fn course_deg(&self) -> f64 {
+        if self.speed_mps() < 0.05 {
+            0.0
+        } else {
+            self.x[2].atan2(self.x[3]).to_degrees().rem_euclid(360.0)
+        }
+    }
+}
