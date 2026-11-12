@@ -21,7 +21,11 @@ fn flat() -> DemGrid {
 }
 
 fn p(e: f64, n: f64, u: f64) -> Position3D {
-    Position3D { east_m: e, north_m: n, up_m: u }
+    Position3D {
+        east_m: e,
+        north_m: n,
+        up_m: u,
+    }
 }
 
 #[test]
