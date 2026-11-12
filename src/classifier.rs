@@ -8,3 +8,14 @@ pub enum TacticalAffiliation {
     #[default]
     Unknown,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum TargetCategory {
+    Vehicle,
+    Person,
+    Drone,
+    Aircraft,
+    Vessel,
+    #[default]
+    Unknown,
+}
