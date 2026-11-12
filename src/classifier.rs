@@ -27,6 +27,16 @@ pub struct MilStdClassifier {
 }
 
 impl MilStdClassifier {
+    /// Creates a classifier from an explicit affiliation and category.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sightline_cot::classifier::{MilStdClassifier, TacticalAffiliation, TargetCategory};
+    ///
+    /// let cls = MilStdClassifier::new(TacticalAffiliation::Friendly, TargetCategory::Aircraft);
+    /// assert_eq!(cls.to_cot_type(), "a-f-A");
+    /// ```
     pub const fn new(affiliation: TacticalAffiliation, category: TargetCategory) -> Self {
         Self {
             affiliation,
