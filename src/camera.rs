@@ -640,7 +640,7 @@ mod dem_tests {
         assert_eq!(grid.elevation_at(5.0, 5.0), Some(1.0));
         let pose = CameraPose {
             roll_rad: 0.0,
-            pitch_rad: -core::f64::consts::FRAC_PI_2,
+            pitch_rad: 0.0,
             yaw_rad: 0.0,
             cam_up_m: 100.0,
         };
