@@ -264,3 +264,22 @@ impl ImmFilter {
         self.probs[MODEL_CA] + self.probs[MODEL_CT] > 0.5
     }
 }
+
+#[cfg(test)]
+mod imm_tests {
+    use super::*;
+
+    #[test]
+    fn test_imm_constant_velocity_tracking() {
+        let cfg = ImmConfig::default();
+        let mut imm = ImmFilter::new([0.0, 0.0, 0.0], cfg);
+        for step in 1..=50 {
+            let t = step as f64 * 0.1;
+            let z = [10.0 * t, 0.0, 0.0];
+            imm.step(0.1, z);
+        }
+        assert!(imm.probs[MODEL_CV] > 0.5);
+        let st = imm.fused_state();
+        assert!((st[3] - 10.0).abs() < 1.0);
+    }
+}
