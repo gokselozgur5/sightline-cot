@@ -90,3 +90,22 @@ fn check(imm: &ImmFilter) {
     assert!(imm.probs.iter().all(|p| (0.0..=1.0).contains(p)));
     assert!(imm.fused_state().iter().all(|v| v.is_finite()));
 }
+
+#[test]
+fn straight_turn_straight_keeps_invariants() {
+    let mut imm = ImmFilter::new([0.0; 3], ImmConfig::default());
+    let (mut x, mut y, mut h) = (0.0_f64, 0.0_f64, 0.0_f64);
+    let mut peak: f64 = 0.0;
+    for k in 0..150 {
+        let w = if (50..100).contains(&k) { 0.5 } else { 0.0 };
+        h += w * 0.1;
+        x += 30.0 * h.cos() * 0.1;
+        y += 30.0 * h.sin() * 0.1;
+        imm.step(0.1, [x, y, 0.0]);
+        check(&imm);
+        if (50..100).contains(&k) {
+            peak = peak.max(imm.probs[1] + imm.probs[2]);
+        }
+    }
+    assert!(peak > 0.5, "maneuver never detected: {peak}");
+}
