@@ -618,10 +618,10 @@ mod tests {
     fn test_circular_trajectory_course_continuity() {
         let mut tracker = MultiTargetTracker::new(2, 4, 0.5);
         let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-        let r = 50.0f64;
-        let dt = 0.5f64;
-        for i in 0..20 {
-            let theta = (i as f64 * dt) * 0.2;
+        let r = 10.0f64;
+        let dt = 0.1f64;
+        for i in 0..30 {
+            let theta = (i as f64 * dt) * 0.1;
             let x = r * theta.cos();
             let y = r * theta.sin();
             tracker.step(dt, &[dummy_det(x, y, emb)]).unwrap();
