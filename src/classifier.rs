@@ -195,3 +195,20 @@ mod tests {
         assert_eq!(TacticalAffiliation::Unknown.cot_char(), 'u');
     }
 }
+
+#[cfg(test)]
+mod tests_cot_type {
+    use super::*;
+
+    #[test]
+    fn test_to_cot_type_mappings() {
+        let f = TacticalClassification::new(TacticalAffiliation::Friendly, TargetCategory::Vehicle);
+        assert_eq!(f.to_cot_type(), "a-f-G-E-V-C");
+        let h = TacticalClassification::new(TacticalAffiliation::Hostile, TargetCategory::Drone);
+        assert_eq!(h.to_cot_type(), "a-h-A-M-F-Q");
+        let n = TacticalClassification::new(TacticalAffiliation::Neutral, TargetCategory::Aircraft);
+        assert_eq!(n.to_cot_type(), "a-n-A");
+        let u = TacticalClassification::new(TacticalAffiliation::Unknown, TargetCategory::Vessel);
+        assert_eq!(u.to_cot_type(), "a-u-S");
+    }
+}
