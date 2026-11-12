@@ -27,3 +27,14 @@ fn sample_event(i: usize) -> TakCotEvent {
     }
 }
 
+/// Runs the workload each round and returns the best wall-clock time in seconds.
+fn best_seconds<F: FnMut()>(mut run: F) -> f64 {
+    let mut best = f64::INFINITY;
+    for _ in 0..ROUNDS {
+        let start = Instant::now();
+        run();
+        best = best.min(start.elapsed().as_secs_f64());
+    }
+    best
+}
+
