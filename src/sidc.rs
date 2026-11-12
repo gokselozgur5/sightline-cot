@@ -312,3 +312,19 @@ fn parse_cot_dom(token: Option<&str>) -> SidcDomain {
         _ => SidcDomain::Land,
     }
 }
+
+impl TacticalSymbol {
+    pub fn from_cot_type(cot: &str) -> Self {
+        let mut it = cot.split('-');
+        let _ = it.next();
+        let aff = parse_cot_aff(it.next());
+        let dom = parse_cot_dom(it.next());
+        Self {
+            version: SidcVersion::MilStd2525D,
+            affiliation: aff,
+            domain: dom,
+            entity_code: 0,
+            modifier: 0,
+        }
+    }
+}
