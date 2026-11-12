@@ -80,3 +80,15 @@ fn step_rejects_null_output_with_nonzero_capacity() {
         sightline_engine_free(e);
     }
 }
+
+#[test]
+fn cot_xml_rejects_null_track_and_null_buffer() {
+    let t = SightlineTrackC::default();
+    let mut buf = [0 as c_char; 8];
+    unsafe {
+        let rc = sightline_track_to_cot_xml(std::ptr::null(), 0, buf.as_mut_ptr(), 8);
+        assert_eq!(rc, SIGHTLINE_ERR_NULL);
+        let rc = sightline_track_to_cot_xml(&t, 0, std::ptr::null_mut(), 0);
+        assert_eq!(rc, SIGHTLINE_ERR_NULL);
+    }
+}
