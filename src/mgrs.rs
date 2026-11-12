@@ -122,13 +122,20 @@ fn utm_project_point(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, 
     let p3 = p2 * p;
     let p4 = p2 * p2;
     let p5 = p4 * p;
+    let p6 = p3 * p3;
+    let p7 = p6 * p;
     let east = FALSE_EASTING
         + UTM_K0
             * nu
             * (p + (1.0 - t + eta2) * p3 / 6.0
-                + (5.0 - 18.0 * t + t * t + 72.0 * eta2) * p5 / 120.0);
+                + (5.0 - 18.0 * t + t * t + 72.0 * eta2) * p5 / 120.0
+                + (61.0 - 479.0 * t + 179.0 * t * t - t * t * t) * p7 / 5040.0);
     let north_val = UTM_K0
-        * (m + nu * tan_lat * (p2 / 2.0 + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0));
+        * (m + nu
+            * tan_lat
+            * (p2 / 2.0
+                + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0
+                + (61.0 - 58.0 * t + t * t + 600.0 * eta2) * p6 / 720.0));
     let north = if hemi == 'S' {
         FALSE_NORTHING_SOUTH + north_val
     } else {
