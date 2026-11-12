@@ -201,3 +201,16 @@ impl ImmFilter {
         }
     }
 }
+
+impl ImmFilter {
+    /// Predict all sub-filters forward by dt.
+    pub fn predict(&mut self, dt: f64) {
+        self.filters[MODEL_CV].predict_cv(dt, self.config.cv_proc_noise);
+        self.filters[MODEL_CA].predict_ca(dt, self.config.ca_proc_noise);
+        self.filters[MODEL_CT].predict_ct(
+            dt,
+            self.config.turn_rate_rad_s,
+            self.config.ct_proc_noise,
+        );
+    }
+}
