@@ -14,3 +14,15 @@ pub enum ProtoError {
     InvalidWireType,
     Utf8Error,
 }
+
+/// Encodes an unsigned 64-bit integer into varint bytes.
+pub fn encode_varint(mut val: u64, buf: &mut [u8]) -> Result<usize, ProtoError> {
+    let mut i = 0;
+    while val >= 0x80 {
+        if i >= buf.len() {
+            return Err(ProtoError::BufferTooShort);
+        }
+        buf[i] = ((val & 0x7F) | 0x80) as u8;
+        val >>= 7;
+        i += 1;
+    }
