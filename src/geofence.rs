@@ -66,3 +66,19 @@ impl Geofence {
         inside
     }
 }
+
+impl Geofence {
+    pub fn distance_to_boundary_m(&self, lat: f64, lon: f64) -> f64 {
+        let mut min_dist_deg_sq = f64::MAX;
+        let n = self.vertex_count;
+        for i in 0..n {
+            let dlat = self.vertices[i][0] - lat;
+            let dlon = (self.vertices[i][1] - lon) * lat.to_radians().cos();
+            let dist_sq = dlat * dlat + dlon * dlon;
+            if dist_sq < min_dist_deg_sq {
+                min_dist_deg_sq = dist_sq;
+            }
+        }
+        min_dist_deg_sq.sqrt() * 111_319.5
+    }
+}
