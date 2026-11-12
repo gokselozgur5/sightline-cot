@@ -586,6 +586,19 @@ mod tests {
     }
 
     #[test]
+    fn test_kinematic_course_and_speed_smoothing() {
+        let mut tracker = MultiTargetTracker::new(2, 4, 0.5);
+        let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        for i in 0..10 {
+            let det = dummy_det(i as f64 * 10.0, 0.0, emb);
+            tracker.step(1.0, &[det]).unwrap();
+        }
+        let trk = &tracker.tracks[0];
+        assert!((trk.speed_mps() - 10.0).abs() < 1.0);
+        assert!((trk.course_deg() - 90.0).abs() < 5.0);
+    }
+
+    #[test]
     fn test_velocity_convergence_on_linear_trajectory() {
         let mut tracker = MultiTargetTracker::new(2, 3, 0.5);
         let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
