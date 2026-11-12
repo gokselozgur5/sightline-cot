@@ -257,3 +257,10 @@ impl ImmFilter {
         fused
     }
 }
+
+impl ImmFilter {
+    /// Returns true if a high-G turn or acceleration maneuver is active.
+    pub fn is_maneuvering(&self) -> bool {
+        self.probs[MODEL_CA] + self.probs[MODEL_CT] > 0.5
+    }
+}
