@@ -499,6 +499,34 @@ impl DemGrid {
         }
         Ok(ray_enu)
     }
+
+    /// Intersect downward camera ray with DEM terrain using Newton-Raphson.
+    pub fn intersect_ray(
+        &self,
+        ray_cam: [f64; 3],
+        pose: &CameraPose,
+    ) -> Result<[f64; 3], CameraError> {
+        let r_enu = Self::check_ray_downward(ray_cam, pose)?;
+        let mut t = (0.0 - pose.cam_up_m) / r_enu[2];
+        for _ in 0..20 {
+            let (e, n, u) = (t * r_enu[0], t * r_enu[1], pose.cam_up_m + t * r_enu[2]);
+            if !self.contains_en(e, n) {
+                return Err(CameraError::DemOutOfGrid);
+            }
+            let h = self.lookup_elevation(e, n)?;
+            let f_val = u - h;
+            if f_val.abs() < 1e-4 {
+                return Ok([e, n, h]);
+            }
+            let grad = self.surface_gradient(e, n)?;
+            let df_dt = r_enu[2] - (grad[0] * r_enu[0] + grad[1] * r_enu[1]);
+            if df_dt.abs() < 1e-9 {
+                return Err(CameraError::DemRayConvergenceFailed);
+            }
+            t -= f_val / df_dt;
+        }
+        Err(CameraError::DemRayConvergenceFailed)
+    }
 }
 
 #[cfg(test)]
