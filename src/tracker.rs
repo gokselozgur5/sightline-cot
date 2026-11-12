@@ -763,3 +763,22 @@ mod tests_extrapolation {
         assert!((p[1] - 190.0).abs() < 1e-4);
     }
 }
+
+#[cfg(test)]
+mod tests_predicates {
+    use super::test_kinematics_helpers::make_kinematic_det;
+    use super::*;
+
+    #[test]
+    fn test_coasting_and_extrapolation_predicates() {
+        let det = make_kinematic_det(0.0, 0.0);
+        let mut trk = Track::new(1, &det);
+        assert!(!trk.is_coasting());
+        trk.status = TrackStatus::Coasting;
+        assert!(trk.is_coasting());
+        trk.hits = 4;
+        trk.time_since_update = 2;
+        assert!(trk.can_extrapolate(3, 5));
+        assert!(!trk.can_extrapolate(5, 5));
+    }
+}
