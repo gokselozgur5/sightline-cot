@@ -112,3 +112,24 @@ fn find_footpoint_latitude(m: f64, e2: f64) -> f64 {
     }
     phi
 }
+
+fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    let ep2 = e2 / (1.0 - e2);
+    let y = if coord.hemisphere == 'S' { coord.northing - FALSE_NORTHING_SOUTH } else { coord.northing };
+    let x = coord.easting - FALSE_EASTING;
+    let m = y / UTM_K0;
+    let phi1 = find_footpoint_latitude(m, e2);
+    let (sin_phi1, cos_phi1) = (phi1.sin(), phi1.cos());
+    let tan_phi1 = phi1.tan();
+    let nu1 = WGS84_A / (1.0 - e2 * sin_phi1 * sin_phi1).sqrt();
+    let rho1 = WGS84_A * (1.0 - e2) / (1.0 - e2 * sin_phi1 * sin_phi1).powf(1.5);
+    let d = x / (nu1 * UTM_K0);
+    let (d2, d3, d4, d5, d6) = (d * d, d * d * d, d * d * d * d, d * d * d * d * d, d * d * d * d * d * d);
+    let t1 = tan_phi1 * tan_phi1;
+    let eta1_2 = ep2 * cos_phi1 * cos_phi1;
+    let lat = phi1 - (nu1 * tan_phi1 / rho1) * (d2 / 2.0 - (5.0 + 3.0 * t1 + 10.0 * eta1_2 - 4.0 * eta1_2 * eta1_2 - 9.0 * ep2) * d4 / 24.0 + (61.0 + 90.0 * t1 + 298.0 * eta1_2 + 45.0 * t1 * t1) * d6 / 720.0);
+    let lon0 = ((coord.zone as f64 - 1.0) * 6.0 - 180.0 + 3.0).to_radians();
+    let lon = lon0 + (d - (1.0 + 2.0 * t1 + eta1_2) * d3 / 6.0 + (5.0 - 2.0 * eta1_2 + 28.0 * t1 - 3.0 * eta1_2 * eta1_2 + 8.0 * ep2 + 24.0 * t1 * t1) * d5 / 120.0) / cos_phi1;
+    (lat.to_degrees(), lon.to_degrees())
+}
