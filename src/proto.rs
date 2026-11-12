@@ -296,3 +296,16 @@ fn skip_wire_varint_or_fixed<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [
         WireType::LengthDelimited => unreachable!(),
     }
 }
+
+fn skip_wire_field<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [u8], &'a [u8]), ProtoError> {
+    if wire == WireType::LengthDelimited {
+        let (len, n) = decode_varint(cur)?;
+        let total = n + len as usize;
+        if cur.len() < total {
+            return Err(ProtoError::UnexpectedEof);
+        }
+        Ok((&cur[n..total], &cur[total..]))
+    } else {
+        skip_wire_varint_or_fixed(wire, cur)
+    }
+}
