@@ -25,3 +25,19 @@ pub struct Geofence {
     pub min_alt_msl: f64,
     pub max_alt_msl: f64,
 }
+
+impl Geofence {
+    pub fn new(poly: &[[f64; 2]], min_alt: f64, max_alt: f64) -> Result<Self, &'static str> {
+        if poly.len() < 3 || poly.len() > MAX_GEOFENCE_VERTICES {
+            return Err("vertex count must be between 3 and 32");
+        }
+        let mut vertices = [[0.0; 2]; MAX_GEOFENCE_VERTICES];
+        vertices[..poly.len()].copy_from_slice(poly);
+        Ok(Self {
+            vertices,
+            vertex_count: poly.len(),
+            min_alt_msl: min_alt,
+            max_alt_msl: max_alt,
+        })
+    }
+}
