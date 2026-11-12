@@ -93,7 +93,11 @@ pub fn encode_tag(
 pub fn decode_tag(buf: &[u8]) -> Result<(u32, WireType, usize), ProtoError> {
     let (key, n) = decode_varint(buf)?;
     let wire_raw = (key & 0x07) as u8;
-    let field_num = (key >> 3) as u32;
+    let field_num = key >> 3;
+    if field_num == 0 || field_num > 0x1FFF_FFFF {
+        return Err(ProtoError::InvalidFieldNumber);
+    }
+    let field_num = field_num as u32;
     let wire_type = WireType::from_u8(wire_raw)?;
     Ok((field_num, wire_type, n))
 }
