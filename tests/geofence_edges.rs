@@ -76,3 +76,11 @@ fn antimeridian_polygon_containment() {
     assert!(gf.is_point_inside_polygon(0.5, -179.5));
     assert!(!gf.is_point_inside_polygon(0.5, 0.0));
 }
+
+#[test]
+fn concave_polygon_notch_is_outside() {
+    let poly = [[0.0, 0.0], [0.0, 3.0], [3.0, 3.0], [3.0, 2.0], [1.0, 1.5], [3.0, 1.0], [3.0, 0.0]];
+    let gf = Geofence::new(&poly, 0.0, 1000.0).unwrap();
+    assert!(gf.is_point_inside_polygon(0.5, 1.5));
+    assert!(!gf.is_point_inside_polygon(2.5, 1.5));
+}
