@@ -224,3 +224,9 @@ impl TakCotEvent {
         Ok(())
     }
 }
+
+/// Encodes a framed TAK Protocol Version 1 packet (0xBF magic + payload).
+pub fn encode_tak_packet(event: &TakCotEvent, out: &mut Vec<u8>) -> Result<(), ProtoError> {
+    out.push(TAK_PROTO_MAGIC);
+    event.encode_protobuf(out)
+}
