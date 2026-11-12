@@ -82,6 +82,14 @@ mod tests_ctrl_escape {
         assert_eq!(unescape_xml_attr("&#zz;&#;"), "&#zz;&#;");
     }
 }
+fn decode_numeric_ref(ent: &str) -> Option<char> {
+    let body = ent.strip_prefix("&#")?.strip_suffix(';')?;
+    let code = match body.strip_prefix(['x', 'X']) {
+        Some(hex) => u32::from_str_radix(hex, 16).ok()?,
+        None => body.parse().ok()?,
+    };
+    char::from_u32(code)
+}
 /// Unescape XML attribute entities in a single pass.
 pub fn unescape_xml_attr(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
@@ -96,7 +104,10 @@ pub fn unescape_xml_attr(s: &str) -> String {
                 "&lt;" => out.push('<'),
                 "&gt;" => out.push('>'),
                 "&amp;" => out.push('&'),
-                other => out.push_str(other),
+                other => match decode_numeric_ref(other) {
+                    Some(c) => out.push(c),
+                    None => out.push_str(other),
+                },
             }
             rest = &rem[semi + 1..];
         } else {
