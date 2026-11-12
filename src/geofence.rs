@@ -148,6 +148,31 @@ impl Geofence {
     }
 }
 
+impl Geofence {
+    /// Like `evaluate_breach`, but keeps the previous side while within `margin_m` of the boundary.
+    pub fn evaluate_breach_hysteresis(
+        &self,
+        lat: f64,
+        lon: f64,
+        alt: f64,
+        prev: Option<bool>,
+        margin_m: f64,
+    ) -> GeofenceBreach {
+        let raw = self.evaluate_breach(lat, lon, alt, prev);
+        let now_inside = matches!(raw.state, GeofenceState::Inside | GeofenceState::Entered);
+        let flipped = matches!(prev, Some(p) if p != now_inside);
+        if !flipped || raw.distance_to_boundary_m >= margin_m {
+            return raw;
+        }
+        let state = if now_inside {
+            GeofenceState::Outside
+        } else {
+            GeofenceState::Inside
+        };
+        GeofenceBreach { state, ..raw }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
