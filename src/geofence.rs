@@ -36,3 +36,27 @@ pub struct Geofence {
 
 impl Geofence {
     /// Construct a 3D tactical geofence from vertices and altitude bounds.
+    pub fn new(
+        poly: &[GeofencePoint],
+        min_alt_m: f64,
+        max_alt_m: f64,
+    ) -> Result<Self, &'static str> {
+        if poly.len() < 3 || poly.len() > MAX_GEOFENCE_VERTICES {
+            return Err("vertex count must be between 3 and 32");
+        }
+        if min_alt_m > max_alt_m || !min_alt_m.is_finite() || !max_alt_m.is_finite() {
+            return Err("invalid altitude bounds");
+        }
+        let mut vertices = [GeofencePoint {
+            lat_deg: 0.0,
+            lon_deg: 0.0,
+        }; MAX_GEOFENCE_VERTICES];
+        for (i, p) in poly.iter().enumerate() {
+            if !p.lat_deg.is_finite() || !p.lon_deg.is_finite() {
+                return Err("non-finite coordinate");
+            }
+            vertices[i] = *p;
+        }
+        Ok(Self {
+            vertices,
+            vertex_count: poly.len(),
