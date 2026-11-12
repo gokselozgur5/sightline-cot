@@ -217,3 +217,28 @@ pub fn format_mgrs(lat_deg: f64, lon_deg: f64, digits_per_axis: usize) -> Result
     append_digits(&mut s.bytes, &mut s.len, n_val, digits_per_axis);
     Ok(s)
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_zone_and_band_selection() {
+        assert_eq!(lon_to_utm_zone(0.0).unwrap(), 31);
+        assert_eq!(lon_to_utm_zone(-122.4194).unwrap(), 10);
+        assert_eq!(lat_to_mgrs_band(0.0).unwrap(), 'N');
+        assert_eq!(lat_to_mgrs_band(37.7749).unwrap(), 'S');
+    }
+
+    #[test]
+    fn test_wgs84_utm_roundtrip_precision() {
+        let coords = [(37.7749, -122.4194), (40.7128, -74.0060)];
+        for (lat, lon) in coords {
+            let utm = wgs84_to_utm(lat, lon).unwrap();
+            let (lat_rt, lon_rt) = utm_to_wgs84(&utm).unwrap();
+            assert!((lat - lat_rt).abs() < 1e-5);
+            assert!((lon - lon_rt).abs() < 1e-5);
+        }
+    }
+}
