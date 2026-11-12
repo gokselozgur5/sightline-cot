@@ -84,6 +84,20 @@ impl Geofence {
 }
 
 impl Geofence {
+    fn segment_dist_sq(p: (f64, f64), a: (f64, f64), b: (f64, f64)) -> f64 {
+        let (dx, dy) = (b.0 - a.0, b.1 - a.1);
+        let len_sq = dx * dx + dy * dy;
+        let t = if len_sq == 0.0 {
+            0.0
+        } else {
+            (((p.0 - a.0) * dx + (p.1 - a.1) * dy) / len_sq).clamp(0.0, 1.0)
+        };
+        let (cx, cy) = (a.0 + t * dx, a.1 + t * dy);
+        (p.0 - cx).powi(2) + (p.1 - cy).powi(2)
+    }
+}
+
+impl Geofence {
     fn classify_transition(is_inside: bool, prev: Option<bool>) -> GeofenceState {
         match (is_inside, prev) {
             (true, Some(false)) => GeofenceState::Entered,
