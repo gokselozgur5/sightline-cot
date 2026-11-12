@@ -344,3 +344,24 @@ impl TacticalSymbol {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_2525d_generation_and_parsing() {
+        let sym = TacticalSymbol {
+            version: SidcVersion::MilStd2525D,
+            affiliation: SidcAffiliation::Friend,
+            domain: SidcDomain::Air,
+            entity_code: 0,
+            modifier: 0,
+        };
+        let buf = sym.to_2525d();
+        assert_eq!(buf.len(), 30);
+        let parsed = TacticalSymbol::from_sidc(buf.as_str()).unwrap();
+        assert_eq!(parsed.affiliation, SidcAffiliation::Friend);
+        assert_eq!(parsed.domain, SidcDomain::Air);
+    }
+}
