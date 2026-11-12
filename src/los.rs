@@ -148,4 +148,18 @@ mod tests {
         assert!(res.obstruction.is_some());
         assert!(res.min_clearance_m < 0.0);
     }
+
+    #[test]
+    fn test_earth_curvature_and_horizon_angle() {
+        let drop = earth_curvature_drop(10_000.0);
+        assert!((drop - 7.848).abs() < 0.1);
+        let dem = create_test_dem();
+        let obs = Position3D {
+            east_m: 10.0,
+            north_m: 0.0,
+            up_m: 5.0,
+        };
+        let ang = compute_horizon_elevation_angle(&dem, obs, 0.0, 20.0, 5);
+        assert!(ang > 0.0);
+    }
 }
