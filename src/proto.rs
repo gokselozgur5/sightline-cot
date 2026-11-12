@@ -298,3 +298,14 @@ impl TakMessage {
                 let len = decode_varint(buf, off)? as usize;
                 *off += len;
             }
+            5 => {
+                *off += 4;
+            }
+            _ => return Err(ProtoError::InvalidWireType),
+        }
+        if *off > buf.len() {
+            return Err(ProtoError::BufferTooShort);
+        }
+        Ok(())
+    }
+}
