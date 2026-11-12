@@ -56,3 +56,16 @@ fn multi_target_tracks_roundtrip_through_xml() {
         assert!((back.lon_deg - e.lon_deg).abs() < 1e-6);
     }
 }
+#[test]
+fn multi_target_tracks_roundtrip_through_protobuf() {
+    for e in &confirmed_events() {
+        let mut buf = Vec::new();
+        encode_tak_packet(&TakCotEvent::from(e), &mut buf).expect("encode");
+        let back = decode_tak_packet(&buf).expect("decode").to_cot_event();
+        assert_eq!(back.uid, e.uid);
+        assert_eq!(back.cot_type, e.cot_type);
+        assert_eq!(back.lat_deg, e.lat_deg);
+        assert_eq!(back.lon_deg, e.lon_deg);
+        assert_eq!(back.time_ms, e.time_ms);
+    }
+}
