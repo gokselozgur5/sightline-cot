@@ -224,6 +224,7 @@ fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
     let nu1 = WGS84_A / (1.0 - e2 * sin_phi1 * sin_phi1).sqrt();
     let rho1 = WGS84_A * (1.0 - e2) / (1.0 - e2 * sin_phi1 * sin_phi1).powf(1.5);
     let d = x / (nu1 * UTM_K0);
+    let d7 = d * d * d * d * d * d * d;
     let (d2, d3, d4, d5, d6) = (
         d * d,
         d * d * d,
@@ -237,7 +238,9 @@ fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
         - (nu1 * tan_phi1 / rho1)
             * (d2 / 2.0
                 - (5.0 + 3.0 * t1 + 10.0 * eta1_2 - 4.0 * eta1_2 * eta1_2 - 9.0 * ep2) * d4 / 24.0
-                + (61.0 + 90.0 * t1 + 298.0 * eta1_2 + 45.0 * t1 * t1) * d6 / 720.0);
+                + (61.0 + 90.0 * t1 + 298.0 * eta1_2 + 45.0 * t1 * t1) * d6 / 720.0
+                - (1385.0 + 3633.0 * t1 + 4095.0 * t1 * t1 + 1575.0 * t1 * t1 * t1) * d6 * d2
+                    / 40320.0);
     let lon0 = ((coord.zone as f64 - 1.0) * 6.0 - 180.0 + 3.0).to_radians();
     let lon = lon0
         + (d - (1.0 + 2.0 * t1 + eta1_2) * d3 / 6.0
@@ -245,7 +248,8 @@ fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
                 + 8.0 * ep2
                 + 24.0 * t1 * t1)
                 * d5
-                / 120.0)
+                / 120.0
+            - (61.0 + 662.0 * t1 + 1320.0 * t1 * t1 + 720.0 * t1 * t1 * t1) * d7 / 5040.0)
             / cos_phi1;
     (lat.to_degrees(), lon.to_degrees())
 }
