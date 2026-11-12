@@ -220,3 +220,21 @@ impl SidcDomain {
         }
     }
 }
+
+impl TacticalSymbol {
+    pub fn to_2525d(&self) -> SidcBuffer {
+        let mut buf = [b'0'; 32];
+        buf[0] = b'1';
+        buf[1] = b'0';
+        let aff = self.affiliation.to_2525d_code().as_bytes();
+        buf[2] = aff[0];
+        buf[3] = aff[1];
+        let dom = self.domain.to_2525d_code().as_bytes();
+        buf[4] = dom[0];
+        buf[5] = dom[1];
+        SidcBuffer {
+            bytes: buf,
+            len: 30,
+        }
+    }
+}
