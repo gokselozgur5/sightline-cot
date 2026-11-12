@@ -282,6 +282,16 @@ pub struct MgrsString {
 }
 
 impl MgrsString {
+    /// Returns the formatted MGRS text.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sightline_cot::format_mgrs;
+    ///
+    /// let mgrs = format_mgrs(0.0, 3.0, 1).unwrap();
+    /// assert_eq!(mgrs.as_str(), "31NEA00");
+    /// ```
     pub fn as_str(&self) -> &str {
         core::str::from_utf8(&self.bytes[..self.len]).unwrap_or("")
     }
