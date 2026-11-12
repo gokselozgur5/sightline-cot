@@ -166,3 +166,16 @@ impl SidcAffiliation {
         }
     }
 }
+
+impl SidcDomain {
+    pub fn to_2525d_code(&self) -> &'static str {
+        match self {
+            Self::Air => "01",
+            Self::Space => "05",
+            Self::Land => "10",
+            Self::Surface => "30",
+            Self::Subsurface => "35",
+            Self::Activity => "40",
+        }
+    }
+}
