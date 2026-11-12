@@ -272,3 +272,15 @@ impl TakMessage {
         Ok(s.to_string())
     }
 }
+
+impl TakMessage {
+    fn read_f64(buf: &[u8], off: &mut usize) -> Result<f64, ProtoError> {
+        if *off + 8 > buf.len() {
+            return Err(ProtoError::BufferTooShort);
+        }
+        let mut b = [0u8; 8];
+        b.copy_from_slice(&buf[*off..*off + 8]);
+        *off += 8;
+        Ok(f64::from_le_bytes(b))
+    }
+}
