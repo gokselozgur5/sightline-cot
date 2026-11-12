@@ -206,3 +206,17 @@ impl SidcDomain {
         }
     }
 }
+
+impl SidcDomain {
+    pub fn from_2525c_char(c: char) -> Result<Self, SidcError> {
+        match c {
+            'A' => Ok(Self::Air),
+            'P' => Ok(Self::Space),
+            'G' => Ok(Self::Land),
+            'S' => Ok(Self::Surface),
+            'U' => Ok(Self::Subsurface),
+            'X' => Ok(Self::Activity),
+            _ => Err(SidcError::InvalidDomain),
+        }
+    }
+}
