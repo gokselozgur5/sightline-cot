@@ -107,4 +107,20 @@ mod tests {
             TargetCategory::Unknown
         );
     }
+
+    #[test]
+    fn test_friendly_hierarchy_mapping() {
+        let cases = [
+            (TargetCategory::Vehicle, "a-f-G-E-V-C"),
+            (TargetCategory::Person, "a-f-G-E-S"),
+            (TargetCategory::Drone, "a-f-A-M-F"),
+            (TargetCategory::Aircraft, "a-f-A"),
+            (TargetCategory::Vessel, "a-f-S"),
+            (TargetCategory::Unknown, "a-u-G"),
+        ];
+        for (category, expected) in cases {
+            let cls = MilStdClassifier::new(TacticalAffiliation::Friendly, category);
+            assert_eq!(cls.to_cot_type(), expected, "category {category:?}");
+        }
+    }
 }
