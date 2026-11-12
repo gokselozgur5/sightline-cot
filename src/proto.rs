@@ -102,3 +102,13 @@ pub fn decode_fixed64(buf: &[u8]) -> Result<(f64, usize), ProtoError> {
     bytes.copy_from_slice(&buf[..8]);
     Ok((f64::from_le_bytes(bytes), 8))
 }
+
+/// Encodes a 64-bit IEEE-754 float into little-endian bytes.
+#[inline]
+pub fn encode_fixed64(val: f64, buf: &mut [u8]) -> Result<usize, ProtoError> {
+    if buf.len() < 8 {
+        return Err(ProtoError::BufferTooSmall);
+    }
+    buf[..8].copy_from_slice(&val.to_le_bytes());
+    Ok(8)
+}
