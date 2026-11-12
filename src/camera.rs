@@ -586,6 +586,24 @@ mod tests {
         assert!((lat_p - 90.0).abs() < 1e-4);
         assert!((hae_p - 10.0).abs() < 1e-3);
     }
+
+    #[test]
+    fn test_pinhole_rejects_non_finite_principal_point() {
+        let bad = Err(CameraError::InvalidParameters);
+        let centers = [
+            (f64::NAN, 0.0),
+            (f64::INFINITY, 0.0),
+            (0.0, f64::NEG_INFINITY),
+        ];
+        for (cx, cy) in centers {
+            let (fx, fy) = (100.0, 100.0);
+            let cam = Intrinsics::Pinhole { fx, fy, cx, cy };
+            assert_eq!(cam.pixel_to_ray(1.0, 1.0), bad);
+        }
+        let (fx, fy, cx, cy) = (1e-300, 1e-300, 0.0, 0.0);
+        let tiny = Intrinsics::Pinhole { fx, fy, cx, cy };
+        assert_eq!(tiny.pixel_to_ray(1e10, 1.0), bad);
+    }
 }
 
 /// Regular 2D Digital Elevation Model (DEM) grid.
