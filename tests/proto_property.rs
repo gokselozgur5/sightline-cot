@@ -57,3 +57,19 @@ fn gen_str(rng: &mut Rng) -> String {
 fn gen_coord(rng: &mut Rng, span: f64) -> f64 {
     (rng.next() >> 11) as f64 / (1u64 << 53) as f64 * 2.0 * span - span
 }
+
+fn gen_event(rng: &mut Rng) -> TakCotEvent {
+    TakCotEvent {
+        r#type: gen_str(rng),
+        uid: gen_str(rng),
+        send_time: rng.next(),
+        start_time: rng.next() >> 20,
+        stale_time: rng.next() % 1000,
+        how: gen_str(rng),
+        lat: gen_coord(rng, 90.0),
+        lon: gen_coord(rng, 180.0),
+        hae: gen_coord(rng, 10_000.0),
+        ce: gen_coord(rng, 50.0),
+        le: gen_coord(rng, 50.0),
+    }
+}
