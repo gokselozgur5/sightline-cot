@@ -301,3 +301,21 @@ mod imm_turn_tests {
         assert!(imm.is_maneuvering() || imm.probs[MODEL_CT] > imm.probs[MODEL_CV]);
     }
 }
+
+#[cfg(test)]
+mod imm_ca_tests {
+    use super::*;
+
+    #[test]
+    fn test_imm_high_g_acceleration_detection() {
+        let cfg = ImmConfig::default();
+        let mut imm = ImmFilter::new([0.0, 0.0, 0.0], cfg);
+        let a = 9.81;
+        for step in 1..=30 {
+            let t = step as f64 * 0.1;
+            let z = [0.5 * a * t * t, 0.0, 0.0];
+            imm.step(0.1, z);
+        }
+        assert!(imm.is_maneuvering());
+    }
+}
