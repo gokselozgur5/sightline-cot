@@ -166,3 +166,17 @@ impl TakCotEvent {
         }
     }
 }
+
+fn write_proto_str(num: u32, s: &str, out: &mut Vec<u8>) -> Result<(), ProtoError> {
+    if s.is_empty() {
+        return Ok(());
+    }
+    let mut tag_buf = [0u8; 10];
+    let n_tag = encode_tag(num, WireType::LengthDelimited, &mut tag_buf)?;
+    out.extend_from_slice(&tag_buf[..n_tag]);
+    let mut len_buf = [0u8; 10];
+    let n_len = encode_varint(s.len() as u64, &mut len_buf)?;
+    out.extend_from_slice(&len_buf[..n_len]);
+    out.extend_from_slice(s.as_bytes());
+    Ok(())
+}
