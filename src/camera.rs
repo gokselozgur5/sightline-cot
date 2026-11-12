@@ -21,6 +21,8 @@ impl std::fmt::Display for CameraError {
             Self::RayAboveHorizon => write!(f, "ray is above or parallel to horizon"),
             Self::DistortionSolverFailed => write!(f, "fisheye distortion solver failed"),
             Self::InvalidParameters => write!(f, "invalid camera or pose parameters"),
+            Self::DemOutOfGrid => write!(f, "coordinate lies outside dem grid"),
+            Self::DemRayConvergenceFailed => write!(f, "dem ray intersection failed to converge"),
         }
     }
 }
