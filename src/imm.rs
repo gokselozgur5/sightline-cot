@@ -190,6 +190,22 @@ impl ImmFilter {
     }
 }
 
+/// Normalizes log-domain weights into probabilities with log-sum-exp.
+/// Returns None when no weight is finite or the sum is degenerate.
+pub fn normalize_log_probs(log_w: [f64; NUM_MODELS]) -> Option<[f64; NUM_MODELS]> {
+    let max = log_w.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    if !max.is_finite() {
+        return None;
+    }
+    let mut out = log_w.map(|w| (w - max).exp());
+    let sum: f64 = out.iter().sum();
+    if !sum.is_finite() || sum <= 0.0 {
+        return None;
+    }
+    out.iter_mut().for_each(|p| *p /= sum);
+    Some(out)
+}
+
 impl ImmFilter {
     /// Model mixing step prior to prediction.
     pub fn mix(&mut self) {
