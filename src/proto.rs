@@ -348,3 +348,30 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod tests_proto_packet {
+    use super::*;
+
+    #[test]
+    fn test_tak_packet_roundtrip() {
+        let evt = TakCotEvent {
+            r#type: "a-f-G-E-V-C".into(),
+            uid: "DRONE-01".into(),
+            send_time: 1731398400000,
+            start_time: 1731398400000,
+            stale_time: 1731398460000,
+            how: "m-g".into(),
+            lat: 39.9,
+            lon: 32.8,
+            hae: 900.0,
+            ce: 1.5,
+            le: 2.0,
+        };
+        let mut packet = Vec::new();
+        encode_tak_packet(&evt, &mut packet).unwrap();
+        assert_eq!(packet[0], TAK_PROTO_MAGIC);
+        let decoded = decode_tak_packet(&packet).unwrap();
+        assert_eq!(evt, decoded);
+    }
+}
