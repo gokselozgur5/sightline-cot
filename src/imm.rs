@@ -30,3 +30,10 @@ impl Default for ImmConfig {
         }
     }
 }
+
+/// Single 6-DoF kinematic Kalman sub-filter.
+#[derive(Debug, Clone, PartialEq)]
+pub struct SubFilter {
+    pub state: [f64; 6],
+    pub cov: [[f64; 6]; 6],
+}
