@@ -112,3 +112,19 @@ pub fn encode_fixed64(val: f64, buf: &mut [u8]) -> Result<usize, ProtoError> {
     buf[..8].copy_from_slice(&val.to_le_bytes());
     Ok(8)
 }
+
+/// Strongly-typed zero-allocation TAK Protobuf CotEvent representation.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct TakCotEvent {
+    pub r#type: String,
+    pub uid: String,
+    pub send_time: u64,
+    pub start_time: u64,
+    pub stale_time: u64,
+    pub how: String,
+    pub lat: f64,
+    pub lon: f64,
+    pub hae: f64,
+    pub ce: f64,
+    pub le: f64,
+}
