@@ -328,3 +328,19 @@ impl TacticalSymbol {
         }
     }
 }
+
+impl TacticalSymbol {
+    pub fn to_cot_type(&self) -> &'static str {
+        match (self.affiliation, self.domain) {
+            (SidcAffiliation::Friend, SidcDomain::Air) => "a-f-A",
+            (SidcAffiliation::Hostile, SidcDomain::Air) => "a-h-A",
+            (SidcAffiliation::Friend, SidcDomain::Surface) => "a-f-S",
+            (SidcAffiliation::Hostile, SidcDomain::Surface) => "a-h-S",
+            (SidcAffiliation::Friend, SidcDomain::Land) => "a-f-G",
+            (SidcAffiliation::Hostile, SidcDomain::Land) => "a-h-G",
+            (SidcAffiliation::Neutral, SidcDomain::Land) => "a-n-G",
+            (SidcAffiliation::Neutral, SidcDomain::Air) => "a-n-A",
+            _ => "a-u-G",
+        }
+    }
+}
