@@ -365,6 +365,17 @@ pub struct DemGrid {
     pub elevations: Vec<f64>,
 }
 
+impl DemGrid {
+    fn validate_grid(step: f64, c: usize, r: usize, elev: &[f64]) -> bool {
+        step.is_finite()
+            && step > 0.0
+            && c >= 2
+            && r >= 2
+            && elev.len() == c * r
+            && elev.iter().all(|h| h.is_finite())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
