@@ -15,3 +15,13 @@ pub struct LosResult {
     pub obstruction: Option<Position3D>,
     pub min_clearance_m: f64,
 }
+
+pub const WGS84_EARTH_RADIUS_M: f64 = 6_371_000.0;
+
+pub fn earth_curvature_drop(distance_m: f64) -> f64 {
+    if distance_m <= 0.0 {
+        0.0
+    } else {
+        distance_m * distance_m / (2.0 * WGS84_EARTH_RADIUS_M)
+    }
+}
