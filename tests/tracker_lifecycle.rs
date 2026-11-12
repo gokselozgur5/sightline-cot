@@ -23,3 +23,14 @@ fn det(x: f64, y: f64, k: usize) -> Detection {
         embedding: emb(k),
     }
 }
+
+#[test]
+fn birth_is_tentative_until_min_hits() {
+    let mut t = MultiTargetTracker::new(3, 4, 0.5);
+    t.step(1.0, &[det(0.0, 0.0, 0)]).unwrap();
+    assert_eq!(t.tracks[0].status, TrackStatus::Tentative);
+    t.step(1.0, &[det(1.0, 0.0, 0)]).unwrap();
+    assert_eq!(t.tracks[0].status, TrackStatus::Tentative);
+    t.step(1.0, &[det(2.0, 0.0, 0)]).unwrap();
+    assert_eq!(t.tracks[0].status, TrackStatus::Confirmed);
+}
