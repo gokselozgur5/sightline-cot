@@ -111,3 +111,23 @@ impl SubFilter {
         }
     }
 }
+
+impl SubFilter {
+    /// Measurement update with 3D position.
+    pub fn update_pos(&mut self, z: [f64; 3], r: f64) -> f64 {
+        let mut likelihood = 1.0;
+        for i in 0..3 {
+            let y = z[i] - self.state[i];
+            let s = self.cov[i][i] + r;
+            let k = self.cov[i][i] / s;
+            self.state[i] += k * y;
+            self.state[i + 3] += (self.cov[i + 3][i] / s) * y;
+            self.cov[i][i] *= 1.0 - k;
+            self.cov[i + 3][i + 3] -= (self.cov[i + 3][i] * self.cov[i + 3][i]) / s;
+            let exponent = -0.5 * (y * y) / s;
+            let norm = 1.0 / (core::f64::consts::TAU * s).sqrt();
+            likelihood *= norm * exponent.exp();
+        }
+        likelihood.max(1e-12)
+    }
+}
