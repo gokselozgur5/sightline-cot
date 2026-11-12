@@ -10,3 +10,12 @@ pub enum GridError {
     InvalidEasting,
     BufferTooSmall,
 }
+
+/// UTM coordinate representation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct UtmCoord {
+    pub zone: u8,
+    pub hemisphere: char,
+    pub easting: f64,
+    pub northing: f64,
+}
