@@ -325,3 +325,24 @@ mod tests {
         assert_eq!(off, 2);
     }
 }
+
+#[cfg(test)]
+mod tests_rt {
+    use super::*;
+
+    fn make_sample() -> TakMessage {
+        TakMessage::new(CotEvent {
+            uid: "UAV-1".to_string(),
+            cot_type: "a-f-A-M-F".to_string(),
+            how: "m-g".to_string(),
+            time_ms: 1700000000000,
+            stale_ms: 1700000030000,
+            lat_deg: 37.7749,
+            lon_deg: -122.4194,
+            hae_m: 150.0,
+            ce_m: 5.0,
+            le_m: 10.0,
+            course_deg: 0.0,
+            speed_mps: 0.0,
+        })
+    }
