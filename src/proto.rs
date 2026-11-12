@@ -455,4 +455,16 @@ mod tests_cot_conversion {
         let back = tak.to_cot_event();
         assert_eq!(cot, back);
     }
+
+    #[test]
+    fn test_negative_zero_coordinate_survives_roundtrip() {
+        let evt = TakCotEvent {
+            lat: -0.0,
+            ..Default::default()
+        };
+        let mut packet = Vec::new();
+        encode_tak_packet(&evt, &mut packet).unwrap();
+        let decoded = decode_tak_packet(&packet).unwrap();
+        assert!(decoded.lat.is_sign_negative());
+    }
 }
