@@ -350,4 +350,14 @@ mod tests {
             Some(GridError::InvalidNorthing)
         );
     }
+
+    #[test]
+    fn test_polar_roundtrip_within_tolerance() {
+        for (lat, lon) in [(84.0, 0.0), (84.0, 6.0), (-80.0, 45.0), (-80.0, -150.0)] {
+            let utm = wgs84_to_utm(lat, lon).unwrap();
+            let (lat_rt, lon_rt) = utm_to_wgs84(&utm).unwrap();
+            assert!((lat - lat_rt).abs() < 1e-4, "lat {lat} roundtrip {lat_rt}");
+            assert!((lon - lon_rt).abs() < 1e-4, "lon {lon} roundtrip {lon_rt}");
+        }
+    }
 }
