@@ -91,4 +91,20 @@ mod tests {
         assert_eq!(hostile_veh.to_cot_type(), "a-h-G-E-V");
         assert_eq!(MilStdClassifier::default().to_cot_type(), "a-u-G");
     }
+
+    #[test]
+    fn test_fuzzy_label_parsing_and_fallback() {
+        assert_eq!(
+            MilStdClassifier::from_label("car").category,
+            TargetCategory::Vehicle
+        );
+        assert_eq!(
+            MilStdClassifier::from_label("person").category,
+            TargetCategory::Person
+        );
+        assert_eq!(
+            MilStdClassifier::from_label("unknown").category,
+            TargetCategory::Unknown
+        );
+    }
 }
