@@ -193,3 +193,16 @@ impl SidcDomain {
         }
     }
 }
+
+impl SidcDomain {
+    pub fn to_2525c_char(&self) -> char {
+        match self {
+            Self::Air => 'A',
+            Self::Space => 'P',
+            Self::Land => 'G',
+            Self::Surface => 'S',
+            Self::Subsurface => 'U',
+            Self::Activity => 'X',
+        }
+    }
+}
