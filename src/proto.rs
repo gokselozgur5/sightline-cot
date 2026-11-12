@@ -346,3 +346,17 @@ mod tests_rt {
             speed_mps: 0.0,
         })
     }
+    #[test]
+    fn test_tak_message_roundtrip_fidelity() {
+        let msg = make_sample();
+        let mut buf = [0u8; 256];
+        let len = msg.encode_framed(&mut buf).unwrap();
+        assert_eq!(buf[0], TAK_MAGIC_BYTE);
+        let decoded = TakMessage::decode_framed(&buf[..len]).unwrap();
+        assert_eq!(decoded.cot_event.uid, "UAV-1");
+        assert_eq!(decoded.cot_event.cot_type, "a-f-A-M-F");
+        assert_eq!(decoded.cot_event.how, "m-g");
+        assert!((decoded.cot_event.lat_deg - 37.7749).abs() < 1e-6);
+        assert!((decoded.cot_event.lon_deg - (-122.4194)).abs() < 1e-6);
+    }
+}
