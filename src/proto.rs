@@ -309,3 +309,19 @@ impl TakMessage {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_varint_encode_decode() {
+        let mut buf = [0u8; 10];
+        let len = encode_varint(300, &mut buf).unwrap();
+        assert_eq!(len, 2);
+        let mut off = 0;
+        let val = decode_varint(&buf[..len], &mut off).unwrap();
+        assert_eq!(val, 300);
+        assert_eq!(off, 2);
+    }
+}
