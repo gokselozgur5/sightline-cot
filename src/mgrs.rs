@@ -182,3 +182,26 @@ pub fn lat_to_mgrs_band(lat_deg: f64) -> Result<char, GridError> {
 }
 
 fn mgrs_100k_col_letter(zone: u8, easting: f64) -> char {
+    const SET_ORIGIN: [usize; 3] = [0, 8, 16];
+    let set_idx = ((zone - 1) % 3) as usize;
+    let base_idx = SET_ORIGIN[set_idx];
+    let col_idx = ((easting / 100000.0).floor() as usize).saturating_sub(1);
+    const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
+    COLS[(base_idx + col_idx) % COLS.len()] as char
+}
+
+fn mgrs_100k_row_letter(zone: u8, northing: f64) -> char {
+    let row_offset = if (zone % 2) == 1 { 0 } else { 5 };
+    let row_idx = ((northing / 100000.0).floor() as usize) % 20;
+    const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
+    ROWS[(row_offset + row_idx) % ROWS.len()] as char
+}
+
+/// Fixed stack buffer for zero-alloc MGRS string representation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MgrsString {
+    pub bytes: [u8; 32],
+    pub len: usize,
+}
+
+impl MgrsString {
