@@ -19,3 +19,11 @@ fn affiliation_2525d_round_trip() {
         assert_eq!(SidcAffiliation::from_2525d_code(code), Ok(aff));
     }
 }
+
+#[test]
+fn affiliation_2525c_round_trip() {
+    for (aff, _, ch) in AFFILIATIONS {
+        assert_eq!(aff.to_2525c_char(), ch);
+        assert_eq!(SidcAffiliation::from_2525c_char(ch), Ok(aff));
+    }
+}
