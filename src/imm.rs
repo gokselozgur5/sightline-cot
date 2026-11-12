@@ -157,15 +157,7 @@ impl SubFilter {
         for i in 0..3 {
             let y = z[i] - self.state[i];
             let s = self.cov[i][i] + r;
-            let k = self.cov[i][i] / s;
-            let kv = self.cov[i][i + 3] / s;
-            self.state[i] += k * y;
-            self.state[i + 3] += kv * y;
-            let pv = self.cov[i][i + 3];
-            self.cov[i][i] *= 1.0 - k;
-            self.cov[i + 3][i + 3] -= (pv * pv) / s;
-            self.cov[i][i + 3] -= k * pv;
-            self.cov[i + 3][i] = self.cov[i][i + 3];
+            self.update_axis(i, y, s);
             log_lik -= 0.5 * ((y * y) / s + (core::f64::consts::TAU * s).ln());
         }
         log_lik
