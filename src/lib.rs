@@ -1,6 +1,7 @@
 //! Sightline CoT core library
 
 pub mod camera;
+pub mod classifier;
 pub mod cot;
 pub mod ffi;
 pub mod tracker;
