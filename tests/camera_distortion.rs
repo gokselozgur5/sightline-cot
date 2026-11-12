@@ -42,3 +42,18 @@ fn test_jacobian_matches_central_differences() {
         assert!((j[1][1] - (yq - yn) / (2.0 * h)).abs() < 1e-8);
     }
 }
+
+#[test]
+fn test_undistort_round_trip_principal_point_to_border() {
+    assert_eq!(LENS.undistort(0.0, 0.0, 20), Ok((0.0, 0.0)));
+    let tiny = LENS.undistort(1e-12, -1e-12, 20).unwrap();
+    assert!((tiny.0 - 1e-12).abs() < 1e-24 && (tiny.1 + 1e-12).abs() < 1e-24);
+    for i in -8..=8 {
+        for j in -6..=6 {
+            let (x, y) = (i as f64 * 0.09, j as f64 * 0.09);
+            let (xd, yd) = LENS.distort(x, y);
+            let (xu, yu) = LENS.undistort(xd, yd, 20).unwrap();
+            assert!((xu - x).abs() < 1e-12 && (yu - y).abs() < 1e-12);
+        }
+    }
+}
