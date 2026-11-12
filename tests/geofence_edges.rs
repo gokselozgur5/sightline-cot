@@ -60,3 +60,10 @@ fn hysteresis_transitions_beyond_margin() {
     let b = gf.evaluate_breach_hysteresis(0.0001, 0.0001, 10.0, Some(false), 5.0);
     assert_eq!(b.state, GeofenceState::Entered);
 }
+
+#[test]
+fn hysteresis_without_history_matches_plain_evaluation() {
+    let gf = tiny_square();
+    let b = gf.evaluate_breach_hysteresis(0.0001, 0.0001, 10.0, None, 50.0);
+    assert_eq!(b.state, GeofenceState::Inside);
+}
