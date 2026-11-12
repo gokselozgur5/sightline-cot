@@ -121,3 +121,16 @@ impl TakMessage {
         Self { cot_event }
     }
 }
+
+impl TakMessage {
+    /// Encodes framed message with 0xBF magic byte prefix.
+    pub fn encode_framed(&self, buf: &mut [u8]) -> Result<usize, ProtoError> {
+        if buf.is_empty() {
+            return Err(ProtoError::BufferTooShort);
+        }
+        buf[0] = TAK_MAGIC_BYTE;
+        let mut off = 1;
+        self.encode_payload(buf, &mut off)?;
+        Ok(off)
+    }
+}
