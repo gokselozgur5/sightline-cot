@@ -149,3 +149,20 @@ impl SidcAffiliation {
         }
     }
 }
+
+impl SidcAffiliation {
+    pub fn from_2525c_char(c: char) -> Result<Self, SidcError> {
+        match c {
+            'P' => Ok(Self::Pending),
+            'U' => Ok(Self::Unknown),
+            'F' => Ok(Self::Friend),
+            'N' => Ok(Self::Neutral),
+            'H' => Ok(Self::Hostile),
+            'A' => Ok(Self::AssumedFriend),
+            'S' => Ok(Self::Suspect),
+            'J' => Ok(Self::Joker),
+            'K' => Ok(Self::Faker),
+            _ => Err(SidcError::InvalidAffiliation),
+        }
+    }
+}
