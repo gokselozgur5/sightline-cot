@@ -45,3 +45,10 @@ pub enum SidcDomain {
     Space,
     Activity,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SidcVersion {
+    Legacy2525C,
+    #[default]
+    MilStd2525D,
+}
