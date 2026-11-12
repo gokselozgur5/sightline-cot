@@ -44,3 +44,26 @@ pub fn wgs84_to_utm(lat_deg: f64, lon_deg: f64) -> Result<UtmCoord, GridError> {
     let hemisphere = if lat_deg >= 0.0 { 'N' } else { 'S' };
     let (east, north) = utm_project_point(lat_deg, lon_deg, zone, hemisphere);
     Ok(UtmCoord {
+        zone,
+        hemisphere,
+        easting: east,
+        northing: north,
+    })
+}
+
+fn utm_project_point(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, f64) {
+    let lat = lat_deg.to_radians();
+    let lon0 = ((zone as f64 - 1.0) * 6.0 - 180.0 + 3.0).to_radians();
+    let dlon = lon_deg.to_radians() - lon0;
+    let (sin_lat, cos_lat) = (lat.sin(), lat.cos());
+    let tan_lat = lat.tan();
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    let ep2 = e2 / (1.0 - e2);
+    let nu = WGS84_A / (1.0 - e2 * sin_lat * sin_lat).sqrt();
+    let m = meridian_arc(lat, e2);
+    let eta2 = ep2 * cos_lat * cos_lat;
+    let t = tan_lat * tan_lat;
+    let p = dlon * cos_lat;
+    let p2 = p * p;
+    let p3 = p2 * p;
+    let p4 = p2 * p2;
