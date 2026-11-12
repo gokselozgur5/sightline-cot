@@ -63,7 +63,7 @@ pub fn decode_varint(buf: &[u8]) -> Result<(u64, usize), ProtoError> {
     let mut val = 0u64;
     let mut shift = 0;
     for (i, &b) in buf.iter().enumerate() {
-        if i >= 10 {
+        if i >= 10 || (i == 9 && b > 1) {
             return Err(ProtoError::MalformedVarint);
         }
         val |= ((b & 0x7F) as u64) << shift;
