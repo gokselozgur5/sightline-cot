@@ -53,3 +53,13 @@ impl MilStdClassifier {
         }
     }
 }
+
+fn match_category(s: &str) -> TargetCategory {
+    if s.eq_ignore_ascii_case("car") || s.eq_ignore_ascii_case("truck") {
+        TargetCategory::Vehicle
+    } else if s.eq_ignore_ascii_case("person") {
+        TargetCategory::Person
+    } else {
+        TargetCategory::Unknown
+    }
+}
