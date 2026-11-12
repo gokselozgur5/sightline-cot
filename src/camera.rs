@@ -444,6 +444,19 @@ impl DemGrid {
         let max_n = self.origin_n_m + (self.rows - 1) as f64 * self.cell_step_m;
         e_m >= self.origin_e_m && e_m <= max_e && n_m >= self.origin_n_m && n_m <= max_n
     }
+
+    fn cell_coords(&self, e_m: f64, n_m: f64) -> (usize, usize, f64, f64) {
+        let u = ((e_m - self.origin_e_m) / self.cell_step_m).max(0.0);
+        let v = ((n_m - self.origin_n_m) / self.cell_step_m).max(0.0);
+        let c0 = (u.floor() as usize).min(self.cols - 2);
+        let r0 = (v.floor() as usize).min(self.rows - 2);
+        (
+            c0,
+            r0,
+            (u - c0 as f64).clamp(0.0, 1.0),
+            (v - r0 as f64).clamp(0.0, 1.0),
+        )
+    }
 }
 
 #[cfg(test)]
