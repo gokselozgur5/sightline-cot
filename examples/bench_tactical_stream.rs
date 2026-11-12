@@ -238,3 +238,23 @@ fn main() {
     println!("Frames processed : {NUM_FRAMES}");
     println!("Total CoT output : {total_bytes} bytes");
     println!("Latency p50      : {p50:.2} us");
+    println!("Latency p99      : {p99:.2} us");
+    println!("Latency max      : {max:.2} us");
+    println!("Latency Mean     : {mean:.2} us");
+    println!("Throughput       : {fps:.1} fps");
+    verify_tracks(&tracker, &targets);
+}
+
+fn verify_tracks(tracker: &MultiTargetTracker, targets: &[SyntheticTarget]) {
+    let confirmed: Vec<&Track> = tracker
+        .tracks
+        .iter()
+        .filter(|t| t.status == TrackStatus::Confirmed)
+        .collect();
+    println!("Confirmed tracks : {}", confirmed.len());
+    assert_eq!(confirmed.len(), targets.len(), "confirmed track count");
+    for tgt in targets {
+        let err = confirmed
+            .iter()
+            .map(|t| (t.x[0] - tgt.east_m).hypot(t.x[1] - tgt.north_m))
+            .fold(f64::MAX, f64::min);
