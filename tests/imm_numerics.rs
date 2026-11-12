@@ -123,3 +123,14 @@ fn accelerate_then_cruise_keeps_invariants() {
     }
     assert!((imm.fused_state()[3] - v).abs() < 8.0);
 }
+
+#[test]
+fn far_outlier_does_not_break_normalization() {
+    let mut imm = ImmFilter::new([0.0; 3], ImmConfig::default());
+    for _ in 0..5 {
+        imm.step(0.1, [0.0; 3]);
+    }
+    imm.step(0.1, [1.0e9, -1.0e9, 1.0e9]);
+    check(&imm);
+    assert_eq!(imm.probs.len(), NUM_MODELS);
+}
