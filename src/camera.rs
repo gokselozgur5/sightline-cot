@@ -543,6 +543,30 @@ impl DemGrid {
             [2.0 * (p_v[0] - p0[0]), 2.0 * (p_v[1] - p0[1])],
         ))
     }
+
+    #[allow(clippy::type_complexity)]
+    fn diff_dem_att(
+        &self,
+        ray: [f64; 3],
+        pose: &CameraPose,
+        p0: [f64; 3],
+    ) -> Result<([f64; 2], [f64; 2], [f64; 2]), CameraError> {
+        let eps = 1e-4;
+        let mut p_p = *pose;
+        p_p.pitch_rad += eps;
+        let pt_p = self.intersect_ray(ray, &p_p)?;
+        let mut p_r = *pose;
+        p_r.roll_rad += eps;
+        let pt_r = self.intersect_ray(ray, &p_r)?;
+        let mut p_y = *pose;
+        p_y.yaw_rad += eps;
+        let pt_y = self.intersect_ray(ray, &p_y)?;
+        Ok((
+            [(pt_p[0] - p0[0]) / eps, (pt_p[1] - p0[1]) / eps],
+            [(pt_r[0] - p0[0]) / eps, (pt_r[1] - p0[1]) / eps],
+            [(pt_y[0] - p0[0]) / eps, (pt_y[1] - p0[1]) / eps],
+        ))
+    }
 }
 
 #[cfg(test)]
