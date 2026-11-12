@@ -61,3 +61,15 @@ pub struct TacticalSymbol {
     pub entity_code: u32,
     pub modifier: u8,
 }
+
+impl Default for TacticalSymbol {
+    fn default() -> Self {
+        Self {
+            version: SidcVersion::MilStd2525D,
+            affiliation: SidcAffiliation::Unknown,
+            domain: SidcDomain::Land,
+            entity_code: 120100,
+            modifier: 0,
+        }
+    }
+}
