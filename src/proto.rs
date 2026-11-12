@@ -331,3 +331,20 @@ pub fn decode_tak_packet(packet: &[u8]) -> Result<TakCotEvent, ProtoError> {
     }
     TakCotEvent::decode_protobuf(&packet[1..])
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_varint_roundtrip() {
+        let mut buf = [0u8; 10];
+        let values = [0u64, 1, 127, 128, 300, 16384, 0x123456789ABCDEF0];
+        for &v in &values {
+            let n = encode_varint(v, &mut buf).unwrap();
+            let (dec, n_dec) = decode_varint(&buf[..n]).unwrap();
+            assert_eq!(v, dec);
+            assert_eq!(n, n_dec);
+        }
+    }
+}
