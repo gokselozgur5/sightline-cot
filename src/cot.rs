@@ -604,3 +604,19 @@ fn test_sa_heartbeat_generation() {
     assert_eq!(hb.lat_deg, 37.5);
     assert_eq!(hb.lon_deg, -122.2);
 }
+
+#[cfg(test)]
+mod test_tcp_helper {
+    use std::io::Read;
+    use std::net::TcpListener;
+
+    pub fn spawn_mock_server(listener: TcpListener) -> std::thread::JoinHandle<Vec<u8>> {
+        std::thread::spawn(move || {
+            let (mut sock, _) = listener.accept().expect("accept");
+            let mut buf = vec![0u8; 1024];
+            let n = sock.read(&mut buf).expect("read");
+            buf.truncate(n);
+            buf
+        })
+    }
+}
