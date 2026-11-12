@@ -246,3 +246,9 @@ impl TakMessage {
         lon_deg: &mut f64,
         hae_m: &mut f64,
     ) -> Result<(), ProtoError> {
+        match field_num {
+            1 => *uid = Self::read_string(buf, off)?,
+            2 => *cot_type = Self::read_string(buf, off)?,
+            3 => *how = Self::read_string(buf, off)?,
+            4 => *time_ms = decode_varint(buf, off)? as i64,
+            5 => *stale_ms = decode_varint(buf, off)? as i64,
