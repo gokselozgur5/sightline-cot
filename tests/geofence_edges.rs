@@ -1,4 +1,4 @@
-use sightline_cot::Geofence;
+use sightline_cot::{Geofence, GeofenceState};
 
 fn unit_square() -> Geofence {
     let poly = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]];
@@ -36,4 +36,18 @@ fn rejects_collinear_polygon() {
 fn accepts_concave_polygon() {
     let poly = [[0.0, 0.0], [0.0, 3.0], [3.0, 3.0], [1.0, 1.5], [3.0, 0.0]];
     assert!(Geofence::new(&poly, 0.0, 100.0).is_ok());
+}
+
+fn tiny_square() -> Geofence {
+    let poly = [[0.0, 0.0], [0.0, 0.0002], [0.0002, 0.0002], [0.0002, 0.0]];
+    Geofence::new(&poly, 0.0, 1000.0).unwrap()
+}
+
+#[test]
+fn hysteresis_holds_state_within_margin() {
+    let gf = tiny_square();
+    let held = gf.evaluate_breach_hysteresis(0.0001, -0.0001, 10.0, Some(true), 50.0);
+    assert_eq!(held.state, GeofenceState::Inside);
+    let held = gf.evaluate_breach_hysteresis(0.0001, 0.0001, 10.0, Some(false), 50.0);
+    assert_eq!(held.state, GeofenceState::Outside);
 }
