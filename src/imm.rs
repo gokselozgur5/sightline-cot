@@ -8,3 +8,13 @@ pub const MODEL_CV: usize = 0;
 pub const MODEL_CA: usize = 1;
 /// Coordinated Turn (CT) model index.
 pub const MODEL_CT: usize = 2;
+
+/// IMM configuration parameters.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ImmConfig {
+    pub pos_noise_m: f64,
+    pub cv_proc_noise: f64,
+    pub ca_proc_noise: f64,
+    pub ct_proc_noise: f64,
+    pub turn_rate_rad_s: f64,
+}
