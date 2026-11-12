@@ -158,3 +158,23 @@ fn detect(o: &Observation, cam: &Intrinsics, pose: &CameraPose) -> Option<Detect
         ce90_m: ce90,
         le90_m: le90,
         bbox: BoundingBox {
+            x1: o.u - 16.0,
+            y1: o.v - 16.0,
+            x2: o.u + 16.0,
+            y2: o.v + 16.0,
+        },
+        embedding: o.emb,
+    })
+}
+
+fn track_to_cot(track: &Track, frame_idx: usize, le_m: f64, cot_type: &str) -> CotEvent {
+    let enu = [track.x[0], track.x[1], track.hae_m];
+    let (lat, lon, hae) = enu_to_geodetic(enu, REF_LAT, REF_LON, REF_HAE);
+    let speed = (track.x[2].powi(2) + track.x[3].powi(2)).sqrt();
+    let course = track.x[2].atan2(track.x[3]).to_degrees().rem_euclid(360.0);
+    let ce_m = 2.146 * (0.5 * (track.p[0][0] + track.p[1][1])).sqrt();
+    let now_ms = (frame_idx as i64) * 33;
+    CotEvent {
+        uid: format!("track-{}", track.id),
+        cot_type: cot_type.to_string(),
+        how: "m-g".to_string(),
