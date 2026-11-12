@@ -51,3 +51,9 @@ pub fn decode_varint(buf: &[u8], offset: &mut usize) -> Result<u64, ProtoError> 
     }
     Err(ProtoError::BufferTooShort)
 }
+
+/// Encodes field number and wire type into varint key.
+pub fn encode_tag(field_num: u32, wire_type: u8, buf: &mut [u8]) -> Result<usize, ProtoError> {
+    let key = ((field_num as u64) << 3) | ((wire_type & 0x07) as u64);
+    encode_varint(key, buf)
+}
