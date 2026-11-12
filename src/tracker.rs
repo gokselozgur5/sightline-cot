@@ -120,6 +120,26 @@ pub struct Track {
 
 impl Track {
     /// Create a new tentative track initialized from a detection.
+    /// Compute smoothed ground speed in meters per second.
+    pub fn speed_mps(&self) -> f64 {
+        let (vx, vy) = (self.x[2], self.x[3]);
+        if !vx.is_finite() || !vy.is_finite() {
+            0.0
+        } else {
+            vx.hypot(vy)
+        }
+    }
+
+    /// Compute ground course angle in degrees [0, 360).
+    pub fn course_deg(&self) -> f64 {
+        let (vx, vy) = (self.x[2], self.x[3]);
+        if !vx.is_finite() || !vy.is_finite() || (vx == 0.0 && vy == 0.0) {
+            0.0
+        } else {
+            vx.atan2(vy).to_degrees().rem_euclid(360.0)
+        }
+    }
+
     pub fn new(id: u64, det: &Detection) -> Self {
         let var_xy = (det.ce90_m / 2.146).powi(2).max(1e-6);
         let mut p = [[0.0; 4]; 4];
