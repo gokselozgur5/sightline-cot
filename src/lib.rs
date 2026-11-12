@@ -28,3 +28,6 @@ mod tests {
         assert_eq!(VERSION, "0.1.0");
     }
 }
+
+pub mod proto;
+pub use proto::{ProtoError, TakMessage, TAK_MAGIC_BYTE};
