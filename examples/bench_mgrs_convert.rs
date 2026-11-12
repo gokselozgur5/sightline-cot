@@ -55,3 +55,19 @@ fn main() {
         }
     });
 
+    println!("WGS84, UTM and MGRS conversions ({POINTS} points, best of {ROUNDS} rounds)");
+    println!(
+        "{:<24} {:>10} {:>12} {:>14}",
+        "Operation", "Calls", "ns/call", "calls/s"
+    );
+    let rows = [
+        ("wgs84_to_utm", fwd_s, points.len()),
+        ("utm_to_wgs84", inv_s, utms.len()),
+        ("format_mgrs (5 digits)", mgrs_s, points.len()),
+    ];
+    for (name, secs, calls) in rows {
+        let ns_per_call = secs * 1e9 / calls as f64;
+        let calls_per_s = calls as f64 / secs;
+        println!("{name:<24} {calls:>10} {ns_per_call:>12.1} {calls_per_s:>14.0}");
+    }
+}
