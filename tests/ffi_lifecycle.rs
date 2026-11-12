@@ -67,3 +67,22 @@ fn engines_are_independent_handles() {
         sightline_engine_free(b);
     }
 }
+
+#[test]
+fn non_finite_inputs_never_unwind_across_the_boundary() {
+    let mut bad = cfg();
+    let mut n = 0usize;
+    let mut out = [SightlineTrackC::default(); 2];
+    unsafe {
+        for v in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+            bad.fy = v;
+            assert!(sightline_engine_new(&bad).is_null());
+        }
+        let e = sightline_engine_new(&cfg());
+        let mut d = det();
+        d.u = f64::NAN;
+        let rc = sightline_engine_step(e, f64::NAN, &d, 1, out.as_mut_ptr(), 2, &mut n);
+        assert!(rc == SIGHTLINE_OK || rc < 0);
+        sightline_engine_free(e);
+    }
+}
