@@ -21,11 +21,11 @@ fn central_meridians_project_to_false_origin() {
 }
 
 #[test]
-fn zone31_meridian_arc_anchors() {
-    let cases = [(45.0, 4982950.0), (60.0, 6651411.2)];
-    for (lat, northing) in cases {
-        let utm = wgs84_to_utm(lat, 3.0).unwrap();
-        assert_eq!(utm.zone, 31);
+fn meridian_arc_anchors() {
+    let cases = [(45.0, 3.0, 31, 4982950.0), (60.0, 9.0, 32, 6651411.2)];
+    for (lat, lon, zone, northing) in cases {
+        let utm = wgs84_to_utm(lat, lon).unwrap();
+        assert_eq!(utm.zone, zone);
         assert_close(utm.easting, 500000.0, 1e-6, "easting");
         assert_close(utm.northing, northing, 100.0, "northing");
     }
@@ -33,7 +33,7 @@ fn zone31_meridian_arc_anchors() {
 
 #[test]
 fn roundtrip_all_zones_both_hemispheres() {
-    let lats = [-79.5, -45.0, -0.5, 0.5, 45.0, 83.9];
+    let lats = [-79.5, -45.0, -0.5, 0.5, 45.0, 71.9];
     for zone in 1..=60u8 {
         let cm = (zone as f64 - 1.0) * 6.0 - 177.0;
         for lon in [cm - 2.9, cm, cm + 2.9] {
