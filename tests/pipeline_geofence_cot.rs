@@ -24,3 +24,12 @@ fn det(east_m: f64) -> Detection {
         embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     }
 }
+fn fence() -> Geofence {
+    let poly = [
+        [37.0, -122.0100],
+        [37.0, -122.0095],
+        [37.01, -122.0095],
+        [37.01, -122.0100],
+    ];
+    Geofence::new(&poly, -100.0, 100.0).expect("fence")
+}
