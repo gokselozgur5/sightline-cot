@@ -44,6 +44,19 @@ impl BrownConrady {
     }
 }
 
+impl BrownConrady {
+    /// Analytic Jacobian of `distort` as rows [d xd, d yd] over columns [d x, d y].
+    pub fn jacobian(&self, x: f64, y: f64) -> [[f64; 2]; 2] {
+        let r2 = x * x + y * y;
+        let radial = 1.0 + r2 * (self.k1 + r2 * (self.k2 + r2 * self.k3));
+        let g = 2.0 * (self.k1 + r2 * (2.0 * self.k2 + 3.0 * r2 * self.k3));
+        let cross = g * x * y + 2.0 * self.p1 * x + 2.0 * self.p2 * y;
+        let dxx = radial + g * x * x + 2.0 * self.p1 * y + 6.0 * self.p2 * x;
+        let dyy = radial + g * y * y + 6.0 * self.p1 * y + 2.0 * self.p2 * x;
+        [[dxx, cross], [cross, dyy]]
+    }
+}
+
 /// Camera intrinsic calibration model.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Intrinsics {
