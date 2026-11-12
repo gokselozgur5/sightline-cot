@@ -31,3 +31,9 @@ fn rejects_collinear_polygon() {
     let line = [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]];
     assert!(Geofence::new(&line, 0.0, 100.0).is_err());
 }
+
+#[test]
+fn accepts_concave_polygon() {
+    let poly = [[0.0, 0.0], [0.0, 3.0], [3.0, 3.0], [1.0, 1.5], [3.0, 0.0]];
+    assert!(Geofence::new(&poly, 0.0, 100.0).is_ok());
+}
