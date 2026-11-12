@@ -258,3 +258,7 @@ fn verify_tracks(tracker: &MultiTargetTracker, targets: &[SyntheticTarget]) {
             .iter()
             .map(|t| (t.x[0] - tgt.east_m).hypot(t.x[1] - tgt.north_m))
             .fold(f64::MAX, f64::min);
+        println!("Final track error: {err:.3} m");
+        assert!(err < 2.0, "track diverged from synthetic truth: {err} m");
+    }
+}
