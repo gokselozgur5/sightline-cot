@@ -64,6 +64,21 @@ pub fn escape_xml_attr(s: &str) -> String {
     }
     out
 }
+#[cfg(test)]
+mod tests_ctrl_escape {
+    use super::*;
+
+    #[test]
+    fn control_chars_are_escaped() {
+        assert_eq!(escape_xml_attr("a\nb\tc\rd"), "a&#10;b&#9;c&#13;d");
+    }
+
+    #[test]
+    fn numeric_references_are_decoded() {
+        assert_eq!(unescape_xml_attr("a&#10;b&#x9;c&#65;"), "a\nb\tcA");
+        assert_eq!(unescape_xml_attr("&#zz;&#;"), "&#zz;&#;");
+    }
+}
 /// Unescape XML attribute entities in a single pass.
 pub fn unescape_xml_attr(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
