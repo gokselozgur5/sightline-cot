@@ -265,3 +265,17 @@ impl TacticalSymbol {
         }
     }
 }
+
+impl TacticalSymbol {
+    fn parse_2525d(s: &str) -> Result<Self, SidcError> {
+        let aff = SidcAffiliation::from_2525d_code(&s[2..4])?;
+        let dom = SidcDomain::from_2525d_code(&s[4..6])?;
+        Ok(Self {
+            version: SidcVersion::MilStd2525D,
+            affiliation: aff,
+            domain: dom,
+            entity_code: 0,
+            modifier: 0,
+        })
+    }
+}
