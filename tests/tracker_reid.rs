@@ -62,3 +62,18 @@ fn track_purity_is_one_and_no_fragmentation() {
     }
     assert_ne!(hist[0][0], hist[0][1]);
 }
+
+#[test]
+fn occlusion_gap_reacquires_same_id() {
+    let mut t = MultiTargetTracker::new(2, 4, 0.5);
+    for i in 0..5 {
+        t.step(1.0, &[det(i as f64, 0.0, 0)]).unwrap();
+    }
+    let id = t.tracks[0].id;
+    for _ in 0..2 {
+        t.step(1.0, &[]).unwrap();
+    }
+    t.step(1.0, &[det(7.0, 0.0, 0)]).unwrap();
+    assert_eq!(t.tracks.len(), 1);
+    assert_eq!(t.tracks[0].id, id);
+}
