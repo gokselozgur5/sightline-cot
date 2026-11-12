@@ -375,3 +375,29 @@ mod tests_proto_packet {
         assert_eq!(evt, decoded);
     }
 }
+
+#[cfg(test)]
+mod tests_cot_conversion {
+    use super::*;
+
+    #[test]
+    fn test_cot_event_bidirectional_conversion() {
+        let cot = CotEvent {
+            uid: "UAV-99".into(),
+            cot_type: "a-u-A-M-F-Q".into(),
+            how: "m-g".into(),
+            time_ms: 1731398500000,
+            stale_ms: 1731398560000,
+            lat_deg: 41.0,
+            lon_deg: 29.0,
+            hae_m: 150.0,
+            ce_m: 2.0,
+            le_m: 3.0,
+            course_deg: 0.0,
+            speed_mps: 0.0,
+        };
+        let tak: TakCotEvent = (&cot).into();
+        let back = tak.to_cot_event();
+        assert_eq!(cot, back);
+    }
+}
