@@ -84,3 +84,16 @@ fn packet_roundtrip_over_generated_events() {
         assert_eq!(decode_tak_packet(&packet), Ok(evt));
     }
 }
+
+#[test]
+fn truncated_packet_prefixes_never_panic() {
+    let mut rng = Rng(0x5555_AAAA_1234_9876);
+    for _ in 0..200 {
+        let mut packet = Vec::new();
+        encode_tak_packet(&gen_event(&mut rng), &mut packet).unwrap();
+        assert!(decode_tak_packet(&[]).is_err());
+        for end in 1..packet.len() {
+            let _ = decode_tak_packet(&packet[..end]);
+        }
+    }
+}
