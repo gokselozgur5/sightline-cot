@@ -62,3 +62,13 @@ fn roundtrip_timestamp_range() {
         assert_eq!((back.time_ms, back.stale_ms), (ms, ms + 30_000));
     }
 }
+
+#[test]
+fn optional_track_defaults_to_zero() {
+    let xml = "<event version=\"2.0\" uid=\"u\" type=\"a-f-G\" how=\"m-g\" \
+        time=\"2026-02-16T12:00:00Z\" start=\"2026-02-16T12:00:00Z\" \
+        stale=\"2026-02-16T12:01:00Z\"><point lat=\"1\" lon=\"2\" hae=\"3\" \
+        ce=\"4\" le=\"5\"/></event>";
+    let ev = CotEvent::from_xml(xml).expect("parse");
+    assert_eq!((ev.course_deg, ev.speed_mps), (0.0, 0.0));
+}
