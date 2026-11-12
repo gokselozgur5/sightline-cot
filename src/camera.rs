@@ -606,13 +606,19 @@ impl DemGrid {
         let mut t = (0.0 - pose.cam_up_m) / ray_enu[2];
         for _ in 0..max_iters {
             let (e, n) = (t * ray_enu[0], t * ray_enu[1]);
-            let h = self.elevation_at(e, n).ok_or(CameraError::RayAboveHorizon)?;
+            let h = self
+                .elevation_at(e, n)
+                .ok_or(CameraError::RayAboveHorizon)?;
             let diff = pose.cam_up_m + t * ray_enu[2] - h;
-            if diff.abs() < 1e-3 { return Ok([e, n, h]); }
+            if diff.abs() < 1e-3 {
+                return Ok([e, n, h]);
+            }
             t += diff / (-ray_enu[2]);
         }
         let (e, n) = (t * ray_enu[0], t * ray_enu[1]);
-        self.elevation_at(e, n).map(|h| [e, n, h]).ok_or(CameraError::RayAboveHorizon)
+        self.elevation_at(e, n)
+            .map(|h| [e, n, h])
+            .ok_or(CameraError::RayAboveHorizon)
     }
 }
 
