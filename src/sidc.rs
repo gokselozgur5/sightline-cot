@@ -386,3 +386,21 @@ mod tests_c {
         assert_eq!(parsed.domain, SidcDomain::Surface);
     }
 }
+
+#[cfg(test)]
+mod tests_cot {
+    use super::*;
+
+    #[test]
+    fn test_cot_type_conversions_and_errors() {
+        let sym = TacticalSymbol::from_cot_type("a-f-A-M-F");
+        assert_eq!(sym.affiliation, SidcAffiliation::Friend);
+        assert_eq!(sym.domain, SidcDomain::Air);
+        assert_eq!(sym.to_cot_type(), "a-f-A");
+
+        assert_eq!(
+            TacticalSymbol::from_sidc("INVALID"),
+            Err(SidcError::InvalidLength)
+        );
+    }
+}
