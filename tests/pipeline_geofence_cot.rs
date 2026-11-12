@@ -72,3 +72,13 @@ fn crossing_reports_entered_then_exited_once() {
     );
     assert!(e < x);
 }
+#[test]
+fn breach_state_selects_cot_type_and_survives_xml() {
+    for (state, ev) in run_crossing() {
+        let inside = matches!(state, GeofenceState::Inside | GeofenceState::Entered);
+        let want = if inside { "a-h-G" } else { "a-f-G" };
+        let back = CotEvent::from_xml(&ev.to_xml()).expect("parse");
+        assert_eq!(back.cot_type, want);
+        assert_eq!(back.uid, ev.uid);
+    }
+}
