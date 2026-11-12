@@ -51,3 +51,14 @@ fn roundtrip_extreme_coordinates() {
         assert!((back.lon_deg - lon).abs() < 1e-7);
     }
 }
+
+#[test]
+fn roundtrip_timestamp_range() {
+    let samples = [0_i64, -1, 999, 951_782_400_000, 4_102_444_800_000];
+    for ms in samples {
+        let ts = format_iso8601_utc(ms);
+        assert_eq!(parse_iso8601_utc(&ts).unwrap(), ms, "{ts}");
+        let back = CotEvent::from_xml(&event("T", ms).to_xml()).expect("parse");
+        assert_eq!((back.time_ms, back.stale_ms), (ms, ms + 30_000));
+    }
+}
