@@ -6,6 +6,7 @@ pub mod cot;
 pub mod ffi;
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
+pub mod imm;
 pub mod los;
 pub mod sidc;
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
