@@ -81,3 +81,13 @@ pub fn encode_tag(field_num: u32, wire_type: WireType, buf: &mut [u8]) -> Result
     let key = ((field_num as u64) << 3) | (wire_type as u64);
     encode_varint(key, buf)
 }
+
+/// Decodes a protobuf field tag returning (field_number, wire_type, bytes_read).
+#[inline]
+pub fn decode_tag(buf: &[u8]) -> Result<(u32, WireType, usize), ProtoError> {
+    let (key, n) = decode_varint(buf)?;
+    let wire_raw = (key & 0x07) as u8;
+    let field_num = (key >> 3) as u32;
+    let wire_type = WireType::from_u8(wire_raw)?;
+    Ok((field_num, wire_type, n))
+}
