@@ -483,6 +483,22 @@ impl DemGrid {
         let dz_dn = ((z01 - z00) * (1.0 - s) + (z11 - z10) * s) / self.cell_step_m;
         Ok([dz_de, dz_dn])
     }
+
+    fn check_ray_downward(ray_cam: [f64; 3], pose: &CameraPose) -> Result<[f64; 3], CameraError> {
+        if !ray_cam.iter().all(|x| x.is_finite())
+            || !pose.roll_rad.is_finite()
+            || !pose.pitch_rad.is_finite()
+            || !pose.yaw_rad.is_finite()
+            || !pose.cam_up_m.is_finite()
+        {
+            return Err(CameraError::InvalidParameters);
+        }
+        let ray_enu = pose.transform_ray(ray_cam);
+        if !ray_enu[2].is_finite() || ray_enu[2] >= -1e-6 {
+            return Err(CameraError::RayAboveHorizon);
+        }
+        Ok(ray_enu)
+    }
 }
 
 #[cfg(test)]
