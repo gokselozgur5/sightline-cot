@@ -53,3 +53,18 @@ fn tracked_targets_have_distinct_ten_digit_mgrs() {
     let east = |s: &str| s[5..10].parse::<i64>().unwrap();
     assert!((east(b.as_str()) - east(a.as_str()) - 100).abs() <= 2);
 }
+#[test]
+fn coarse_mgrs_truncates_fine_mgrs_and_matches_utm() {
+    let (lat, lon) = tracked_latlon()[0];
+    let fine = format_mgrs(lat, lon, 5).expect("fine");
+    let coarse = format_mgrs(lat, lon, 3).expect("coarse");
+    let (f, c) = (fine.as_str(), coarse.as_str());
+    assert_eq!(&c[..5], &f[..5]);
+    assert_eq!(&c[5..8], &f[5..8]);
+    assert_eq!(&c[8..11], &f[10..13]);
+    let utm = wgs84_to_utm(lat, lon).expect("utm");
+    assert_eq!(
+        f[5..10].parse::<f64>().unwrap(),
+        (utm.easting % 100_000.0).floor()
+    );
+}
