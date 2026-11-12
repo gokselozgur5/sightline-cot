@@ -44,3 +44,11 @@ pub struct TacticalClassification {
     pub affiliation: TacticalAffiliation,
     pub category: TargetCategory,
 }
+
+impl TacticalClassification {
+    /// Creates a new tactical classification pair.
+    #[inline]
+    pub const fn new(affiliation: TacticalAffiliation, category: TargetCategory) -> Self {
+        Self { affiliation, category }
+    }
+}
