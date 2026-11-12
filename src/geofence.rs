@@ -283,3 +283,18 @@ mod tests {
                 lat_deg: 1.0,
                 lon_deg: 1.0,
             },
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 1.0,
+            },
+        ];
+        let gf = Geofence::new(&poly, 0.0, 1000.0).unwrap();
+        let b1 = gf.evaluate_breach(0.5, 0.5, 100.0, None);
+        assert_eq!(b1.status, GeofenceStatus::Inside);
+        assert!(b1.distance_to_boundary_m > 50000.0);
+        let b2 = gf.evaluate_breach(1.5, 1.5, 100.0, Some(true));
+        assert_eq!(b2.status, GeofenceStatus::Exited);
+        let b3 = gf.evaluate_breach(0.5, 0.5, 100.0, Some(false));
+        assert_eq!(b3.status, GeofenceStatus::Entered);
+    }
+}
