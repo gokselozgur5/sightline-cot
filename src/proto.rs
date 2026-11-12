@@ -274,3 +274,25 @@ impl TakCotEvent {
         }
     }
 }
+
+fn skip_wire_varint_or_fixed<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [u8], &'a [u8]), ProtoError> {
+    match wire {
+        WireType::Varint => {
+            let (_, n) = decode_varint(cur)?;
+            Ok((&cur[..n], &cur[n..]))
+        }
+        WireType::Fixed64 => {
+            if cur.len() < 8 {
+                return Err(ProtoError::UnexpectedEof);
+            }
+            Ok((&cur[..8], &cur[8..]))
+        }
+        WireType::Fixed32 => {
+            if cur.len() < 4 {
+                return Err(ProtoError::UnexpectedEof);
+            }
+            Ok((&cur[..4], &cur[4..]))
+        }
+        WireType::LengthDelimited => unreachable!(),
+    }
+}
