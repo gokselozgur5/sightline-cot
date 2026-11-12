@@ -658,3 +658,10 @@ impl Track {
         (prev_course_deg + 0.3 * diff).rem_euclid(360.0)
     }
 }
+
+impl Track {
+    /// Extrapolate track ground position during coasting state.
+    pub fn extrapolate_pos(&self, dt_s: f64) -> [f64; 2] {
+        [self.x[0] + self.x[2] * dt_s, self.x[1] + self.x[3] * dt_s]
+    }
+}
