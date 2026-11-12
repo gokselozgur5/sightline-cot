@@ -566,3 +566,10 @@ impl DemGrid {
             elevations,
         })
     }
+
+    /// Check if local ENU coordinates fall within the grid bounds.
+    pub fn contains_en(&self, e_m: f64, n_m: f64) -> bool {
+        let max_e = self.origin_e_m + (self.cols - 1) as f64 * self.cell_step_m;
+        let max_n = self.origin_n_m + (self.rows - 1) as f64 * self.cell_step_m;
+        e_m >= self.origin_e_m && e_m <= max_e && n_m >= self.origin_n_m && n_m <= max_n
+    }
