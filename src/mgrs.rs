@@ -251,3 +251,26 @@ pub fn format_mgrs(
     );
     s.bytes[s.len] = band as u8;
     s.len += 1;
+    s.bytes[s.len] = col as u8;
+    s.len += 1;
+    s.bytes[s.len] = row as u8;
+    s.len += 1;
+    let div = 100_000.0 / (10u32.pow(digits_per_axis as u32) as f64);
+    let e_val = ((utm.easting % 100000.0) / div).floor() as u32;
+    let n_val = ((utm.northing % 100000.0) / div).floor() as u32;
+    append_digits(&mut s.bytes, &mut s.len, e_val, digits_per_axis);
+    append_digits(&mut s.bytes, &mut s.len, n_val, digits_per_axis);
+    Ok(s)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_zone_and_band_selection() {
+        assert_eq!(lon_to_utm_zone(0.0).unwrap(), 31);
+        assert_eq!(lon_to_utm_zone(-122.4194).unwrap(), 10);
+        assert_eq!(lat_to_mgrs_band(0.0).unwrap(), 'N');
+        assert_eq!(lat_to_mgrs_band(37.7749).unwrap(), 'S');
+    }
