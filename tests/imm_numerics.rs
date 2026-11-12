@@ -13,3 +13,16 @@ fn assert_psd(f: &SubFilter) {
         assert!(det >= -1e-9, "negative minor {i}: {det}");
     }
 }
+
+#[test]
+fn predictions_keep_covariance_psd() {
+    let mut f = SubFilter::new([0.0; 3], 4.0, 10.0);
+    for _ in 0..50 {
+        f.predict_cv(0.1, 0.5);
+        assert_psd(&f);
+        f.predict_ca(0.1, 2.5);
+        assert_psd(&f);
+        f.predict_ct(0.1, 0.5, 1.5);
+        assert_psd(&f);
+    }
+}
