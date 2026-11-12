@@ -108,3 +108,16 @@ pub fn encode_f64_field(
     *offset += 8;
     Ok(())
 }
+
+/// TAK Protobuf Message wrapper around CotEvent.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TakMessage {
+    pub cot_event: CotEvent,
+}
+
+impl TakMessage {
+    /// Creates a new TakMessage from CotEvent.
+    pub fn new(cot_event: CotEvent) -> Self {
+        Self { cot_event }
+    }
+}
