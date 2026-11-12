@@ -74,6 +74,20 @@ impl Geofence {
     fn unwrap_lon(lon: f64, reference: f64) -> f64 {
         reference + ((lon - reference + 540.0).rem_euclid(360.0) - 180.0)
     }
+
+    /// Signed longitude step from `a` to `b`, taking the short way round.
+    fn lon_step(a: f64, b: f64) -> f64 {
+        Self::unwrap_lon(b, a) - a
+    }
+
+    /// Net longitude swept by the ring in turns: 0 for an ordinary ring, +1 or -1 around a pole.
+    fn pole_winding(poly: &[[f64; 2]]) -> i32 {
+        let n = poly.len();
+        let sweep: f64 = (0..n)
+            .map(|i| Self::lon_step(poly[i][1], poly[(i + 1) % n][1]))
+            .sum();
+        (sweep / 360.0).round() as i32
+    }
 }
 
 impl Geofence {
