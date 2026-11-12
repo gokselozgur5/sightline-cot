@@ -677,3 +677,25 @@ impl Track {
         self.hits >= min_hits && self.time_since_update <= max_age
     }
 }
+
+#[cfg(test)]
+mod test_kinematics_helpers {
+    use super::*;
+
+    pub fn make_kinematic_det(x: f64, y: f64) -> Detection {
+        Detection {
+            east_m: x,
+            north_m: y,
+            hae_m: 0.0,
+            ce90_m: 1.0,
+            le90_m: 1.0,
+            bbox: BoundingBox {
+                x1: 0.0,
+                y1: 0.0,
+                x2: 1.0,
+                y2: 1.0,
+            },
+            embedding: [0.0; 8],
+        }
+    }
+}
