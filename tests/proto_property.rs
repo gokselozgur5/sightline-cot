@@ -17,3 +17,17 @@ impl Rng {
         x
     }
 }
+
+#[test]
+fn varint_roundtrip_over_generated_values() {
+    let mut rng = Rng(0x9E37_79B9_7F4A_7C15);
+    let mut seen = [false; 11];
+    let mut buf = [0u8; 10];
+    for i in 0..10_000u32 {
+        let v = rng.next() >> (i % 64);
+        let n = encode_varint(v, &mut buf).unwrap();
+        seen[n] = true;
+        assert_eq!(decode_varint(&buf[..n]), Ok((v, n)));
+    }
+    assert!(seen[1..].iter().all(|s| *s), "lengths covered: {seen:?}");
+}
