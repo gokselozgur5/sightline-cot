@@ -36,3 +36,13 @@ fn long_run_updates_keep_covariance_psd() {
         imm.filters.iter().for_each(assert_psd);
     }
 }
+
+#[test]
+fn nonfinite_measurement_keeps_probs_normalized() {
+    let mut imm = ImmFilter::new([0.0; 3], ImmConfig::default());
+    imm.step(0.1, [1.0, 0.0, 0.0]);
+    let before = imm.clone();
+    imm.update([f64::NAN, 0.0, 0.0]);
+    imm.update([f64::INFINITY, 0.0, 0.0]);
+    assert_eq!(imm, before);
+}
