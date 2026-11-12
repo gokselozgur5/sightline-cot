@@ -131,3 +131,12 @@ impl SubFilter {
         likelihood.max(1e-12)
     }
 }
+
+/// Interacting Multiple Model (IMM) multi-model filter.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ImmFilter {
+    pub filters: [SubFilter; NUM_MODELS],
+    pub probs: [f64; NUM_MODELS],
+    pub trans_mat: [[f64; NUM_MODELS]; NUM_MODELS],
+    pub config: ImmConfig,
+}
