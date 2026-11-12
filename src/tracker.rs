@@ -599,6 +599,20 @@ mod tests {
     }
 
     #[test]
+    fn test_occlusion_extrapolation_drift_bounded() {
+        let mut tracker = MultiTargetTracker::new(2, 4, 0.5);
+        let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        for i in 0..5 {
+            tracker.step(1.0, &[dummy_det(0.0, i as f64 * 5.0, emb)]).unwrap();
+        }
+        assert_eq!(tracker.tracks[0].status, TrackStatus::Confirmed);
+        let y_last = tracker.tracks[0].x[1];
+        tracker.step(1.0, &[]).unwrap();
+        assert_eq!(tracker.tracks[0].status, TrackStatus::Coasting);
+        assert!((tracker.tracks[0].x[1] - (y_last + 5.0)).abs() < 1.0);
+    }
+
+    #[test]
     fn test_velocity_convergence_on_linear_trajectory() {
         let mut tracker = MultiTargetTracker::new(2, 3, 0.5);
         let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
