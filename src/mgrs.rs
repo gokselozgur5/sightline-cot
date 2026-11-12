@@ -274,3 +274,22 @@ mod tests {
         assert_eq!(lat_to_mgrs_band(0.0).unwrap(), 'N');
         assert_eq!(lat_to_mgrs_band(37.7749).unwrap(), 'S');
     }
+
+    #[test]
+    fn test_wgs84_utm_roundtrip_precision() {
+        let coords = [(37.7749, -122.4194), (40.7128, -74.0060)];
+        for (lat, lon) in coords {
+            let utm = wgs84_to_utm(lat, lon).unwrap();
+            let (lat_rt, lon_rt) = utm_to_wgs84(&utm).unwrap();
+            assert!((lat - lat_rt).abs() < 1e-5);
+            assert!((lon - lon_rt).abs() < 1e-5);
+        }
+    }
+
+    #[test]
+    fn test_format_mgrs_string() {
+        let s = format_mgrs(37.7749, -122.4194, 5).unwrap();
+        assert_eq!(s.len, 15);
+        assert!(s.as_str().starts_with("10S"));
+    }
+}
