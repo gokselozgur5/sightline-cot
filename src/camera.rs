@@ -77,10 +77,22 @@ impl BrownConrady {
             let dy = (j[0][0] * ey - j[1][0] * ex) / det;
             (x, y) = (x - dx, y - dy);
             if dx.abs() + dy.abs() < 1e-13 {
-                return Ok((x, y));
+                return if self.on_monotonic_branch(x, y) {
+                    Ok((x, y))
+                } else {
+                    Err(CameraError::DistortionSolverFailed)
+                };
             }
         }
         Err(CameraError::DistortionSolverFailed)
+    }
+
+    /// True when the radial scale and its radial derivative are both positive at (x, y).
+    fn on_monotonic_branch(&self, x: f64, y: f64) -> bool {
+        let r2 = x * x + y * y;
+        let radial = 1.0 + r2 * (self.k1 + r2 * (self.k2 + r2 * self.k3));
+        let deriv = 1.0 + r2 * (3.0 * self.k1 + r2 * (5.0 * self.k2 + 7.0 * r2 * self.k3));
+        radial > 0.0 && deriv > 0.0
     }
 }
 
