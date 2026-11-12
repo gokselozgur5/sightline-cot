@@ -100,3 +100,19 @@ impl SidcBuffer {
         self.len == 0
     }
 }
+
+impl SidcAffiliation {
+    pub fn to_2525d_code(&self) -> &'static str {
+        match self {
+            Self::Pending => "01",
+            Self::Unknown => "02",
+            Self::AssumedFriend => "04",
+            Self::Friend => "03",
+            Self::Neutral => "05",
+            Self::Suspect => "07",
+            Self::Hostile => "06",
+            Self::Joker => "08",
+            Self::Faker => "09",
+        }
+    }
+}
