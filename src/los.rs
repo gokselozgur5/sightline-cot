@@ -33,3 +33,24 @@ fn sample_point(obs: Position3D, target: Position3D, frac: f64) -> (f64, f64, f6
         obs.up_m + frac * (target.up_m - obs.up_m),
     )
 }
+
+fn check_step(dem: &DemGrid, p: (f64, f64, f64), dist: f64) -> (f64, Option<Position3D>) {
+    let (e, n, up) = p;
+    let eff_alt = up - earth_curvature_drop(dist);
+    if let Some(h) = dem.elevation_at(e, n) {
+        let clr = eff_alt - h;
+        if clr < 0.0 {
+            return (
+                clr,
+                Some(Position3D {
+                    east_m: e,
+                    north_m: n,
+                    up_m: h,
+                }),
+            );
+        }
+        (clr, None)
+    } else {
+        (f64::MAX, None)
+    }
+}
