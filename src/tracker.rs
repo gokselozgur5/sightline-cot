@@ -628,3 +628,10 @@ mod tests {
         assert_eq!(Track::invert_s(s_neg_det, det_neg), None);
     }
 }
+
+impl Track {
+    /// Compute filtered ground speed in meters per second.
+    pub fn speed_mps(&self) -> f64 {
+        self.x[2].hypot(self.x[3])
+    }
+}
