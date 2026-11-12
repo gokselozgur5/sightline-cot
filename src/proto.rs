@@ -193,3 +193,16 @@ fn write_proto_varint(num: u32, val: u64, out: &mut Vec<u8>) -> Result<(), Proto
     out.extend_from_slice(&val_buf[..n_val]);
     Ok(())
 }
+
+fn write_proto_f64(num: u32, val: f64, out: &mut Vec<u8>) -> Result<(), ProtoError> {
+    if val == 0.0 {
+        return Ok(());
+    }
+    let mut tag_buf = [0u8; 10];
+    let n_tag = encode_tag(num, WireType::Fixed64, &mut tag_buf)?;
+    out.extend_from_slice(&tag_buf[..n_tag]);
+    let mut f_buf = [0u8; 8];
+    encode_fixed64(val, &mut f_buf)?;
+    out.extend_from_slice(&f_buf);
+    Ok(())
+}
