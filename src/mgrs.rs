@@ -170,3 +170,9 @@ pub struct MgrsString {
     pub bytes: [u8; 32],
     pub len: usize,
 }
+
+impl MgrsString {
+    pub fn as_str(&self) -> &str {
+        core::str::from_utf8(&self.bytes[..self.len]).unwrap_or("")
+    }
+}
