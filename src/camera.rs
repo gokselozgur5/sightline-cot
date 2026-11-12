@@ -57,6 +57,33 @@ impl BrownConrady {
     }
 }
 
+impl BrownConrady {
+    /// Invert `distort` with Newton iterations starting from the distorted point.
+    pub fn undistort(&self, xd: f64, yd: f64, max_iters: usize) -> Result<(f64, f64), CameraError> {
+        let coeffs = [self.k1, self.k2, self.k3, self.p1, self.p2];
+        if !xd.is_finite() || !yd.is_finite() || !coeffs.iter().all(|c| c.is_finite()) {
+            return Err(CameraError::InvalidParameters);
+        }
+        let (mut x, mut y) = (xd, yd);
+        for _ in 0..max_iters {
+            let (fx, fy) = self.distort(x, y);
+            let (ex, ey) = (fx - xd, fy - yd);
+            let j = self.jacobian(x, y);
+            let det = j[0][0] * j[1][1] - j[0][1] * j[1][0];
+            if !det.is_finite() || det <= 1e-12 {
+                return Err(CameraError::DistortionSolverFailed);
+            }
+            let dx = (j[1][1] * ex - j[0][1] * ey) / det;
+            let dy = (j[0][0] * ey - j[1][0] * ex) / det;
+            (x, y) = (x - dx, y - dy);
+            if dx.abs() + dy.abs() < 1e-13 {
+                return Ok((x, y));
+            }
+        }
+        Err(CameraError::DistortionSolverFailed)
+    }
+}
+
 /// Camera intrinsic calibration model.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Intrinsics {
