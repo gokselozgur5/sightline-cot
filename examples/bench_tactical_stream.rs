@@ -98,3 +98,23 @@ fn init_scenario() -> Vec<SyntheticTarget> {
             raw_emb: [0.2, 0.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.0],
             cot_type: "a-f-G-E-S",
         },
+    ]
+}
+
+struct Observation {
+    u: f64,
+    v: f64,
+    emb: [f32; 8],
+    cot_type: &'static str,
+}
+
+fn observe(tgt: &SyntheticTarget, cam: &Intrinsics) -> Option<Observation> {
+    let Intrinsics::Pinhole { fx, fy, cx, cy } = *cam else {
+        panic!("bench supports only the pinhole camera model");
+    };
+    let u = fx * tgt.east_m / CAM_ALT_M + cx;
+    let v = cy - fy * tgt.north_m / CAM_ALT_M;
+    if !(0.0..IMG_W).contains(&u) || !(0.0..IMG_H).contains(&v) {
+        return None;
+    }
+    Some(Observation {
