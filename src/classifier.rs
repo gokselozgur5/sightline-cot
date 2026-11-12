@@ -81,6 +81,21 @@ fn match_category(s: &str) -> TargetCategory {
 }
 
 impl MilStdClassifier {
+    /// Builds a classifier from a free-form label such as `"car"` or `"person"`.
+    ///
+    /// Matching is case-insensitive and ignores surrounding whitespace. Labels that
+    /// match no known category yield [`TargetCategory::Unknown`]. The affiliation is
+    /// always [`TacticalAffiliation::Unknown`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sightline_cot::classifier::{MilStdClassifier, TargetCategory};
+    ///
+    /// let cls = MilStdClassifier::from_label("  CAR ");
+    /// assert_eq!(cls.category, TargetCategory::Vehicle);
+    /// assert_eq!(cls.to_cot_type(), "a-u-G");
+    /// ```
     pub fn from_label(label: &str) -> Self {
         Self {
             affiliation: TacticalAffiliation::Unknown,
