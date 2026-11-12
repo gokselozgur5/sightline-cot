@@ -1,6 +1,6 @@
 //! Known-coordinate and roundtrip tests for the MGRS and UTM converter.
 
-use sightline_cot::{utm_to_wgs84, wgs84_to_utm};
+use sightline_cot::{format_mgrs, utm_to_wgs84, wgs84_to_utm};
 
 fn assert_close(actual: f64, expected: f64, tol: f64, label: &str) {
     assert!(
@@ -47,4 +47,10 @@ fn roundtrip_all_zones_both_hemispheres() {
             }
         }
     }
+}
+
+#[test]
+fn format_mgrs_central_meridian_origin() {
+    let s = format_mgrs(0.0, 3.0, 5).unwrap();
+    assert_eq!(s.as_str(), "31NEA0000000000");
 }
