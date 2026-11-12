@@ -22,3 +22,21 @@ fn norway_32v_widened() {
         .as_str()
         .starts_with("32V"));
 }
+
+#[test]
+fn svalbard_x_band_zones() {
+    assert_eq!(zone(78.0, 6.0), 31);
+    assert_eq!(zone(78.0, 15.0), 33);
+    assert_eq!(zone(78.0, 21.0), 35);
+    assert_eq!(zone(78.0, 8.9999), 31);
+    assert_eq!(zone(78.0, 9.0), 33);
+    assert_eq!(zone(78.0, 20.9999), 33);
+    assert_eq!(zone(78.0, 33.0), 37);
+    assert_eq!(zone(78.0, 41.9999), 37);
+    assert_eq!(zone(71.9999, 6.0), 32);
+    assert_eq!(zone(72.0, 6.0), 31);
+    assert!(format_mgrs(78.0, 6.0, 5)
+        .unwrap()
+        .as_str()
+        .starts_with("31X"));
+}
