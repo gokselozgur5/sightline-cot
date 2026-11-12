@@ -73,3 +73,14 @@ fn gen_event(rng: &mut Rng) -> TakCotEvent {
         le: gen_coord(rng, 50.0),
     }
 }
+
+#[test]
+fn packet_roundtrip_over_generated_events() {
+    let mut rng = Rng(0x0123_4567_89AB_CDEF);
+    for _ in 0..2_000 {
+        let evt = gen_event(&mut rng);
+        let mut packet = Vec::new();
+        encode_tak_packet(&evt, &mut packet).unwrap();
+        assert_eq!(decode_tak_packet(&packet), Ok(evt));
+    }
+}
