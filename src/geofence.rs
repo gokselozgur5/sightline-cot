@@ -131,3 +131,26 @@ mod tests {
         assert!(!gf.is_altitude_valid(50.0));
     }
 }
+
+#[test]
+fn test_geofence_breach_event_transitions() {
+    let poly = [
+        [37.0, -122.0],
+        [37.0, -121.0],
+        [38.0, -121.0],
+        [38.0, -122.0],
+    ];
+    let gf = Geofence::new(&poly, 0.0, 1000.0).unwrap();
+
+    let b1 = gf.evaluate_breach(37.5, -121.5, 500.0, None);
+    assert_eq!(b1.state, GeofenceState::Inside);
+
+    let b2 = gf.evaluate_breach(37.5, -121.5, 500.0, Some(false));
+    assert_eq!(b2.state, GeofenceState::Entered);
+
+    let b3 = gf.evaluate_breach(36.0, -121.5, 500.0, Some(true));
+    assert_eq!(b3.state, GeofenceState::Exited);
+
+    let b4 = gf.evaluate_breach(36.0, -121.5, 500.0, Some(false));
+    assert_eq!(b4.state, GeofenceState::Outside);
+}
