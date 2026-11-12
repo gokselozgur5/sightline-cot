@@ -61,3 +61,21 @@ fn main() {
         yaw_rad: 0.3,
         cam_up_m: 500.0,
     };
+    println!("Camera ray casting ({WIDTH}x{HEIGHT} grid, step {STEP}, best of {ROUNDS})");
+    println!(
+        "{:<32} {:>10} {:>12} {:>14}",
+        "Operation", "Rays", "ns/ray", "rays/s"
+    );
+    report("pixel_to_ray (pinhole)", || {
+        grid_rays(&pinhole, &pose, None)
+    });
+    report("pixel_to_ray (fisheye)", || {
+        grid_rays(&fisheye, &pose, None)
+    });
+    report("pinhole + intersect_ground", || {
+        grid_rays(&pinhole, &pose, Some(0.0))
+    });
+    report("fisheye + intersect_ground", || {
+        grid_rays(&fisheye, &pose, Some(0.0))
+    });
+}
