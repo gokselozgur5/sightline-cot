@@ -27,6 +27,23 @@ const FALSE_EASTING: f64 = 500000.0;
 const FALSE_NORTHING_SOUTH: f64 = 10000000.0;
 
 /// Determine standard UTM zone from longitude in degrees.
+///
+/// Zones are 6 degrees wide and numbered from 180 degrees west (zone 1).
+/// A longitude of exactly 180 degrees is clamped into zone 60.
+///
+/// # Errors
+///
+/// Returns [`GridError::InvalidLongitude`] when `lon_deg` is outside `[-180, 180]`.
+///
+/// # Examples
+///
+/// ```
+/// use sightline_cot::lon_to_utm_zone;
+///
+/// assert_eq!(lon_to_utm_zone(-122.4194).unwrap(), 10);
+/// assert_eq!(lon_to_utm_zone(180.0).unwrap(), 60);
+/// assert!(lon_to_utm_zone(200.0).is_err());
+/// ```
 pub fn lon_to_utm_zone(lon_deg: f64) -> Result<u8, GridError> {
     if !(-180.0..=180.0).contains(&lon_deg) {
         return Err(GridError::InvalidLongitude);
