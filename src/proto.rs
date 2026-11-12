@@ -217,3 +217,15 @@ impl TakMessage {
         lon_deg: &mut f64,
         hae_m: &mut f64,
     ) -> Result<(), ProtoError> {
+        while *off < buf.len() {
+            let key = decode_varint(buf, off)?;
+            let field_num = (key >> 3) as u32;
+            let wire_type = (key & 0x07) as u8;
+            Self::dispatch_field(
+                buf, off, field_num, wire_type, uid, cot_type, how, time_ms, stale_ms, lat_deg,
+                lon_deg, hae_m,
+            )?;
+        }
+        Ok(())
+    }
+}
