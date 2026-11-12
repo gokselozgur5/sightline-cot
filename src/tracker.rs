@@ -715,3 +715,18 @@ mod tests_speed_course {
         assert!((trk.course_deg() - 45.0).abs() < 1e-4);
     }
 }
+
+#[cfg(test)]
+mod tests_deadband {
+    use super::test_kinematics_helpers::make_kinematic_det;
+    use super::*;
+
+    #[test]
+    fn test_stationary_course_deadband() {
+        let det = make_kinematic_det(0.0, 0.0);
+        let mut trk = Track::new(1, &det);
+        trk.x[2] = 0.01;
+        trk.x[3] = 0.01;
+        assert_eq!(trk.course_deg(), 0.0);
+    }
+}
