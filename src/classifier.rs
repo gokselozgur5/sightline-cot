@@ -37,3 +37,10 @@ impl TacticalAffiliation {
         }
     }
 }
+
+/// Tactical classification pairing affiliation and category.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub struct TacticalClassification {
+    pub affiliation: TacticalAffiliation,
+    pub category: TargetCategory,
+}
