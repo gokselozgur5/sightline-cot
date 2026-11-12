@@ -208,6 +208,30 @@ pub struct DemGrid {
     pub elevations: Vec<f64>,
 }
 
+impl DemGrid {
+    /// Bilinear elevation lookup at (east_m, north_m).
+    pub fn elevation_at(&self, east_m: f64, north_m: f64) -> Option<f64> {
+        if east_m < self.min_east_m || east_m > self.max_east_m ||
+           north_m < self.min_north_m || north_m > self.max_north_m ||
+           self.cols < 2 || self.rows < 2 {
+            return None;
+        }
+        let u = (east_m - self.min_east_m) / (self.max_east_m - self.min_east_m) * (self.cols - 1) as f64;
+        let v = (north_m - self.min_north_m) / (self.max_north_m - self.min_north_m) * (self.rows - 1) as f64;
+        let c0 = (u.floor() as usize).min(self.cols - 2);
+        let r0 = (v.floor() as usize).min(self.rows - 2);
+        let du = u - c0 as f64;
+        let dv = v - r0 as f64;
+        let z00 = self.elevations[r0 * self.cols + c0];
+        let z01 = self.elevations[r0 * self.cols + (c0 + 1)];
+        let z10 = self.elevations[(r0 + 1) * self.cols + c0];
+        let z11 = self.elevations[(r0 + 1) * self.cols + (c0 + 1)];
+        let z0 = z00 * (1.0 - du) + z01 * du;
+        let z1 = z10 * (1.0 - du) + z11 * du;
+        Some(z0 * (1.0 - dv) + z1 * dv)
+    }
+}
+
 /// Intersect camera-frame ray with horizontal ground plane at `ground_up_m`.
 pub fn intersect_ground(
     ray_cam: [f64; 3],
