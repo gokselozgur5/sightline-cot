@@ -89,3 +89,25 @@ impl SubFilter {
         }
     }
 }
+
+impl SubFilter {
+    /// Coordinated turn state prediction.
+    pub fn predict_ct(&mut self, dt: f64, omega: f64, q: f64) {
+        let (sin_w, cos_w) = if omega.abs() > 1e-4 {
+            let w_dt = omega * dt;
+            (w_dt.sin() / omega, (1.0 - w_dt.cos()) / omega)
+        } else {
+            (dt, 0.0)
+        };
+        let vx = self.state[3];
+        let vy = self.state[4];
+        self.state[0] += sin_w * vx - cos_w * vy;
+        self.state[1] += cos_w * vx + sin_w * vy;
+        self.state[2] += self.state[5] * dt;
+        self.state[3] = (omega * dt).cos() * vx - (omega * dt).sin() * vy;
+        self.state[4] = (omega * dt).sin() * vx + (omega * dt).cos() * vy;
+        for i in 0..6 {
+            self.cov[i][i] += q * dt;
+        }
+    }
+}
