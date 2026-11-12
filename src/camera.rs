@@ -139,11 +139,16 @@ impl Intrinsics {
             || !fy.is_finite()
             || fx <= 0.0
             || fy <= 0.0
+            || !cx.is_finite()
+            || !cy.is_finite()
         {
             return Err(CameraError::InvalidParameters);
         }
         let x = (u - cx) / fx;
         let y = (v - cy) / fy;
+        if !x.is_finite() || !y.is_finite() {
+            return Err(CameraError::InvalidParameters);
+        }
         let norm = (x * x + y * y + 1.0).sqrt();
         Ok([x / norm, y / norm, 1.0 / norm])
     }
