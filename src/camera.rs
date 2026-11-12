@@ -699,4 +699,20 @@ mod fisheye_fold_tests {
         }
         assert!(cam.pixel_to_ray(30.0, 0.0).is_ok());
     }
+
+    #[test]
+    fn test_monotonic_limit_and_near_limit_success() {
+        assert_eq!(equidistant_monotonic_limit_sq(0.0, 0.0), f64::INFINITY);
+        assert_eq!(equidistant_monotonic_limit_sq(0.05, 0.01), f64::INFINITY);
+        assert!((equidistant_monotonic_limit_sq(-0.3, 0.0) - 1.0 / 0.9).abs() < 1e-12);
+        assert!((equidistant_monotonic_limit_sq(-0.5, 0.1) - 1.0).abs() < 1e-12);
+        let t_max = (1.0f64 / 0.9).sqrt();
+        let r_max = 100.0 * t_max * (1.0 - 0.3 * t_max * t_max);
+        let ray = fish(-0.3, 0.0).pixel_to_ray(r_max - 1e-3, 0.0).unwrap();
+        assert!(ray[2].acos() < t_max);
+        assert!(fish(-0.3, 0.0).pixel_to_ray(r_max + 1e-3, 0.0).is_err());
+        let wide = fish(0.0, 0.0).pixel_to_ray(200.0, 0.0).unwrap();
+        assert!((wide[2].acos() - 2.0).abs() < 1e-9);
+        assert_eq!(fish(-0.5, 0.1).pixel_to_ray(0.0, 0.0), Ok([0.0, 0.0, 1.0]));
+    }
 }
