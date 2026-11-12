@@ -323,3 +323,11 @@ impl TakCotEvent {
         Ok(evt)
     }
 }
+
+/// Decodes a framed TAK Protocol Version 1 packet (validating 0xBF magic byte).
+pub fn decode_tak_packet(packet: &[u8]) -> Result<TakCotEvent, ProtoError> {
+    if packet.is_empty() || packet[0] != TAK_PROTO_MAGIC {
+        return Err(ProtoError::InvalidMagic);
+    }
+    TakCotEvent::decode_protobuf(&packet[1..])
+}
