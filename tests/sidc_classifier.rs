@@ -27,3 +27,20 @@ fn affiliation_2525c_round_trip() {
         assert_eq!(SidcAffiliation::from_2525c_char(ch), Ok(aff));
     }
 }
+
+const DOMAINS: [(SidcDomain, &str, char); 6] = [
+    (SidcDomain::Air, "01", 'A'),
+    (SidcDomain::Space, "05", 'P'),
+    (SidcDomain::Land, "10", 'G'),
+    (SidcDomain::Surface, "30", 'S'),
+    (SidcDomain::Subsurface, "35", 'U'),
+    (SidcDomain::Activity, "40", 'X'),
+];
+
+#[test]
+fn domain_2525d_round_trip() {
+    for (dom, code, _) in DOMAINS {
+        assert_eq!(dom.to_2525d_code(), code);
+        assert_eq!(SidcDomain::from_2525d_code(code), Ok(dom));
+    }
+}
