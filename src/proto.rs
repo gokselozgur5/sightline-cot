@@ -71,3 +71,15 @@ pub fn encode_i64_field(
     *offset += len;
     Ok(())
 }
+
+/// Encodes length-delimited string field.
+pub fn encode_string_field(
+    field_num: u32,
+    s: &str,
+    buf: &mut [u8],
+    offset: &mut usize,
+) -> Result<(), ProtoError> {
+    let tag_len = encode_tag(field_num, 2, &mut buf[*offset..])?;
+    *offset += tag_len;
+    let len_len = encode_varint(s.len() as u64, &mut buf[*offset..])?;
+    *offset += len_len;
