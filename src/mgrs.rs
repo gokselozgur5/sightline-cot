@@ -80,3 +80,20 @@ fn meridian_arc(phi: f64, e2: f64) -> f64 {
     let a6 = 35.0 * e6 / 3072.0;
     WGS84_A * (a0 * phi - a2 * (2.0 * phi).sin() + a4 * (4.0 * phi).sin() - a6 * (6.0 * phi).sin())
 }
+
+/// Reverse UTM projection from UTM to WGS84 lat/lon.
+pub fn utm_to_wgs84(coord: &UtmCoord) -> Result<(f64, f64), GridError> {
+    if !(1..=60).contains(&coord.zone) {
+        return Err(GridError::InvalidZone);
+    }
+    if coord.hemisphere != 'N' && coord.hemisphere != 'S' {
+        return Err(GridError::InvalidLatitude);
+    }
+    if !(100000.0..=900000.0).contains(&coord.easting) {
+        return Err(GridError::InvalidEasting);
+    }
+    if !(0.0..=10000000.0).contains(&coord.northing) {
+        return Err(GridError::InvalidNorthing);
+    }
+    Ok(utm_unproject_point(coord))
+}
