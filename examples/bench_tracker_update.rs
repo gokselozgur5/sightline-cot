@@ -36,3 +36,20 @@ fn synthetic_detections(count: usize, frame: usize) -> Vec<Detection> {
         .collect()
 }
 
+/// Returns the mean microseconds per tracker step and the resulting track count.
+fn time_updates(count: usize) -> (f64, usize) {
+    let frames: Vec<Vec<Detection>> = (0..WARMUP_FRAMES + FRAMES)
+        .map(|f| synthetic_detections(count, f))
+        .collect();
+    let mut tracker = MultiTargetTracker::new(3, 5, 2.0);
+    for dets in &frames[..WARMUP_FRAMES] {
+        tracker.step(DT_S, dets).expect("warmup step failed");
+    }
+    let start = Instant::now();
+    for dets in &frames[WARMUP_FRAMES..] {
+        tracker.step(DT_S, dets).expect("step failed");
+    }
+    let us_per_frame = start.elapsed().as_secs_f64() * 1e6 / FRAMES as f64;
+    (us_per_frame, tracker.tracks.len())
+}
+
