@@ -97,3 +97,14 @@ fn truncated_packet_prefixes_never_panic() {
         }
     }
 }
+
+#[test]
+fn random_byte_buffers_never_panic() {
+    let mut rng = Rng(0xA5A5_5A5A_0F0F_F0F0);
+    for _ in 0..20_000 {
+        let len = (rng.next() % 64) as usize;
+        let mut buf: Vec<u8> = (0..len).map(|_| rng.next() as u8).collect();
+        buf.insert(0, 0xBF);
+        let _ = decode_tak_packet(&buf);
+    }
+}
