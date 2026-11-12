@@ -49,3 +49,21 @@ fn free_null_is_a_no_op_and_repeated_cycles_succeed() {
         }
     }
 }
+
+#[test]
+fn engines_are_independent_handles() {
+    let c = cfg();
+    let d = det();
+    let (mut out, mut n) = ([SightlineTrackC::default(); 2], 0usize);
+    unsafe {
+        let a = sightline_engine_new(&c);
+        let b = sightline_engine_new(&c);
+        assert_ne!(a, b);
+        let rc = sightline_engine_step(a, 0.1, &d, 1, out.as_mut_ptr(), 2, &mut n);
+        assert_eq!((rc, n), (SIGHTLINE_OK, 1));
+        sightline_engine_free(a);
+        let rc = sightline_engine_step(b, 0.1, std::ptr::null(), 0, out.as_mut_ptr(), 2, &mut n);
+        assert_eq!((rc, n), (SIGHTLINE_OK, 0));
+        sightline_engine_free(b);
+    }
+}
