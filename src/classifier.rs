@@ -139,4 +139,32 @@ mod tests {
             assert_eq!(cls.to_cot_type(), expected, "category {category:?}");
         }
     }
+
+    #[test]
+    fn test_neutral_and_unknown_fallback_mapping() {
+        let neutral = [
+            (TargetCategory::Vehicle, "a-n-G-E-V"),
+            (TargetCategory::Person, "a-n-G-E-S"),
+            (TargetCategory::Drone, "a-n-G"),
+            (TargetCategory::Aircraft, "a-n-G"),
+            (TargetCategory::Vessel, "a-n-G"),
+            (TargetCategory::Unknown, "a-n-G"),
+        ];
+        for (category, expected) in neutral {
+            let cls = MilStdClassifier::new(TacticalAffiliation::Neutral, category);
+            assert_eq!(cls.to_cot_type(), expected, "neutral {category:?}");
+        }
+        let unknown = [
+            TargetCategory::Vehicle,
+            TargetCategory::Person,
+            TargetCategory::Drone,
+            TargetCategory::Aircraft,
+            TargetCategory::Vessel,
+            TargetCategory::Unknown,
+        ];
+        for category in unknown {
+            let cls = MilStdClassifier::new(TacticalAffiliation::Unknown, category);
+            assert_eq!(cls.to_cot_type(), "a-u-G", "unknown {category:?}");
+        }
+    }
 }
