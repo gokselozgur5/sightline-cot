@@ -25,3 +25,31 @@ pub struct MilStdClassifier {
     pub affiliation: TacticalAffiliation,
     pub category: TargetCategory,
 }
+
+impl MilStdClassifier {
+    pub const fn new(affiliation: TacticalAffiliation, category: TargetCategory) -> Self {
+        Self {
+            affiliation,
+            category,
+        }
+    }
+
+    pub fn to_cot_type(&self) -> &'static str {
+        match (self.affiliation, self.category) {
+            (TacticalAffiliation::Friendly, TargetCategory::Vehicle) => "a-f-G-E-V-C",
+            (TacticalAffiliation::Hostile, TargetCategory::Vehicle) => "a-h-G-E-V",
+            (TacticalAffiliation::Friendly, TargetCategory::Person) => "a-f-G-E-S",
+            (TacticalAffiliation::Hostile, TargetCategory::Person) => "a-h-G-E-S",
+            (TacticalAffiliation::Friendly, TargetCategory::Drone) => "a-f-A-M-F",
+            (TacticalAffiliation::Hostile, TargetCategory::Drone) => "a-h-A-M-F",
+            (TacticalAffiliation::Friendly, TargetCategory::Aircraft) => "a-f-A",
+            (TacticalAffiliation::Hostile, TargetCategory::Aircraft) => "a-h-A",
+            (TacticalAffiliation::Friendly, TargetCategory::Vessel) => "a-f-S",
+            (TacticalAffiliation::Hostile, TargetCategory::Vessel) => "a-h-S",
+            (TacticalAffiliation::Neutral, TargetCategory::Vehicle) => "a-n-G-E-V",
+            (TacticalAffiliation::Neutral, TargetCategory::Person) => "a-n-G-E-S",
+            (TacticalAffiliation::Neutral, _) => "a-n-G",
+            _ => "a-u-G",
+        }
+    }
+}
