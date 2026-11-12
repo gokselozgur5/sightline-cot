@@ -237,3 +237,23 @@ impl ImmFilter {
         }
     }
 }
+
+impl ImmFilter {
+    /// Step full IMM cycle: mix -> predict -> update.
+    pub fn step(&mut self, dt: f64, z: [f64; 3]) -> [f64; 6] {
+        self.mix();
+        self.predict(dt);
+        self.update(z);
+        self.fused_state()
+    }
+    /// Compute probability-weighted fused state output.
+    pub fn fused_state(&self) -> [f64; 6] {
+        let mut fused = [0.0; 6];
+        for j in 0..NUM_MODELS {
+            for k in 0..6 {
+                fused[k] += self.probs[j] * self.filters[j].state[k];
+            }
+        }
+        fused
+    }
+}
