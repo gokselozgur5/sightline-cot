@@ -228,3 +228,26 @@ pub fn format_mgrs(
     lon_deg: f64,
     digits_per_axis: usize,
 ) -> Result<MgrsString, GridError> {
+    if !(1..=5).contains(&digits_per_axis) {
+        return Err(GridError::InvalidNorthing);
+    }
+    let utm = wgs84_to_utm(lat_deg, lon_deg)?;
+    let band = lat_to_mgrs_band(lat_deg)?;
+    let col = mgrs_100k_col_letter(utm.zone, utm.easting);
+    let row = mgrs_100k_row_letter(utm.zone, utm.northing);
+    let mut s = MgrsString {
+        bytes: [0u8; 32],
+        len: 0,
+    };
+    if utm.zone < 10 {
+        s.bytes[s.len] = b'0';
+        s.len += 1;
+    }
+    append_digits(
+        &mut s.bytes,
+        &mut s.len,
+        utm.zone as u32,
+        if utm.zone < 10 { 1 } else { 2 },
+    );
+    s.bytes[s.len] = band as u8;
+    s.len += 1;
