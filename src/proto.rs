@@ -206,3 +206,21 @@ fn write_proto_f64(num: u32, val: f64, out: &mut Vec<u8>) -> Result<(), ProtoErr
     out.extend_from_slice(&f_buf);
     Ok(())
 }
+
+impl TakCotEvent {
+    /// Encodes TakCotEvent into binary protobuf bytes.
+    pub fn encode_protobuf(&self, out: &mut Vec<u8>) -> Result<(), ProtoError> {
+        write_proto_str(1, &self.r#type, out)?;
+        write_proto_str(2, &self.uid, out)?;
+        write_proto_varint(3, self.send_time, out)?;
+        write_proto_varint(4, self.start_time, out)?;
+        write_proto_varint(5, self.stale_time, out)?;
+        write_proto_str(6, &self.how, out)?;
+        write_proto_f64(7, self.lat, out)?;
+        write_proto_f64(8, self.lon, out)?;
+        write_proto_f64(9, self.hae, out)?;
+        write_proto_f64(10, self.ce, out)?;
+        write_proto_f64(11, self.le, out)?;
+        Ok(())
+    }
+}
