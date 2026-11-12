@@ -177,3 +177,18 @@ mod tests {
             },
             GeofencePoint {
                 lat_deg: 1.0,
+                lon_deg: 0.0,
+            },
+        ];
+        assert!(Geofence::new(&poly, 0.0, 1000.0).is_err());
+        let poly3 = [
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
