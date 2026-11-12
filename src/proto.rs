@@ -128,3 +128,23 @@ pub struct TakCotEvent {
     pub ce: f64,
     pub le: f64,
 }
+
+use crate::cot::CotEvent;
+
+impl From<&CotEvent> for TakCotEvent {
+    fn from(c: &CotEvent) -> Self {
+        Self {
+            r#type: c.cot_type.clone(),
+            uid: c.uid.clone(),
+            send_time: c.time_ms as u64,
+            start_time: c.time_ms as u64,
+            stale_time: c.stale_ms as u64,
+            how: c.how.clone(),
+            lat: c.lat_deg,
+            lon: c.lon_deg,
+            hae: c.hae_m,
+            ce: c.ce_m,
+            le: c.le_m,
+        }
+    }
+}
