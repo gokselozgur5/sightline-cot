@@ -80,10 +80,12 @@ impl Geofence {
     pub fn is_point_inside_polygon(&self, lat: f64, lon: f64) -> bool {
         let mut inside = false;
         let n = self.vertex_count;
+        let r = self.vertices[0][1];
+        let lon = Self::unwrap_lon(lon, r);
         let mut j = n - 1;
         for i in 0..n {
-            let (xi, yi) = (self.vertices[i][1], self.vertices[i][0]);
-            let (xj, yj) = (self.vertices[j][1], self.vertices[j][0]);
+            let (xi, yi) = (Self::unwrap_lon(self.vertices[i][1], r), self.vertices[i][0]);
+            let (xj, yj) = (Self::unwrap_lon(self.vertices[j][1], r), self.vertices[j][0]);
             let intersect =
                 ((yi > lat) != (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
             if intersect {
