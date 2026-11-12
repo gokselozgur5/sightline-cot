@@ -10,3 +10,20 @@ const MESSAGES: usize = 200_000;
 const ROUNDS: usize = 5;
 const BASE_TIME_MS: u64 = 1_767_225_600_000;
 
+/// Builds a synthetic track message whose fields vary slightly with the index.
+fn sample_event(i: usize) -> TakCotEvent {
+    TakCotEvent {
+        r#type: "a-h-G".to_string(),
+        uid: format!("sightline-track-{i}"),
+        send_time: BASE_TIME_MS + i as u64,
+        start_time: BASE_TIME_MS + i as u64,
+        stale_time: BASE_TIME_MS + i as u64 + 60_000,
+        how: "m-r".to_string(),
+        lat: 37.7749 + i as f64 * 1e-6,
+        lon: -122.4194 - i as f64 * 1e-6,
+        hae: 50.0,
+        ce: 4.5,
+        le: 3.2,
+    }
+}
+
