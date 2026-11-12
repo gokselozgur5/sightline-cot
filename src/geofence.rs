@@ -82,3 +82,14 @@ impl Geofence {
         min_dist_deg_sq.sqrt() * 111_319.5
     }
 }
+
+impl Geofence {
+    fn classify_transition(is_inside: bool, prev: Option<bool>) -> GeofenceState {
+        match (is_inside, prev) {
+            (true, Some(false)) => GeofenceState::Entered,
+            (false, Some(true)) => GeofenceState::Exited,
+            (true, _) => GeofenceState::Inside,
+            (false, _) => GeofenceState::Outside,
+        }
+    }
+}
