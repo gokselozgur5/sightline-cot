@@ -90,3 +90,21 @@ pub fn encode_string_field(
     *offset += s.len();
     Ok(())
 }
+
+/// Encodes fixed64 64-bit float field.
+pub fn encode_f64_field(
+    field_num: u32,
+    val: f64,
+    buf: &mut [u8],
+    offset: &mut usize,
+) -> Result<(), ProtoError> {
+    let tag_len = encode_tag(field_num, 1, &mut buf[*offset..])?;
+    *offset += tag_len;
+    if *offset + 8 > buf.len() {
+        return Err(ProtoError::BufferTooShort);
+    }
+    let bits = val.to_bits();
+    buf[*offset..*offset + 8].copy_from_slice(&bits.to_le_bytes());
+    *offset += 8;
+    Ok(())
+}
