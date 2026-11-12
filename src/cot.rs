@@ -1,7 +1,15 @@
 //! Zero-dependency Cursor-on-Target 2.0 codec.
 
 use std::fmt;
-use std::net::{SocketAddr, UdpSocket};
+use std::io::Write;
+use std::net::{SocketAddr, TcpStream, ToSocketAddrs, UdpSocket};
+
+/// Non-blocking/reconnecting TCP streamer to a TAK Server endpoint.
+#[derive(Debug)]
+pub struct CotTcpStreamer {
+    server_addr: SocketAddr,
+    stream: Option<TcpStream>,
+}
 
 /// Errors produced during CoT parsing, validation, or dispatch.
 #[derive(Debug, Clone, PartialEq)]
