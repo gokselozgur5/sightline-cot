@@ -163,8 +163,8 @@ impl TakCotEvent {
             hae_m: self.hae,
             ce_m: self.ce,
             le_m: self.le,
-            course_deg: None,
-            speed_mps: None,
+            course_deg: 0.0,
+            speed_mps: 0.0,
         }
     }
 }
