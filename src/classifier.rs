@@ -49,7 +49,10 @@ impl TacticalClassification {
     /// Creates a new tactical classification pair.
     #[inline]
     pub const fn new(affiliation: TacticalAffiliation, category: TargetCategory) -> Self {
-        Self { affiliation, category }
+        Self {
+            affiliation,
+            category,
+        }
     }
 }
 
