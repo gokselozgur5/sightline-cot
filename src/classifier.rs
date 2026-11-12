@@ -163,3 +163,19 @@ impl TargetCategory {
         }
     }
 }
+
+impl TacticalAffiliation {
+    /// Parses an affiliation label string or CoT prefix character.
+    pub fn parse_label(label: &str) -> Self {
+        let trimmed = label.trim();
+        if trimmed.eq_ignore_ascii_case("friendly") || trimmed.eq_ignore_ascii_case("f") {
+            Self::Friendly
+        } else if trimmed.eq_ignore_ascii_case("hostile") || trimmed.eq_ignore_ascii_case("h") {
+            Self::Hostile
+        } else if trimmed.eq_ignore_ascii_case("neutral") || trimmed.eq_ignore_ascii_case("n") {
+            Self::Neutral
+        } else {
+            Self::Unknown
+        }
+    }
+}
