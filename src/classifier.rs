@@ -87,3 +87,22 @@ impl TacticalClassification {
         }
     }
 }
+
+impl TacticalClassification {
+    const fn cot_type_neutral_unknown(&self) -> &'static str {
+        match (self.affiliation, self.category) {
+            (TacticalAffiliation::Neutral, TargetCategory::Vehicle) => "a-n-G-E-V-C",
+            (TacticalAffiliation::Neutral, TargetCategory::Person) => "a-n-G-U-C",
+            (TacticalAffiliation::Neutral, TargetCategory::Drone) => "a-n-A-M-F-Q",
+            (TacticalAffiliation::Neutral, TargetCategory::Aircraft) => "a-n-A",
+            (TacticalAffiliation::Neutral, TargetCategory::Vessel) => "a-n-S",
+            (TacticalAffiliation::Neutral, TargetCategory::Unknown) => "a-n-G",
+            (TacticalAffiliation::Unknown, TargetCategory::Vehicle) => "a-u-G-E-V-C",
+            (TacticalAffiliation::Unknown, TargetCategory::Person) => "a-u-G-U-C",
+            (TacticalAffiliation::Unknown, TargetCategory::Drone) => "a-u-A-M-F-Q",
+            (TacticalAffiliation::Unknown, TargetCategory::Aircraft) => "a-u-A",
+            (TacticalAffiliation::Unknown, TargetCategory::Vessel) => "a-u-S",
+            _ => "a-u-G",
+        }
+    }
+}
