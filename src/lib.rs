@@ -2,6 +2,7 @@
 
 pub mod camera;
 pub mod cot;
+pub use cot::CotTcpStreamer;
 pub mod ffi;
 pub mod tracker;
 
