@@ -25,3 +25,17 @@ pub enum WireType {
     LengthDelimited = 2,
     Fixed32 = 5,
 }
+
+impl WireType {
+    /// Parses wire type tag from byte.
+    #[inline]
+    pub const fn from_u8(val: u8) -> Result<Self, ProtoError> {
+        match val {
+            0 => Ok(Self::Varint),
+            1 => Ok(Self::Fixed64),
+            2 => Ok(Self::LengthDelimited),
+            5 => Ok(Self::Fixed32),
+            other => Err(ProtoError::UnsupportedWireType(other)),
+        }
+    }
+}
