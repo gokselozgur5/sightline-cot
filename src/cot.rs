@@ -91,13 +91,19 @@ mod tests_ctrl_escape {
         assert_eq!(unescape_xml_attr("&#zz;&#;"), "&#zz;&#;");
     }
 }
+/// Decode a numeric character reference. Only unsigned digits that name an
+/// XML 1.0 `Char` are accepted; anything else yields `None` and the caller
+/// leaves the reference undecoded.
 fn decode_numeric_ref(ent: &str) -> Option<char> {
     let body = ent.strip_prefix("&#")?.strip_suffix(';')?;
-    let code = match body.strip_prefix(['x', 'X']) {
-        Some(hex) => u32::from_str_radix(hex, 16).ok()?,
-        None => body.parse().ok()?,
+    let (digits, radix) = match body.strip_prefix(['x', 'X']) {
+        Some(hex) => (hex, 16),
+        None => (body, 10),
     };
-    char::from_u32(code)
+    if digits.is_empty() || !digits.chars().all(|c| c.is_digit(radix)) {
+        return None;
+    }
+    char::from_u32(u32::from_str_radix(digits, radix).ok()?).filter(|&c| is_xml_char(c))
 }
 /// Unescape XML attribute entities in a single pass.
 pub fn unescape_xml_attr(s: &str) -> String {
