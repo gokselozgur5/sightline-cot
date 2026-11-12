@@ -60,3 +60,20 @@ impl Geofence {
         Ok(Self {
             vertices,
             vertex_count: poly.len(),
+            min_alt_m,
+            max_alt_m,
+        })
+    }
+
+    fn is_left(p0: GeofencePoint, p1: GeofencePoint, p2: GeofencePoint) -> f64 {
+        (p1.lon_deg - p0.lon_deg) * (p2.lat_deg - p0.lat_deg)
+            - (p2.lon_deg - p0.lon_deg) * (p1.lat_deg - p0.lat_deg)
+    }
+
+    /// Point-in-polygon test using winding number algorithm.
+    pub fn contains_horizontal(&self, pt: GeofencePoint) -> bool {
+        let mut wn: i32 = 0;
+        let n = self.vertex_count;
+        for i in 0..n {
+            let v_curr = self.vertices[i];
+            let v_next = self.vertices[(i + 1) % n];
