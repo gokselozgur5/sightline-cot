@@ -59,6 +59,10 @@ fn match_category(s: &str) -> TargetCategory {
         TargetCategory::Vehicle
     } else if s.eq_ignore_ascii_case("person") {
         TargetCategory::Person
+    } else if s.eq_ignore_ascii_case("drone") || s.eq_ignore_ascii_case("uav") {
+        TargetCategory::Drone
+    } else if s.eq_ignore_ascii_case("boat") || s.eq_ignore_ascii_case("vessel") {
+        TargetCategory::Vessel
     } else {
         TargetCategory::Unknown
     }
