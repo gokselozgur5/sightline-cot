@@ -43,7 +43,12 @@ pub fn wgs84_to_utm(lat_deg: f64, lon_deg: f64) -> Result<UtmCoord, GridError> {
     let zone = lon_to_utm_zone(lon_deg)?;
     let hemisphere = if lat_deg >= 0.0 { 'N' } else { 'S' };
     let (east, north) = utm_project_point(lat_deg, lon_deg, zone, hemisphere);
-    Ok(UtmCoord { zone, hemisphere, easting: east, northing: north })
+    Ok(UtmCoord {
+        zone,
+        hemisphere,
+        easting: east,
+        northing: north,
+    })
 }
 
 fn utm_project_point(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, f64) {
@@ -63,11 +68,18 @@ fn utm_project_point(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, 
     let p3 = p2 * p;
     let p4 = p2 * p2;
     let p5 = p4 * p;
-    let east = FALSE_EASTING + UTM_K0 * nu * (p + (1.0 - t + eta2) * p3 / 6.0
-        + (5.0 - 18.0 * t + t * t + 72.0 * eta2) * p5 / 120.0);
-    let north_val = UTM_K0 * (m + nu * tan_lat * (p2 / 2.0
-        + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0));
-    let north = if hemi == 'S' { FALSE_NORTHING_SOUTH + north_val } else { north_val };
+    let east = FALSE_EASTING
+        + UTM_K0
+            * nu
+            * (p + (1.0 - t + eta2) * p3 / 6.0
+                + (5.0 - 18.0 * t + t * t + 72.0 * eta2) * p5 / 120.0);
+    let north_val = UTM_K0
+        * (m + nu * tan_lat * (p2 / 2.0 + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0));
+    let north = if hemi == 'S' {
+        FALSE_NORTHING_SOUTH + north_val
+    } else {
+        north_val
+    };
     (east, north)
 }
 
