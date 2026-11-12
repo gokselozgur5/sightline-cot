@@ -75,7 +75,10 @@ impl Intrinsics {
             let step = f / df;
             theta -= step;
             if step.abs() < 1e-12 {
-                if theta.is_finite() && (0.0..std::f64::consts::PI).contains(&theta) {
+                if theta.is_finite()
+                    && (0.0..std::f64::consts::PI).contains(&theta)
+                    && theta * theta < equidistant_monotonic_limit_sq(k1, k2)
+                {
                     return Ok(theta);
                 } else {
                     return Err(CameraError::DistortionSolverFailed);
