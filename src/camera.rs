@@ -100,6 +100,29 @@ pub enum Intrinsics {
     },
 }
 
+/// First positive root in theta^2 of d/dtheta [theta (1 + k1 theta^2 + k2 theta^4)].
+fn equidistant_monotonic_limit_sq(k1: f64, k2: f64) -> f64 {
+    if k2 == 0.0 {
+        return if k1 < 0.0 {
+            -1.0 / (3.0 * k1)
+        } else {
+            f64::INFINITY
+        };
+    }
+    let disc = 9.0 * k1 * k1 - 20.0 * k2;
+    if disc < 0.0 {
+        return f64::INFINITY;
+    }
+    let sq = disc.sqrt();
+    [
+        (-3.0 * k1 - sq) / (10.0 * k2),
+        (-3.0 * k1 + sq) / (10.0 * k2),
+    ]
+    .into_iter()
+    .filter(|s| *s > 0.0)
+    .fold(f64::INFINITY, f64::min)
+}
+
 impl Intrinsics {
     fn invert_equidistant(r_d: f64, k1: f64, k2: f64) -> Result<f64, CameraError> {
         let mut theta = r_d;
