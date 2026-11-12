@@ -77,3 +77,28 @@ impl Geofence {
         for i in 0..n {
             let v_curr = self.vertices[i];
             let v_next = self.vertices[(i + 1) % n];
+            if v_curr.lat_deg <= pt.lat_deg {
+                if v_next.lat_deg > pt.lat_deg && Self::is_left(v_curr, v_next, pt) > 0.0 {
+                    wn += 1;
+                }
+            } else if v_next.lat_deg <= pt.lat_deg && Self::is_left(v_curr, v_next, pt) < 0.0 {
+                wn -= 1;
+            }
+        }
+        wn != 0
+    }
+
+    /// 3D containment check including altitude MSL window.
+    pub fn contains_3d(&self, lat_deg: f64, lon_deg: f64, alt_m: f64) -> bool {
+        if alt_m < self.min_alt_m || alt_m > self.max_alt_m {
+            return false;
+        }
+        self.contains_horizontal(GeofencePoint { lat_deg, lon_deg })
+    }
+
+    fn dist_to_segment_m(p: GeofencePoint, a: GeofencePoint, b: GeofencePoint) -> f64 {
+        let mean_lat_rad = (a.lat_deg + b.lat_deg) * 0.5 * std::f64::consts::PI / 180.0;
+        let k_lat = 111132.95;
+        let k_lon = 111412.84 * mean_lat_rad.cos();
+        let ax = (a.lon_deg - p.lon_deg) * k_lon;
+        let ay = (a.lat_deg - p.lat_deg) * k_lat;
