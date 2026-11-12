@@ -76,3 +76,19 @@ impl MilStdClassifier {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_milstd_classification_mapping() {
+        let friendly_veh =
+            MilStdClassifier::new(TacticalAffiliation::Friendly, TargetCategory::Vehicle);
+        assert_eq!(friendly_veh.to_cot_type(), "a-f-G-E-V-C");
+        let hostile_veh =
+            MilStdClassifier::new(TacticalAffiliation::Hostile, TargetCategory::Vehicle);
+        assert_eq!(hostile_veh.to_cot_type(), "a-h-G-E-V");
+        assert_eq!(MilStdClassifier::default().to_cot_type(), "a-u-G");
+    }
+}
