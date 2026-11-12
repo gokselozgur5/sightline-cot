@@ -25,3 +25,19 @@ fn det(east_m: f64, idx: usize) -> Detection {
         embedding,
     }
 }
+fn tracked_latlon() -> Vec<(f64, f64)> {
+    let mut tracker = MultiTargetTracker::new(2, 5, 1.0);
+    for _ in 0..3 {
+        tracker
+            .step(0.1, &[det(0.0, 0), det(100.0, 1)])
+            .expect("step");
+    }
+    let mut pts: Vec<_> = tracker
+        .tracks
+        .iter()
+        .map(|t| enu_to_geodetic([t.x[0], t.x[1], t.hae_m], REF.0, REF.1, 0.0))
+        .map(|(lat, lon, _)| (lat, lon))
+        .collect();
+    pts.sort_by(|a, b| a.1.total_cmp(&b.1));
+    pts
+}
