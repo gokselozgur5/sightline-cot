@@ -212,3 +212,26 @@ mod tests_cot_type {
         assert_eq!(u.to_cot_type(), "a-u-S");
     }
 }
+
+#[cfg(test)]
+mod tests_parsing {
+    use super::*;
+
+    #[test]
+    fn test_label_parsing_and_fallbacks() {
+        assert_eq!(TargetCategory::parse_label("Car"), TargetCategory::Vehicle);
+        assert_eq!(TargetCategory::parse_label("tank"), TargetCategory::Vehicle);
+        assert_eq!(
+            TargetCategory::parse_label("solDIER"),
+            TargetCategory::Person
+        );
+        assert_eq!(
+            TargetCategory::parse_label("quadcopter"),
+            TargetCategory::Drone
+        );
+        assert_eq!(
+            TargetCategory::parse_label("fighter_jet"),
+            TargetCategory::Unknown
+        );
+    }
+}
