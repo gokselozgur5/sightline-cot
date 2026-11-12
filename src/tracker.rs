@@ -665,3 +665,15 @@ impl Track {
         [self.x[0] + self.x[2] * dt_s, self.x[1] + self.x[3] * dt_s]
     }
 }
+
+impl Track {
+    /// Whether track is currently in coasting state after misses.
+    pub fn is_coasting(&self) -> bool {
+        self.status == TrackStatus::Coasting
+    }
+
+    /// Whether track has sufficient history to extrapolate through occlusion.
+    pub fn can_extrapolate(&self, min_hits: usize, max_age: usize) -> bool {
+        self.hits >= min_hits && self.time_since_update <= max_age
+    }
+}
