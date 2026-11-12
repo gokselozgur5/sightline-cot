@@ -16,3 +16,21 @@ fn event(uid: &str, time_ms: i64) -> CotEvent {
         speed_mps: 25.0,
     }
 }
+
+#[test]
+fn roundtrip_unusual_identifiers() {
+    for uid in [
+        "",
+        "a b",
+        "x&y",
+        "<tag>",
+        "q\"'",
+        "caf\u{e9}-\u{4e2d}",
+        "&amp;",
+        "a;b&c;",
+    ] {
+        let ev = event(uid, 1_700_000_000_000);
+        let back = CotEvent::from_xml(&ev.to_xml()).expect("parse");
+        assert_eq!(back.uid, uid, "uid {uid:?}");
+    }
+}
