@@ -46,3 +46,14 @@ fn varint_encode_into_undersized_buffer_fails() {
         );
     }
 }
+
+fn gen_str(rng: &mut Rng) -> String {
+    let len = (rng.next() % 24) as usize;
+    (0..len)
+        .map(|_| (b' ' + (rng.next() % 95) as u8) as char)
+        .collect()
+}
+
+fn gen_coord(rng: &mut Rng, span: f64) -> f64 {
+    (rng.next() >> 11) as f64 / (1u64 << 53) as f64 * 2.0 * span - span
+}
