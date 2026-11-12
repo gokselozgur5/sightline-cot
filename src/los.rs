@@ -25,3 +25,11 @@ pub fn earth_curvature_drop(distance_m: f64) -> f64 {
         distance_m * distance_m / (2.0 * WGS84_EARTH_RADIUS_M)
     }
 }
+
+fn sample_point(obs: Position3D, target: Position3D, frac: f64) -> (f64, f64, f64) {
+    (
+        obs.east_m + frac * (target.east_m - obs.east_m),
+        obs.north_m + frac * (target.north_m - obs.north_m),
+        obs.up_m + frac * (target.up_m - obs.up_m),
+    )
+}
