@@ -309,3 +309,17 @@ fn skip_wire_field<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [u8], &'a [
         skip_wire_varint_or_fixed(wire, cur)
     }
 }
+
+impl TakCotEvent {
+    /// Decodes TakCotEvent from protobuf bytes.
+    pub fn decode_protobuf(mut buf: &[u8]) -> Result<Self, ProtoError> {
+        let mut evt = Self::default();
+        while !buf.is_empty() {
+            let (num, wire, tag_len) = decode_tag(buf)?;
+            let (raw, rem) = skip_wire_field(wire, &buf[tag_len..])?;
+            evt.decode_field(num, wire, raw)?;
+            buf = rem;
+        }
+        Ok(evt)
+    }
+}
