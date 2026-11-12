@@ -69,3 +69,10 @@ fn ridge_masks_tracked_target() {
     assert!(o.east_m.abs() < 100.0, "obstruction near the ridge line");
     assert!(r.min_clearance_m < 0.0);
 }
+#[test]
+fn flat_terrain_reveals_tracked_target() {
+    let r = los_from_observer(&dem(0.0));
+    assert!(r.is_visible);
+    assert!(r.obstruction.is_none());
+    assert!(r.min_clearance_m > 0.0);
+}
