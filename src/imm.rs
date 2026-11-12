@@ -173,3 +173,31 @@ impl ImmFilter {
         c_bar
     }
 }
+
+impl ImmFilter {
+    /// Model mixing step prior to prediction.
+    pub fn mix(&mut self) {
+        let c_bar = self.compute_c_bar();
+        let mut mu = [[0.0; NUM_MODELS]; NUM_MODELS];
+        for i in 0..NUM_MODELS {
+            for j in 0..NUM_MODELS {
+                let p = self.trans_mat[i][j] * self.probs[i];
+                mu[i][j] = if c_bar[j] > 1e-12 {
+                    p / c_bar[j]
+                } else {
+                    1.0 / 3.0
+                };
+            }
+        }
+        let old = self.filters.clone();
+        for j in 0..NUM_MODELS {
+            let mut st = [0.0; 6];
+            for i in 0..NUM_MODELS {
+                for k in 0..6 {
+                    st[k] += mu[i][j] * old[i].state[k];
+                }
+            }
+            self.filters[j].state = st;
+        }
+    }
+}
