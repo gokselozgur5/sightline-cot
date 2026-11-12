@@ -360,3 +360,22 @@ mod tests_rt {
         assert!((decoded.cot_event.lon_deg - (-122.4194)).abs() < 1e-6);
     }
 }
+
+#[cfg(test)]
+mod tests_err {
+    use super::*;
+
+    #[test]
+    fn test_magic_byte_and_buffer_short_errors() {
+        let mut buf = [0u8; 10];
+        buf[0] = 0xAA;
+        assert_eq!(
+            TakMessage::decode_framed(&buf),
+            Err(ProtoError::InvalidMagicByte)
+        );
+        assert_eq!(
+            TakMessage::decode_framed(&[]),
+            Err(ProtoError::BufferTooShort)
+        );
+    }
+}
