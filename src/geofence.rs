@@ -262,3 +262,24 @@ mod tests {
                 lon_deg: 1.0,
             },
         ];
+        let gf = Geofence::new(&poly, 100.0, 500.0).unwrap();
+        assert!(!gf.contains_3d(0.5, 0.5, 50.0));
+        assert!(gf.contains_3d(0.5, 0.5, 250.0));
+        assert!(!gf.contains_3d(0.5, 0.5, 600.0));
+    }
+
+    #[test]
+    fn test_breach_transition_and_distance() {
+        let poly = [
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
+                lon_deg: 1.0,
+            },
