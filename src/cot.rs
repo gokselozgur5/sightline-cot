@@ -586,3 +586,21 @@ fn test_udp_dispatcher_full_roundtrip() {
     assert!((decoded.lon_deg - (-122.4194)).abs() < 1e-6);
     assert!((decoded.speed_mps - 18.5).abs() < 1e-2);
 }
+
+#[test]
+fn test_sa_heartbeat_generation() {
+    let hb = CotTcpStreamer::generate_sa_heartbeat(
+        "ALPHA-1",
+        1700000000000,
+        37.5,
+        -122.2,
+        150.0,
+        12.0,
+        90.0,
+    );
+    assert_eq!(hb.uid, "ALPHA-1");
+    assert_eq!(hb.cot_type, "a-f-G-U-C");
+    assert_eq!(hb.stale_ms, 1700000030000);
+    assert_eq!(hb.lat_deg, 37.5);
+    assert_eq!(hb.lon_deg, -122.2);
+}
