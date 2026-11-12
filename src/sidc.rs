@@ -256,6 +256,9 @@ impl TacticalSymbol {
 impl TacticalSymbol {
     pub fn from_sidc(sidc: &str) -> Result<Self, SidcError> {
         let trimmed = sidc.trim();
+        if !trimmed.is_ascii() {
+            return Err(SidcError::InvalidCharacter);
+        }
         if trimmed.len() == 30 {
             Self::parse_2525d(trimmed)
         } else if trimmed.len() == 15 {
