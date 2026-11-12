@@ -203,8 +203,29 @@ impl ImmFilter {
                 }
             }
             self.filters[j].state = st;
+            self.filters[j].cov = mixed_cov(&old, &mu, j, &st);
         }
     }
+}
+
+/// Mixed covariance for model j, including the spread-of-means term.
+fn mixed_cov(
+    old: &[SubFilter; NUM_MODELS],
+    mu: &[[f64; NUM_MODELS]; NUM_MODELS],
+    j: usize,
+    mean: &[f64; 6],
+) -> [[f64; 6]; 6] {
+    let mut cov = [[0.0; 6]; 6];
+    for i in 0..NUM_MODELS {
+        for r in 0..6 {
+            let dr = old[i].state[r] - mean[r];
+            for c in 0..6 {
+                let dc = old[i].state[c] - mean[c];
+                cov[r][c] += mu[i][j] * (old[i].cov[r][c] + dr * dc);
+            }
+        }
+    }
+    cov
 }
 
 impl ImmFilter {
