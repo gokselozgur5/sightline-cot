@@ -567,6 +567,36 @@ impl DemGrid {
             [(pt_y[0] - p0[0]) / eps, (pt_y[1] - p0[1]) / eps],
         ))
     }
+
+    /// Estimate slope-compensated CE90 and LE90 error bounds in meters.
+    pub fn estimate_covariance_ce_le(
+        &self,
+        cam: &Intrinsics,
+        pose: &CameraPose,
+        u: f64,
+        v: f64,
+        px_sig: f64,
+        att_sig: f64,
+    ) -> Result<(f64, f64), CameraError> {
+        if !px_sig.is_finite() || px_sig < 0.0 || !att_sig.is_finite() || att_sig < 0.0 {
+            return Err(CameraError::InvalidParameters);
+        }
+        let ray = cam.pixel_to_ray(u, v)?;
+        let p0 = self.intersect_ray(ray, pose)?;
+        let (d_u, d_v) = self.diff_dem_u_v(cam, pose, u, v, p0)?;
+        let (d_p, d_r, d_y) = self.diff_dem_att(ray, pose, p0)?;
+        let (v_px, v_att) = (px_sig * px_sig, att_sig * att_sig);
+        let var_e = (d_u[0].powi(2) + d_v[0].powi(2)) * v_px
+            + (d_p[0].powi(2) + d_r[0].powi(2) + d_y[0].powi(2)) * v_att;
+        let var_n = (d_u[1].powi(2) + d_v[1].powi(2)) * v_px
+            + (d_p[1].powi(2) + d_r[1].powi(2) + d_y[1].powi(2)) * v_att;
+        let grad = self.surface_gradient(p0[0], p0[1])?;
+        let slope_factor = (1.0 + grad[0].powi(2) + grad[1].powi(2)).sqrt();
+        let ce90 = 2.146 * (0.5 * (var_e + var_n)).sqrt();
+        let le90 = 1.6449
+            * ((var_e * grad[0].powi(2) + var_n * grad[1].powi(2) + 0.25).sqrt() * slope_factor);
+        Ok((ce90, le90))
+    }
 }
 
 #[cfg(test)]
