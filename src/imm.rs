@@ -167,6 +167,17 @@ impl ImmFilter {
 }
 
 impl ImmFilter {
+    /// Returns true if every row of the transition matrix is a valid
+    /// probability distribution within the given tolerance.
+    pub fn trans_mat_is_valid(&self, tol: f64) -> bool {
+        self.trans_mat.iter().all(|row| {
+            row.iter().all(|p| p.is_finite() && *p >= 0.0 && *p <= 1.0)
+                && (row.iter().sum::<f64>() - 1.0).abs() <= tol
+        })
+    }
+}
+
+impl ImmFilter {
     /// Compute normalization factors for model mixing.
     pub fn compute_c_bar(&self) -> [f64; NUM_MODELS] {
         let mut c_bar = [0.0; NUM_MODELS];
