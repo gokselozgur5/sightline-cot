@@ -50,6 +50,10 @@ pub struct CotEvent {
     pub speed_mps: f64,
 }
 /// Escape XML attribute special characters to prevent XML injection.
+///
+/// Policy: characters outside the XML 1.0 `Char` production (control
+/// characters U+0000 to U+001F other than tab, LF and CR) cannot be
+/// represented even as references, so they are stripped from the output.
 pub fn escape_xml_attr(s: &str) -> String {
     let mut out = String::with_capacity(s.len() + 8);
     for c in s.chars() {
@@ -62,10 +66,15 @@ pub fn escape_xml_attr(s: &str) -> String {
             '\n' => out.push_str("&#10;"),
             '\t' => out.push_str("&#9;"),
             '\r' => out.push_str("&#13;"),
-            _ => out.push(c),
+            c if is_xml_char(c) => out.push(c),
+            _ => {}
         }
     }
     out
+}
+/// True when `c` is allowed by the XML 1.0 `Char` production.
+fn is_xml_char(c: char) -> bool {
+    matches!(c, '\t' | '\n' | '\r' | '\u{20}'..='\u{D7FF}' | '\u{E000}'..='\u{FFFD}' | '\u{10000}'..='\u{10FFFF}')
 }
 #[cfg(test)]
 mod tests_ctrl_escape {
