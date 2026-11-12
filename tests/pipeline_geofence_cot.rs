@@ -59,3 +59,16 @@ fn run_crossing() -> Vec<(GeofenceState, CotEvent)> {
     }
     out
 }
+#[test]
+fn crossing_reports_entered_then_exited_once() {
+    let states: Vec<_> = run_crossing().iter().map(|(s, _)| *s).collect();
+    assert_eq!(states[0], GeofenceState::Outside);
+    let count = |s| states.iter().filter(|x| **x == s).count();
+    assert_eq!(count(GeofenceState::Entered), 1);
+    assert_eq!(count(GeofenceState::Exited), 1);
+    let (e, x) = (
+        states.iter().position(|s| *s == GeofenceState::Entered),
+        states.iter().position(|s| *s == GeofenceState::Exited),
+    );
+    assert!(e < x);
+}
