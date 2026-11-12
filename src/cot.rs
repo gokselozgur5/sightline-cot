@@ -275,6 +275,27 @@ fn parse_event_header(ev_tag: &str) -> Result<(String, String, String, i64, i64)
     let stale_ms = parse_iso8601_utc(stale_str)?;
     Ok((uid, cot_type, how, time_ms, stale_ms))
 }
+#[cfg(test)]
+mod tests_stale_order {
+    use super::*;
+
+    #[test]
+    fn stale_before_time_is_rejected() {
+        let mut ev = CotEvent::from_xml(&sample_xml()).unwrap();
+        ev.stale_ms = ev.time_ms - 1;
+        assert!(CotEvent::from_xml(&ev.to_xml()).is_err());
+        ev.stale_ms = ev.time_ms;
+        assert!(CotEvent::from_xml(&ev.to_xml()).is_ok());
+    }
+
+    fn sample_xml() -> String {
+        "<event version=\"2.0\" uid=\"u\" type=\"a-f-G\" how=\"m-g\" \
+        time=\"2026-02-16T12:00:00.000Z\" start=\"2026-02-16T12:00:00.000Z\" \
+        stale=\"2026-02-16T12:01:00.000Z\"><point lat=\"1\" lon=\"1\" hae=\"0\" \
+        ce=\"1\" le=\"1\"/></event>"
+            .to_string()
+    }
+}
 fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, spd: f64) -> Result<(), CotError> {
     if !(-90.0..=90.0).contains(&lat) {
         return Err(CotError::CoordinateOutOfBounds(
