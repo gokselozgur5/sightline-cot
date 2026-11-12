@@ -460,6 +460,24 @@ mod tests_bounds {
         assert!(CotEvent::from_xml("not xml").is_err());
     }
 }
+impl CotTcpStreamer {
+    pub fn new<A: ToSocketAddrs>(addr: A) -> Result<Self, CotError> {
+        let server_addr = addr
+            .to_socket_addrs()
+            .map_err(|e| CotError::NetworkError(e.to_string()))?
+            .next()
+            .ok_or_else(|| CotError::NetworkError("address resolution failed".into()))?;
+        Ok(Self {
+            server_addr,
+            stream: None,
+        })
+    }
+
+    pub fn server_addr(&self) -> SocketAddr {
+        self.server_addr
+    }
+}
+
 #[cfg(test)]
 mod tests_udp_rt {
     use super::*;
