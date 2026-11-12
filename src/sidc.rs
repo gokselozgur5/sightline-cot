@@ -73,3 +73,18 @@ impl Default for TacticalSymbol {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SidcBuffer {
+    bytes: [u8; 32],
+    len: usize,
+}
+
+impl SidcBuffer {
+    pub const fn empty() -> Self {
+        Self {
+            bytes: [0u8; 32],
+            len: 0,
+        }
+    }
+}
