@@ -238,3 +238,27 @@ mod tests {
         }));
         assert!(!gf.contains_horizontal(GeofencePoint {
             lat_deg: 3.0,
+            lon_deg: 3.0
+        }));
+    }
+
+    #[test]
+    fn test_3d_altitude_bounds() {
+        let poly = [
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
+                lon_deg: 1.0,
+            },
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 1.0,
+            },
+        ];
