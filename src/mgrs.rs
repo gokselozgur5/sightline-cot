@@ -300,4 +300,13 @@ mod tests {
         assert_eq!(lon_to_utm_zone(-174.0).unwrap(), 2);
         assert_eq!(lon_to_utm_zone(-174.0001).unwrap(), 1);
     }
+
+    #[test]
+    fn test_latitude_band_edges() {
+        assert_eq!(lat_to_mgrs_band(-80.0).unwrap(), 'C');
+        assert_eq!(lat_to_mgrs_band(-72.0).unwrap(), 'D');
+        assert_eq!(lat_to_mgrs_band(84.0).unwrap(), 'X');
+        assert_eq!(lat_to_mgrs_band(-80.0001), Err(GridError::InvalidLatitude));
+        assert_eq!(lat_to_mgrs_band(84.0001), Err(GridError::InvalidLatitude));
+    }
 }
