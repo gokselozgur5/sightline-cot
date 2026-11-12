@@ -62,3 +62,24 @@ fn bad_row_sum_is_rejected() {
     imm.trans_mat[1] = [0.5, 0.5, 0.5];
     assert!(!imm.trans_mat_is_valid(1e-9));
 }
+
+#[test]
+fn negative_entry_is_rejected() {
+    let mut imm = filter();
+    imm.trans_mat[0] = [1.1, -0.1, 0.0];
+    assert!(!imm.trans_mat_is_valid(1e-9));
+}
+
+#[test]
+fn nan_entry_is_rejected() {
+    let mut imm = filter();
+    imm.trans_mat[2][0] = f64::NAN;
+    assert!(!imm.trans_mat_is_valid(1e-9));
+}
+
+#[test]
+fn mixing_weights_stay_normalized() {
+    let imm = filter();
+    let total: f64 = imm.compute_c_bar().iter().sum();
+    assert!((total - 1.0).abs() < 1e-12);
+}
