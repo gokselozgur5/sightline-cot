@@ -53,3 +53,11 @@ fn tracked_target(dem: &DemGrid) -> Position3D {
         up_m: t.hae_m + 2.0,
     }
 }
+fn los_from_observer(dem: &DemGrid) -> LosResult {
+    let obs = Position3D {
+        east_m: -400.0,
+        north_m: 0.0,
+        up_m: 30.0,
+    };
+    check_los(dem, obs, tracked_target(dem), 200)
+}
