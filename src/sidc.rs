@@ -52,3 +52,12 @@ pub enum SidcVersion {
     #[default]
     MilStd2525D,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TacticalSymbol {
+    pub version: SidcVersion,
+    pub affiliation: SidcAffiliation,
+    pub domain: SidcDomain,
+    pub entity_code: u32,
+    pub modifier: u8,
+}
