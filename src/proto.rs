@@ -275,7 +275,7 @@ impl TakCotEvent {
     }
 }
 
-fn skip_wire_varint_or_fixed<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [u8], &'a [u8]), ProtoError> {
+fn skip_wire_varint_or_fixed(wire: WireType, cur: &[u8]) -> Result<(&[u8], &[u8]), ProtoError> {
     match wire {
         WireType::Varint => {
             let (_, n) = decode_varint(cur)?;
@@ -297,7 +297,7 @@ fn skip_wire_varint_or_fixed<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [
     }
 }
 
-fn skip_wire_field<'a>(wire: WireType, cur: &'a [u8]) -> Result<(&'a [u8], &'a [u8]), ProtoError> {
+fn skip_wire_field(wire: WireType, cur: &[u8]) -> Result<(&[u8], &[u8]), ProtoError> {
     if wire == WireType::LengthDelimited {
         let (len, n) = decode_varint(cur)?;
         let total = n + len as usize;
