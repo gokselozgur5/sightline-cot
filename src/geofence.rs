@@ -70,6 +70,13 @@ impl Geofence {
 }
 
 impl Geofence {
+    /// Unwraps `lon` into the 360 degree window centered on `reference`.
+    fn unwrap_lon(lon: f64, reference: f64) -> f64 {
+        reference + ((lon - reference + 540.0).rem_euclid(360.0) - 180.0)
+    }
+}
+
+impl Geofence {
     pub fn is_point_inside_polygon(&self, lat: f64, lon: f64) -> bool {
         let mut inside = false;
         let n = self.vertex_count;
