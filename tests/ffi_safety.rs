@@ -25,3 +25,15 @@ fn cfg() -> SightlineCameraCfg {
         q_acc: 0.5,
     }
 }
+
+fn det() -> SightlineDetectionC {
+    SightlineDetectionC {
+        u: 520.0,
+        v: 480.0,
+        x1: 500.0,
+        y1: 460.0,
+        x2: 540.0,
+        y2: 500.0,
+        embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    }
+}
