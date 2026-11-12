@@ -57,3 +57,18 @@ fn test_undistort_round_trip_principal_point_to_border() {
         }
     }
 }
+
+#[test]
+fn test_undistort_failure_paths() {
+    let invalid = Err(CameraError::InvalidParameters);
+    assert_eq!(LENS.undistort(f64::NAN, 0.1, 20), invalid);
+    assert_eq!(LENS.undistort(0.1, f64::INFINITY, 20), invalid);
+    let bad = lens([-0.28, f64::NAN, 0.0, 0.0, 0.0]);
+    assert_eq!(bad.undistort(0.1, 0.1, 20), invalid);
+    let failed = Err(CameraError::DistortionSolverFailed);
+    assert_eq!(LENS.undistort(0.3, 0.2, 0), failed);
+    assert_eq!(LENS.undistort(0.3, 0.2, 1), failed);
+    let barrel = lens([-0.5, 0.0, 0.0, 0.0, 0.0]);
+    assert_eq!(barrel.undistort(0.6, 0.0, 50), failed);
+    assert_eq!(barrel.undistort(0.0, 1e200, 50), failed);
+}
