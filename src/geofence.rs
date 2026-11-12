@@ -71,10 +71,11 @@ impl Geofence {
     pub fn distance_to_boundary_m(&self, lat: f64, lon: f64) -> f64 {
         let mut min_dist_deg_sq = f64::MAX;
         let n = self.vertex_count;
+        let k = lat.to_radians().cos();
         for i in 0..n {
-            let dlat = self.vertices[i][0] - lat;
-            let dlon = (self.vertices[i][1] - lon) * lat.to_radians().cos();
-            let dist_sq = dlat * dlat + dlon * dlon;
+            let a = self.vertices[i];
+            let b = self.vertices[(i + 1) % n];
+            let dist_sq = Self::segment_dist_sq((lon * k, lat), (a[1] * k, a[0]), (b[1] * k, b[0]));
             if dist_sq < min_dist_deg_sq {
                 min_dist_deg_sq = dist_sq;
             }
