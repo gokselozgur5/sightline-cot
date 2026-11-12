@@ -123,4 +123,20 @@ mod tests {
             assert_eq!(cls.to_cot_type(), expected, "category {category:?}");
         }
     }
+
+    #[test]
+    fn test_hostile_hierarchy_mapping() {
+        let cases = [
+            (TargetCategory::Vehicle, "a-h-G-E-V"),
+            (TargetCategory::Person, "a-h-G-E-S"),
+            (TargetCategory::Drone, "a-h-A-M-F"),
+            (TargetCategory::Aircraft, "a-h-A"),
+            (TargetCategory::Vessel, "a-h-S"),
+            (TargetCategory::Unknown, "a-u-G"),
+        ];
+        for (category, expected) in cases {
+            let cls = MilStdClassifier::new(TacticalAffiliation::Hostile, category);
+            assert_eq!(cls.to_cot_type(), expected, "category {category:?}");
+        }
+    }
 }
