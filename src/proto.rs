@@ -373,6 +373,16 @@ mod tests {
             assert_eq!(n, n_dec);
         }
     }
+
+    #[test]
+    fn test_varint_rejects_overlong_tenth_byte() {
+        let mut buf = [0xFFu8; 10];
+        buf[9] = 0x7F;
+        assert_eq!(decode_varint(&buf), Err(ProtoError::MalformedVarint));
+        let mut max = [0u8; 10];
+        let n = encode_varint(u64::MAX, &mut max).unwrap();
+        assert_eq!(decode_varint(&max[..n]), Ok((u64::MAX, 10)));
+    }
 }
 
 #[cfg(test)]
