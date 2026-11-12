@@ -699,3 +699,19 @@ mod test_kinematics_helpers {
         }
     }
 }
+
+#[cfg(test)]
+mod tests_speed_course {
+    use super::test_kinematics_helpers::make_kinematic_det;
+    use super::*;
+
+    #[test]
+    fn test_speed_and_course_computation() {
+        let det = make_kinematic_det(0.0, 0.0);
+        let mut trk = Track::new(1, &det);
+        trk.x[2] = 10.0;
+        trk.x[3] = 10.0;
+        assert!((trk.speed_mps() - 14.1421356).abs() < 1e-4);
+        assert!((trk.course_deg() - 45.0).abs() < 1e-4);
+    }
+}
