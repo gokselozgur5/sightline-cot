@@ -140,3 +140,23 @@ pub struct ImmFilter {
     pub trans_mat: [[f64; NUM_MODELS]; NUM_MODELS],
     pub config: ImmConfig,
 }
+
+impl ImmFilter {
+    pub fn new(init_pos: [f64; 3], config: ImmConfig) -> Self {
+        let pos_var = config.pos_noise_m * config.pos_noise_m;
+        let vel_var = 10.0;
+        let filters = [
+            SubFilter::new(init_pos, pos_var, vel_var),
+            SubFilter::new(init_pos, pos_var, vel_var),
+            SubFilter::new(init_pos, pos_var, vel_var),
+        ];
+        let probs = [0.8, 0.1, 0.1];
+        let trans_mat = [[0.85, 0.10, 0.05], [0.15, 0.75, 0.10], [0.10, 0.15, 0.75]];
+        Self {
+            filters,
+            probs,
+            trans_mat,
+            config,
+        }
+    }
+}
