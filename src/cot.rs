@@ -273,6 +273,9 @@ fn parse_event_header(ev_tag: &str) -> Result<(String, String, String, i64, i64)
     let stale_str = find_attr_in_tag(ev_tag, "stale").ok_or(CotError::MissingAttribute("stale"))?;
     let time_ms = parse_iso8601_utc(time_str)?;
     let stale_ms = parse_iso8601_utc(stale_str)?;
+    if stale_ms < time_ms {
+        return Err(CotError::InvalidXml("stale precedes time".into()));
+    }
     Ok((uid, cot_type, how, time_ms, stale_ms))
 }
 #[cfg(test)]
