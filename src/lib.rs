@@ -13,6 +13,7 @@ pub use mgrs::{
     format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, utm_to_wgs84, wgs84_to_utm, GridError,
     MgrsString, UtmCoord,
 };
+pub mod proto;
 pub mod sidc;
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub mod tracker;
