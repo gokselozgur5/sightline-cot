@@ -65,3 +65,15 @@ fn main() {
         }
     });
 
+    println!("TAK protobuf codec ({MESSAGES} messages, best of {ROUNDS} rounds)");
+    println!(
+        "{:<10} {:>12} {:>14} {:>12}",
+        "Operation", "ns/msg", "msgs/s", "MiB/s"
+    );
+    for (name, secs) in [("encode", encode_s), ("decode", decode_s)] {
+        let ns_per_msg = secs * 1e9 / MESSAGES as f64;
+        let msgs_per_s = MESSAGES as f64 / secs;
+        let mib_per_s = wire_bytes as f64 / secs / 1_048_576.0;
+        println!("{name:<10} {ns_per_msg:>12.1} {msgs_per_s:>14.0} {mib_per_s:>12.1}");
+    }
+}
