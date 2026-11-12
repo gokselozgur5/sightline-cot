@@ -609,6 +609,30 @@ mod tests {
         let tiny = Intrinsics::Pinhole { fx, fy, cx, cy };
         assert_eq!(tiny.pixel_to_ray(1e10, 1.0), bad);
     }
+
+    #[test]
+    fn test_fisheye_rejects_non_finite_center_and_coefficients() {
+        let fish = |cx, cy, k1, k2| Intrinsics::EquidistantFisheye {
+            fx: 100.0,
+            fy: 100.0,
+            cx,
+            cy,
+            k1,
+            k2,
+        };
+        let (nan, inf) = (f64::NAN, f64::INFINITY);
+        assert!(fish(0.0, 0.0, 0.0, 0.0).pixel_to_ray(1.0, 1.0).is_ok());
+        let cases = [
+            [nan, 0.0, 0.0, 0.0],
+            [0.0, inf, 0.0, 0.0],
+            [0.0, 0.0, nan, 0.0],
+            [0.0, 0.0, 0.0, -inf],
+        ];
+        for [cx, cy, k1, k2] in cases {
+            let res = fish(cx, cy, k1, k2).pixel_to_ray(1.0, 1.0);
+            assert_eq!(res, Err(CameraError::InvalidParameters));
+        }
+    }
 }
 
 /// Regular 2D Digital Elevation Model (DEM) grid.
