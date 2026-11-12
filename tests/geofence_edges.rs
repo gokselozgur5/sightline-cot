@@ -51,3 +51,12 @@ fn hysteresis_holds_state_within_margin() {
     let held = gf.evaluate_breach_hysteresis(0.0001, 0.0001, 10.0, Some(false), 50.0);
     assert_eq!(held.state, GeofenceState::Outside);
 }
+
+#[test]
+fn hysteresis_transitions_beyond_margin() {
+    let gf = tiny_square();
+    let b = gf.evaluate_breach_hysteresis(0.0001, -0.0001, 10.0, Some(true), 5.0);
+    assert_eq!(b.state, GeofenceState::Exited);
+    let b = gf.evaluate_breach_hysteresis(0.0001, 0.0001, 10.0, Some(false), 5.0);
+    assert_eq!(b.state, GeofenceState::Entered);
+}
