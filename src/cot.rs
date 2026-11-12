@@ -225,6 +225,19 @@ pub fn parse_iso8601_utc(s: &str) -> Result<i64, CotError> {
     let total_secs = days * 86400 + h as i64 * 3600 + min as i64 * 60 + sec as i64;
     Ok(total_secs * 1000 + ms as i64)
 }
+#[cfg(test)]
+mod tests_ts_digits {
+    use super::*;
+
+    #[test]
+    fn signed_components_are_rejected() {
+        assert!(parse_iso8601_utc("2026-02-16T+1:00:00.000Z").is_err());
+        assert!(parse_iso8601_utc("2026-+2-16T01:00:00.000Z").is_err());
+        assert!(parse_iso8601_utc("+026-02-16T01:00:00.000Z").is_err());
+        assert!(parse_iso8601_utc("2026-02-16T01:00:+0.000Z").is_err());
+        assert!(parse_iso8601_utc("2026-02-16T01:00:00.000Z").is_ok());
+    }
+}
 fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
     let open_pat = format!("<{tag}");
     let start = xml.find(&open_pat)?;
