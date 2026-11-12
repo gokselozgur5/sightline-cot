@@ -294,3 +294,12 @@ impl TacticalSymbol {
         })
     }
 }
+
+fn parse_cot_aff(token: Option<&str>) -> SidcAffiliation {
+    match token {
+        Some("f") => SidcAffiliation::Friend,
+        Some("h") => SidcAffiliation::Hostile,
+        Some("n") => SidcAffiliation::Neutral,
+        _ => SidcAffiliation::Unknown,
+    }
+}
