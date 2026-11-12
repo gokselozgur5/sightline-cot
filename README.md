@@ -86,3 +86,14 @@ Deterministic 10,000-frame, 3-target scenario (pixel, bbox and Re-ID to ground r
 | Throughput (frames/s) | 168226.1 | 191732.4 | 192274.7 |
 
 Timings vary between runs. The example also prints 3 confirmed tracks and a final position error under 1 mm against the synthetic truth.
+
+## Tactical Mission Benchmark & Metrics
+
+Deterministic 10,000-frame tactical stream benchmark running through DEM elevation modeling, multi-target tracking, and CoT broadcast. Measured with `cargo run --release --example bench_tactical_stream` on macOS arm64.
+
+| Metric | Measured Value |
+|---|---|
+| Frames processed | 10,000 |
+| Total CoT output | ~9.0 MB |
+| Latency p50 | 4.54 us |
+| Latency p99 | 6.38 us |
