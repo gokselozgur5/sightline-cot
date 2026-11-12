@@ -41,3 +41,9 @@ impl Geofence {
         })
     }
 }
+
+impl Geofence {
+    pub fn is_altitude_valid(&self, alt_msl: f64) -> bool {
+        alt_msl >= self.min_alt_msl && alt_msl <= self.max_alt_msl
+    }
+}
