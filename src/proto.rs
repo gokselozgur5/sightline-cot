@@ -15,6 +15,8 @@ pub enum ProtoError {
     UnsupportedWireType(u8),
     MissingField(&'static str),
     BufferTooSmall,
+    /// Field number is zero or outside the protobuf range.
+    InvalidFieldNumber,
 }
 
 /// Standard protobuf wire types.
