@@ -161,3 +161,15 @@ impl TakMessage {
         Self::decode_payload(&buf[1..])
     }
 }
+
+impl TakMessage {
+    fn decode_payload(buf: &[u8]) -> Result<Self, ProtoError> {
+        let mut off = 0;
+        let mut uid = String::new();
+        let mut cot_type = String::new();
+        let mut how = String::new();
+        let mut time_ms = 0i64;
+        let mut stale_ms = 0i64;
+        let mut lat_deg = 0.0f64;
+        let mut lon_deg = 0.0f64;
+        let mut hae_m = 0.0f64;
