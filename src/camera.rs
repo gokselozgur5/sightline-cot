@@ -573,3 +573,21 @@ impl DemGrid {
         let max_n = self.origin_n_m + (self.rows - 1) as f64 * self.cell_step_m;
         e_m >= self.origin_e_m && e_m <= max_e && n_m >= self.origin_n_m && n_m <= max_n
     }
+
+    /// Bilinear elevation lookup at (e_m, n_m).
+    pub fn elevation_at(&self, e_m: f64, n_m: f64) -> Option<f64> {
+        if !self.contains_en(e_m, n_m) {
+            return None;
+        }
+        let u = ((e_m - self.origin_e_m) / self.cell_step_m).max(0.0);
+        let v = ((n_m - self.origin_n_m) / self.cell_step_m).max(0.0);
+        let c0 = (u.floor() as usize).min(self.cols - 2);
+        let r0 = (v.floor() as usize).min(self.rows - 2);
+        let s = u - c0 as f64;
+        let t = v - r0 as f64;
+        let z00 = self.elevations[r0 * self.cols + c0];
+        let z10 = self.elevations[r0 * self.cols + c0 + 1];
+        let z01 = self.elevations[(r0 + 1) * self.cols + c0];
+        let z11 = self.elevations[(r0 + 1) * self.cols + c0 + 1];
+        Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
+    }
