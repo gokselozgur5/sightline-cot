@@ -104,18 +104,20 @@ impl Geofence {
 }
 
 impl Geofence {
+    /// Equirectangular distance to the nearest edge, with each edge and the query point
+    /// unwrapped around the edge midpoint so edges across the antimeridian are measured
+    /// the short way round.
     pub fn distance_to_boundary_m(&self, lat: f64, lon: f64) -> f64 {
-        let mut min_dist_deg_sq = f64::MAX;
         let n = self.vertex_count;
         let k = lat.to_radians().cos();
-        for i in 0..n {
-            let a = self.vertices[i];
-            let b = self.vertices[(i + 1) % n];
-            let dist_sq = Self::segment_dist_sq((lon * k, lat), (a[1] * k, a[0]), (b[1] * k, b[0]));
-            if dist_sq < min_dist_deg_sq {
-                min_dist_deg_sq = dist_sq;
-            }
-        }
+        let min_dist_deg_sq = (0..n)
+            .map(|i| {
+                let (a, b) = (self.vertices[i], self.vertices[(i + 1) % n]);
+                let bx = Self::unwrap_lon(b[1], a[1]);
+                let px = Self::unwrap_lon(lon, (a[1] + bx) / 2.0);
+                Self::segment_dist_sq((px * k, lat), (a[1] * k, a[0]), (bx * k, b[0]))
+            })
+            .fold(f64::MAX, f64::min);
         min_dist_deg_sq.sqrt() * 111_319.5
     }
 }
