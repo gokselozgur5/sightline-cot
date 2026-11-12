@@ -241,4 +241,11 @@ mod tests {
             assert!((lon - lon_rt).abs() < 1e-5);
         }
     }
+
+    #[test]
+    fn test_format_mgrs_string() {
+        let s = format_mgrs(37.7749, -122.4194, 5).unwrap();
+        assert_eq!(s.len, 15);
+        assert!(s.as_str().starts_with("10S"));
+    }
 }
