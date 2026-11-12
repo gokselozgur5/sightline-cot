@@ -338,4 +338,16 @@ mod tests {
         assert_eq!(utm_to_wgs84(&low_east), Err(GridError::InvalidEasting));
         assert_eq!(utm_to_wgs84(&neg_north), Err(GridError::InvalidNorthing));
     }
+
+    #[test]
+    fn test_format_mgrs_rejects_bad_precision() {
+        assert_eq!(
+            format_mgrs(37.7749, -122.4194, 0).err(),
+            Some(GridError::InvalidNorthing)
+        );
+        assert_eq!(
+            format_mgrs(37.7749, -122.4194, 6).err(),
+            Some(GridError::InvalidNorthing)
+        );
+    }
 }
