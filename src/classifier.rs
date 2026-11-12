@@ -67,3 +67,23 @@ impl TargetCategory {
         }
     }
 }
+
+impl TacticalClassification {
+    const fn cot_type_friendly_hostile(&self) -> Option<&'static str> {
+        match (self.affiliation, self.category) {
+            (TacticalAffiliation::Friendly, TargetCategory::Vehicle) => Some("a-f-G-E-V-C"),
+            (TacticalAffiliation::Friendly, TargetCategory::Person) => Some("a-f-G-U-C"),
+            (TacticalAffiliation::Friendly, TargetCategory::Drone) => Some("a-f-A-M-F-Q"),
+            (TacticalAffiliation::Friendly, TargetCategory::Aircraft) => Some("a-f-A"),
+            (TacticalAffiliation::Friendly, TargetCategory::Vessel) => Some("a-f-S"),
+            (TacticalAffiliation::Friendly, TargetCategory::Unknown) => Some("a-f-G"),
+            (TacticalAffiliation::Hostile, TargetCategory::Vehicle) => Some("a-h-G-E-V-C"),
+            (TacticalAffiliation::Hostile, TargetCategory::Person) => Some("a-h-G-U-C"),
+            (TacticalAffiliation::Hostile, TargetCategory::Drone) => Some("a-h-A-M-F-Q"),
+            (TacticalAffiliation::Hostile, TargetCategory::Aircraft) => Some("a-h-A"),
+            (TacticalAffiliation::Hostile, TargetCategory::Vessel) => Some("a-h-S"),
+            (TacticalAffiliation::Hostile, TargetCategory::Unknown) => Some("a-h-G"),
+            _ => None,
+        }
+    }
+}
