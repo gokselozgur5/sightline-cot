@@ -150,7 +150,8 @@ fn detect(o: &Observation, cam: &Intrinsics, pose: &CameraPose) -> Option<Detect
         ground_pt = intersect_ground(ray, pose, ground_elev).ok()?;
         ground_elev = dem_elevation_lookup(ground_pt[0], ground_pt[1]);
     }
-    let (ce90, le90) = estimate_covariance_ce_le(cam, pose, o.u, o.v, ground_elev, 1.0, 0.001).ok()?;
+    let (ce90, le90) =
+        estimate_covariance_ce_le(cam, pose, o.u, o.v, ground_elev, 1.0, 0.001).ok()?;
     Some(Detection {
         east_m: ground_pt[0],
         north_m: ground_pt[1],
@@ -203,7 +204,11 @@ fn process_frame(
     let mut bytes = 0;
     for (i, trk) in tracker.tracks.iter().enumerate() {
         if trk.status == TrackStatus::Confirmed {
-            let cot_type = if i < obs.len() { obs[i].cot_type } else { "a-f-G-E-V" };
+            let cot_type = if i < obs.len() {
+                obs[i].cot_type
+            } else {
+                "a-f-G-E-V"
+            };
             bytes += track_to_cot(trk, frame_idx, le_m, cot_type).to_xml().len();
         }
     }
