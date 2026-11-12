@@ -138,3 +138,23 @@ fn pregenerate(targets: &mut [SyntheticTarget], cam: &Intrinsics) -> Vec<Vec<Obs
     frames
 }
 
+fn dem_elevation_lookup(east_m: f64, north_m: f64) -> f64 {
+    5.0 * (east_m * 0.01).sin() * (north_m * 0.01).cos()
+}
+
+fn detect(o: &Observation, cam: &Intrinsics, pose: &CameraPose) -> Option<Detection> {
+    let ray = cam.pixel_to_ray(o.u, o.v).ok()?;
+    let mut ground_elev = 0.0f64;
+    let mut ground_pt = [0.0; 3];
+    for _ in 0..3 {
+        ground_pt = intersect_ground(ray, pose, ground_elev).ok()?;
+        ground_elev = dem_elevation_lookup(ground_pt[0], ground_pt[1]);
+    }
+    let (ce90, le90) = estimate_covariance_ce_le(cam, pose, o.u, o.v, ground_elev, 1.0, 0.001).ok()?;
+    Some(Detection {
+        east_m: ground_pt[0],
+        north_m: ground_pt[1],
+        hae_m: ground_pt[2],
+        ce90_m: ce90,
+        le90_m: le90,
+        bbox: BoundingBox {
