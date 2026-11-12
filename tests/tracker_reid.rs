@@ -52,3 +52,13 @@ fn crossing_targets_have_zero_id_switches() {
         assert_eq!(switches, 0, "target {k} switched ids");
     }
 }
+
+#[test]
+fn track_purity_is_one_and_no_fragmentation() {
+    let hist = run_crossing(50);
+    for k in 0..2 {
+        let present = hist.iter().filter(|f| f[k].is_some()).count();
+        assert_eq!(present, hist.len(), "target {k} fragmented");
+    }
+    assert_ne!(hist[0][0], hist[0][1]);
+}
