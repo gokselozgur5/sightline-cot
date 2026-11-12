@@ -31,6 +31,12 @@ impl Geofence {
         if poly.len() < 3 || poly.len() > MAX_GEOFENCE_VERTICES {
             return Err("vertex count must be between 3 and 32");
         }
+        if !(min_alt.is_finite() && max_alt.is_finite()) || min_alt > max_alt {
+            return Err("altitude envelope must be finite with min <= max");
+        }
+        if poly.iter().flatten().any(|c| !c.is_finite()) {
+            return Err("polygon coordinates must be finite");
+        }
         let mut vertices = [[0.0; 2]; MAX_GEOFENCE_VERTICES];
         vertices[..poly.len()].copy_from_slice(poly);
         Ok(Self {
