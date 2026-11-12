@@ -470,6 +470,19 @@ impl DemGrid {
         let z1 = z01 * (1.0 - s) + z11 * s;
         Ok(z0 * (1.0 - t) + z1 * t)
     }
+
+    /// Compute local ground slope gradients [dz/de, dz/dn] at (e_m, n_m).
+    pub fn surface_gradient(&self, e_m: f64, n_m: f64) -> Result<[f64; 2], CameraError> {
+        if !self.contains_en(e_m, n_m) {
+            return Err(CameraError::DemOutOfGrid);
+        }
+        let (c0, r0, s, t) = self.cell_coords(e_m, n_m);
+        let (z00, z10) = (self.get_elev(c0, r0), self.get_elev(c0 + 1, r0));
+        let (z01, z11) = (self.get_elev(c0, r0 + 1), self.get_elev(c0 + 1, r0 + 1));
+        let dz_de = ((z10 - z00) * (1.0 - t) + (z11 - z01) * t) / self.cell_step_m;
+        let dz_dn = ((z01 - z00) * (1.0 - s) + (z11 - z10) * s) / self.cell_step_m;
+        Ok([dz_de, dz_dn])
+    }
 }
 
 #[cfg(test)]
