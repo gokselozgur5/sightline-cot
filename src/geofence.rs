@@ -49,6 +49,9 @@ impl Geofence {
         if poly.iter().flatten().any(|c| !c.is_finite()) {
             return Err("polygon coordinates must be finite");
         }
+        if Self::polygon_area2(poly).abs() < 1e-12 {
+            return Err("polygon must have non-zero area");
+        }
         let mut vertices = [[0.0; 2]; MAX_GEOFENCE_VERTICES];
         vertices[..poly.len()].copy_from_slice(poly);
         Ok(Self {
