@@ -32,3 +32,15 @@ fn best_seconds<F: FnMut()>(mut run: F) -> f64 {
     best
 }
 
+fn main() {
+    let points = sample_points(POINTS);
+    let utms: Vec<UtmCoord> = points
+        .iter()
+        .filter_map(|&(lat, lon)| wgs84_to_utm(lat, lon).ok())
+        .collect();
+
+    let fwd_s = best_seconds(|| {
+        for &(lat, lon) in &points {
+            black_box(wgs84_to_utm(lat, lon).ok());
+        }
+    });
