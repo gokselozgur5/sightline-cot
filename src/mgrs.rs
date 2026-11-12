@@ -188,3 +188,32 @@ fn append_digits(buf: &mut [u8], len: &mut usize, mut val: u32, digits: usize) {
         *len += 1;
     }
 }
+
+/// Format MGRS coordinate string at specified precision (1m, 10m, 100m, 1000m).
+pub fn format_mgrs(lat_deg: f64, lon_deg: f64, digits_per_axis: usize) -> Result<MgrsString, GridError> {
+    if !(1..=5).contains(&digits_per_axis) {
+        return Err(GridError::InvalidNorthing);
+    }
+    let utm = wgs84_to_utm(lat_deg, lon_deg)?;
+    let band = lat_to_mgrs_band(lat_deg)?;
+    let col = mgrs_100k_col_letter(utm.zone, utm.easting);
+    let row = mgrs_100k_row_letter(utm.zone, utm.northing);
+    let mut s = MgrsString { bytes: [0u8; 32], len: 0 };
+    if utm.zone < 10 {
+        s.bytes[s.len] = b'0';
+        s.len += 1;
+    }
+    append_digits(&mut s.bytes, &mut s.len, utm.zone as u32, if utm.zone < 10 { 1 } else { 2 });
+    s.bytes[s.len] = band as u8;
+    s.len += 1;
+    s.bytes[s.len] = col as u8;
+    s.len += 1;
+    s.bytes[s.len] = row as u8;
+    s.len += 1;
+    let div = 100_000.0 / (10u32.pow(digits_per_axis as u32) as f64);
+    let e_val = ((utm.easting % 100000.0) / div).floor() as u32;
+    let n_val = ((utm.northing % 100000.0) / div).floor() as u32;
+    append_digits(&mut s.bytes, &mut s.len, e_val, digits_per_axis);
+    append_digits(&mut s.bytes, &mut s.len, n_val, digits_per_axis);
+    Ok(s)
+}
