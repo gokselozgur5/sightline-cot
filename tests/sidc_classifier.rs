@@ -52,3 +52,19 @@ fn domain_2525c_round_trip() {
         assert_eq!(SidcDomain::from_2525c_char(ch), Ok(dom));
     }
 }
+
+#[test]
+fn symbol_2525d_round_trip_all_pairs() {
+    for (aff, _, _) in AFFILIATIONS {
+        for (dom, _, _) in DOMAINS {
+            let sym = TacticalSymbol {
+                affiliation: aff,
+                domain: dom,
+                ..TacticalSymbol::default()
+            };
+            let text = sym.to_2525d();
+            let parsed = TacticalSymbol::from_sidc(text.as_str()).unwrap();
+            assert_eq!((parsed.affiliation, parsed.domain), (aff, dom));
+        }
+    }
+}
