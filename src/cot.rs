@@ -499,6 +499,25 @@ impl CotTcpStreamer {
     }
 }
 
+impl CotTcpStreamer {
+    pub fn send_event(&mut self, event: &CotEvent) -> Result<(), CotError> {
+        let xml = event.to_xml();
+        self.send_raw(xml.as_bytes())
+    }
+
+    pub fn send_raw(&mut self, payload: &[u8]) -> Result<(), CotError> {
+        if self.stream.is_none() {
+            self.connect()?;
+        }
+        let stream = self.stream.as_mut().unwrap();
+        if let Err(e) = stream.write_all(payload).and_then(|_| stream.flush()) {
+            self.stream = None;
+            return Err(CotError::NetworkError(e.to_string()));
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests_udp_rt {
     use super::*;
