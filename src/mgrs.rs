@@ -131,6 +131,28 @@ fn meridian_arc(phi: f64, e2: f64) -> f64 {
 }
 
 /// Reverse UTM projection from UTM to WGS84 lat/lon.
+///
+/// Returns `(lat_deg, lon_deg)`. Easting must lie in `100000..=900000` metres
+/// and northing in `0..=10000000` metres.
+///
+/// # Errors
+///
+/// Returns [`GridError::InvalidZone`] for a zone outside `1..=60`,
+/// [`GridError::InvalidLatitude`] for a hemisphere other than `N` or `S`,
+/// [`GridError::InvalidEasting`] or [`GridError::InvalidNorthing`] for
+/// out-of-range coordinates.
+///
+/// # Examples
+///
+/// ```
+/// use sightline_cot::mgrs::UtmCoord;
+/// use sightline_cot::utm_to_wgs84;
+///
+/// let coord = UtmCoord { zone: 31, hemisphere: 'N', easting: 500000.0, northing: 0.0 };
+/// let (lat, lon) = utm_to_wgs84(&coord).unwrap();
+/// assert!(lat.abs() < 1e-9);
+/// assert!((lon - 3.0).abs() < 1e-9);
+/// ```
 pub fn utm_to_wgs84(coord: &UtmCoord) -> Result<(f64, f64), GridError> {
     if !(1..=60).contains(&coord.zone) {
         return Err(GridError::InvalidZone);
