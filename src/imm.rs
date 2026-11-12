@@ -137,6 +137,20 @@ impl SubFilter {
 }
 
 impl SubFilter {
+    /// Scalar Kalman update of the full state from position axis `i`,
+    /// given innovation `y` and innovation variance `s`.
+    pub fn update_axis(&mut self, i: usize, y: f64, s: f64) {
+        let col: [f64; 6] = core::array::from_fn(|k| self.cov[k][i]);
+        for a in 0..6 {
+            self.state[a] += col[a] / s * y;
+            for b in 0..6 {
+                self.cov[a][b] -= col[a] * col[b] / s;
+            }
+        }
+    }
+}
+
+impl SubFilter {
     /// Measurement update with 3D position; returns the log-likelihood.
     pub fn update_pos(&mut self, z: [f64; 3], r: f64) -> f64 {
         let mut log_lik = 0.0;
