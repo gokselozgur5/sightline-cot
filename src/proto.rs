@@ -202,3 +202,18 @@ impl TakMessage {
         Ok(Self { cot_event: evt })
     }
 }
+
+impl TakMessage {
+    #[allow(clippy::too_many_arguments)]
+    fn decode_fields(
+        buf: &[u8],
+        off: &mut usize,
+        uid: &mut String,
+        cot_type: &mut String,
+        how: &mut String,
+        time_ms: &mut i64,
+        stale_ms: &mut i64,
+        lat_deg: &mut f64,
+        lon_deg: &mut f64,
+        hae_m: &mut f64,
+    ) -> Result<(), ProtoError> {
