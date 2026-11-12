@@ -91,6 +91,29 @@ impl SubFilter {
     }
 }
 
+/// Propagates a covariance through a linear transition: F P F^T.
+pub fn propagate_cov(f: &[[f64; 6]; 6], p: &[[f64; 6]; 6]) -> [[f64; 6]; 6] {
+    let mut fp = [[0.0; 6]; 6];
+    let mut out = [[0.0; 6]; 6];
+    for i in 0..6 {
+        for j in 0..6 {
+            fp[i][j] = (0..6).map(|k| f[i][k] * p[k][j]).sum();
+        }
+    }
+    for i in 0..6 {
+        for j in 0..6 {
+            out[i][j] = (0..6).map(|k| fp[i][k] * f[j][k]).sum();
+        }
+    }
+    for i in 0..6 {
+        for j in 0..i {
+            let m = 0.5 * (out[i][j] + out[j][i]);
+            (out[i][j], out[j][i]) = (m, m);
+        }
+    }
+    out
+}
+
 impl SubFilter {
     /// Coordinated turn state prediction.
     pub fn predict_ct(&mut self, dt: f64, omega: f64, q: f64) {
