@@ -148,3 +148,16 @@ impl TakMessage {
         Ok(())
     }
 }
+
+impl TakMessage {
+    /// Decodes framed message validating 0xBF magic prefix.
+    pub fn decode_framed(buf: &[u8]) -> Result<Self, ProtoError> {
+        if buf.is_empty() {
+            return Err(ProtoError::BufferTooShort);
+        }
+        if buf[0] != TAK_MAGIC_BYTE {
+            return Err(ProtoError::InvalidMagicByte);
+        }
+        Self::decode_payload(&buf[1..])
+    }
+}
