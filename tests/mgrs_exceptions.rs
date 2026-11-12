@@ -40,3 +40,13 @@ fn svalbard_x_band_zones() {
         .as_str()
         .starts_with("31X"));
 }
+
+#[test]
+fn exception_areas_roundtrip() {
+    for (lat, lon) in [(60.0, 5.0), (60.0, 3.0), (78.0, 6.0), (78.0, 21.0)] {
+        let utm = wgs84_to_utm(lat, lon).unwrap();
+        let (lat_rt, lon_rt) = utm_to_wgs84(&utm).unwrap();
+        assert!((lat - lat_rt).abs() < 1e-6, "lat {lat_rt}");
+        assert!((lon - lon_rt).abs() < 1e-6, "lon {lon_rt}");
+    }
+}
