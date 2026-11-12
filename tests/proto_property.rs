@@ -31,3 +31,18 @@ fn varint_roundtrip_over_generated_values() {
     }
     assert!(seen[1..].iter().all(|s| *s), "lengths covered: {seen:?}");
 }
+
+#[test]
+fn varint_encode_into_undersized_buffer_fails() {
+    let mut rng = Rng(0xDEAD_BEEF_CAFE_F00D);
+    let mut full = [0u8; 10];
+    for i in 0..1_000u32 {
+        let v = rng.next() >> (i % 64);
+        let n = encode_varint(v, &mut full).unwrap();
+        let mut short = vec![0u8; n - 1];
+        assert_eq!(
+            encode_varint(v, &mut short),
+            Err(ProtoError::BufferTooSmall)
+        );
+    }
+}
