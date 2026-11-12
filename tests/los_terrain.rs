@@ -23,3 +23,17 @@ fn same_point_below_ground_is_blocked() {
     assert!(!r.is_visible);
     assert_eq!(r.obstruction.unwrap().up_m, 0.0);
 }
+// Add below-ground observer and vertical path tests
+#[test]
+fn below_ground_observer_is_blocked() {
+    let r = check_los(&flat(), p(100.0, 100.0, -1.0), p(900.0, 100.0, 100.0), 20);
+    assert!(!r.is_visible);
+    assert!(r.min_clearance_m < 0.0);
+}
+
+#[test]
+fn vertical_path_above_ground_is_visible() {
+    let r = check_los(&flat(), p(500.0, 500.0, 10.0), p(500.0, 500.0, 300.0), 10);
+    assert!(r.is_visible);
+    assert!(r.min_clearance_m >= 10.0);
+}
