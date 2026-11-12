@@ -32,3 +32,22 @@ pub fn encode_varint(mut val: u64, buf: &mut [u8]) -> Result<usize, ProtoError> 
     buf[i] = (val & 0x7F) as u8;
     Ok(i + 1)
 }
+
+/// Decodes a varint from buffer updating offset.
+pub fn decode_varint(buf: &[u8], offset: &mut usize) -> Result<u64, ProtoError> {
+    let mut result: u64 = 0;
+    let mut shift = 0;
+    while *offset < buf.len() {
+        let b = buf[*offset];
+        *offset += 1;
+        result |= ((b & 0x7F) as u64) << shift;
+        if (b & 0x80) == 0 {
+            return Ok(result);
+        }
+        shift += 7;
+        if shift >= 64 {
+            return Err(ProtoError::VarintOverflow);
+        }
+    }
+    Err(ProtoError::BufferTooShort)
+}
