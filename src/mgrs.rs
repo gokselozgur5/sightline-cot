@@ -163,3 +163,10 @@ fn mgrs_100k_row_letter(zone: u8, northing: f64) -> char {
     const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
     ROWS[(row_offset + row_idx) % ROWS.len()] as char
 }
+
+/// Fixed stack buffer for zero-alloc MGRS string representation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MgrsString {
+    pub bytes: [u8; 32],
+    pub len: usize,
+}
