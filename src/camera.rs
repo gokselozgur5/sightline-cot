@@ -615,3 +615,30 @@ impl DemGrid {
         self.elevation_at(e, n).map(|h| [e, n, h]).ok_or(CameraError::RayAboveHorizon)
     }
 }
+
+#[cfg(test)]
+mod dem_tests {
+    use super::*;
+
+    #[test]
+    fn test_dem_bilinear_and_slope_intersection() {
+        let grid = DemGrid::new(
+            0.0,
+            0.0,
+            10.0,
+            3,
+            3,
+            vec![0.0, 2.0, 4.0, 0.0, 2.0, 4.0, 0.0, 2.0, 4.0],
+        )
+        .unwrap();
+        assert_eq!(grid.elevation_at(5.0, 5.0), Some(1.0));
+        let pose = CameraPose {
+            roll_rad: 0.0,
+            pitch_rad: -1.5707963,
+            yaw_rad: 0.0,
+            cam_up_m: 100.0,
+        };
+        let pt = grid.intersect_dem([0.0, 0.0, 1.0], &pose, 10).unwrap();
+        assert!((pt[2] - 0.0).abs() < 1e-2);
+    }
+}
