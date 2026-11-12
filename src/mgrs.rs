@@ -97,3 +97,18 @@ pub fn utm_to_wgs84(coord: &UtmCoord) -> Result<(f64, f64), GridError> {
     }
     Ok(utm_unproject_point(coord))
 }
+
+fn find_footpoint_latitude(m: f64, e2: f64) -> f64 {
+    let mut phi = m / (WGS84_A * (1.0 - e2 / 4.0));
+    for _ in 0..6 {
+        let m_eval = meridian_arc(phi, e2);
+        let d = (1.0 - e2 * phi.sin().powi(2)).sqrt();
+        let dm = WGS84_A * (1.0 - e2) / (d * d * d);
+        let diff = (m - m_eval) / dm;
+        phi += diff;
+        if diff.abs() < 1e-12 {
+            break;
+        }
+    }
+    phi
+}
