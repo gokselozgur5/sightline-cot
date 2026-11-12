@@ -57,3 +57,20 @@ pub fn encode_varint(mut val: u64, buf: &mut [u8]) -> Result<usize, ProtoError> 
     buf[i] = val as u8;
     Ok(i + 1)
 }
+
+/// Decodes a protobuf varint from slice, returning (value, bytes_read).
+pub fn decode_varint(buf: &[u8]) -> Result<(u64, usize), ProtoError> {
+    let mut val = 0u64;
+    let mut shift = 0;
+    for (i, &b) in buf.iter().enumerate() {
+        if i >= 10 {
+            return Err(ProtoError::MalformedVarint);
+        }
+        val |= ((b & 0x7F) as u64) << shift;
+        if b & 0x80 == 0 {
+            return Ok((val, i + 1));
+        }
+        shift += 7;
+    }
+    Err(ProtoError::UnexpectedEof)
+}
