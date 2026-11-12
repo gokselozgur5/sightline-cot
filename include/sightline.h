@@ -62,6 +62,7 @@ void sightline_engine_free(SightlineEngine *e);
 int32_t sightline_engine_step(SightlineEngine *e, double dt_s,
                               const SightlineDetectionC *dets, size_t n,
                               SightlineTrackC *out, size_t cap, size_t *out_n);
+/* The event stale time is time_ms plus 30000 ms (saturating). */
 int32_t sightline_track_to_cot_xml(const SightlineTrackC *t, int64_t time_ms,
                                    char *buf, size_t cap);
 
