@@ -279,3 +279,18 @@ impl TacticalSymbol {
         })
     }
 }
+
+impl TacticalSymbol {
+    fn parse_2525c(s: &str) -> Result<Self, SidcError> {
+        let b = s.as_bytes();
+        let aff = SidcAffiliation::from_2525c_char(b[1] as char)?;
+        let dom = SidcDomain::from_2525c_char(b[2] as char)?;
+        Ok(Self {
+            version: SidcVersion::Legacy2525C,
+            affiliation: aff,
+            domain: dom,
+            entity_code: 0,
+            modifier: 0,
+        })
+    }
+}
