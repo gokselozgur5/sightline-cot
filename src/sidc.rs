@@ -238,3 +238,17 @@ impl TacticalSymbol {
         }
     }
 }
+
+impl TacticalSymbol {
+    pub fn to_2525c(&self) -> SidcBuffer {
+        let mut buf = [b'-'; 32];
+        buf[0] = b'S';
+        buf[1] = self.affiliation.to_2525c_char() as u8;
+        buf[2] = self.domain.to_2525c_char() as u8;
+        buf[3] = b'P';
+        SidcBuffer {
+            bytes: buf,
+            len: 15,
+        }
+    }
+}
