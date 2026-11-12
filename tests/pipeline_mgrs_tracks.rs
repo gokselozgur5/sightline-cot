@@ -41,3 +41,15 @@ fn tracked_latlon() -> Vec<(f64, f64)> {
     pts.sort_by(|a, b| a.1.total_cmp(&b.1));
     pts
 }
+#[test]
+fn tracked_targets_have_distinct_ten_digit_mgrs() {
+    let pts = tracked_latlon();
+    assert_eq!(pts.len(), 2);
+    let a = format_mgrs(pts[0].0, pts[0].1, 5).expect("a");
+    let b = format_mgrs(pts[1].0, pts[1].1, 5).expect("b");
+    assert_eq!(a.as_str().len(), 15);
+    assert!(a.as_str().starts_with("10S"));
+    assert_ne!(a.as_str(), b.as_str());
+    let east = |s: &str| s[5..10].parse::<i64>().unwrap();
+    assert!((east(b.as_str()) - east(a.as_str()) - 100).abs() <= 2);
+}
