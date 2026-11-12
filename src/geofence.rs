@@ -192,3 +192,27 @@ mod tests {
             },
             GeofencePoint {
                 lat_deg: 1.0,
+                lon_deg: 1.0,
+            },
+        ];
+        assert!(Geofence::new(&poly3, 500.0, 100.0).is_err());
+        assert!(Geofence::new(&poly3, 0.0, 1000.0).is_ok());
+    }
+
+    #[test]
+    fn test_pip_convex_and_concave() {
+        let poly = [
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 2.0,
+                lon_deg: 0.0,
+            },
+            GeofencePoint {
+                lat_deg: 2.0,
+                lon_deg: 1.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
