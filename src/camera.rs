@@ -527,6 +527,22 @@ impl DemGrid {
         }
         Err(CameraError::DemRayConvergenceFailed)
     }
+
+    fn diff_dem_u_v(
+        &self,
+        cam: &Intrinsics,
+        pose: &CameraPose,
+        u: f64,
+        v: f64,
+        p0: [f64; 3],
+    ) -> Result<([f64; 2], [f64; 2]), CameraError> {
+        let p_u = self.intersect_ray(cam.pixel_to_ray(u + 0.5, v)?, pose)?;
+        let p_v = self.intersect_ray(cam.pixel_to_ray(u, v + 0.5)?, pose)?;
+        Ok((
+            [2.0 * (p_u[0] - p0[0]), 2.0 * (p_u[1] - p0[1])],
+            [2.0 * (p_v[0] - p0[0]), 2.0 * (p_v[1] - p0[1])],
+        ))
+    }
 }
 
 #[cfg(test)]
