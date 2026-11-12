@@ -216,3 +216,25 @@ mod tests {
             },
             GeofencePoint {
                 lat_deg: 1.0,
+                lon_deg: 1.0,
+            },
+            GeofencePoint {
+                lat_deg: 1.0,
+                lon_deg: 2.0,
+            },
+            GeofencePoint {
+                lat_deg: 0.0,
+                lon_deg: 2.0,
+            },
+        ];
+        let gf = Geofence::new(&poly, 0.0, 500.0).unwrap();
+        assert!(gf.contains_horizontal(GeofencePoint {
+            lat_deg: 0.5,
+            lon_deg: 0.5
+        }));
+        assert!(!gf.contains_horizontal(GeofencePoint {
+            lat_deg: 1.5,
+            lon_deg: 1.5
+        }));
+        assert!(!gf.contains_horizontal(GeofencePoint {
+            lat_deg: 3.0,
