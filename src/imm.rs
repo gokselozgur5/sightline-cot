@@ -78,15 +78,15 @@ impl SubFilter {
     pub fn predict_ca(&mut self, dt: f64, q: f64) {
         for i in 0..3 {
             self.state[i] += self.state[i + 3] * dt;
-        }
-        let dt2 = dt * dt;
-        let dt3 = dt2 * dt / 2.0;
-        let dt4 = dt2 * dt2 / 2.0;
-        for i in 0..3 {
-            self.cov[i][i] += dt4 * q;
+            let (p0, p1, p2) = (self.cov[i][i], self.cov[i][i + 3], self.cov[i + 3][i + 3]);
+            self.cov[i][i] = p0 + 2.0 * dt * p1 + dt * dt * p2;
+            self.cov[i][i + 3] = p1 + dt * p2;
+            self.cov[i + 3][i] = self.cov[i][i + 3];
+            let dt2 = dt * dt;
+            self.cov[i][i] += 0.5 * dt2 * dt2 * q;
             self.cov[i + 3][i + 3] += dt2 * q;
-            self.cov[i][i + 3] += dt3 * q;
-            self.cov[i + 3][i] += dt3 * q;
+            self.cov[i][i + 3] += 0.5 * dt2 * dt * q;
+            self.cov[i + 3][i] = self.cov[i][i + 3];
         }
     }
 }
