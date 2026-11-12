@@ -109,3 +109,17 @@ fn straight_turn_straight_keeps_invariants() {
     }
     assert!(peak > 0.5, "maneuver never detected: {peak}");
 }
+
+#[test]
+fn accelerate_then_cruise_keeps_invariants() {
+    let mut imm = ImmFilter::new([0.0; 3], ImmConfig::default());
+    let (mut x, mut v) = (0.0, 0.0);
+    for k in 0..120 {
+        let a = if k < 40 { 15.0 } else { 0.0 };
+        v += a * 0.1;
+        x += v * 0.1;
+        imm.step(0.1, [x, 0.0, 0.0]);
+        check(&imm);
+    }
+    assert!((imm.fused_state()[3] - v).abs() < 8.0);
+}
