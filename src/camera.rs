@@ -457,6 +457,19 @@ impl DemGrid {
             (v - r0 as f64).clamp(0.0, 1.0),
         )
     }
+
+    /// Bilinear continuous elevation lookup at local ENU coordinates.
+    pub fn lookup_elevation(&self, e_m: f64, n_m: f64) -> Result<f64, CameraError> {
+        if !self.contains_en(e_m, n_m) {
+            return Err(CameraError::DemOutOfGrid);
+        }
+        let (c0, r0, s, t) = self.cell_coords(e_m, n_m);
+        let (z00, z10) = (self.get_elev(c0, r0), self.get_elev(c0 + 1, r0));
+        let (z01, z11) = (self.get_elev(c0, r0 + 1), self.get_elev(c0 + 1, r0 + 1));
+        let z0 = z00 * (1.0 - s) + z10 * s;
+        let z1 = z01 * (1.0 - s) + z11 * s;
+        Ok(z0 * (1.0 - t) + z1 * t)
+    }
 }
 
 #[cfg(test)]
