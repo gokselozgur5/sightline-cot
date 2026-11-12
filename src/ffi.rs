@@ -329,13 +329,15 @@ pub unsafe extern "C" fn sightline_engine_step(
     guard(|| step_impl((e, dets, n), dt_s, (out, cap, out_n)))
 }
 
+const STALE_OFFSET_MS: i64 = 30_000;
+
 fn to_cot(t: &SightlineTrackC) -> CotEvent {
     CotEvent {
         uid: format!("sightline-{}", t.id),
         cot_type: "a-u-G".to_string(),
         how: "m-g".to_string(),
         time_ms: 0,
-        stale_ms: 30_000,
+        stale_ms: STALE_OFFSET_MS,
         lat_deg: t.lat_deg,
         lon_deg: t.lon_deg,
         hae_m: t.hae_m,
@@ -364,6 +366,7 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         }
         let mut ev = to_cot(&*t);
         ev.time_ms = time_ms;
+        ev.stale_ms = time_ms.saturating_add(STALE_OFFSET_MS);
         let xml = ev.to_xml();
         if xml.len() + 1 > cap {
             return SIGHTLINE_ERR_BUFFER;
