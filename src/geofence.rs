@@ -93,3 +93,21 @@ impl Geofence {
         }
     }
 }
+
+impl Geofence {
+    pub fn evaluate_breach(
+        &self,
+        lat: f64,
+        lon: f64,
+        alt: f64,
+        prev: Option<bool>,
+    ) -> GeofenceBreach {
+        let inside = self.is_point_inside_polygon(lat, lon) && self.is_altitude_valid(alt);
+        let dist = self.distance_to_boundary_m(lat, lon);
+        let state = Self::classify_transition(inside, prev);
+        GeofenceBreach {
+            state,
+            distance_to_boundary_m: dist,
+        }
+    }
+}
