@@ -211,13 +211,19 @@ pub struct DemGrid {
 impl DemGrid {
     /// Bilinear elevation lookup at (east_m, north_m).
     pub fn elevation_at(&self, east_m: f64, north_m: f64) -> Option<f64> {
-        if east_m < self.min_east_m || east_m > self.max_east_m ||
-           north_m < self.min_north_m || north_m > self.max_north_m ||
-           self.cols < 2 || self.rows < 2 {
+        if east_m < self.min_east_m
+            || east_m > self.max_east_m
+            || north_m < self.min_north_m
+            || north_m > self.max_north_m
+            || self.cols < 2
+            || self.rows < 2
+        {
             return None;
         }
-        let u = (east_m - self.min_east_m) / (self.max_east_m - self.min_east_m) * (self.cols - 1) as f64;
-        let v = (north_m - self.min_north_m) / (self.max_north_m - self.min_north_m) * (self.rows - 1) as f64;
+        let u = (east_m - self.min_east_m) / (self.max_east_m - self.min_east_m)
+            * (self.cols - 1) as f64;
+        let v = (north_m - self.min_north_m) / (self.max_north_m - self.min_north_m)
+            * (self.rows - 1) as f64;
         let c0 = (u.floor() as usize).min(self.cols - 2);
         let r0 = (v.floor() as usize).min(self.rows - 2);
         let du = u - c0 as f64;
