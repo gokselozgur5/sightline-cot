@@ -29,16 +29,25 @@ pub struct Geofence {
 impl Geofence {
     fn polygon_area2(poly: &[[f64; 2]]) -> f64 {
         let n = poly.len();
+        let mut x = poly[0][1];
         (0..n)
             .map(|i| {
                 let (a, b) = (poly[i], poly[(i + 1) % n]);
-                a[1] * b[0] - b[1] * a[0]
+                let xb = x + Self::lon_step(a[1], b[1]);
+                let term = x * b[0] - xb * a[0];
+                x = xb;
+                term
             })
             .sum()
     }
 }
 
 impl Geofence {
+    /// Builds a geofence from `[lat, lon]` vertices.
+    ///
+    /// Consecutive vertices are joined the short way round in longitude, so every edge must
+    /// span less than 180 degrees. A ring that winds once around a pole encloses the pole
+    /// in the hemisphere of its mean vertex latitude.
     pub fn new(poly: &[[f64; 2]], min_alt: f64, max_alt: f64) -> Result<Self, &'static str> {
         if poly.len() < 3 || poly.len() > MAX_GEOFENCE_VERTICES {
             return Err("vertex count must be between 3 and 32");
@@ -49,7 +58,7 @@ impl Geofence {
         if poly.iter().flatten().any(|c| !c.is_finite()) {
             return Err("polygon coordinates must be finite");
         }
-        if Self::polygon_area2(poly).abs() < 1e-12 {
+        if Self::pole_winding(poly) == 0 && Self::polygon_area2(poly).abs() < 1e-12 {
             return Err("polygon must have non-zero area");
         }
         let mut vertices = [[0.0; 2]; MAX_GEOFENCE_VERTICES];
