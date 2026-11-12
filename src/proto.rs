@@ -185,3 +185,20 @@ impl TakMessage {
             &mut lon_deg,
             &mut hae_m,
         )?;
+        let evt = CotEvent {
+            uid,
+            cot_type,
+            how,
+            time_ms,
+            stale_ms,
+            lat_deg,
+            lon_deg,
+            hae_m,
+            ce_m: 5.0,
+            le_m: 10.0,
+            course_deg: 0.0,
+            speed_mps: 0.0,
+        };
+        Ok(Self { cot_event: evt })
+    }
+}
