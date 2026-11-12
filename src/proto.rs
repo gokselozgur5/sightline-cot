@@ -134,3 +134,10 @@ impl TakMessage {
         Ok(off)
     }
 }
+
+impl TakMessage {
+    fn encode_payload(&self, buf: &mut [u8], off: &mut usize) -> Result<(), ProtoError> {
+        encode_string_field(1, &self.cot_event.uid, buf, off)?;
+        encode_string_field(2, &self.cot_event.cot_type, buf, off)?;
+        encode_string_field(3, &self.cot_event.how, buf, off)?;
+        encode_i64_field(4, self.cot_event.time_ms, buf, off)?;
