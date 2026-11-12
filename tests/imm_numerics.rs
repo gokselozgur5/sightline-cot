@@ -46,3 +46,19 @@ fn nonfinite_measurement_keeps_probs_normalized() {
     imm.update([f64::INFINITY, 0.0, 0.0]);
     assert_eq!(imm, before);
 }
+
+fn filter() -> ImmFilter {
+    ImmFilter::new([0.0; 3], ImmConfig::default())
+}
+
+#[test]
+fn default_trans_mat_is_valid() {
+    assert!(filter().trans_mat_is_valid(1e-9));
+}
+
+#[test]
+fn bad_row_sum_is_rejected() {
+    let mut imm = filter();
+    imm.trans_mat[1] = [0.5, 0.5, 0.5];
+    assert!(!imm.trans_mat_is_valid(1e-9));
+}
