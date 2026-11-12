@@ -23,3 +23,22 @@ fn det(x: f64, y: f64, k: usize) -> Detection {
         embedding: emb(k),
     }
 }
+
+/// Runs two crossing targets and returns the track id seen for each truth target per frame.
+fn run_crossing(frames: usize) -> Vec<[Option<u64>; 2]> {
+    let mut t = MultiTargetTracker::new(2, 4, 0.5);
+    let mut out = Vec::new();
+    for i in 0..frames {
+        let x = i as f64 * 2.0;
+        t.step(1.0, &[det(x, 0.0, 0), det(100.0 - x, 0.5, 1)])
+            .unwrap();
+        let find = |k: usize| {
+            t.tracks
+                .iter()
+                .find(|tr| tr.embedding[k] > 0.9)
+                .map(|tr| tr.id)
+        };
+        out.push([find(0), find(1)]);
+    }
+    out
+}
