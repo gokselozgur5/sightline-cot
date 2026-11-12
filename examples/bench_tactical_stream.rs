@@ -198,3 +198,23 @@ fn process_frame(
     tracker: &mut MultiTargetTracker,
 ) -> usize {
     let dets: Vec<Detection> = obs.iter().filter_map(|o| detect(o, cam, pose)).collect();
+    let le_m = dets.iter().map(|d| d.le90_m).fold(0.0, f64::max);
+    tracker.step(DT_S, &dets).expect("tracker step failed");
+    let mut bytes = 0;
+    for (i, trk) in tracker.tracks.iter().enumerate() {
+        if trk.status == TrackStatus::Confirmed {
+            let cot_type = if i < obs.len() { obs[i].cot_type } else { "a-f-G-E-V" };
+            bytes += track_to_cot(trk, frame_idx, le_m, cot_type).to_xml().len();
+        }
+    }
+    bytes
+}
+
+fn main() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 960.0,
+        cy: 540.0,
+    };
+    let pose = CameraPose {
