@@ -19,3 +19,9 @@ pub enum TargetCategory {
     #[default]
     Unknown,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct MilStdClassifier {
+    pub affiliation: TacticalAffiliation,
+    pub category: TargetCategory,
+}
