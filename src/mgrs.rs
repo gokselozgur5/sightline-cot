@@ -147,3 +147,12 @@ pub fn lat_to_mgrs_band(lat_deg: f64) -> Result<char, GridError> {
     };
     Ok(BANDS[idx.min(BANDS.len() - 1)] as char)
 }
+
+fn mgrs_100k_col_letter(zone: u8, easting: f64) -> char {
+    const SET_ORIGIN: [usize; 3] = [0, 8, 16];
+    let set_idx = ((zone - 1) % 3) as usize;
+    let base_idx = SET_ORIGIN[set_idx];
+    let col_idx = ((easting / 100000.0).floor() as usize).saturating_sub(1);
+    const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
+    COLS[(base_idx + col_idx) % COLS.len()] as char
+}
