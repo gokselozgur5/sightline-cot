@@ -38,3 +38,15 @@ fn best_seconds<F: FnMut()>(mut run: F) -> f64 {
     best
 }
 
+fn main() {
+    let events: Vec<TakCotEvent> = (0..MESSAGES).map(sample_event).collect();
+    let encoded: Vec<Vec<u8>> = events
+        .iter()
+        .map(|e| {
+            let mut buf = Vec::new();
+            e.encode_protobuf(&mut buf).expect("encode failed");
+            buf
+        })
+        .collect();
+    let wire_bytes: usize = encoded.iter().map(Vec::len).sum();
+
