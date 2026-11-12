@@ -27,3 +27,29 @@ fn ground_hit(dem: &DemGrid) -> [f64; 3] {
     let ray = intr.pixel_to_ray(1400.0, 540.0).expect("ray");
     dem.intersect_dem(ray, &pose, 20).expect("dem hit")
 }
+fn tracked_target(dem: &DemGrid) -> Position3D {
+    let g = ground_hit(dem);
+    let bbox = BoundingBox {
+        x1: g[0] - 5.0,
+        y1: g[1] - 5.0,
+        x2: g[0] + 5.0,
+        y2: g[1] + 5.0,
+    };
+    let d = Detection {
+        east_m: g[0],
+        north_m: g[1],
+        hae_m: g[2],
+        ce90_m: 1.0,
+        le90_m: 1.0,
+        bbox,
+        embedding: [1.0; 8],
+    };
+    let mut tracker = MultiTargetTracker::new(2, 5, 1.0);
+    tracker.step(0.1, std::slice::from_ref(&d)).expect("step");
+    let t = &tracker.tracks[0];
+    Position3D {
+        east_m: t.x[0],
+        north_m: t.x[1],
+        up_m: t.hae_m + 2.0,
+    }
+}
