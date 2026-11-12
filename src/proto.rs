@@ -163,6 +163,8 @@ impl TakCotEvent {
             hae_m: self.hae,
             ce_m: self.ce,
             le_m: self.le,
+            course_deg: None,
+            speed_mps: None,
         }
     }
 }
@@ -241,6 +243,23 @@ impl TakCotEvent {
             (5, WireType::Varint) => self.stale_time = decode_varint(raw)?.0,
             (6, WireType::LengthDelimited) => self.how = std::str::from_utf8(raw).map_err(|_| ProtoError::MalformedVarint)?.to_string(),
             _ => {},
+        }
+        Ok(())
+    }
+}
+
+impl TakCotEvent {
+    fn decode_field_fixed64(&mut self, num: u32, wire: WireType, raw: &[u8]) -> Result<(), ProtoError> {
+        if wire == WireType::Fixed64 {
+            let val = decode_fixed64(raw)?.0;
+            match num {
+                7 => self.lat = val,
+                8 => self.lon = val,
+                9 => self.hae = val,
+                10 => self.ce = val,
+                11 => self.le = val,
+                _ => {},
+            }
         }
         Ok(())
     }
