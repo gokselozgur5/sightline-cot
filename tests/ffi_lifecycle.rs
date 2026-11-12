@@ -36,3 +36,16 @@ fn det() -> SightlineDetectionC {
         embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     }
 }
+
+#[test]
+fn free_null_is_a_no_op_and_repeated_cycles_succeed() {
+    let c = cfg();
+    unsafe {
+        sightline_engine_free(std::ptr::null_mut());
+        for _ in 0..64 {
+            let e = sightline_engine_new(&c);
+            assert!(!e.is_null());
+            sightline_engine_free(e);
+        }
+    }
+}
