@@ -172,6 +172,10 @@ impl Intrinsics {
             || !fy.is_finite()
             || fx <= 0.0
             || fy <= 0.0
+            || !cx.is_finite()
+            || !cy.is_finite()
+            || !k1.is_finite()
+            || !k2.is_finite()
         {
             return Err(CameraError::InvalidParameters);
         }
