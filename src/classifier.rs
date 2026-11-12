@@ -117,3 +117,14 @@ impl TacticalClassification {
         }
     }
 }
+
+impl TargetCategory {
+    const fn match_ground_label(s: &str) -> Option<Self> {
+        let b = s.as_bytes();
+        match b {
+            b"car" | b"truck" | b"bus" | b"vehicle" | b"tank" | b"apc" => Some(Self::Vehicle),
+            b"person" | b"pedestrian" | b"soldier" | b"infantry" => Some(Self::Person),
+            _ => None,
+        }
+    }
+}
