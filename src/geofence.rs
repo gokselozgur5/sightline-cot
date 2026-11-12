@@ -100,6 +100,20 @@ impl Geofence {
 }
 
 impl Geofence {
+    /// True when the meridian through `lon` crosses edge `a`-`b` north of `lat`.
+    fn crosses_north(a: [f64; 2], b: [f64; 2], lat: f64, lon: f64) -> bool {
+        let dx = Self::lon_step(a[1], b[1]);
+        let lo = dx.min(0.0);
+        let s = (lon - a[1] - lo).rem_euclid(360.0);
+        if dx == 0.0 || s >= dx.abs() {
+            return false;
+        }
+        let t = (s + lo) / dx;
+        a[0] + t * (b[0] - a[0]) > lat
+    }
+}
+
+impl Geofence {
     pub fn is_point_inside_polygon(&self, lat: f64, lon: f64) -> bool {
         let mut inside = false;
         let n = self.vertex_count;
