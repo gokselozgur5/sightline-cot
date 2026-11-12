@@ -53,3 +53,15 @@ fn time_updates(count: usize) -> (f64, usize) {
     (us_per_frame, tracker.tracks.len())
 }
 
+fn main() {
+    println!("Tracker update timing ({FRAMES} frames after {WARMUP_FRAMES} warmup)");
+    println!(
+        "{:<10} {:>12} {:>14} {:>10}",
+        "Targets", "us/frame", "frames/s", "Tracks"
+    );
+    for count in [10, 100] {
+        let (us_per_frame, tracks) = time_updates(count);
+        let frames_per_s = 1e6 / us_per_frame;
+        println!("{count:<10} {us_per_frame:>12.2} {frames_per_s:>14.0} {tracks:>10}");
+    }
+}
