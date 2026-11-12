@@ -9,6 +9,10 @@ pub enum CameraError {
     DistortionSolverFailed,
     /// Invalid input parameters such as non-positive focal lengths.
     InvalidParameters,
+    /// Requested coordinate lies outside DEM grid boundaries.
+    DemOutOfGrid,
+    /// Iterative ground ray intersection failed to converge.
+    DemRayConvergenceFailed,
 }
 
 impl std::fmt::Display for CameraError {
