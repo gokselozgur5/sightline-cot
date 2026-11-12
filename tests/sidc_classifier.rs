@@ -1,4 +1,4 @@
-use sightline_cot::sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
+use sightline_cot::sidc::{SidcAffiliation, SidcDomain, SidcError, TacticalSymbol};
 
 const AFFILIATIONS: [(SidcAffiliation, &str, char); 9] = [
     (SidcAffiliation::Pending, "01", 'P'),
@@ -67,4 +67,17 @@ fn symbol_2525d_round_trip_all_pairs() {
             assert_eq!((parsed.affiliation, parsed.domain), (aff, dom));
         }
     }
+}
+
+#[test]
+fn sidc_non_ascii_input_is_rejected() {
+    // "1" + two-byte character + 27 ASCII zeros: 30 bytes, slicing splits the character.
+    let input = format!("1\u{e9}{}", "0".repeat(27));
+    assert_eq!(input.len(), 30);
+    assert_eq!(
+        TacticalSymbol::from_sidc(&input),
+        Err(SidcError::InvalidCharacter)
+    );
+    let short = format!("S\u{e9}{}", "x".repeat(12));
+    assert!(TacticalSymbol::from_sidc(&short).is_err());
 }
