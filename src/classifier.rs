@@ -106,3 +106,14 @@ impl TacticalClassification {
         }
     }
 }
+
+impl TacticalClassification {
+    /// Generates canonical MIL-STD-2525 / CoT 2.0 type string.
+    pub const fn to_cot_type(&self) -> &'static str {
+        if let Some(t) = self.cot_type_friendly_hostile() {
+            t
+        } else {
+            self.cot_type_neutral_unknown()
+        }
+    }
+}
