@@ -39,3 +39,21 @@ impl WireType {
         }
     }
 }
+
+/// Encodes an unsigned 64-bit integer into a protobuf varint buffer.
+pub fn encode_varint(mut val: u64, buf: &mut [u8]) -> Result<usize, ProtoError> {
+    let mut i = 0;
+    while val >= 0x80 {
+        if i >= buf.len() {
+            return Err(ProtoError::BufferTooSmall);
+        }
+        buf[i] = (val as u8 & 0x7F) | 0x80;
+        val >>= 7;
+        i += 1;
+    }
+    if i >= buf.len() {
+        return Err(ProtoError::BufferTooSmall);
+    }
+    buf[i] = val as u8;
+    Ok(i + 1)
+}
