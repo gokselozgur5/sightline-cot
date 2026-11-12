@@ -196,6 +196,18 @@ impl CameraPose {
     }
 }
 
+/// Regular 2D Digital Elevation Model grid.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DemGrid {
+    pub min_east_m: f64,
+    pub max_east_m: f64,
+    pub min_north_m: f64,
+    pub max_north_m: f64,
+    pub cols: usize,
+    pub rows: usize,
+    pub elevations: Vec<f64>,
+}
+
 /// Intersect camera-frame ray with horizontal ground plane at `ground_up_m`.
 pub fn intersect_ground(
     ray_cam: [f64; 3],
