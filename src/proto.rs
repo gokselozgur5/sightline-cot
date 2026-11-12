@@ -173,3 +173,15 @@ impl TakMessage {
         let mut lat_deg = 0.0f64;
         let mut lon_deg = 0.0f64;
         let mut hae_m = 0.0f64;
+        Self::decode_fields(
+            buf,
+            &mut off,
+            &mut uid,
+            &mut cot_type,
+            &mut how,
+            &mut time_ms,
+            &mut stale_ms,
+            &mut lat_deg,
+            &mut lon_deg,
+            &mut hae_m,
+        )?;
