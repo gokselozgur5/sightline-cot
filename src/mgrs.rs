@@ -299,7 +299,27 @@ fn append_digits(buf: &mut [u8], len: &mut usize, mut val: u32, digits: usize) {
     }
 }
 
-/// Format MGRS coordinate string at specified precision (1m, 10m, 100m, 1000m).
+/// Format an MGRS coordinate string at the given precision.
+///
+/// `digits_per_axis` is the number of easting and northing digits, from `1`
+/// (10 km cells) to `5` (1 m cells). The output has the form
+/// `<zone><band><column><row><easting digits><northing digits>`.
+///
+/// # Errors
+///
+/// Returns [`GridError::InvalidNorthing`] when `digits_per_axis` is outside
+/// `1..=5`, and the coordinate errors of [`wgs84_to_utm`] and
+/// [`lat_to_mgrs_band`] for out-of-range input.
+///
+/// # Examples
+///
+/// ```
+/// use sightline_cot::{format_mgrs, GridError};
+///
+/// let mgrs = format_mgrs(0.0, 3.0, 5).unwrap();
+/// assert_eq!(mgrs.as_str(), "31NEA0000000000");
+/// assert_eq!(format_mgrs(0.0, 3.0, 0).err(), Some(GridError::InvalidNorthing));
+/// ```
 pub fn format_mgrs(
     lat_deg: f64,
     lon_deg: f64,
