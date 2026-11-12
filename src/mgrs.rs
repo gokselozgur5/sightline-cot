@@ -34,3 +34,14 @@ pub fn lon_to_utm_zone(lon_deg: f64) -> Result<u8, GridError> {
     let zone = ((lon_deg + 180.0) / 6.0).floor() as u8 + 1;
     Ok(zone.clamp(1, 60))
 }
+
+/// Forward UTM projection from WGS84 lat/lon.
+pub fn wgs84_to_utm(lat_deg: f64, lon_deg: f64) -> Result<UtmCoord, GridError> {
+    if !(-80.0..=84.0).contains(&lat_deg) {
+        return Err(GridError::InvalidLatitude);
+    }
+    let zone = lon_to_utm_zone(lon_deg)?;
+    let hemisphere = if lat_deg >= 0.0 { 'N' } else { 'S' };
+    let (east, north) = utm_project_point(lat_deg, lon_deg, zone, hemisphere);
+    Ok(UtmCoord { zone, hemisphere, easting: east, northing: north })
+}
