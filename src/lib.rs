@@ -5,6 +5,8 @@ pub mod classifier;
 pub mod cot;
 pub use cot::CotTcpStreamer;
 pub mod ffi;
+pub mod geofence;
+pub use geofence::{Geofence, GeofenceBreach, GeofenceStatus};
 pub mod tracker;
 
 pub const VERSION: &str = "0.1.0";
