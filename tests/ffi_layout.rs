@@ -34,3 +34,20 @@ fn field_offsets_match_the_c_header() {
     let st = unsafe { std::ptr::addr_of!((*tb).status) } as usize - tb as usize;
     assert_eq!(st, 64);
 }
+
+#[test]
+fn error_codes_are_distinct_and_negative() {
+    let codes = [
+        SIGHTLINE_ERR_NULL,
+        SIGHTLINE_ERR_INVALID,
+        SIGHTLINE_ERR_BUFFER,
+        SIGHTLINE_ERR_PANIC,
+        SIGHTLINE_ERR_CAMERA,
+        SIGHTLINE_ERR_TRACKER,
+    ];
+    assert_eq!(SIGHTLINE_OK, 0);
+    for (i, a) in codes.iter().enumerate() {
+        assert!(*a < 0);
+        assert!(codes[i + 1..].iter().all(|b| b != a));
+    }
+}
