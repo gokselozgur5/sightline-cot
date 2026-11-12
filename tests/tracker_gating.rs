@@ -58,3 +58,23 @@ fn negative_ce90_is_rejected() {
     d.ce90_m = -1.0;
     assert_eq!(t.step(1.0, &[d]), Err(TrackerError::NonFiniteInput));
 }
+
+#[test]
+fn two_detections_one_track_only_nearest_matches() {
+    let mut t = MultiTargetTracker::new(1, 4, 0.5);
+    t.step(1.0, &[det(0.0, 0.0, 0)]).unwrap();
+    t.step(1.0, &[det(0.2, 0.0, 0), det(2.0, 0.0, 0)]).unwrap();
+    assert_eq!(t.tracks.len(), 2);
+    assert_eq!(t.tracks[0].hits, 2);
+    assert_eq!(t.tracks[1].hits, 1);
+}
+
+#[test]
+fn zero_ce90_detection_does_not_panic() {
+    let mut t = MultiTargetTracker::new(1, 4, 0.5);
+    let mut d = det(0.0, 0.0, 0);
+    d.ce90_m = 0.0;
+    t.step(1.0, &[d.clone()]).unwrap();
+    t.step(1.0, &[d]).unwrap();
+    assert_eq!(t.tracks.len(), 1);
+}
