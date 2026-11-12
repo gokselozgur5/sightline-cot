@@ -264,3 +264,13 @@ impl TakCotEvent {
         Ok(())
     }
 }
+
+impl TakCotEvent {
+    fn decode_field(&mut self, num: u32, wire: WireType, raw: &[u8]) -> Result<(), ProtoError> {
+        if num <= 6 {
+            self.decode_field_str_time(num, wire, raw)
+        } else {
+            self.decode_field_fixed64(num, wire, raw)
+        }
+    }
+}
