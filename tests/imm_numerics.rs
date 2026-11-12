@@ -1,4 +1,4 @@
-use sightline_cot::imm::{ImmConfig, ImmFilter, SubFilter};
+use sightline_cot::imm::{ImmConfig, ImmFilter, SubFilter, NUM_MODELS};
 
 fn assert_psd(f: &SubFilter) {
     for i in 0..6 {
@@ -82,4 +82,11 @@ fn mixing_weights_stay_normalized() {
     let imm = filter();
     let total: f64 = imm.compute_c_bar().iter().sum();
     assert!((total - 1.0).abs() < 1e-12);
+}
+
+fn check(imm: &ImmFilter) {
+    let sum: f64 = imm.probs.iter().sum();
+    assert!((sum - 1.0).abs() < 1e-9, "sum {sum}");
+    assert!(imm.probs.iter().all(|p| (0.0..=1.0).contains(p)));
+    assert!(imm.fused_state().iter().all(|v| v.is_finite()));
 }
