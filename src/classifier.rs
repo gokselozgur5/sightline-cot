@@ -12,3 +12,15 @@ pub enum TacticalAffiliation {
     #[default]
     Unknown,
 }
+
+/// Operational target category according to MIL-STD-2525 / CoT hierarchy.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum TargetCategory {
+    Vehicle,
+    Person,
+    Drone,
+    Aircraft,
+    Vessel,
+    #[default]
+    Unknown,
+}
