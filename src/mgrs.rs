@@ -227,6 +227,24 @@ fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
 }
 
 /// Latitude band letter determination according to MGRS.
+///
+/// Bands are 8 degrees tall from `-80` (band `C`) up to `72`, and band `X`
+/// spans `72` to `84` degrees. The letters `I` and `O` are never used.
+///
+/// # Errors
+///
+/// Returns [`GridError::InvalidLatitude`] when `lat_deg` is outside `[-80, 84]`.
+///
+/// # Examples
+///
+/// ```
+/// use sightline_cot::lat_to_mgrs_band;
+///
+/// assert_eq!(lat_to_mgrs_band(-80.0).unwrap(), 'C');
+/// assert_eq!(lat_to_mgrs_band(0.0).unwrap(), 'N');
+/// assert_eq!(lat_to_mgrs_band(84.0).unwrap(), 'X');
+/// assert!(lat_to_mgrs_band(85.0).is_err());
+/// ```
 pub fn lat_to_mgrs_band(lat_deg: f64) -> Result<char, GridError> {
     if !(-80.0..=84.0).contains(&lat_deg) {
         return Err(GridError::InvalidLatitude);
