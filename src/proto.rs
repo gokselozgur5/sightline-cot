@@ -284,3 +284,17 @@ impl TakMessage {
         Ok(f64::from_le_bytes(b))
     }
 }
+
+impl TakMessage {
+    fn skip_wire_type(buf: &[u8], off: &mut usize, wire_type: u8) -> Result<(), ProtoError> {
+        match wire_type {
+            0 => {
+                decode_varint(buf, off)?;
+            }
+            1 => {
+                *off += 8;
+            }
+            2 => {
+                let len = decode_varint(buf, off)? as usize;
+                *off += len;
+            }
