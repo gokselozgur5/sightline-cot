@@ -61,3 +61,11 @@ fn los_from_observer(dem: &DemGrid) -> LosResult {
     };
     check_los(dem, obs, tracked_target(dem), 200)
 }
+#[test]
+fn ridge_masks_tracked_target() {
+    let r = los_from_observer(&dem(100.0));
+    assert!(!r.is_visible);
+    let o = r.obstruction.expect("obstruction");
+    assert!(o.east_m.abs() < 100.0, "obstruction near the ridge line");
+    assert!(r.min_clearance_m < 0.0);
+}
