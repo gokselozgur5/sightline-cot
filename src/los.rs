@@ -54,3 +54,28 @@ fn check_step(dem: &DemGrid, p: (f64, f64, f64), dist: f64) -> (f64, Option<Posi
         (f64::MAX, None)
     }
 }
+
+pub fn check_los(dem: &DemGrid, obs: Position3D, tgt: Position3D, n: usize) -> LosResult {
+    let (steps, mut min_clr) = (n.max(2), f64::MAX);
+    let (dx, dy) = (tgt.east_m - obs.east_m, tgt.north_m - obs.north_m);
+    let tot_d = (dx * dx + dy * dy).sqrt();
+    for i in 1..steps {
+        let frac = i as f64 / steps as f64;
+        let (clr, obs_pt) = check_step(dem, sample_point(obs, tgt, frac), frac * tot_d);
+        if clr < min_clr {
+            min_clr = clr;
+        }
+        if let Some(pt) = obs_pt {
+            return LosResult {
+                is_visible: false,
+                obstruction: Some(pt),
+                min_clearance_m: min_clr,
+            };
+        }
+    }
+    LosResult {
+        is_visible: true,
+        obstruction: None,
+        min_clearance_m: min_clr,
+    }
+}
