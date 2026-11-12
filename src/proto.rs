@@ -326,10 +326,11 @@ fn skip_wire_varint_or_fixed(wire: WireType, cur: &[u8]) -> Result<(&[u8], &[u8]
 fn skip_wire_field(wire: WireType, cur: &[u8]) -> Result<(&[u8], &[u8]), ProtoError> {
     if wire == WireType::LengthDelimited {
         let (len, n) = decode_varint(cur)?;
-        let total = n + len as usize;
-        if cur.len() < total {
-            return Err(ProtoError::UnexpectedEof);
-        }
+        let total = usize::try_from(len)
+            .ok()
+            .and_then(|l| l.checked_add(n))
+            .filter(|t| *t <= cur.len())
+            .ok_or(ProtoError::UnexpectedEof)?;
         Ok((&cur[n..total], &cur[total..]))
     } else {
         skip_wire_varint_or_fixed(wire, cur)
