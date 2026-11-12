@@ -402,6 +402,18 @@ mod tests_proto_packet {
         let decoded = decode_tak_packet(&packet).unwrap();
         assert_eq!(evt, decoded);
     }
+
+    #[test]
+    fn test_decode_rejects_out_of_range_field_numbers() {
+        let mut buf = [0u8; 10];
+        let key = (((1u64 << 32) + 7) << 3) | 1;
+        let n = encode_varint(key, &mut buf).unwrap();
+        let mut p = buf[..n].to_vec();
+        p.extend_from_slice(&1.0f64.to_le_bytes());
+        let err = Err(ProtoError::InvalidFieldNumber);
+        assert_eq!(TakCotEvent::decode_protobuf(&p), err);
+        assert_eq!(TakCotEvent::decode_protobuf(&[0x00, 0x01]), err);
+    }
 }
 
 #[cfg(test)]
