@@ -730,3 +730,19 @@ mod tests_deadband {
         assert_eq!(trk.course_deg(), 0.0);
     }
 }
+
+#[cfg(test)]
+mod tests_smoothing {
+    use super::test_kinematics_helpers::make_kinematic_det;
+    use super::*;
+
+    #[test]
+    fn test_circular_trajectory_course_smoothing() {
+        let det = make_kinematic_det(0.0, 0.0);
+        let mut trk = Track::new(1, &det);
+        trk.x[2] = 10.0;
+        trk.x[3] = 0.0;
+        let smoothed = trk.smoothed_course_deg(80.0);
+        assert!((smoothed - 83.0).abs() < 1e-4);
+    }
+}
