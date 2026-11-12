@@ -613,6 +613,23 @@ mod tests {
     }
 
     #[test]
+    fn test_circular_trajectory_course_continuity() {
+        let mut tracker = MultiTargetTracker::new(2, 4, 0.5);
+        let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        let r = 50.0f64;
+        let dt = 0.5f64;
+        for i in 0..20 {
+            let theta = (i as f64 * dt) * 0.2;
+            let x = r * theta.cos();
+            let y = r * theta.sin();
+            tracker.step(dt, &[dummy_det(x, y, emb)]).unwrap();
+        }
+        let trk = &tracker.tracks[0];
+        assert_eq!(trk.status, TrackStatus::Confirmed);
+        assert!(trk.speed_mps() > 0.0);
+    }
+
+    #[test]
     fn test_velocity_convergence_on_linear_trajectory() {
         let mut tracker = MultiTargetTracker::new(2, 3, 0.5);
         let emb = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
