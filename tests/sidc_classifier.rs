@@ -44,3 +44,11 @@ fn domain_2525d_round_trip() {
         assert_eq!(SidcDomain::from_2525d_code(code), Ok(dom));
     }
 }
+
+#[test]
+fn domain_2525c_round_trip() {
+    for (dom, _, ch) in DOMAINS {
+        assert_eq!(dom.to_2525c_char(), ch);
+        assert_eq!(SidcDomain::from_2525c_char(ch), Ok(dom));
+    }
+}
