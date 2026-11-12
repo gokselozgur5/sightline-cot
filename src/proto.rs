@@ -83,3 +83,10 @@ pub fn encode_string_field(
     *offset += tag_len;
     let len_len = encode_varint(s.len() as u64, &mut buf[*offset..])?;
     *offset += len_len;
+    if *offset + s.len() > buf.len() {
+        return Err(ProtoError::BufferTooShort);
+    }
+    buf[*offset..*offset + s.len()].copy_from_slice(s.as_bytes());
+    *offset += s.len();
+    Ok(())
+}
