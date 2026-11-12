@@ -160,3 +160,16 @@ impl ImmFilter {
         }
     }
 }
+
+impl ImmFilter {
+    /// Compute normalization factors for model mixing.
+    pub fn compute_c_bar(&self) -> [f64; NUM_MODELS] {
+        let mut c_bar = [0.0; NUM_MODELS];
+        for j in 0..NUM_MODELS {
+            for i in 0..NUM_MODELS {
+                c_bar[j] += self.trans_mat[i][j] * self.probs[i];
+            }
+        }
+        c_bar
+    }
+}
