@@ -18,3 +18,27 @@ fn test_identity_and_known_distortion_values() {
     assert!((yt - (0.4 + 0.01 * (0.25 + 0.32) - 2.0 * 0.02 * 0.12)).abs() < 1e-15);
     assert_eq!(radial.distort(0.0, 0.0), (0.0, 0.0));
 }
+
+const LENS: BrownConrady = BrownConrady {
+    k1: -0.28,
+    k2: 0.07,
+    k3: -0.005,
+    p1: 0.0012,
+    p2: -0.0008,
+};
+
+#[test]
+fn test_jacobian_matches_central_differences() {
+    let h = 1e-6;
+    for (x, y) in [(0.0, 0.0), (0.2, -0.1), (-0.5, 0.35), (0.6, 0.45)] {
+        let j = LENS.jacobian(x, y);
+        let (xp, yp) = LENS.distort(x + h, y);
+        let (xm, ym) = LENS.distort(x - h, y);
+        let (xq, yq) = LENS.distort(x, y + h);
+        let (xn, yn) = LENS.distort(x, y - h);
+        assert!((j[0][0] - (xp - xm) / (2.0 * h)).abs() < 1e-8);
+        assert!((j[1][0] - (yp - ym) / (2.0 * h)).abs() < 1e-8);
+        assert!((j[0][1] - (xq - xn) / (2.0 * h)).abs() < 1e-8);
+        assert!((j[1][1] - (yq - yn) / (2.0 * h)).abs() < 1e-8);
+    }
+}
