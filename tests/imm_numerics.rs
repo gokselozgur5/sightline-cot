@@ -26,3 +26,13 @@ fn predictions_keep_covariance_psd() {
         assert_psd(&f);
     }
 }
+
+#[test]
+fn long_run_updates_keep_covariance_psd() {
+    let mut imm = ImmFilter::new([0.0; 3], ImmConfig::default());
+    for k in 1..=300 {
+        let t = k as f64 * 0.1;
+        imm.step(0.1, [10.0 * t, (0.3 * t).sin() * 20.0, 5.0]);
+        imm.filters.iter().for_each(assert_psd);
+    }
+}
