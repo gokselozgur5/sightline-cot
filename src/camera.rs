@@ -648,3 +648,29 @@ mod dem_tests {
         assert!((pt[2] - 0.0).abs() < 1e-2);
     }
 }
+
+#[cfg(test)]
+mod fisheye_fold_tests {
+    use super::*;
+
+    fn fish(k1: f64, k2: f64) -> Intrinsics {
+        Intrinsics::EquidistantFisheye {
+            fx: 100.0,
+            fy: 100.0,
+            cx: 0.0,
+            cy: 0.0,
+            k1,
+            k2,
+        }
+    }
+
+    #[test]
+    fn test_fisheye_rejects_folded_branch_root() {
+        let cam = fish(-0.5, 0.1);
+        let failed = Err(CameraError::DistortionSolverFailed);
+        for u in [69.0, 80.0, 150.0, 400.0] {
+            assert_eq!(cam.pixel_to_ray(u, 0.0), failed);
+        }
+        assert!(cam.pixel_to_ray(30.0, 0.0).is_ok());
+    }
+}
