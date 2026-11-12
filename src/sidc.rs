@@ -303,3 +303,12 @@ fn parse_cot_aff(token: Option<&str>) -> SidcAffiliation {
         _ => SidcAffiliation::Unknown,
     }
 }
+
+fn parse_cot_dom(token: Option<&str>) -> SidcDomain {
+    match token {
+        Some("A") => SidcDomain::Air,
+        Some("S") => SidcDomain::Surface,
+        Some("U") => SidcDomain::Subsurface,
+        _ => SidcDomain::Land,
+    }
+}
