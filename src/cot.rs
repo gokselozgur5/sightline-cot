@@ -518,6 +518,33 @@ impl CotTcpStreamer {
     }
 }
 
+impl CotTcpStreamer {
+    pub fn generate_sa_heartbeat(
+        uid: &str,
+        time_ms: i64,
+        lat_deg: f64,
+        lon_deg: f64,
+        hae_m: f64,
+        speed_mps: f64,
+        course_deg: f64,
+    ) -> CotEvent {
+        CotEvent {
+            uid: uid.to_string(),
+            cot_type: "a-f-G-U-C".to_string(),
+            how: "m-g".to_string(),
+            time_ms,
+            stale_ms: time_ms + 30_000,
+            lat_deg,
+            lon_deg,
+            hae_m,
+            ce_m: 5.0,
+            le_m: 10.0,
+            course_deg,
+            speed_mps,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests_udp_rt {
     use super::*;
