@@ -537,3 +537,32 @@ pub struct DemGrid {
     pub rows: usize,
     pub elevations: Vec<f64>,
 }
+
+impl DemGrid {
+    /// Construct a validated DemGrid.
+    pub fn new(
+        e0: f64,
+        n0: f64,
+        step: f64,
+        cols: usize,
+        rows: usize,
+        elevations: Vec<f64>,
+    ) -> Result<Self, CameraError> {
+        if !e0.is_finite() || !n0.is_finite() || !step.is_finite() || step <= 0.0 {
+            return Err(CameraError::InvalidParameters);
+        }
+        if cols < 2 || rows < 2 || elevations.len() != cols * rows {
+            return Err(CameraError::InvalidParameters);
+        }
+        if !elevations.iter().all(|h| h.is_finite()) {
+            return Err(CameraError::InvalidParameters);
+        }
+        Ok(Self {
+            origin_e_m: e0,
+            origin_n_m: n0,
+            cell_step_m: step,
+            cols,
+            rows,
+            elevations,
+        })
+    }
