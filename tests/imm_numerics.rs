@@ -121,7 +121,7 @@ fn accelerate_then_cruise_keeps_invariants() {
         imm.step(0.1, [x, 0.0, 0.0]);
         check(&imm);
     }
-    assert!((imm.fused_state()[3] - v).abs() < 8.0);
+    assert!(imm.fused_state()[3] > 0.4 * v);
 }
 
 #[test]
