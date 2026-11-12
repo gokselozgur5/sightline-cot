@@ -28,3 +28,8 @@ fn sample_event(i: usize) -> CotEvent {
     }
 }
 
+/// Serializes every event and returns the total number of XML bytes produced.
+fn encode_all(events: &[CotEvent]) -> usize {
+    events.iter().map(|e| black_box(e.to_xml()).len()).sum()
+}
+
