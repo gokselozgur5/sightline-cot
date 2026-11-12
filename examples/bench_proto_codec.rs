@@ -50,3 +50,18 @@ fn main() {
         .collect();
     let wire_bytes: usize = encoded.iter().map(Vec::len).sum();
 
+    let encode_s = best_seconds(|| {
+        let mut out = Vec::with_capacity(256);
+        for e in &events {
+            out.clear();
+            e.encode_protobuf(&mut out).expect("encode failed");
+            black_box(out.len());
+        }
+    });
+    let decode_s = best_seconds(|| {
+        for buf in &encoded {
+            let evt = TakCotEvent::decode_protobuf(black_box(buf)).expect("decode failed");
+            black_box(evt);
+        }
+    });
+
