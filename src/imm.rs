@@ -18,3 +18,15 @@ pub struct ImmConfig {
     pub ct_proc_noise: f64,
     pub turn_rate_rad_s: f64,
 }
+
+impl Default for ImmConfig {
+    fn default() -> Self {
+        Self {
+            pos_noise_m: 2.0,
+            cv_proc_noise: 0.5,
+            ca_proc_noise: 2.5,
+            ct_proc_noise: 1.5,
+            turn_rate_rad_s: 0.5235987756, // 30 deg/s
+        }
+    }
+}
