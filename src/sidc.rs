@@ -252,3 +252,16 @@ impl TacticalSymbol {
         }
     }
 }
+
+impl TacticalSymbol {
+    pub fn from_sidc(sidc: &str) -> Result<Self, SidcError> {
+        let trimmed = sidc.trim();
+        if trimmed.len() == 30 {
+            Self::parse_2525d(trimmed)
+        } else if trimmed.len() == 15 {
+            Self::parse_2525c(trimmed)
+        } else {
+            Err(SidcError::InvalidLength)
+        }
+    }
+}
