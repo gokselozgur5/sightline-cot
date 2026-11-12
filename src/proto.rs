@@ -57,3 +57,17 @@ pub fn encode_tag(field_num: u32, wire_type: u8, buf: &mut [u8]) -> Result<usize
     let key = ((field_num as u64) << 3) | ((wire_type & 0x07) as u64);
     encode_varint(key, buf)
 }
+
+/// Encodes an int64 field as varint.
+pub fn encode_i64_field(
+    field_num: u32,
+    val: i64,
+    buf: &mut [u8],
+    offset: &mut usize,
+) -> Result<(), ProtoError> {
+    let tag_len = encode_tag(field_num, 0, &mut buf[*offset..])?;
+    *offset += tag_len;
+    let len = encode_varint(val as u64, &mut buf[*offset..])?;
+    *offset += len;
+    Ok(())
+}
