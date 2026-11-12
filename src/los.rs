@@ -101,3 +101,13 @@ pub fn compute_horizon_elevation_angle(
     }
     max_ang
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_test_dem() -> DemGrid {
+        let elev = vec![0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0];
+        DemGrid::new(0.0, 0.0, 10.0, 3, 3, elev).unwrap()
+    }
+}
