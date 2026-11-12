@@ -201,7 +201,7 @@ fn write_proto_varint(num: u32, val: u64, out: &mut Vec<u8>) -> Result<(), Proto
 }
 
 fn write_proto_f64(num: u32, val: f64, out: &mut Vec<u8>) -> Result<(), ProtoError> {
-    if val == 0.0 {
+    if val.to_bits() == 0 {
         return Ok(());
     }
     let mut tag_buf = [0u8; 10];
