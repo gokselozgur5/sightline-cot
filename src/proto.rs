@@ -260,3 +260,15 @@ impl TakMessage {
         Ok(())
     }
 }
+
+impl TakMessage {
+    fn read_string(buf: &[u8], off: &mut usize) -> Result<String, ProtoError> {
+        let len = decode_varint(buf, off)? as usize;
+        if *off + len > buf.len() {
+            return Err(ProtoError::BufferTooShort);
+        }
+        let s = std::str::from_utf8(&buf[*off..*off + len]).map_err(|_| ProtoError::Utf8Error)?;
+        *off += len;
+        Ok(s.to_string())
+    }
+}
