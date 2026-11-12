@@ -34,3 +34,14 @@ pub enum SidcAffiliation {
     Joker,
     Faker,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SidcDomain {
+    #[default]
+    Land,
+    Air,
+    Surface,
+    Subsurface,
+    Space,
+    Activity,
+}
