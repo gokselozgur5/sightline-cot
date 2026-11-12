@@ -110,4 +110,23 @@ mod tests {
         let elev = vec![0.0, 0.0, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0];
         DemGrid::new(0.0, 0.0, 10.0, 3, 3, elev).unwrap()
     }
+
+    #[test]
+    fn test_los_clear_overhead() {
+        let dem = create_test_dem();
+        let obs = Position3D {
+            east_m: 0.0,
+            north_m: 10.0,
+            up_m: 50.0,
+        };
+        let tgt = Position3D {
+            east_m: 20.0,
+            north_m: 10.0,
+            up_m: 50.0,
+        };
+        let res = check_los(&dem, obs, tgt, 10);
+        assert!(res.is_visible);
+        assert!(res.obstruction.is_none());
+        assert!(res.min_clearance_m > 25.0);
+    }
 }
