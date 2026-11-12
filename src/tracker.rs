@@ -746,3 +746,20 @@ mod tests_smoothing {
         assert!((smoothed - 83.0).abs() < 1e-4);
     }
 }
+
+#[cfg(test)]
+mod tests_extrapolation {
+    use super::test_kinematics_helpers::make_kinematic_det;
+    use super::*;
+
+    #[test]
+    fn test_occlusion_extrapolation_bounded_drift() {
+        let det = make_kinematic_det(100.0, 200.0);
+        let mut trk = Track::new(1, &det);
+        trk.x[2] = 15.0;
+        trk.x[3] = -5.0;
+        let p = trk.extrapolate_pos(2.0);
+        assert!((p[0] - 130.0).abs() < 1e-4);
+        assert!((p[1] - 190.0).abs() < 1e-4);
+    }
+}
