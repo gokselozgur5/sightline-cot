@@ -141,3 +141,10 @@ impl TakMessage {
         encode_string_field(2, &self.cot_event.cot_type, buf, off)?;
         encode_string_field(3, &self.cot_event.how, buf, off)?;
         encode_i64_field(4, self.cot_event.time_ms, buf, off)?;
+        encode_i64_field(5, self.cot_event.stale_ms, buf, off)?;
+        encode_f64_field(6, self.cot_event.lat_deg, buf, off)?;
+        encode_f64_field(7, self.cot_event.lon_deg, buf, off)?;
+        encode_f64_field(8, self.cot_event.hae_m, buf, off)?;
+        Ok(())
+    }
+}
