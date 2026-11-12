@@ -33,3 +33,29 @@ fn fence() -> Geofence {
     ];
     Geofence::new(&poly, -100.0, 100.0).expect("fence")
 }
+fn run_crossing() -> Vec<(GeofenceState, CotEvent)> {
+    let (gf, mut tracker) = (fence(), MultiTargetTracker::new(2, 5, 1.0));
+    let (mut prev, mut out) = (None, Vec::new());
+    for f in 0..40 {
+        tracker.step(1.0, &[det(2.0 * f as f64)]).expect("step");
+        let Some(t) = tracker
+            .tracks
+            .iter()
+            .find(|t| t.status == TrackStatus::Confirmed)
+        else {
+            continue;
+        };
+        let (lat, lon, hae) = enu_to_geodetic([t.x[0], t.x[1], t.hae_m], REF.0, REF.1, 0.0);
+        let b = gf.evaluate_breach(lat, lon, hae, prev);
+        prev = Some(matches!(
+            b.state,
+            GeofenceState::Inside | GeofenceState::Entered
+        ));
+        let ty = if prev == Some(true) { "a-h-G" } else { "a-f-G" };
+        out.push((
+            b.state,
+            t.to_cot_event("TRK", ty, lat, lon, f * 1000, f * 1000 + 9000),
+        ));
+    }
+    out
+}
