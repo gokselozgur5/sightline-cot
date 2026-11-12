@@ -140,3 +140,26 @@ impl TargetCategory {
         }
     }
 }
+
+impl TargetCategory {
+    /// Parses a semantic label into TargetCategory, falling back to Unknown.
+    pub fn parse_label(label: &str) -> Self {
+        let trimmed = label.trim();
+        let mut buf = [0u8; 32];
+        let len = trimmed.len().min(buf.len());
+        for (i, b) in trimmed.as_bytes()[..len].iter().enumerate() {
+            buf[i] = b.to_ascii_lowercase();
+        }
+        let lower = match std::str::from_utf8(&buf[..len]) {
+            Ok(s) => s,
+            Err(_) => return Self::Unknown,
+        };
+        if let Some(cat) = Self::match_ground_label(lower) {
+            cat
+        } else if let Some(cat) = Self::match_air_sea_label(lower) {
+            cat
+        } else {
+            Self::Unknown
+        }
+    }
+}
