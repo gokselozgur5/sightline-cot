@@ -12,6 +12,7 @@ pub enum ProtoError {
     InvalidMagic,
     UnexpectedEof,
     MalformedVarint,
+    InvalidUtf8,
     UnsupportedWireType(u8),
     MissingField(&'static str),
     BufferTooSmall,
@@ -253,12 +254,12 @@ impl TakCotEvent {
         match (num, wire) {
             (1, WireType::LengthDelimited) => {
                 self.r#type = std::str::from_utf8(raw)
-                    .map_err(|_| ProtoError::MalformedVarint)?
+                    .map_err(|_| ProtoError::InvalidUtf8)?
                     .to_string()
             }
             (2, WireType::LengthDelimited) => {
                 self.uid = std::str::from_utf8(raw)
-                    .map_err(|_| ProtoError::MalformedVarint)?
+                    .map_err(|_| ProtoError::InvalidUtf8)?
                     .to_string()
             }
             (3, WireType::Varint) => self.send_time = decode_varint(raw)?.0,
@@ -266,7 +267,7 @@ impl TakCotEvent {
             (5, WireType::Varint) => self.stale_time = decode_varint(raw)?.0,
             (6, WireType::LengthDelimited) => {
                 self.how = std::str::from_utf8(raw)
-                    .map_err(|_| ProtoError::MalformedVarint)?
+                    .map_err(|_| ProtoError::InvalidUtf8)?
                     .to_string()
             }
             _ => {}
