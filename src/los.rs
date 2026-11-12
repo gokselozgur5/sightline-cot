@@ -34,9 +34,10 @@ fn sample_point(obs: Position3D, target: Position3D, frac: f64) -> (f64, f64, f6
     )
 }
 
-fn check_step(dem: &DemGrid, p: (f64, f64, f64), dist: f64) -> (f64, Option<Position3D>) {
+/// `bulge` is the surface rise above the endpoint chord at this sample.
+fn check_step(dem: &DemGrid, p: (f64, f64, f64), bulge: f64) -> (f64, Option<Position3D>) {
     let (e, n, up) = p;
-    let eff_alt = up - earth_curvature_drop(dist);
+    let eff_alt = up - bulge;
     if let Some(h) = dem.elevation_at(e, n) {
         let clr = eff_alt - h;
         if clr < 0.0 {
@@ -58,10 +59,11 @@ fn check_step(dem: &DemGrid, p: (f64, f64, f64), dist: f64) -> (f64, Option<Posi
 pub fn check_los(dem: &DemGrid, obs: Position3D, tgt: Position3D, n: usize) -> LosResult {
     let (steps, mut min_clr) = (n.max(2), f64::MAX);
     let (dx, dy) = (tgt.east_m - obs.east_m, tgt.north_m - obs.north_m);
-    let tot_d = (dx * dx + dy * dy).sqrt();
+    let full_drop = earth_curvature_drop((dx * dx + dy * dy).sqrt());
     for i in 1..steps {
         let frac = i as f64 / steps as f64;
-        let (clr, obs_pt) = check_step(dem, sample_point(obs, tgt, frac), frac * tot_d);
+        let bulge = full_drop * frac * (1.0 - frac);
+        let (clr, obs_pt) = check_step(dem, sample_point(obs, tgt, frac), bulge);
         if clr < min_clr {
             min_clr = clr;
         }
