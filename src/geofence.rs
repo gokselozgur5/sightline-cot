@@ -111,3 +111,23 @@ impl Geofence {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_geofence_creation_and_containment() {
+        let square = [
+            [37.0, -122.0],
+            [37.0, -121.0],
+            [38.0, -121.0],
+            [38.0, -122.0],
+        ];
+        let gf = Geofence::new(&square, 100.0, 500.0).unwrap();
+        assert!(gf.is_point_inside_polygon(37.5, -121.5));
+        assert!(!gf.is_point_inside_polygon(36.5, -121.5));
+        assert!(gf.is_altitude_valid(250.0));
+        assert!(!gf.is_altitude_valid(50.0));
+    }
+}
