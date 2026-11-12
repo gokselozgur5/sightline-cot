@@ -25,3 +25,18 @@ fn report<F: FnMut() -> usize>(label: &str, mut run: F) {
     println!("{label:<32} {rays:>10} {ns_per_ray:>12.1} {rays_per_s:>14.0}");
 }
 
+/// Casts one ray per sampled pixel and optionally intersects it with the ground plane.
+fn grid_rays(intr: &Intrinsics, pose: &CameraPose, ground_up_m: Option<f64>) -> usize {
+    let mut count = 0;
+    for v in (0..HEIGHT).step_by(STEP) {
+        for u in (0..WIDTH).step_by(STEP) {
+            let ray = black_box(intr.pixel_to_ray(f64::from(u), f64::from(v)));
+            if let (Some(ground_m), Ok(r)) = (ground_up_m, ray) {
+                black_box(intersect_ground(r, pose, ground_m).ok());
+            }
+            count += 1;
+        }
+    }
+    count
+}
+
