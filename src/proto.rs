@@ -238,15 +238,32 @@ pub fn encode_tak_packet(event: &TakCotEvent, out: &mut Vec<u8>) -> Result<(), P
 }
 
 impl TakCotEvent {
-    fn decode_field_str_time(&mut self, num: u32, wire: WireType, raw: &[u8]) -> Result<(), ProtoError> {
+    fn decode_field_str_time(
+        &mut self,
+        num: u32,
+        wire: WireType,
+        raw: &[u8],
+    ) -> Result<(), ProtoError> {
         match (num, wire) {
-            (1, WireType::LengthDelimited) => self.r#type = std::str::from_utf8(raw).map_err(|_| ProtoError::MalformedVarint)?.to_string(),
-            (2, WireType::LengthDelimited) => self.uid = std::str::from_utf8(raw).map_err(|_| ProtoError::MalformedVarint)?.to_string(),
+            (1, WireType::LengthDelimited) => {
+                self.r#type = std::str::from_utf8(raw)
+                    .map_err(|_| ProtoError::MalformedVarint)?
+                    .to_string()
+            }
+            (2, WireType::LengthDelimited) => {
+                self.uid = std::str::from_utf8(raw)
+                    .map_err(|_| ProtoError::MalformedVarint)?
+                    .to_string()
+            }
             (3, WireType::Varint) => self.send_time = decode_varint(raw)?.0,
             (4, WireType::Varint) => self.start_time = decode_varint(raw)?.0,
             (5, WireType::Varint) => self.stale_time = decode_varint(raw)?.0,
-            (6, WireType::LengthDelimited) => self.how = std::str::from_utf8(raw).map_err(|_| ProtoError::MalformedVarint)?.to_string(),
-            _ => {},
+            (6, WireType::LengthDelimited) => {
+                self.how = std::str::from_utf8(raw)
+                    .map_err(|_| ProtoError::MalformedVarint)?
+                    .to_string()
+            }
+            _ => {}
         }
         Ok(())
     }
