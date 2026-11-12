@@ -309,4 +309,33 @@ mod tests {
         assert_eq!(lat_to_mgrs_band(-80.0001), Err(GridError::InvalidLatitude));
         assert_eq!(lat_to_mgrs_band(84.0001), Err(GridError::InvalidLatitude));
     }
+
+    #[test]
+    fn test_utm_to_wgs84_rejects_out_of_range() {
+        let base = UtmCoord {
+            zone: 31,
+            hemisphere: 'N',
+            easting: 500000.0,
+            northing: 1000.0,
+        };
+        let zone0 = UtmCoord { zone: 0, ..base };
+        let zone61 = UtmCoord { zone: 61, ..base };
+        let bad_hemi = UtmCoord {
+            hemisphere: 'X',
+            ..base
+        };
+        let low_east = UtmCoord {
+            easting: 99999.0,
+            ..base
+        };
+        let neg_north = UtmCoord {
+            northing: -1.0,
+            ..base
+        };
+        assert_eq!(utm_to_wgs84(&zone0), Err(GridError::InvalidZone));
+        assert_eq!(utm_to_wgs84(&zone61), Err(GridError::InvalidZone));
+        assert_eq!(utm_to_wgs84(&bad_hemi), Err(GridError::InvalidLatitude));
+        assert_eq!(utm_to_wgs84(&low_east), Err(GridError::InvalidEasting));
+        assert_eq!(utm_to_wgs84(&neg_north), Err(GridError::InvalidNorthing));
+    }
 }
