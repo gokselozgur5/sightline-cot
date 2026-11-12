@@ -30,14 +30,14 @@ fn p(e: f64, n: f64, u: f64) -> Position3D {
 
 #[test]
 fn low_endpoints_over_10km_are_blocked_by_curvature() {
-    let r = check_los(&flat(), p(0.0, 5000.0, 5.0), p(10_000.0, 5000.0, 5.0), 10);
+    let r = check_los(&flat(), p(0.0, 5000.0, 1.5), p(10_000.0, 5000.0, 1.5), 10);
     assert!(!r.is_visible);
 }
 
 #[test]
 fn higher_endpoints_clear_curvature_with_expected_margin() {
     let r = check_los(&flat(), p(0.0, 5000.0, 10.0), p(10_000.0, 5000.0, 10.0), 10);
-    let expect = 10.0 - earth_curvature_drop(9_000.0);
+    let expect = 10.0 - earth_curvature_drop(10_000.0) / 4.0;
     assert!(r.is_visible);
     assert!((r.min_clearance_m - expect).abs() < 1e-6);
 }
