@@ -59,6 +59,9 @@ pub fn escape_xml_attr(s: &str) -> String {
             '>' => out.push_str("&gt;"),
             '"' => out.push_str("&quot;"),
             '\'' => out.push_str("&apos;"),
+            '\n' => out.push_str("&#10;"),
+            '\t' => out.push_str("&#9;"),
+            '\r' => out.push_str("&#13;"),
             _ => out.push(c),
         }
     }
