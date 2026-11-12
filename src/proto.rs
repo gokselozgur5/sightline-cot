@@ -252,3 +252,11 @@ impl TakMessage {
             3 => *how = Self::read_string(buf, off)?,
             4 => *time_ms = decode_varint(buf, off)? as i64,
             5 => *stale_ms = decode_varint(buf, off)? as i64,
+            6 => *lat_deg = Self::read_f64(buf, off)?,
+            7 => *lon_deg = Self::read_f64(buf, off)?,
+            8 => *hae_m = Self::read_f64(buf, off)?,
+            _ => Self::skip_wire_type(buf, off, wire_type)?,
+        }
+        Ok(())
+    }
+}
