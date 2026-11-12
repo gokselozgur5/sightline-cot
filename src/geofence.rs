@@ -27,6 +27,18 @@ pub struct Geofence {
 }
 
 impl Geofence {
+    fn polygon_area2(poly: &[[f64; 2]]) -> f64 {
+        let n = poly.len();
+        (0..n)
+            .map(|i| {
+                let (a, b) = (poly[i], poly[(i + 1) % n]);
+                a[1] * b[0] - b[1] * a[0]
+            })
+            .sum()
+    }
+}
+
+impl Geofence {
     pub fn new(poly: &[[f64; 2]], min_alt: f64, max_alt: f64) -> Result<Self, &'static str> {
         if poly.len() < 3 || poly.len() > MAX_GEOFENCE_VERTICES {
             return Err("vertex count must be between 3 and 32");
