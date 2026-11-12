@@ -43,3 +43,16 @@ fn confirmed_events() -> Vec<CotEvent> {
     }
     out
 }
+#[test]
+fn multi_target_tracks_roundtrip_through_xml() {
+    let events = confirmed_events();
+    assert_eq!(events.len(), 2);
+    assert_ne!(events[0].uid, events[1].uid);
+    for e in &events {
+        let back = CotEvent::from_xml(&e.to_xml()).expect("parse");
+        assert_eq!(back.uid, e.uid);
+        assert_eq!(back.cot_type, e.cot_type);
+        assert!((back.lat_deg - e.lat_deg).abs() < 1e-6);
+        assert!((back.lon_deg - e.lon_deg).abs() < 1e-6);
+    }
+}
