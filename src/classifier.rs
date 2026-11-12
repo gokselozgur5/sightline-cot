@@ -235,3 +235,24 @@ mod tests_parsing {
         );
     }
 }
+
+#[cfg(test)]
+mod tests_parsing_affiliation {
+    use super::*;
+
+    #[test]
+    fn test_affiliation_parsing() {
+        assert_eq!(
+            TacticalAffiliation::parse_label("HOSTILE"),
+            TacticalAffiliation::Hostile
+        );
+        assert_eq!(
+            TacticalAffiliation::parse_label("f"),
+            TacticalAffiliation::Friendly
+        );
+        assert_eq!(
+            TacticalAffiliation::parse_label("aliens"),
+            TacticalAffiliation::Unknown
+        );
+    }
+}
