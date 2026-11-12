@@ -283,3 +283,21 @@ mod imm_tests {
         assert!((st[3] - 10.0).abs() < 1.0);
     }
 }
+
+#[cfg(test)]
+mod imm_turn_tests {
+    use super::*;
+
+    #[test]
+    fn test_imm_coordinated_turn_maneuver_detection() {
+        let cfg = ImmConfig::default();
+        let mut imm = ImmFilter::new([0.0, 0.0, 0.0], cfg);
+        let w = 0.5235987756; // 30 deg/s
+        for step in 1..=30 {
+            let t = step as f64 * 0.1;
+            let z = [(w * t).sin() * 50.0, (1.0 - (w * t).cos()) * 50.0, 0.0];
+            imm.step(0.1, z);
+        }
+        assert!(imm.is_maneuvering() || imm.probs[MODEL_CT] > imm.probs[MODEL_CV]);
+    }
+}
