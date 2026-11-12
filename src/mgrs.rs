@@ -67,3 +67,26 @@ fn utm_project_point(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, 
     let p2 = p * p;
     let p3 = p2 * p;
     let p4 = p2 * p2;
+    let p5 = p4 * p;
+    let east = FALSE_EASTING
+        + UTM_K0
+            * nu
+            * (p + (1.0 - t + eta2) * p3 / 6.0
+                + (5.0 - 18.0 * t + t * t + 72.0 * eta2) * p5 / 120.0);
+    let north_val = UTM_K0
+        * (m + nu * tan_lat * (p2 / 2.0 + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0));
+    let north = if hemi == 'S' {
+        FALSE_NORTHING_SOUTH + north_val
+    } else {
+        north_val
+    };
+    (east, north)
+}
+
+fn meridian_arc(phi: f64, e2: f64) -> f64 {
+    let e4 = e2 * e2;
+    let e6 = e4 * e2;
+    let a0 = 1.0 - e2 / 4.0 - 3.0 * e4 / 64.0 - 5.0 * e6 / 256.0;
+    let a2 = 3.0 * e2 / 8.0 + 3.0 * e4 / 32.0 + 45.0 * e6 / 1024.0;
+    let a4 = 15.0 * e4 / 256.0 + 45.0 * e6 / 1024.0;
+    let a6 = 35.0 * e6 / 3072.0;
