@@ -374,6 +374,28 @@ impl DemGrid {
             && elev.len() == c * r
             && elev.iter().all(|h| h.is_finite())
     }
+
+    /// Construct a validated DemGrid.
+    pub fn new(
+        e0: f64,
+        n0: f64,
+        step: f64,
+        c: usize,
+        r: usize,
+        elev: Vec<f64>,
+    ) -> Result<Self, CameraError> {
+        if !e0.is_finite() || !n0.is_finite() || !Self::validate_grid(step, c, r, &elev) {
+            return Err(CameraError::InvalidParameters);
+        }
+        Ok(Self {
+            origin_e_m: e0,
+            origin_n_m: n0,
+            cell_step_m: step,
+            cols: c,
+            rows: r,
+            elevations: elev,
+        })
+    }
 }
 
 #[cfg(test)]
