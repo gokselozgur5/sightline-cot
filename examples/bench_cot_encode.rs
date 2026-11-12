@@ -33,3 +33,25 @@ fn encode_all(events: &[CotEvent]) -> usize {
     events.iter().map(|e| black_box(e.to_xml()).len()).sum()
 }
 
+fn main() {
+    let events: Vec<CotEvent> = (0..EVENTS).map(sample_event).collect();
+    let mut best = f64::INFINITY;
+    let mut bytes = 0;
+    for _ in 0..ROUNDS {
+        let start = Instant::now();
+        bytes = encode_all(&events);
+        best = best.min(start.elapsed().as_secs_f64());
+    }
+    let ns_per_event = best * 1e9 / EVENTS as f64;
+    let events_per_s = EVENTS as f64 / best;
+    let mib_per_s = bytes as f64 / best / 1_048_576.0;
+    println!("CoT 2.0 XML encode ({EVENTS} events, best of {ROUNDS} rounds)");
+    println!(
+        "{:<10} {:>12} {:>14} {:>12} {:>12}",
+        "Events", "ns/event", "events/s", "MiB/s", "Avg bytes"
+    );
+    println!(
+        "{EVENTS:<10} {ns_per_event:>12.1} {events_per_s:>14.0} {mib_per_s:>12.1} {:>12}",
+        bytes / EVENTS
+    );
+}
