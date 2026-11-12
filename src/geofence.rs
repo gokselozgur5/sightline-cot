@@ -115,28 +115,13 @@ impl Geofence {
 
 impl Geofence {
     pub fn is_point_inside_polygon(&self, lat: f64, lon: f64) -> bool {
-        let mut inside = false;
-        let n = self.vertex_count;
-        let r = self.vertices[0][1];
-        let lon = Self::unwrap_lon(lon, r);
-        let mut j = n - 1;
-        for i in 0..n {
-            let (xi, yi) = (
-                Self::unwrap_lon(self.vertices[i][1], r),
-                self.vertices[i][0],
-            );
-            let (xj, yj) = (
-                Self::unwrap_lon(self.vertices[j][1], r),
-                self.vertices[j][0],
-            );
-            let intersect =
-                ((yi > lat) != (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
-            if intersect {
-                inside = !inside;
-            }
-            j = i;
-        }
-        inside
+        let poly = &self.vertices[..self.vertex_count];
+        let n = poly.len();
+        let crossings = (0..n)
+            .filter(|&i| Self::crosses_north(poly[i], poly[(i + 1) % n], lat, lon))
+            .count();
+        let north_cap = poly.iter().map(|v| v[0]).sum::<f64>() >= 0.0;
+        (crossings % 2 == 1) != (Self::pole_winding(poly) != 0 && north_cap)
     }
 }
 
