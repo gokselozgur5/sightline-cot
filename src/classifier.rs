@@ -182,3 +182,16 @@ impl TacticalAffiliation {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_affiliation_cot_char() {
+        assert_eq!(TacticalAffiliation::Friendly.cot_char(), 'f');
+        assert_eq!(TacticalAffiliation::Hostile.cot_char(), 'h');
+        assert_eq!(TacticalAffiliation::Neutral.cot_char(), 'n');
+        assert_eq!(TacticalAffiliation::Unknown.cot_char(), 'u');
+    }
+}
