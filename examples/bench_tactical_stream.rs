@@ -38,3 +38,23 @@ impl LatencyStats {
     fn record(&mut self, us: f64) {
         self.micros.push(us);
     }
+
+    fn compute_metrics(&mut self) -> (f64, f64, f64, f64, f64) {
+        self.micros.sort_by(|a, b| a.total_cmp(b));
+        let len = self.micros.len();
+        let p50 = self.micros[len * 50 / 100];
+        let p99 = self.micros[len * 99 / 100];
+        let max = *self.micros.last().unwrap_or(&0.0);
+        let mean = self.micros.iter().sum::<f64>() / (len as f64);
+        (p50, p99, max, mean, 1_000_000.0 / mean)
+    }
+}
+
+struct SyntheticTarget {
+    east_m: f64,
+    north_m: f64,
+    vel_e: f64,
+    vel_n: f64,
+    raw_emb: [f32; 8],
+    cot_type: &'static str,
+}
