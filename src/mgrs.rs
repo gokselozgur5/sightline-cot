@@ -205,3 +205,26 @@ pub struct MgrsString {
 }
 
 impl MgrsString {
+    pub fn as_str(&self) -> &str {
+        core::str::from_utf8(&self.bytes[..self.len]).unwrap_or("")
+    }
+}
+
+fn append_digits(buf: &mut [u8], len: &mut usize, mut val: u32, digits: usize) {
+    let mut temp = [b'0'; 10];
+    for i in (0..digits).rev() {
+        temp[i] = b'0' + (val % 10) as u8;
+        val /= 10;
+    }
+    for b in &temp[..digits] {
+        buf[*len] = *b;
+        *len += 1;
+    }
+}
+
+/// Format MGRS coordinate string at specified precision (1m, 10m, 100m, 1000m).
+pub fn format_mgrs(
+    lat_deg: f64,
+    lon_deg: f64,
+    digits_per_axis: usize,
+) -> Result<MgrsString, GridError> {
