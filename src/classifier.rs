@@ -34,6 +34,18 @@ impl MilStdClassifier {
         }
     }
 
+    /// Returns the CoT type string for this affiliation and category.
+    ///
+    /// Unmapped pairs, including every `Unknown` affiliation, fall back to `a-u-G`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use sightline_cot::classifier::{MilStdClassifier, TacticalAffiliation, TargetCategory};
+    ///
+    /// let cls = MilStdClassifier::new(TacticalAffiliation::Hostile, TargetCategory::Drone);
+    /// assert_eq!(cls.to_cot_type(), "a-h-A-M-F");
+    /// ```
     pub fn to_cot_type(&self) -> &'static str {
         match (self.affiliation, self.category) {
             (TacticalAffiliation::Friendly, TargetCategory::Vehicle) => "a-f-G-E-V-C",
