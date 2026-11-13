@@ -35,3 +35,22 @@ fn test_truncate_mgrs_kilometer_precisions() {
         "31NEA"
     );
 }
+
+#[test]
+fn test_truncate_mgrs_rejects_invalid_inputs() {
+    use sightline_cot::mgrs_truncate::TruncateError;
+
+    let short = "31NEA0156";
+    assert_eq!(
+        truncate_mgrs(short, MgrsPrecision::Point1m),
+        Err(TruncateError::TargetPrecisionExceedsInput)
+    );
+    assert_eq!(
+        truncate_mgrs("31NEA015", MgrsPrecision::Point1k),
+        Err(TruncateError::InvalidFormat)
+    );
+    assert_eq!(
+        truncate_mgrs("INVALID", MgrsPrecision::Point1k),
+        Err(TruncateError::InvalidFormat)
+    );
+}
