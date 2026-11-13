@@ -17,3 +17,15 @@ fn row_letter(zone: u8, northing: f64) -> char {
     let row_idx = ((northing / 100000.0).floor() as usize) % 20;
     ROWS[(row_offset + row_idx) % ROWS.len()] as char
 }
+
+fn append_digits(buf: &mut [u8], len: &mut usize, mut val: u32, digits: usize) {
+    let mut temp = [b'0'; 10];
+    for i in (0..digits).rev() {
+        temp[i] = b'0' + (val % 10) as u8;
+        val /= 10;
+    }
+    for b in &temp[..digits] {
+        buf[*len] = *b;
+        *len += 1;
+    }
+}
