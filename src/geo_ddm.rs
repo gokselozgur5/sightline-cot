@@ -83,3 +83,32 @@ fn split_components(toks: &[String]) -> Result<(&[String], &[String]), DdmError>
         _ => Err(DdmError::InvalidFormat),
     }
 }
+
+fn parse_comp(toks: &[String]) -> Result<(f64, Option<char>), DdmError> {
+    let (h, deg_s, min_s) = match toks {
+        [t0, t1] => (None, t0.as_str(), t1.as_str()),
+        [t0, t1, t2] if parse_hemi(t0).is_some() => (parse_hemi(t0), t1.as_str(), t2.as_str()),
+        [t0, t1, t2] if parse_hemi(t2).is_some() => (parse_hemi(t2), t0.as_str(), t1.as_str()),
+        _ => return Err(DdmError::InvalidFormat),
+    };
+    let deg: f64 = deg_s.parse().map_err(|_| DdmError::InvalidDegrees)?;
+    let min: f64 = min_s.parse().map_err(|_| DdmError::InvalidMinutes)?;
+    if !deg.is_finite() {
+        return Err(DdmError::InvalidDegrees);
+    }
+    if !min.is_finite() || min < 0.0 || min >= 60.0 {
+        return Err(DdmError::MinutesOutOfRange);
+    }
+    let is_neg = deg_s.starts_with('-');
+    if h.is_some() && is_neg {
+        return Err(DdmError::ConflictingHemisphere);
+    }
+    let mag = deg.abs() + min / 60.0;
+    let signed = match h {
+        Some('S' | 'W') => -mag,
+        Some(_) => mag,
+        None if is_neg => -mag,
+        None => mag,
+    };
+    Ok((signed, h))
+}
