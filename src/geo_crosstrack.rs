@@ -26,3 +26,14 @@ pub fn initial_bearing_rad(from: [f64; 2], to: [f64; 2]) -> f64 {
     let x = lat1.cos() * lat2.sin() - lat1.sin() * lat2.cos() * d_lon.cos();
     y.atan2(x)
 }
+
+/// Signed cross-track distance in metres from point to the great-circle path start -> end.
+///
+/// Positive if point is to the right of the path, negative if to the left.
+pub fn cross_track_distance_m(start: [f64; 2], end: [f64; 2], point: [f64; 2]) -> f64 {
+    let d13 = angular_distance_rad(start, point);
+    let theta13 = initial_bearing_rad(start, point);
+    let theta12 = initial_bearing_rad(start, end);
+    let delta_xt = (d13.sin() * (theta13 - theta12).sin()).asin();
+    delta_xt * MEAN_EARTH_RADIUS_M
+}
