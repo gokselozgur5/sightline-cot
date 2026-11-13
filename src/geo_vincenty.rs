@@ -200,3 +200,31 @@ fn direct_omega(c: f64, s_alp: f64, sig: f64, s_s: f64, c_s: f64, c_2sm: f64) ->
     (1.0 - c) * WGS84_F * s_alp * (sig + c * s_s * t)
 }
 
+
+fn compute_direct_coords(
+    lon1: f64,
+    s_u1: f64,
+    c_u1: f64,
+    s_alp: f64,
+    c2_alp: f64,
+    alp1: f64,
+    sig: f64,
+    c_2sm: f64,
+) -> VincentyDirect {
+    let (s_s, c_s) = (sig.sin(), sig.cos());
+    let x = s_u1 * s_s - c_u1 * c_s * alp1.cos();
+    let num = s_u1 * c_s + c_u1 * s_s * alp1.cos();
+    let den = (1.0 - WGS84_F) * (s_alp * s_alp + x * x).sqrt();
+    let lat2 = num.atan2(den).to_degrees();
+    let lam = (s_s * alp1.sin()).atan2(c_u1 * c_s - s_u1 * s_s * alp1.cos());
+    let lon2 = (lon1
+        + (lam - direct_omega(vincenty_c(c2_alp), s_alp, sig, s_s, c_s, c_2sm)).to_degrees()
+        + 180.0)
+        .rem_euclid(360.0)
+        - 180.0;
+    VincentyDirect {
+        lat_deg: lat2,
+        lon_deg: lon2,
+        reverse_azimuth_deg: wrap_azimuth(s_alp.atan2(-x).to_degrees()),
+    }
+}
