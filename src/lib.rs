@@ -22,8 +22,8 @@ pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub mod geo_angle;
 pub mod geo_compass;
 pub mod geo_meridian_arc;
-pub mod geo_radii;
 pub mod geo_polyline;
+pub mod geo_radii;
 pub mod tracker;
 
 pub const VERSION: &str = "0.1.0";

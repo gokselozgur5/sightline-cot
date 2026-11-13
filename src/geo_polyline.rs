@@ -38,7 +38,10 @@ pub fn great_circle_intermediate(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2]
     let x = sa * lat1.cos() * lon1.cos() + sb * lat2.cos() * lon2.cos();
     let y = sa * lat1.cos() * lon1.sin() + sb * lat2.cos() * lon2.sin();
     let z = sa * lat1.sin() + sb * lat2.sin();
-    [z.atan2((x * x + y * y).sqrt()).to_degrees(), y.atan2(x).to_degrees()]
+    [
+        z.atan2((x * x + y * y).sqrt()).to_degrees(),
+        y.atan2(x).to_degrees(),
+    ]
 }
 
 /// Total length in metres of a polyline with a custom sphere radius.
@@ -66,7 +69,10 @@ pub fn polyline_resample_radius(points: &[[f64; 2]], step_m: f64, radius: f64) -
     if total_len == 0.0 {
         return vec![points[0]];
     }
-    let segs: Vec<f64> = points.windows(2).map(|w| haversine_distance_radius(w[0], w[1], radius)).collect();
+    let segs: Vec<f64> = points
+        .windows(2)
+        .map(|w| haversine_distance_radius(w[0], w[1], radius))
+        .collect();
     let (mut res, mut target, mut idx, mut start) = (Vec::new(), 0.0, 0, 0.0);
     while target <= total_len + step_m * 1e-9 {
         let clamped = target.min(total_len);
