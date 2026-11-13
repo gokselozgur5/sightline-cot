@@ -163,3 +163,11 @@ pub fn nearest_point_on_polyline_with_radius(
     }
     best
 }
+
+/// Find nearest point on a polyline using default Earth radius.
+pub fn nearest_point_on_polyline(
+    polyline: &[[f64; 2]],
+    query: [f64; 2],
+) -> Option<PolylineNearest> {
+    nearest_point_on_polyline_with_radius(polyline, query, DEFAULT_EARTH_RADIUS_M)
+}
