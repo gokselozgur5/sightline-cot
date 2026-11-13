@@ -12,3 +12,18 @@ pub fn segment_distance_m(p0: [f64; 2], p1: [f64; 2]) -> f64 {
             .sqrt()
             .atan2((1.0 - a).clamp(0.0, 1.0).sqrt())
 }
+
+/// Initial forward bearing in degrees in [0, 360) from `p0` to `p1`.
+pub fn segment_bearing_deg(p0: [f64; 2], p1: [f64; 2]) -> f64 {
+    let (lat0, lat1) = (p0[0].to_radians(), p1[0].to_radians());
+    let dlon = (p1[1] - p0[1]).to_radians();
+    let y = dlon.sin() * lat1.cos();
+    let x = lat0.cos() * lat1.sin() - lat0.sin() * lat1.cos() * dlon.cos();
+    let deg = y.atan2(x).to_degrees();
+    let b = deg % 360.0;
+    if b < 0.0 {
+        b + 360.0
+    } else {
+        b
+    }
+}
