@@ -39,3 +39,23 @@ pub fn rhumb_bearing(p1: [f64; 2], p2: [f64; 2]) -> f64 {
     let bearing = dlon.atan2(dpsi).to_degrees();
     bearing.rem_euclid(360.0)
 }
+
+/// Computes the destination point along a rhumb line with custom radius.
+pub fn rhumb_destination_radius(start: [f64; 2], bearing_deg: f64, distance_m: f64, radius: f64) -> [f64; 2] {
+    let lat1 = start[0].to_radians();
+    let lon1 = start[1].to_radians();
+    let theta = bearing_deg.to_radians();
+    let delta = distance_m / radius;
+    let dlat = delta * theta.cos();
+    let lat2 = (lat1 + dlat).clamp(-FRAC_PI_2, FRAC_PI_2);
+    let dpsi = mercator_lat(lat2) - mercator_lat(lat1);
+    let q = if dpsi.abs() < 1e-12 { lat1.cos() } else { (lat2 - lat1) / dpsi };
+    let dlon = if q.abs() < 1e-12 { 0.0 } else { (delta * theta.sin()) / q };
+    let lon2 = ((lon1 + dlon).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    [lat2.to_degrees(), lon2]
+}
+
+/// Computes the destination point along a rhumb line using WGS84 mean earth radius.
+pub fn rhumb_destination(start: [f64; 2], bearing_deg: f64, distance_m: f64) -> [f64; 2] {
+    rhumb_destination_radius(start, bearing_deg, distance_m, WGS84_EARTH_RADIUS)
+}
