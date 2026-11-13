@@ -67,3 +67,15 @@ fn vincenty_ab(cos2_alpha: f64) -> (f64, f64) {
 fn vincenty_c(cos2_alpha: f64) -> f64 {
     WGS84_F / 16.0 * cos2_alpha * (4.0 + WGS84_F * (4.0 - 3.0 * cos2_alpha))
 }
+
+fn vincenty_delta_sigma(b: f64, sin_sigma: f64, cos_sigma: f64, cos_2sigma_m: f64) -> f64 {
+    let cos2_2sigma_m = cos_2sigma_m * cos_2sigma_m;
+    b * sin_sigma
+        * (cos_2sigma_m
+            + b / 4.0
+                * (cos_sigma * (-1.0 + 2.0 * cos2_2sigma_m)
+                    - b / 6.0
+                        * cos_2sigma_m
+                        * (-3.0 + 4.0 * sin_sigma * sin_sigma)
+                        * (-3.0 + 4.0 * cos2_2sigma_m)))
+}
