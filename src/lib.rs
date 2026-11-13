@@ -40,6 +40,7 @@ pub use geo_haversine::{
 };
 pub mod geo_hull;
 pub mod geo_meridian_arc;
+pub mod geo_midpoint;
 pub mod geo_perimeter;
 pub mod geo_polyline;
 pub mod geo_polyline_nearest;
