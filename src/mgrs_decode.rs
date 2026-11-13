@@ -49,3 +49,30 @@ fn decode_100k_row(zone: u8, row: u8) -> Result<f64, MgrsDecodeError> {
     let row_idx = (r_idx + 20 - row_offset) % 20;
     Ok(row_idx as f64 * 100_000.0)
 }
+
+fn parse_components(s: &str) -> Result<(u8, char, u8, u8, &str), MgrsDecodeError> {
+    let s = s.trim();
+    if s.len() < 3 {
+        return Err(MgrsDecodeError::InvalidLength);
+    }
+    let b = s.as_bytes();
+    let (zone, rest) = if b[0].is_ascii_digit() && b[1].is_ascii_digit() {
+        let z = (b[0] - b'0') * 10 + (b[1] - b'0');
+        (z, &s[2..])
+    } else if b[0].is_ascii_digit() {
+        (b[0] - b'0', &s[1..])
+    } else {
+        return Err(MgrsDecodeError::InvalidZone);
+    };
+    if !(1..=60).contains(&zone) {
+        return Err(MgrsDecodeError::InvalidZone);
+    }
+    let rb = rest.as_bytes();
+    if rb.len() < 3 {
+        return Err(MgrsDecodeError::InvalidLength);
+    }
+    let band = rb[0].to_ascii_uppercase() as char;
+    let col = rb[1].to_ascii_uppercase();
+    let row = rb[2].to_ascii_uppercase();
+    Ok((zone, band, col, row, &rest[3..]))
+}
