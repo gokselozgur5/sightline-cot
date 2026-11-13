@@ -23,3 +23,19 @@ impl core::fmt::Display for VincentyError {
 }
 
 impl std::error::Error for VincentyError {}
+
+/// Result of the Vincenty inverse geodesic calculation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct VincentyInverse {
+    pub distance_m: f64,
+    pub forward_azimuth_deg: f64,
+    pub reverse_azimuth_deg: f64,
+}
+
+/// Result of the Vincenty direct geodesic calculation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct VincentyDirect {
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+    pub reverse_azimuth_deg: f64,
+}
