@@ -79,3 +79,28 @@ fn vincenty_delta_sigma(b: f64, sin_sigma: f64, cos_sigma: f64, cos_2sigma_m: f6
                         * (-3.0 + 4.0 * sin_sigma * sin_sigma)
                         * (-3.0 + 4.0 * cos2_2sigma_m)))
 }
+
+fn solve_step(
+    sin_u1: f64,
+    cos_u1: f64,
+    sin_u2: f64,
+    cos_u2: f64,
+    lambda: f64,
+) -> Result<(f64, f64, f64, f64, f64, f64), VincentyError> {
+    let (sin_l, cos_l) = (lambda.sin(), lambda.cos());
+    let sin_sigma =
+        ((cos_u2 * sin_l).powi(2) + (cos_u1 * sin_u2 - sin_u1 * cos_u2 * cos_l).powi(2)).sqrt();
+    if sin_sigma.abs() < 1e-12 {
+        return Err(VincentyError::NoConvergence);
+    }
+    let cos_sigma = sin_u1 * sin_u2 + cos_u1 * cos_u2 * cos_l;
+    let sigma = sin_sigma.atan2(cos_sigma);
+    let sin_alpha = cos_u1 * cos_u2 * sin_l / sin_sigma;
+    let cos2_alpha = 1.0 - sin_alpha * sin_alpha;
+    let cos_2sigma_m = if cos2_alpha.abs() > 1e-12 {
+        cos_sigma - 2.0 * sin_u1 * sin_u2 / cos2_alpha
+    } else {
+        0.0
+    };
+    Ok((sigma, sin_sigma, cos_sigma, sin_alpha, cos2_alpha, cos_2sigma_m))
+}
