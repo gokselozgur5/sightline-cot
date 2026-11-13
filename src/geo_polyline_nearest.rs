@@ -42,3 +42,15 @@ fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
 fn angle_rad(a: [f64; 3], b: [f64; 3]) -> f64 {
     dot(a, b).clamp(-1.0, 1.0).acos()
 }
+
+fn segment_normal(va: [f64; 3], vb: [f64; 3]) -> (Option<[f64; 3]>, f64) {
+    let seg_len = angle_rad(va, vb);
+    let n = cross(va, vb);
+    let n_sq = dot(n, n);
+    if seg_len < 1e-12 || n_sq < 1e-24 {
+        (None, seg_len)
+    } else {
+        let inv = 1.0 / n_sq.sqrt();
+        (Some([n[0] * inv, n[1] * inv, n[2] * inv]), seg_len)
+    }
+}
