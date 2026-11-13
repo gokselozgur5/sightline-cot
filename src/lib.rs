@@ -39,6 +39,7 @@ pub use geo_haversine::{
     haversine_distance_with_radius,
 };
 pub mod geo_hull;
+pub mod geo_intersect;
 pub mod geo_meridian_arc;
 pub mod geo_midpoint;
 pub mod geo_perimeter;
