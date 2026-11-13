@@ -129,3 +129,7 @@ fn solve_inverse_loop(
     }
     Err(VincentyError::NoConvergence)
 }
+
+fn wrap_azimuth(deg: f64) -> f64 {
+    (deg + 360.0).rem_euclid(360.0)
+}
