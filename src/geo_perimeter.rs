@@ -48,3 +48,16 @@ pub fn polygon_perimeter(poly: &[[f64; 2]]) -> Option<f64> {
             .sum(),
     )
 }
+
+/// Forward bearing in degrees [0, 360) for each edge of a polygon.
+pub fn polygon_segment_bearings(poly: &[[f64; 2]]) -> Option<Vec<f64>> {
+    let n = poly.len();
+    if n < 3 || poly.iter().flatten().any(|c| !c.is_finite()) {
+        return None;
+    }
+    Some(
+        (0..n)
+            .map(|i| segment_bearing_deg(poly[i], poly[(i + 1) % n]))
+            .collect(),
+    )
+}
