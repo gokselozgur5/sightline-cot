@@ -74,3 +74,30 @@ fn validate_inputs(
     }
     Ok(())
 }
+
+/// Calculates destination point given starting point, bearing, range and spherical radius.
+pub fn destination_point_with_radius(
+    lat_deg: f64,
+    lon_deg: f64,
+    bearing_deg: f64,
+    range_m: f64,
+    radius_m: f64,
+) -> Result<(f64, f64), GeoDestError> {
+    validate_inputs(lat_deg, lon_deg, bearing_deg, range_m, radius_m)?;
+    let phi1 = lat_deg.to_radians();
+    let lam1 = lon_deg.to_radians();
+    let theta = bearing_deg.to_radians();
+    let delta = range_m / radius_m;
+    let sin_phi2 = phi1.sin() * delta.cos() + phi1.cos() * delta.sin() * theta.cos();
+    let phi2 = sin_phi2.clamp(-1.0, 1.0).asin();
+    let y = theta.sin() * delta.sin() * phi1.cos();
+    let x = delta.cos() - phi1.sin() * phi2.sin();
+    let lam2 = lam1 + y.atan2(x);
+    let lat_out = phi2.to_degrees();
+    let lon_deg_raw = lam2.to_degrees();
+    let mut lon_out = (lon_deg_raw + 180.0).rem_euclid(360.0) - 180.0;
+    if lon_out == -180.0 && lon_deg > 0.0 {
+        lon_out = 180.0;
+    }
+    Ok((lat_out, lon_out))
+}
