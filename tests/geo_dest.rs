@@ -13,3 +13,18 @@ fn test_destination_acceptance_roundtrip_range() {
     let init_b = initial_bearing(lat, lon, dest_lat, dest_lon);
     assert!((init_b - bearing).abs() < 1e-4);
 }
+
+#[test]
+fn test_destination_antimeridian_and_polar() {
+    let (dest_lat, dest_lon) = destination_point(0.0, 179.95, 90.0, 20_000.0).expect("cross east");
+    assert!(dest_lon < 0.0);
+    let d = haversine_distance(0.0, 179.95, dest_lat, dest_lon);
+    assert!((d - 20_000.0).abs() < 1.0);
+
+    let (pole_lat, _) = destination_point(89.5, 0.0, 0.0, 50_000.0).expect("polar dest");
+    assert!((-90.0..=90.0).contains(&pole_lat));
+
+    let (zero_lat, zero_lon) = destination_point(45.0, 10.0, 120.0, 0.0).expect("zero range");
+    assert!((zero_lat - 45.0).abs() < 1e-9);
+    assert!((zero_lon - 10.0).abs() < 1e-9);
+}
