@@ -79,3 +79,26 @@ fn dp_indices(pts: &[[f64; 2]], start: usize, end: usize, tol: f64, keep: &mut [
         dp_indices(pts, max_i, end, tol, keep);
     }
 }
+
+/// Simplify a polyline within a specific local frame.
+pub fn simplify_polyline_in_frame(
+    points: &[[f64; 2]],
+    frame: &LocalFrame,
+    tolerance_m: f64,
+) -> Vec<[f64; 2]> {
+    let n = points.len();
+    if n <= 2 || tolerance_m <= 0.0 || !tolerance_m.is_finite() {
+        return points.to_vec();
+    }
+    let local: Vec<[f64; 2]> = points.iter().map(|p| frame.project(*p)).collect();
+    let mut keep = vec![false; n];
+    keep[0] = true;
+    keep[n - 1] = true;
+    dp_indices(&local, 0, n - 1, tolerance_m, &mut keep);
+    points
+        .iter()
+        .zip(keep)
+        .filter(|(_, k)| *k)
+        .map(|(p, _)| *p)
+        .collect()
+}
