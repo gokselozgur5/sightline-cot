@@ -32,3 +32,19 @@ impl HelmertParams {
         [t[0] + k * r[0], t[1] + k * r[1], t[2] + k * r[2]]
     }
 }
+
+impl HelmertParams {
+    /// Exact inverse of [`HelmertParams::apply`], solved by fixed-point iteration.
+    pub fn invert(&self, q: [f64; 3]) -> [f64; 3] {
+        let k = 1.0 + self.scale_ppm * 1e-6;
+        let t = self.translation_m;
+        let base = [(q[0] - t[0]) / k, (q[1] - t[1]) / k, (q[2] - t[2]) / k];
+        let rot_only = Self { translation_m: [0.0; 3], scale_ppm: 0.0, ..*self };
+        let mut p = base;
+        for _ in 0..8 {
+            let rp = rot_only.apply(p);
+            p = [base[0] - (rp[0] - p[0]), base[1] - (rp[1] - p[1]), base[2] - (rp[2] - p[2])];
+        }
+        p
+    }
+}
