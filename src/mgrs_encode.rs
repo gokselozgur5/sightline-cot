@@ -33,3 +33,27 @@ impl Mgrs10Digit {
 pub fn encode_mgrs_10digit(lat_deg: f64, lon_deg: f64) -> Result<Mgrs10Digit, GridError> {
     Mgrs10Digit::from_lat_lon(lat_deg, lon_deg)
 }
+
+impl Mgrs10Digit {
+    /// Format as compact MGRS string (e.g. "31NEA0000000000").
+    pub fn format_compact(&self) -> String {
+        format!(
+            "{:02}{}{}{}{:05}{:05}",
+            self.zone, self.band, self.col, self.row, self.easting, self.northing
+        )
+    }
+
+    /// Format as spaced MGRS string (e.g. "31N EA 00000 00000").
+    pub fn format_spaced(&self) -> String {
+        format!(
+            "{:02}{} {}{} {:05} {:05}",
+            self.zone, self.band, self.col, self.row, self.easting, self.northing
+        )
+    }
+}
+
+impl core::fmt::Display for Mgrs10Digit {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.format_compact())
+    }
+}
