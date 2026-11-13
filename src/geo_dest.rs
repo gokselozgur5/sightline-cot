@@ -47,3 +47,30 @@ pub fn initial_bearing(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     let b = y.atan2(x).to_degrees();
     (b + 360.0).rem_euclid(360.0)
 }
+
+fn validate_inputs(
+    lat_deg: f64,
+    lon_deg: f64,
+    bearing_deg: f64,
+    range_m: f64,
+    radius_m: f64,
+) -> Result<(), GeoDestError> {
+    if !lat_deg.is_finite()
+        || !lon_deg.is_finite()
+        || !bearing_deg.is_finite()
+        || !range_m.is_finite()
+        || !radius_m.is_finite()
+    {
+        return Err(GeoDestError::NonFiniteInput);
+    }
+    if range_m < 0.0 || radius_m <= 0.0 {
+        return Err(GeoDestError::NegativeRange);
+    }
+    if !(-90.0..=90.0).contains(&lat_deg) {
+        return Err(GeoDestError::InvalidLatitude);
+    }
+    if !(-180.0..=180.0).contains(&lon_deg) {
+        return Err(GeoDestError::InvalidLongitude);
+    }
+    Ok(())
+}
