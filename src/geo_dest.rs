@@ -101,3 +101,13 @@ pub fn destination_point_with_radius(
     }
     Ok((lat_out, lon_out))
 }
+
+/// Calculates destination point using the WGS84 mean spherical radius.
+pub fn destination_point(
+    lat_deg: f64,
+    lon_deg: f64,
+    bearing_deg: f64,
+    range_m: f64,
+) -> Result<(f64, f64), GeoDestError> {
+    destination_point_with_radius(lat_deg, lon_deg, bearing_deg, range_m, WGS84_MEAN_RADIUS_M)
+}
