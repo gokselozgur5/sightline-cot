@@ -36,3 +36,14 @@ pub fn haversine_distance(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt().max(0.0));
     WGS84_MEAN_RADIUS_M * c
 }
+
+/// Computes the initial bearing from point 1 to point 2 in degrees [0, 360).
+pub fn initial_bearing(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
+    let phi1 = lat1.to_radians();
+    let phi2 = lat2.to_radians();
+    let dlam = (lon2 - lon1).to_radians();
+    let y = dlam.sin() * phi2.cos();
+    let x = phi1.cos() * phi2.sin() - phi1.sin() * phi2.cos() * dlam.cos();
+    let b = y.atan2(x).to_degrees();
+    (b + 360.0).rem_euclid(360.0)
+}
