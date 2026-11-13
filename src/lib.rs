@@ -27,6 +27,7 @@ pub mod geo_hull;
 pub mod geo_meridian_arc;
 pub mod geo_polyline;
 pub mod geo_radii;
+pub mod geo_rhumb;
 pub mod geo_simplify;
 pub use geo_simplify::{simplify_polyline, LocalFrame};
 pub mod tracker;
