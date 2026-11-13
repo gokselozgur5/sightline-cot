@@ -29,3 +29,15 @@ fn test_initial_bearing_cardinal_and_reference_pairs() {
     let b = haversine_bearing_deg(london, paris);
     assert!((b - 148.12).abs() < 0.1, "got bearing {b}");
 }
+
+#[test]
+fn test_coincident_and_antipodal_points() {
+    let p = [35.6895, 139.6917];
+    assert!(haversine_distance_m(p, p) < 1e-6);
+
+    let north_pole = [90.0, 0.0];
+    let south_pole = [-90.0, 0.0];
+    let d = haversine_distance_m(north_pole, south_pole);
+    let half_circumference = std::f64::consts::PI * 6_371_008.8;
+    assert!((d - half_circumference).abs() < 1e-4);
+}
