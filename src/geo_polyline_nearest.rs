@@ -26,3 +26,19 @@ fn to_lat_lon(v: [f64; 3]) -> [f64; 2] {
     let hyp = (v[0] * v[0] + v[1] * v[1]).sqrt();
     [v[2].atan2(hyp).to_degrees(), v[1].atan2(v[0]).to_degrees()]
 }
+
+fn dot(a: [f64; 3], b: [f64; 3]) -> f64 {
+    a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+}
+
+fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
+    [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    ]
+}
+
+fn angle_rad(a: [f64; 3], b: [f64; 3]) -> f64 {
+    dot(a, b).clamp(-1.0, 1.0).acos()
+}
