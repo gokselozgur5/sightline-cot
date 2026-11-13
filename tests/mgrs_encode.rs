@@ -15,3 +15,12 @@ fn test_encode_mgrs_10digit_equator() {
     assert_eq!(mgrs.format_spaced(), "31N EA 00000 00000");
     assert_eq!(mgrs.to_string(), "31NEA0000000000");
 }
+
+#[test]
+fn test_encode_mgrs_10digit_rejects_out_of_range() {
+    use sightline_cot::mgrs::GridError;
+
+    assert_eq!(encode_mgrs_10digit(85.0, 0.0), Err(GridError::InvalidLatitude));
+    assert_eq!(encode_mgrs_10digit(-85.0, 0.0), Err(GridError::InvalidLatitude));
+    assert_eq!(encode_mgrs_10digit(0.0, 185.0), Err(GridError::InvalidLongitude));
+}
