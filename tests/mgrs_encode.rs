@@ -20,7 +20,16 @@ fn test_encode_mgrs_10digit_equator() {
 fn test_encode_mgrs_10digit_rejects_out_of_range() {
     use sightline_cot::mgrs::GridError;
 
-    assert_eq!(encode_mgrs_10digit(85.0, 0.0), Err(GridError::InvalidLatitude));
-    assert_eq!(encode_mgrs_10digit(-85.0, 0.0), Err(GridError::InvalidLatitude));
-    assert_eq!(encode_mgrs_10digit(0.0, 185.0), Err(GridError::InvalidLongitude));
+    assert_eq!(
+        encode_mgrs_10digit(85.0, 0.0),
+        Err(GridError::InvalidLatitude)
+    );
+    assert_eq!(
+        encode_mgrs_10digit(-85.0, 0.0),
+        Err(GridError::InvalidLatitude)
+    );
+    assert_eq!(
+        encode_mgrs_10digit(0.0, 185.0),
+        Err(GridError::InvalidLongitude)
+    );
 }
