@@ -103,7 +103,7 @@ fn parse_digits(d: &str) -> Result<(f64, f64), MgrsDecodeError> {
     if d.is_empty() {
         return Ok((50_000.0, 50_000.0));
     }
-    if d.len() % 2 != 0 || d.len() > 10 || !d.chars().all(|c| c.is_ascii_digit()) {
+    if !d.len().is_multiple_of(2) || d.len() > 10 || !d.chars().all(|c| c.is_ascii_digit()) {
         return Err(MgrsDecodeError::InvalidDigits);
     }
     let half = d.len() / 2;
