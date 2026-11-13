@@ -112,3 +112,32 @@ fn parse_comp(toks: &[String]) -> Result<(f64, Option<char>), DdmError> {
     };
     Ok((signed, h))
 }
+
+/// Parses a degrees decimal-minutes coordinate string into (lat_deg, lon_deg).
+pub fn parse_ddm(s: &str) -> Result<(f64, f64), DdmError> {
+    let trimmed = s.trim();
+    if trimmed.is_empty() {
+        return Err(DdmError::EmptyInput);
+    }
+    let toks = tokenize(trimmed);
+    let (toks1, toks2) = split_components(&toks)?;
+    let (v1, h1) = parse_comp(toks1)?;
+    let (v2, h2) = parse_comp(toks2)?;
+    let (lat, lon) = match (h1, h2) {
+        (Some('N' | 'S'), Some('E' | 'W')) => (v1, v2),
+        (Some('E' | 'W'), Some('N' | 'S')) => (v2, v1),
+        (Some('N' | 'S'), None) => (v1, v2),
+        (Some('E' | 'W'), None) => (v2, v1),
+        (None, Some('E' | 'W')) => (v1, v2),
+        (None, Some('N' | 'S')) => (v2, v1),
+        (None, None) => (v1, v2),
+        _ => return Err(DdmError::ConflictingHemisphere),
+    };
+    if !(-90.0..=90.0).contains(&lat) {
+        return Err(DdmError::LatitudeOutOfRange);
+    }
+    if !(-180.0..=180.0).contains(&lon) {
+        return Err(DdmError::LongitudeOutOfRange);
+    }
+    Ok((lat, lon))
+}
