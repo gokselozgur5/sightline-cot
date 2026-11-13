@@ -30,3 +30,12 @@ pub fn rhumb_distance_radius(p1: [f64; 2], p2: [f64; 2], radius: f64) -> f64 {
 pub fn rhumb_distance(p1: [f64; 2], p2: [f64; 2]) -> f64 {
     rhumb_distance_radius(p1, p2, WGS84_EARTH_RADIUS)
 }
+
+/// Computes the constant rhumb line bearing (course) in degrees from `p1` to `p2` in [0, 360).
+pub fn rhumb_bearing(p1: [f64; 2], p2: [f64; 2]) -> f64 {
+    let (lat1, lat2) = (p1[0].to_radians(), p2[0].to_radians());
+    let dlon = unwrap_lon_diff(p1[1], p2[1]);
+    let dpsi = mercator_lat(lat2) - mercator_lat(lat1);
+    let bearing = dlon.atan2(dpsi).to_degrees();
+    bearing.rem_euclid(360.0)
+}
