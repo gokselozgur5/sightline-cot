@@ -1,6 +1,6 @@
 //! MGRS 10-digit grid reference decoding to UTM and WGS84.
 
-use crate::mgrs::GridError;
+use crate::mgrs::{GridError, UtmCoord};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MgrsDecodeError {
@@ -118,4 +118,29 @@ fn parse_digits(d: &str) -> Result<(f64, f64), MgrsDecodeError> {
         e as f64 * scale + scale * 0.5,
         n as f64 * scale + scale * 0.5,
     ))
+}
+
+/// Decode an MGRS grid string into a UTM coordinate.
+pub fn decode_mgrs_utm(s: &str) -> Result<UtmCoord, MgrsDecodeError> {
+    let (zone, band, col, row, digits) = parse_components(s)?;
+    let (hemi, approx_n) = band_approx_northing(band)?;
+    let (col_e, row_n) = (decode_100k_col(zone, col)?, decode_100k_row(zone, row)?);
+    let (rem_e, rem_n) = parse_digits(digits)?;
+    let base_n = row_n + rem_n;
+    let mut best_n = base_n;
+    let mut best_diff = (base_n - approx_n).abs();
+    for k in 1..=5 {
+        let cand = k as f64 * 2_000_000.0 + base_n;
+        let diff = (cand - approx_n).abs();
+        if diff < best_diff {
+            best_diff = diff;
+            best_n = cand;
+        }
+    }
+    Ok(UtmCoord {
+        zone,
+        hemisphere: hemi,
+        easting: col_e + rem_e,
+        northing: best_n,
+    })
 }
