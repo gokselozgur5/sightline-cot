@@ -56,3 +56,29 @@ pub fn polyline_has_self_intersection(points: &[[f64; 2]]) -> bool {
     }
     false
 }
+
+/// Finds all self-intersections between non-adjacent segments of a polyline.
+pub fn find_self_intersections(points: &[[f64; 2]]) -> Vec<SegmentIntersection> {
+    let n = points.len();
+    let mut intersections = Vec::new();
+    if n < 4 {
+        return intersections;
+    }
+    let is_closed = (points[0][0] - points[n - 1][0]).abs() < 1e-9
+        && (points[0][1] - points[n - 1][1]).abs() < 1e-9;
+    for i in 0..n - 1 {
+        for j in i + 2..n - 1 {
+            if is_closed && i == 0 && j == n - 2 {
+                continue;
+            }
+            if let Some(point) = segments_intersect(points[i], points[i + 1], points[j], points[j + 1]) {
+                intersections.push(SegmentIntersection {
+                    segment_a: i,
+                    segment_b: j,
+                    point,
+                });
+            }
+        }
+    }
+    intersections
+}
