@@ -35,7 +35,12 @@ impl UtmCoordinate {
         if !northing.is_finite() || northing < 0.0 {
             return Err(UtmStringError::InvalidNorthing);
         }
-        Ok(Self { zone, band, easting, northing })
+        Ok(Self {
+            zone,
+            band,
+            easting,
+            northing,
+        })
     }
 }
 
@@ -44,7 +49,9 @@ pub fn parse_utm_string(s: &str) -> Result<UtmCoordinate, UtmStringError> {
     let tok: Vec<&str> = s.split_whitespace().collect();
     let (zs, bs, es, ns) = match tok.as_slice() {
         [zb, e, n] => {
-            let p = zb.find(|c: char| !c.is_ascii_digit()).ok_or(UtmStringError::InvalidFormat)?;
+            let p = zb
+                .find(|c: char| !c.is_ascii_digit())
+                .ok_or(UtmStringError::InvalidFormat)?;
             (&zb[..p], &zb[p..], *e, *n)
         }
         [z, b, e, n] => (*z, *b, *e, *n),
@@ -71,7 +78,13 @@ fn fmt_coord(v: f64) -> String {
 
 /// Format a UTM coordinate into a standard string representation.
 pub fn format_utm_string(coord: &UtmCoordinate) -> String {
-    format!("{}{} {} {}", coord.zone, coord.band, fmt_coord(coord.easting), fmt_coord(coord.northing))
+    format!(
+        "{}{} {} {}",
+        coord.zone,
+        coord.band,
+        fmt_coord(coord.easting),
+        fmt_coord(coord.northing)
+    )
 }
 
 impl core::fmt::Display for UtmCoordinate {
