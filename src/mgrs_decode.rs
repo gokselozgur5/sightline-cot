@@ -26,3 +26,26 @@ impl std::fmt::Display for MgrsDecodeError {
 }
 
 impl std::error::Error for MgrsDecodeError {}
+
+const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
+const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
+
+fn decode_100k_col(zone: u8, col: u8) -> Result<f64, MgrsDecodeError> {
+    let c_idx = COLS
+        .iter()
+        .position(|&c| c == col)
+        .ok_or(MgrsDecodeError::InvalidSquare)?;
+    let base_idx = [0, 8, 16][((zone - 1) % 3) as usize];
+    let col_idx = (c_idx + 24 - base_idx) % 24;
+    Ok((col_idx + 1) as f64 * 100_000.0)
+}
+
+fn decode_100k_row(zone: u8, row: u8) -> Result<f64, MgrsDecodeError> {
+    let r_idx = ROWS
+        .iter()
+        .position(|&r| r == row)
+        .ok_or(MgrsDecodeError::InvalidSquare)?;
+    let row_offset = if (zone % 2) == 1 { 0 } else { 5 };
+    let row_idx = (r_idx + 20 - row_offset) % 20;
+    Ok(row_idx as f64 * 100_000.0)
+}
