@@ -104,3 +104,28 @@ fn solve_step(
     };
     Ok((sigma, sin_sigma, cos_sigma, sin_alpha, cos2_alpha, cos_2sigma_m))
 }
+
+fn solve_inverse_loop(
+    sin_u1: f64,
+    cos_u1: f64,
+    sin_u2: f64,
+    cos_u2: f64,
+    l: f64,
+) -> Result<(f64, f64, f64, f64, f64), VincentyError> {
+    let mut lambda = l;
+    for _ in 0..200 {
+        let (sigma, s_sig, c_sig, s_alp, c2_alp, c_2sm) =
+            solve_step(sin_u1, cos_u1, sin_u2, cos_u2, lambda)?;
+        let c = vincenty_c(c2_alp);
+        let lam_next = l
+            + (1.0 - c)
+                * WGS84_F
+                * s_alp
+                * (sigma + c * s_sig * (c_2sm + c * c_sig * (-1.0 + 2.0 * c_2sm * c_2sm)));
+        if (lam_next - lambda).abs() < 1e-12 {
+            return Ok((sigma, s_alp, c2_alp, c_2sm, lam_next));
+        }
+        lambda = lam_next;
+    }
+    Err(VincentyError::NoConvergence)
+}
