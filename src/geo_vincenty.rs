@@ -43,3 +43,16 @@ pub struct VincentyDirect {
 pub const WGS84_A: f64 = 6_378_137.0;
 pub const WGS84_F: f64 = 1.0 / 298.257_223_563;
 pub const WGS84_B: f64 = 6_356_752.314_245_179;
+
+fn validate_point(lat_deg: f64, lon_deg: f64) -> Result<(), VincentyError> {
+    if !lat_deg.is_finite() || !lon_deg.is_finite() {
+        return Err(VincentyError::NonFiniteInput);
+    }
+    if !(-90.0..=90.0).contains(&lat_deg) {
+        return Err(VincentyError::InvalidLatitude);
+    }
+    if !(-180.0..=180.0).contains(&lon_deg) {
+        return Err(VincentyError::InvalidLongitude);
+    }
+    Ok(())
+}
