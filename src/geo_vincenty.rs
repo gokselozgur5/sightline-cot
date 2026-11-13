@@ -39,3 +39,7 @@ pub struct VincentyDirect {
     pub lon_deg: f64,
     pub reverse_azimuth_deg: f64,
 }
+
+pub const WGS84_A: f64 = 6_378_137.0;
+pub const WGS84_F: f64 = 1.0 / 298.257_223_563;
+pub const WGS84_B: f64 = 6_356_752.314_245_179;
