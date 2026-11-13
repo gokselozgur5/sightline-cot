@@ -30,6 +30,8 @@ pub mod geo_cross_track;
 pub mod geo_ddm;
 pub mod geo_destination;
 pub mod geo_greatcircle;
+pub mod geo_haversine;
+pub use geo_haversine::{archav, hav};
 pub mod geo_hull;
 pub mod geo_meridian_arc;
 pub mod geo_perimeter;
