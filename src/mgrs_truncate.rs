@@ -17,3 +17,17 @@ pub enum MgrsPrecision {
     Point10m,
     Point1m,
 }
+
+impl MgrsPrecision {
+    /// Number of digits per coordinate axis (0 to 5).
+    pub fn digits_per_axis(&self) -> usize {
+        match self {
+            Self::Point100k => 0,
+            Self::Point10k => 1,
+            Self::Point1k => 2,
+            Self::Point100m => 3,
+            Self::Point10m => 4,
+            Self::Point1m => 5,
+        }
+    }
+}
