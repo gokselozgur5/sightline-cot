@@ -29,3 +29,25 @@ fn append_digits(buf: &mut [u8], len: &mut usize, mut val: u32, digits: usize) {
         *len += 1;
     }
 }
+
+fn init_mgrs_header(zone: u8, band: char, col: char, row: char) -> MgrsString {
+    let mut s = MgrsString {
+        bytes: [0u8; 32],
+        len: 0,
+    };
+    if zone < 10 {
+        s.bytes[s.len] = b'0';
+        s.len += 1;
+    }
+    append_digits(
+        &mut s.bytes,
+        &mut s.len,
+        zone as u32,
+        if zone < 10 { 1 } else { 2 },
+    );
+    s.bytes[s.len] = band as u8;
+    s.bytes[s.len + 1] = col as u8;
+    s.bytes[s.len + 2] = row as u8;
+    s.len += 3;
+    s
+}
