@@ -8,3 +8,15 @@ pub struct HelmertParams {
     pub scale_ppm: f64,
 }
 
+impl HelmertParams {
+    fn matrix(&self) -> [[f64; 3]; 3] {
+        let k = std::f64::consts::PI / (180.0 * 3600.0);
+        let [rx, ry, rz] = self.rotation_arcsec.map(|r| r * k);
+        let s = 1.0 + self.scale_ppm * 1e-6;
+        [
+            [s, -s * rz, s * ry],
+            [s * rz, s, -s * rx],
+            [-s * ry, s * rx, s],
+        ]
+    }
+}
