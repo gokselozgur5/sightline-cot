@@ -37,3 +37,15 @@ pub fn cross_track_distance_m(start: [f64; 2], end: [f64; 2], point: [f64; 2]) -
     let delta_xt = (d13.sin() * (theta13 - theta12).sin()).asin();
     delta_xt * MEAN_EARTH_RADIUS_M
 }
+
+/// Signed along-track distance in metres from path start toward end.
+pub fn along_track_distance_m(start: [f64; 2], end: [f64; 2], point: [f64; 2]) -> f64 {
+    let d13 = angular_distance_rad(start, point);
+    let d_xt = cross_track_distance_m(start, end, point) / MEAN_EARTH_RADIUS_M;
+    let cos_d = d13.cos() / d_xt.cos();
+    let d_at = cos_d.clamp(-1.0, 1.0).acos();
+    let theta13 = initial_bearing_rad(start, point);
+    let theta12 = initial_bearing_rad(start, end);
+    let sign = (theta13 - theta12).cos().signum();
+    sign * d_at * MEAN_EARTH_RADIUS_M
+}
