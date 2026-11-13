@@ -85,3 +85,8 @@ pub fn polyline_resample_radius(points: &[[f64; 2]], step_m: f64, radius: f64) -
     }
     res
 }
+
+/// Resamples a polyline at fixed spacing `step_m` using WGS84 radius.
+pub fn polyline_resample(points: &[[f64; 2]], step_m: f64) -> Vec<[f64; 2]> {
+    polyline_resample_radius(points, step_m, WGS84_EARTH_RADIUS)
+}
