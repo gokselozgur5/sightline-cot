@@ -154,3 +154,27 @@ fn compute_inverse_result(
         reverse_azimuth_deg: wrap_azimuth(a2),
     }
 }
+
+/// Computes geodesic distance and azimuths between two points on WGS84.
+pub fn vincenty_inverse(
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
+) -> Result<VincentyInverse, VincentyError> {
+    validate_point(lat1, lon1)?;
+    validate_point(lat2, lon2)?;
+    if (lat1 - lat2).abs() < 1e-12 && (lon1 - lon2).abs() < 1e-12 {
+        return Ok(VincentyInverse {
+            distance_m: 0.0,
+            forward_azimuth_deg: 0.0,
+            reverse_azimuth_deg: 0.0,
+        });
+    }
+    let u1 = ((1.0 - WGS84_F) * lat1.to_radians().tan()).atan();
+    let u2 = ((1.0 - WGS84_F) * lat2.to_radians().tan()).atan();
+    let (s_u1, c_u1, s_u2, c_u2) = (u1.sin(), u1.cos(), u2.sin(), u2.cos());
+    let (sig, _, c2_a, c_2sm, lam) =
+        solve_inverse_loop(s_u1, c_u1, s_u2, c_u2, (lon2 - lon1).to_radians())?;
+    Ok(compute_inverse_result(sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2))
+}
