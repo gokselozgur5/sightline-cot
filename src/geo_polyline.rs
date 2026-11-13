@@ -14,3 +14,29 @@ pub fn haversine_distance_radius(p1: [f64; 2], p2: [f64; 2], radius: f64) -> f64
 pub fn haversine_distance(p1: [f64; 2], p2: [f64; 2]) -> f64 {
     haversine_distance_radius(p1, p2, WGS84_EARTH_RADIUS)
 }
+
+/// Great-circle intermediate point between `p1` and `p2` at fraction `f` in [0, 1].
+pub fn great_circle_intermediate(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2] {
+    if f <= 0.0 {
+        return p1;
+    }
+    if f >= 1.0 {
+        return p2;
+    }
+    let (lat1, lat2) = (p1[0].to_radians(), p2[0].to_radians());
+    let (lon1, lon2) = (p1[1].to_radians(), p2[1].to_radians());
+    let (dlat, dlon) = (lat2 - lat1, lon2 - lon1);
+    let a = (dlat / 2.0).sin().powi(2) + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
+    let delta = 2.0 * a.clamp(0.0, 1.0).sqrt().asin();
+    if delta.sin().abs() < 1e-15 {
+        return p1;
+    }
+    let (sa, sb) = (
+        ((1.0 - f) * delta).sin() / delta.sin(),
+        (f * delta).sin() / delta.sin(),
+    );
+    let x = sa * lat1.cos() * lon1.cos() + sb * lat2.cos() * lon2.cos();
+    let y = sa * lat1.cos() * lon1.sin() + sb * lat2.cos() * lon2.sin();
+    let z = sa * lat1.sin() + sb * lat2.sin();
+    [z.atan2((x * x + y * y).sqrt()).to_degrees(), y.atan2(x).to_degrees()]
+}
