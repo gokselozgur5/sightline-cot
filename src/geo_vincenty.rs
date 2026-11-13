@@ -102,7 +102,14 @@ fn solve_step(
     } else {
         0.0
     };
-    Ok((sigma, sin_sigma, cos_sigma, sin_alpha, cos2_alpha, cos_2sigma_m))
+    Ok((
+        sigma,
+        sin_sigma,
+        cos_sigma,
+        sin_alpha,
+        cos2_alpha,
+        cos_2sigma_m,
+    ))
 }
 
 fn solve_inverse_loop(
@@ -146,8 +153,12 @@ fn compute_inverse_result(
 ) -> VincentyInverse {
     let (a, b) = vincenty_ab(c2_a);
     let s = WGS84_B * a * (sigma - vincenty_delta_sigma(b, sigma.sin(), sigma.cos(), c_2sm));
-    let a1 = (c_u2 * lam.sin()).atan2(c_u1 * s_u2 - s_u1 * c_u2 * lam.cos()).to_degrees();
-    let a2 = (c_u1 * lam.sin()).atan2(-s_u1 * c_u2 + c_u1 * s_u2 * lam.cos()).to_degrees();
+    let a1 = (c_u2 * lam.sin())
+        .atan2(c_u1 * s_u2 - s_u1 * c_u2 * lam.cos())
+        .to_degrees();
+    let a2 = (c_u1 * lam.sin())
+        .atan2(-s_u1 * c_u2 + c_u1 * s_u2 * lam.cos())
+        .to_degrees();
     VincentyInverse {
         distance_m: s,
         forward_azimuth_deg: wrap_azimuth(a1),
@@ -176,7 +187,9 @@ pub fn vincenty_inverse(
     let (s_u1, c_u1, s_u2, c_u2) = (u1.sin(), u1.cos(), u2.sin(), u2.cos());
     let (sig, _, c2_a, c_2sm, lam) =
         solve_inverse_loop(s_u1, c_u1, s_u2, c_u2, (lon2 - lon1).to_radians())?;
-    Ok(compute_inverse_result(sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2))
+    Ok(compute_inverse_result(
+        sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2,
+    ))
 }
 
 fn solve_direct_sigma(b: f64, s: f64, a: f64, sigma1: f64) -> (f64, f64, f64) {
@@ -199,7 +212,6 @@ fn direct_omega(c: f64, s_alp: f64, sig: f64, s_s: f64, c_s: f64, c_2sm: f64) ->
     let t = c_2sm + c * c_s * (-1.0 + 2.0 * c_2sm * c_2sm);
     (1.0 - c) * WGS84_F * s_alp * (sig + c * s_s * t)
 }
-
 
 fn compute_direct_coords(
     lon1: f64,
