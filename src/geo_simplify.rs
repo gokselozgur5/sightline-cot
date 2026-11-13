@@ -102,3 +102,12 @@ pub fn simplify_polyline_in_frame(
         .map(|(p, _)| *p)
         .collect()
 }
+
+/// Simplify a polyline using a local frame anchored at its start.
+pub fn simplify_polyline(points: &[[f64; 2]], tolerance_m: f64) -> Vec<[f64; 2]> {
+    if points.is_empty() {
+        return Vec::new();
+    }
+    let frame = LocalFrame::new(points[0][0], points[0][1]);
+    simplify_polyline_in_frame(points, &frame, tolerance_m)
+}
