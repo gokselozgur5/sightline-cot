@@ -12,3 +12,16 @@ pub fn hav(theta_rad: f64) -> f64 {
 pub fn archav(h: f64) -> f64 {
     2.0 * h.clamp(0.0, 1.0).sqrt().asin()
 }
+
+/// Great-circle distance between two [lat, lon] points on a sphere with custom radius.
+pub fn haversine_distance_with_radius(p1: [f64; 2], p2: [f64; 2], radius_m: f64) -> f64 {
+    let (lat1, lat2) = (p1[0].to_radians(), p2[0].to_radians());
+    let (d_lat, d_lon) = ((p2[0] - p1[0]).to_radians(), (p2[1] - p1[1]).to_radians());
+    let h = hav(d_lat) + lat1.cos() * lat2.cos() * hav(d_lon);
+    archav(h) * radius_m
+}
+
+/// Great-circle distance in metres using WGS84 mean Earth radius (6,371,008.8 m).
+pub fn haversine_distance_m(p1: [f64; 2], p2: [f64; 2]) -> f64 {
+    haversine_distance_with_radius(p1, p2, MEAN_EARTH_RADIUS_M)
+}
