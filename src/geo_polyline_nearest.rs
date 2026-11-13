@@ -134,3 +134,32 @@ pub fn nearest_point_on_segment_with_radius(
 pub fn nearest_point_on_segment(a: [f64; 2], b: [f64; 2], query: [f64; 2]) -> PolylineNearest {
     nearest_point_on_segment_with_radius(a, b, query, DEFAULT_EARTH_RADIUS_M)
 }
+
+/// Find nearest point on a polyline with custom sphere radius.
+pub fn nearest_point_on_polyline_with_radius(
+    polyline: &[[f64; 2]],
+    query: [f64; 2],
+    radius_m: f64,
+) -> Option<PolylineNearest> {
+    if polyline.is_empty() {
+        return None;
+    }
+    if polyline.len() == 1 {
+        let p0 = polyline[0];
+        let v0 = to_unit_vec(p0[0], p0[1]);
+        let vq = to_unit_vec(query[0], query[1]);
+        return Some(endpoint_res(p0, angle_rad(v0, vq) * radius_m, 0.0));
+    }
+    let mut best: Option<PolylineNearest> = None;
+    for i in 0..(polyline.len() - 1) {
+        let mut cand =
+            nearest_point_on_segment_with_radius(polyline[i], polyline[i + 1], query, radius_m);
+        cand.segment_index = i;
+        match &best {
+            None => best = Some(cand),
+            Some(curr) if cand.distance_m < curr.distance_m => best = Some(cand),
+            _ => {}
+        }
+    }
+    best
+}
