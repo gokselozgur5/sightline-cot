@@ -97,3 +97,25 @@ fn band_approx_northing(band: char) -> Result<(char, f64), MgrsDecodeError> {
     };
     Ok((hemi, n))
 }
+
+fn parse_digits(d: &str) -> Result<(f64, f64), MgrsDecodeError> {
+    let d = d.trim();
+    if d.is_empty() {
+        return Ok((50_000.0, 50_000.0));
+    }
+    if d.len() % 2 != 0 || d.len() > 10 || !d.chars().all(|c| c.is_ascii_digit()) {
+        return Err(MgrsDecodeError::InvalidDigits);
+    }
+    let half = d.len() / 2;
+    let e = d[..half]
+        .parse::<u32>()
+        .map_err(|_| MgrsDecodeError::InvalidDigits)?;
+    let n = d[half..]
+        .parse::<u32>()
+        .map_err(|_| MgrsDecodeError::InvalidDigits)?;
+    let scale = 10_f64.powi(5 - half as i32);
+    Ok((
+        e as f64 * scale + scale * 0.5,
+        n as f64 * scale + scale * 0.5,
+    ))
+}
