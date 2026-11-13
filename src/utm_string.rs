@@ -38,3 +38,25 @@ impl UtmCoordinate {
         Ok(Self { zone, band, easting, northing })
     }
 }
+
+/// Parse a UTM coordinate string such as "33T 500000 4649776".
+pub fn parse_utm_string(s: &str) -> Result<UtmCoordinate, UtmStringError> {
+    let tok: Vec<&str> = s.split_whitespace().collect();
+    let (zs, bs, es, ns) = match tok.as_slice() {
+        [zb, e, n] => {
+            let p = zb.find(|c: char| !c.is_ascii_digit()).ok_or(UtmStringError::InvalidFormat)?;
+            (&zb[..p], &zb[p..], *e, *n)
+        }
+        [z, b, e, n] => (*z, *b, *e, *n),
+        _ => return Err(UtmStringError::InvalidFormat),
+    };
+    let zone: u8 = zs.parse().map_err(|_| UtmStringError::InvalidZone)?;
+    let mut b_chars = bs.chars();
+    let band = b_chars.next().ok_or(UtmStringError::InvalidBand)?;
+    if b_chars.next().is_some() {
+        return Err(UtmStringError::InvalidBand);
+    }
+    let easting: f64 = es.parse().map_err(|_| UtmStringError::InvalidEasting)?;
+    let northing: f64 = ns.parse().map_err(|_| UtmStringError::InvalidNorthing)?;
+    UtmCoordinate::new(zone, band, easting, northing)
+}
