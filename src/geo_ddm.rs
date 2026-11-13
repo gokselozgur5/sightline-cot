@@ -56,3 +56,30 @@ fn tokenize(s: &str) -> Vec<String> {
     }
     normalized.split_whitespace().map(String::from).collect()
 }
+
+fn parse_hemi(tok: &str) -> Option<char> {
+    if tok.len() == 1 {
+        let ch = tok.chars().next()?.to_ascii_uppercase();
+        if matches!(ch, 'N' | 'S' | 'E' | 'W') {
+            return Some(ch);
+        }
+    }
+    None
+}
+
+fn split_components(toks: &[String]) -> Result<(&[String], &[String]), DdmError> {
+    match toks.len() {
+        4 => Ok((&toks[0..2], &toks[2..4])),
+        6 => Ok((&toks[0..3], &toks[3..6])),
+        5 => {
+            if parse_hemi(&toks[0]).is_some() || parse_hemi(&toks[2]).is_some() {
+                Ok((&toks[0..3], &toks[3..5]))
+            } else if parse_hemi(&toks[4]).is_some() {
+                Ok((&toks[0..2], &toks[2..5]))
+            } else {
+                Err(DdmError::InvalidFormat)
+            }
+        }
+        _ => Err(DdmError::InvalidFormat),
+    }
+}
