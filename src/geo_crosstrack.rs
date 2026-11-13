@@ -17,3 +17,12 @@ pub fn angular_distance_rad(from: [f64; 2], to: [f64; 2]) -> f64 {
         + lat1.cos() * lat2.cos() * (d_lon * 0.5).sin().powi(2);
     2.0 * a.clamp(0.0, 1.0).sqrt().asin()
 }
+
+/// Initial bearing in radians from one point to another.
+pub fn initial_bearing_rad(from: [f64; 2], to: [f64; 2]) -> f64 {
+    let (lat1, lat2) = (from[0].to_radians(), to[0].to_radians());
+    let d_lon = (to[1] - from[1]).to_radians();
+    let y = d_lon.sin() * lat2.cos();
+    let x = lat1.cos() * lat2.sin() - lat1.sin() * lat2.cos() * d_lon.cos();
+    y.atan2(x)
+}
