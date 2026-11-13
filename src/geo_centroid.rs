@@ -34,3 +34,26 @@ fn unwrap_lon(lon: f64, ref_lon: f64) -> f64 {
     }
     d
 }
+
+/// Compute the geodetic centroid `[lat_deg, lon_deg]` of a geographic polygon.
+pub fn polygon_centroid(poly: &[[f64; 2]]) -> Option<[f64; 2]> {
+    let n = poly.len();
+    if n < 3 || poly.iter().flatten().any(|c| !c.is_finite()) {
+        return None;
+    }
+    let lat0 = poly.iter().map(|p| p[0]).sum::<f64>() / n as f64;
+    let lon0 = poly.iter().map(|p| p[1]).sum::<f64>() / n as f64;
+    let cos_lat = lat0.to_radians().cos().max(1e-12);
+    let pts: Vec<[f64; 2]> = poly
+        .iter()
+        .map(|p| {
+            let dx = unwrap_lon(p[1], lon0) * cos_lat * METERS_PER_DEG;
+            let dy = (p[0] - lat0) * METERS_PER_DEG;
+            [dx, dy]
+        })
+        .collect();
+    let [cx, cy] = planar_centroid(&pts)?;
+    let lat = lat0 + cy / METERS_PER_DEG;
+    let lon = lon0 + cx / (cos_lat * METERS_PER_DEG);
+    Some([lat, lon])
+}
