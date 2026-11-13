@@ -23,6 +23,8 @@ pub mod geo_angle;
 pub mod geo_compass;
 pub mod geo_meridian_arc;
 pub mod geo_radii;
+pub mod geo_simplify;
+pub use geo_simplify::LocalFrame;
 pub mod tracker;
 
 pub const VERSION: &str = "0.1.0";
