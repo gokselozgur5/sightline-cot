@@ -19,3 +19,21 @@ fn test_geodesic_midpoint_antimeridian() {
     assert!(lat.abs() < 1e-6);
     assert!((lon.abs() - 180.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_geodesic_midpoint_errors() {
+    use sightline_cot::geo_midpoint::MidpointError;
+
+    assert_eq!(
+        geodesic_midpoint(0.0, 0.0, 0.0, 180.0),
+        Err(MidpointError::AntipodalPoints)
+    );
+    assert_eq!(
+        geodesic_midpoint(91.0, 0.0, 0.0, 0.0),
+        Err(MidpointError::InvalidLatitude)
+    );
+    assert_eq!(
+        geodesic_midpoint(0.0, 181.0, 0.0, 0.0),
+        Err(MidpointError::InvalidLongitude)
+    );
+}
