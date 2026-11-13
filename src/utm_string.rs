@@ -60,3 +60,29 @@ pub fn parse_utm_string(s: &str) -> Result<UtmCoordinate, UtmStringError> {
     let northing: f64 = ns.parse().map_err(|_| UtmStringError::InvalidNorthing)?;
     UtmCoordinate::new(zone, band, easting, northing)
 }
+
+fn fmt_coord(v: f64) -> String {
+    if v.fract() == 0.0 {
+        format!("{:.0}", v)
+    } else {
+        format!("{}", v)
+    }
+}
+
+/// Format a UTM coordinate into a standard string representation.
+pub fn format_utm_string(coord: &UtmCoordinate) -> String {
+    format!("{}{} {} {}", coord.zone, coord.band, fmt_coord(coord.easting), fmt_coord(coord.northing))
+}
+
+impl core::fmt::Display for UtmCoordinate {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", format_utm_string(self))
+    }
+}
+
+impl core::str::FromStr for UtmCoordinate {
+    type Err = UtmStringError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        parse_utm_string(s)
+    }
+}
