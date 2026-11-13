@@ -228,3 +228,31 @@ fn compute_direct_coords(
         reverse_azimuth_deg: wrap_azimuth(s_alp.atan2(-x).to_degrees()),
     }
 }
+
+/// Computes destination coordinates and reverse azimuth on WGS84.
+pub fn vincenty_direct(
+    lat1: f64,
+    lon1: f64,
+    bearing1_deg: f64,
+    distance_m: f64,
+) -> Result<VincentyDirect, VincentyError> {
+    validate_point(lat1, lon1)?;
+    if !bearing1_deg.is_finite() || !distance_m.is_finite() {
+        return Err(VincentyError::NonFiniteInput);
+    }
+    if distance_m < 0.0 {
+        return Err(VincentyError::NegativeDistance);
+    }
+    let alp1 = bearing1_deg.to_radians();
+    let tan_u1 = (1.0 - WGS84_F) * lat1.to_radians().tan();
+    let cos_u1 = 1.0 / (1.0 + tan_u1 * tan_u1).sqrt();
+    let sin_u1 = tan_u1 * cos_u1;
+    let sig1 = tan_u1.atan2(alp1.cos());
+    let sin_alp = cos_u1 * alp1.sin();
+    let cos2_alp = 1.0 - sin_alp * sin_alp;
+    let (a, b) = vincenty_ab(cos2_alp);
+    let (sig, _, cos_2sm) = solve_direct_sigma(b, distance_m, a, sig1);
+    Ok(compute_direct_coords(
+        lon1, sin_u1, cos_u1, sin_alp, cos2_alp, alp1, sig, cos_2sm,
+    ))
+}
