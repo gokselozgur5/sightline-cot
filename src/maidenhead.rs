@@ -51,3 +51,32 @@ pub fn decode_maidenhead(loc: &str) -> Result<(f64, f64), MaidenheadError> {
     }
     Ok((lat, lon))
 }
+
+/// Encode (latitude, longitude) into a Maidenhead locator with 1, 2, or 3 pairs.
+pub fn encode_maidenhead(lat: f64, lon: f64, pairs: usize) -> Result<String, MaidenheadError> {
+    if !(1..=3).contains(&pairs) {
+        return Err(MaidenheadError::InvalidPrecision);
+    }
+    if !(-90.0..=90.0).contains(&lat) || lat.is_nan() {
+        return Err(MaidenheadError::LatitudeOutOfRange);
+    }
+    if !(-180.0..=180.0).contains(&lon) || lon.is_nan() {
+        return Err(MaidenheadError::LongitudeOutOfRange);
+    }
+    let (x, y) = (lon.min(180.0 - 1e-12) + 180.0, lat.min(90.0 - 1e-12) + 90.0);
+    let mut out = String::with_capacity(pairs * 2);
+    let (flon, flat) = ((x / 20.0).floor() as u8, (y / 10.0).floor() as u8);
+    out.extend([(b'A' + flon) as char, (b'A' + flat) as char]);
+    if pairs >= 2 {
+        let (rx, ry) = (x - flon as f64 * 20.0, y - flat as f64 * 10.0);
+        let (qlon, qlat) = ((rx / 2.0).floor() as u8, (ry / 1.0).floor() as u8);
+        out.push((b'0' + qlon) as char);
+        out.push((b'0' + qlat) as char);
+        if pairs == 3 {
+            let (sx, sy) = (rx - qlon as f64 * 2.0, ry - qlat as f64 * 1.0);
+            out.push((b'a' + (sx * 12.0).floor() as u8) as char);
+            out.push((b'a' + (sy * 24.0).floor() as u8) as char);
+        }
+    }
+    Ok(out)
+}
