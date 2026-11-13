@@ -1,5 +1,5 @@
 use sightline_cot::format_mgrs;
-use sightline_cot::mgrs_decode::decode_mgrs;
+use sightline_cot::mgrs_decode::{decode_mgrs, MgrsDecodeError};
 
 #[test]
 fn test_decode_mgrs_10_digit_roundtrip() {
@@ -17,4 +17,17 @@ fn test_decode_mgrs_10_digit_roundtrip() {
         assert!((lat - lat_dec).abs() < 1e-4);
         assert!((lon - lon_dec).abs() < 1e-4);
     }
+}
+
+#[test]
+fn test_decode_mgrs_errors() {
+    assert_eq!(decode_mgrs(""), Err(MgrsDecodeError::InvalidLength));
+    assert_eq!(decode_mgrs("00NAA1234"), Err(MgrsDecodeError::InvalidZone));
+    assert_eq!(decode_mgrs("61NAA1234"), Err(MgrsDecodeError::InvalidZone));
+    assert_eq!(decode_mgrs("31IAA1234"), Err(MgrsDecodeError::InvalidBand));
+    assert_eq!(
+        decode_mgrs("31N111234"),
+        Err(MgrsDecodeError::InvalidSquare)
+    );
+    assert_eq!(decode_mgrs("31NEA123"), Err(MgrsDecodeError::InvalidDigits));
 }
