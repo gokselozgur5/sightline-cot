@@ -73,3 +73,12 @@ fn project_to_plane(vq: [f64; 3], n_hat: [f64; 3]) -> Option<[f64; 3]> {
     }
     Some(f)
 }
+
+fn endpoint_res(pt: [f64; 2], dist: f64, frac: f64) -> PolylineNearest {
+    PolylineNearest {
+        point: pt,
+        distance_m: dist,
+        segment_index: 0,
+        fraction: frac,
+    }
+}
