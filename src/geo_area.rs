@@ -18,3 +18,21 @@ pub fn planar_polygon_area(pts: &[[f64; 2]]) -> Option<f64> {
     }
     Some((area2 * 0.5).abs())
 }
+
+/// Planar perimeter of a 2D polygon in linear units.
+pub fn planar_polygon_perimeter(pts: &[[f64; 2]]) -> Option<f64> {
+    let n = pts.len();
+    if n < 3 || pts.iter().flatten().any(|c| !c.is_finite()) {
+        return None;
+    }
+    let mut perim = 0.0;
+    for i in 0..n {
+        let (p0, p1) = (pts[i], pts[(i + 1) % n]);
+        let (dx, dy) = (p1[0] - p0[0], p1[1] - p0[1]);
+        perim += (dx * dx + dy * dy).sqrt();
+    }
+    if !perim.is_finite() {
+        return None;
+    }
+    Some(perim)
+}
