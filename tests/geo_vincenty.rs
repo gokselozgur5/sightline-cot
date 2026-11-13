@@ -26,3 +26,24 @@ fn test_direct_recovers_inverse() {
     assert!((dir.lon_deg - lon2).abs() < 1e-7);
     assert!((dir.reverse_azimuth_deg - inv.reverse_azimuth_deg).abs() < 1e-5);
 }
+
+use sightline_cot::geo_vincenty::VincentyError;
+
+#[test]
+fn test_antipodal_and_error_cases() {
+    let res = vincenty_inverse(0.0, 0.0, 0.5, 179.7);
+    assert!(res == Err(VincentyError::NoConvergence) || res.is_ok());
+
+    assert_eq!(
+        vincenty_inverse(95.0, 0.0, 0.0, 0.0),
+        Err(VincentyError::InvalidLatitude)
+    );
+    assert_eq!(
+        vincenty_direct(0.0, 0.0, 0.0, -10.0),
+        Err(VincentyError::NegativeDistance)
+    );
+    assert_eq!(
+        vincenty_direct(0.0, 0.0, f64::NAN, 100.0),
+        Err(VincentyError::NonFiniteInput)
+    );
+}
