@@ -31,3 +31,21 @@ fn zero_shift_is_identity() {
     assert!((lat - 45.0).abs() < 1e-12 && (lon + 100.0).abs() < 1e-12);
     assert!((h - 250.0).abs() < 1e-9);
 }
+
+#[test]
+fn wgs84_to_clarke_matches_rigorous_shift() {
+    let t = [-8.0, 160.0, 176.0];
+    let s = MolodenskyShift {
+        a: WGS84_A,
+        f: WGS84_F,
+        translation: t,
+        da: CLARKE_A - WGS84_A,
+        df: CLARKE_F - WGS84_F,
+    };
+    let (lat, lon, h) = s.apply(40.0, -100.0, 100.0);
+    let p = to_ecef(40.0, -100.0, 100.0, WGS84_A, WGS84_F);
+    let q: [f64; 3] = std::array::from_fn(|i| p[i] + t[i]);
+    let r = to_ecef(lat, lon, h, CLARKE_A, CLARKE_F);
+    let d = ((q[0] - r[0]).powi(2) + (q[1] - r[1]).powi(2) + (q[2] - r[2]).powi(2)).sqrt();
+    assert!(d < 1.0, "residual {d} m");
+}
