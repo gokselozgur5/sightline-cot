@@ -4,6 +4,7 @@ pub mod camera;
 pub mod classifier;
 pub mod cot;
 pub mod ffi;
+pub mod geo_molodensky;
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
