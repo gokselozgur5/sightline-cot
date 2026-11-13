@@ -54,3 +54,22 @@ fn segment_normal(va: [f64; 3], vb: [f64; 3]) -> (Option<[f64; 3]>, f64) {
         (Some([n[0] * inv, n[1] * inv, n[2] * inv]), seg_len)
     }
 }
+
+fn project_to_plane(vq: [f64; 3], n_hat: [f64; 3]) -> Option<[f64; 3]> {
+    let qn = dot(vq, n_hat);
+    let vp = [
+        vq[0] - qn * n_hat[0],
+        vq[1] - qn * n_hat[1],
+        vq[2] - qn * n_hat[2],
+    ];
+    let v_sq = dot(vp, vp);
+    if v_sq < 1e-24 {
+        return None;
+    }
+    let inv = 1.0 / v_sq.sqrt();
+    let mut f = [vp[0] * inv, vp[1] * inv, vp[2] * inv];
+    if dot(vq, f) < 0.0 {
+        f = [-f[0], -f[1], -f[2]];
+    }
+    Some(f)
+}
