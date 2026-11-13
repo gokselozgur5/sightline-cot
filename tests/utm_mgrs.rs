@@ -1,6 +1,6 @@
 use sightline_cot::format_mgrs;
-use sightline_cot::utm_mgrs::utm_to_mgrs;
-use sightline_cot::wgs84_to_utm;
+use sightline_cot::utm_mgrs::{utm_to_mgrs, utm_to_mgrs_with_band};
+use sightline_cot::{wgs84_to_utm, GridError, UtmCoord};
 
 #[test]
 fn test_utm_to_mgrs_matches_format_mgrs() {
@@ -20,4 +20,26 @@ fn test_utm_to_mgrs_matches_format_mgrs() {
             assert_eq!(direct.as_str(), from_geo.as_str());
         }
     }
+}
+
+#[test]
+fn test_utm_to_mgrs_with_band_and_errors() {
+    let u = UtmCoord {
+        zone: 31,
+        hemisphere: 'N',
+        easting: 500000.0,
+        northing: 0.0,
+    };
+    assert_eq!(
+        utm_to_mgrs_with_band(&u, 'N', 5).unwrap().as_str(),
+        "31NEA0000000000"
+    );
+    assert_eq!(
+        utm_to_mgrs_with_band(&u, 'N', 0),
+        Err(GridError::InvalidNorthing)
+    );
+    assert_eq!(
+        utm_to_mgrs_with_band(&u, 'N', 6),
+        Err(GridError::InvalidNorthing)
+    );
 }
