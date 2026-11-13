@@ -1,6 +1,6 @@
 //! MGRS 10-digit grid reference decoding to UTM and WGS84.
 
-use crate::mgrs::{GridError, UtmCoord};
+use crate::mgrs::{utm_to_wgs84, GridError, UtmCoord};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MgrsDecodeError {
@@ -143,4 +143,9 @@ pub fn decode_mgrs_utm(s: &str) -> Result<UtmCoord, MgrsDecodeError> {
         easting: col_e + rem_e,
         northing: best_n,
     })
+}
+
+/// Decode an MGRS grid string to WGS84 latitude and longitude in degrees.
+pub fn decode_mgrs(s: &str) -> Result<(f64, f64), MgrsDecodeError> {
+    utm_to_wgs84(&decode_mgrs_utm(s)?).map_err(MgrsDecodeError::Grid)
 }
