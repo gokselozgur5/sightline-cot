@@ -28,3 +28,25 @@ fn test_destination_antimeridian_and_polar() {
     assert!((zero_lat - 45.0).abs() < 1e-9);
     assert!((zero_lon - 10.0).abs() < 1e-9);
 }
+
+use sightline_cot::geo_dest::GeoDestError;
+
+#[test]
+fn test_destination_error_cases() {
+    assert_eq!(
+        destination_point(95.0, 0.0, 0.0, 1000.0),
+        Err(GeoDestError::InvalidLatitude)
+    );
+    assert_eq!(
+        destination_point(0.0, 190.0, 0.0, 1000.0),
+        Err(GeoDestError::InvalidLongitude)
+    );
+    assert_eq!(
+        destination_point(0.0, 0.0, 0.0, -100.0),
+        Err(GeoDestError::NegativeRange)
+    );
+    assert_eq!(
+        destination_point(f64::NAN, 0.0, 0.0, 100.0),
+        Err(GeoDestError::NonFiniteInput)
+    );
+}
