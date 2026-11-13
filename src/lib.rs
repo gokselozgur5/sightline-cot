@@ -14,6 +14,7 @@ pub mod imm;
 pub mod los;
 pub mod maidenhead;
 pub mod mgrs;
+pub mod mgrs_decode;
 pub mod mgrs_encode;
 pub mod mgrs_truncate;
 pub use mgrs::{
