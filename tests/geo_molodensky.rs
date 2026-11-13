@@ -17,7 +17,12 @@ fn nad27() -> MolodenskyShift {
 
 #[test]
 fn zero_shift_is_identity() {
-    let z = MolodenskyShift { da: 0.0, df: 0.0, dxyz: [0.0; 3], ..nad27() };
+    let z = MolodenskyShift {
+        da: 0.0,
+        df: 0.0,
+        dxyz: [0.0; 3],
+        ..nad27()
+    };
     let (la, lo, h) = z.apply(40.0, -100.0, 250.0);
     assert!((la - 40.0).abs() < 1e-12 && (lo + 100.0).abs() < 1e-12 && (h - 250.0).abs() < 1e-9);
 }
@@ -26,7 +31,11 @@ fn to_ecef(a: f64, f: f64, lat: f64, lon: f64, h: f64) -> [f64; 3] {
     let (p, l) = (lat.to_radians(), lon.to_radians());
     let e2 = f * (2.0 - f);
     let n = a / (1.0 - e2 * p.sin().powi(2)).sqrt();
-    [(n + h) * p.cos() * l.cos(), (n + h) * p.cos() * l.sin(), (n * (1.0 - e2) + h) * p.sin()]
+    [
+        (n + h) * p.cos() * l.cos(),
+        (n + h) * p.cos() * l.sin(),
+        (n * (1.0 - e2) + h) * p.sin(),
+    ]
 }
 
 #[test]
