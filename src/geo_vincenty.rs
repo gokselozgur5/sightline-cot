@@ -56,3 +56,14 @@ fn validate_point(lat_deg: f64, lon_deg: f64) -> Result<(), VincentyError> {
     }
     Ok(())
 }
+
+fn vincenty_ab(cos2_alpha: f64) -> (f64, f64) {
+    let u2 = cos2_alpha * (WGS84_A * WGS84_A - WGS84_B * WGS84_B) / (WGS84_B * WGS84_B);
+    let a = 1.0 + u2 / 16384.0 * (4096.0 + u2 * (-768.0 + u2 * (320.0 - 175.0 * u2)));
+    let b = u2 / 1024.0 * (256.0 + u2 * (-128.0 + u2 * (74.0 - 47.0 * u2)));
+    (a, b)
+}
+
+fn vincenty_c(cos2_alpha: f64) -> f64 {
+    WGS84_F / 16.0 * cos2_alpha * (4.0 + WGS84_F * (4.0 - 3.0 * cos2_alpha))
+}
