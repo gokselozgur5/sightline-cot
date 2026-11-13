@@ -11,6 +11,7 @@ pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
 pub mod los;
+pub mod maidenhead;
 pub mod mgrs;
 pub use mgrs::{
     format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, utm_to_wgs84, wgs84_to_utm, GridError,
