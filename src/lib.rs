@@ -6,6 +6,7 @@ pub mod cot;
 pub mod ffi;
 pub mod geo_helmert;
 pub mod geo_molodensky;
+pub mod geo_velocity;
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
