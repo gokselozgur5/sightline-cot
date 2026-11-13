@@ -40,6 +40,7 @@ pub mod geo_rhumb;
 pub mod geo_simplify;
 pub use geo_simplify::{simplify_polyline, LocalFrame};
 pub mod tracker;
+pub mod utm_mgrs;
 pub mod utm_string;
 
 pub const VERSION: &str = "0.1.0";
