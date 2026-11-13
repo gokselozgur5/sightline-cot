@@ -49,5 +49,10 @@ pub fn truncate_mgrs(mgrs: &str, target: MgrsPrecision) -> Result<String, Trunca
         return Err(TruncateError::TargetPrecisionExceedsInput);
     }
     let (e, n) = numerical.split_at(in_digits);
-    Ok(format!("{}{}{}", prefix, &e[..target_digits], &n[..target_digits]))
+    Ok(format!(
+        "{}{}{}",
+        prefix,
+        &e[..target_digits],
+        &n[..target_digits]
+    ))
 }
