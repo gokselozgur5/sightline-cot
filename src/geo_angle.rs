@@ -19,3 +19,8 @@ pub fn wrap_180(deg: f64) -> f64 {
         w
     }
 }
+
+/// Signed shortest rotation in degrees that takes `from` to `to`, in (-180, 180].
+pub fn angle_diff(from: f64, to: f64) -> f64 {
+    wrap_180(wrap_360(to) - wrap_360(from))
+}
