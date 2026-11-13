@@ -59,3 +59,28 @@ pub fn rhumb_destination_radius(start: [f64; 2], bearing_deg: f64, distance_m: f
 pub fn rhumb_destination(start: [f64; 2], bearing_deg: f64, distance_m: f64) -> [f64; 2] {
     rhumb_destination_radius(start, bearing_deg, distance_m, WGS84_EARTH_RADIUS)
 }
+
+/// Computes an intermediate point along a rhumb line at fraction `f` in [0, 1].
+pub fn rhumb_intermediate(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2] {
+    if f <= 0.0 {
+        return p1;
+    }
+    if f >= 1.0 {
+        return p2;
+    }
+    let lat1 = p1[0].to_radians();
+    let lat2 = p2[0].to_radians();
+    let dlat = lat2 - lat1;
+    let dlon = unwrap_lon_diff(p1[1], p2[1]);
+    let psi1 = mercator_lat(lat1);
+    let psi2 = mercator_lat(lat2);
+    let dpsi = psi2 - psi1;
+    let psi_f = psi1 + f * dpsi;
+    let lat_f = if dpsi.abs() < 1e-12 {
+        lat1 + f * dlat
+    } else {
+        2.0 * psi_f.exp().atan() - FRAC_PI_2
+    };
+    let lon_f = ((p1[1].to_radians() + f * dlon).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    [lat_f.to_degrees(), lon_f]
+}
