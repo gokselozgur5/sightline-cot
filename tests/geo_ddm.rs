@@ -41,3 +41,32 @@ fn test_ddm_south_east() {
     assert!((lat1 - exp_lat).abs() < 1e-6);
     assert!((lon1 - exp_lon).abs() < 1e-6);
 }
+
+use sightline_cot::geo_ddm::DdmError;
+
+#[test]
+fn test_ddm_error_cases() {
+    assert_eq!(parse_ddm(""), Err(DdmError::EmptyInput));
+    assert_eq!(parse_ddm("   "), Err(DdmError::EmptyInput));
+    assert_eq!(parse_ddm("40 26.767"), Err(DdmError::InvalidFormat));
+    assert_eq!(
+        parse_ddm("N 40 65.0 W 79 10.0"),
+        Err(DdmError::MinutesOutOfRange)
+    );
+    assert_eq!(
+        parse_ddm("N 95 00.0 W 79 10.0"),
+        Err(DdmError::LatitudeOutOfRange)
+    );
+    assert_eq!(
+        parse_ddm("N 40 00.0 W 185 10.0"),
+        Err(DdmError::LongitudeOutOfRange)
+    );
+    assert_eq!(
+        parse_ddm("-40 26.767 N W 79 58.933"),
+        Err(DdmError::ConflictingHemisphere)
+    );
+    assert_eq!(
+        parse_ddm("N 40 10.0 N 45 10.0"),
+        Err(DdmError::ConflictingHemisphere)
+    );
+}
