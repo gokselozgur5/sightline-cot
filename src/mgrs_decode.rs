@@ -76,3 +76,24 @@ fn parse_components(s: &str) -> Result<(u8, char, u8, u8, &str), MgrsDecodeError
     let row = rb[2].to_ascii_uppercase();
     Ok((zone, band, col, row, &rest[3..]))
 }
+
+const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
+
+fn band_approx_northing(band: char) -> Result<(char, f64), MgrsDecodeError> {
+    let b_pos = BANDS
+        .iter()
+        .position(|&b| b == band as u8)
+        .ok_or(MgrsDecodeError::InvalidBand)?;
+    let hemi = if band >= 'N' { 'N' } else { 'S' };
+    let lat = if b_pos == 19 {
+        78.0
+    } else {
+        -80.0 + (b_pos as f64) * 8.0 + 4.0
+    };
+    let n = if hemi == 'N' {
+        lat * 111_132.0
+    } else {
+        10_000_000.0 + lat * 111_132.0
+    };
+    Ok((hemi, n))
+}
