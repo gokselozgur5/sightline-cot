@@ -72,15 +72,13 @@ pub fn rhumb_intermediate(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2] {
     let lat2 = p2[0].to_radians();
     let dlat = lat2 - lat1;
     let dlon = unwrap_lon_diff(p1[1], p2[1]);
-    let psi1 = mercator_lat(lat1);
-    let psi2 = mercator_lat(lat2);
-    let dpsi = psi2 - psi1;
-    let psi_f = psi1 + f * dpsi;
-    let lat_f = if dpsi.abs() < 1e-12 {
-        lat1 + f * dlat
+    let lat_f = lat1 + f * dlat;
+    let dpsi = mercator_lat(lat2) - mercator_lat(lat1);
+    let dlon_f = if dpsi.abs() < 1e-12 {
+        f * dlon
     } else {
-        2.0 * psi_f.exp().atan() - FRAC_PI_2
+        (mercator_lat(lat_f) - mercator_lat(lat1)) * (dlon / dpsi)
     };
-    let lon_f = ((p1[1].to_radians() + f * dlon).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    let lon_f = (p1[1] + dlon_f.to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
     [lat_f.to_degrees(), lon_f]
 }
