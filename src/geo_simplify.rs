@@ -45,3 +45,18 @@ impl LocalFrame {
         [self.origin_lat + d_lat, self.origin_lon + d_lon]
     }
 }
+
+/// Distance in metres from point p to segment [a, b].
+pub fn segment_distance(p: [f64; 2], a: [f64; 2], b: [f64; 2]) -> f64 {
+    let dx = b[0] - a[0];
+    let dy = b[1] - a[1];
+    let len_sq = dx * dx + dy * dy;
+    if len_sq <= 1e-12 {
+        let (ex, ey) = (p[0] - a[0], p[1] - a[1]);
+        return (ex * ex + ey * ey).sqrt();
+    }
+    let t = (((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len_sq).clamp(0.0, 1.0);
+    let (cx, cy) = (a[0] + t * dx, a[1] + t * dy);
+    let (rx, ry) = (p[0] - cx, p[1] - cy);
+    (rx * rx + ry * ry).sqrt()
+}
