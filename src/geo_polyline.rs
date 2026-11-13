@@ -56,3 +56,32 @@ pub fn polyline_length_radius(points: &[[f64; 2]], radius: f64) -> f64 {
 pub fn polyline_length(points: &[[f64; 2]]) -> f64 {
     polyline_length_radius(points, WGS84_EARTH_RADIUS)
 }
+
+/// Resamples a polyline at fixed spacing `step_m` using a custom radius.
+pub fn polyline_resample_radius(points: &[[f64; 2]], step_m: f64, radius: f64) -> Vec<[f64; 2]> {
+    if points.len() < 2 || step_m <= 0.0 || !step_m.is_finite() {
+        return points.to_vec();
+    }
+    let total_len = polyline_length_radius(points, radius);
+    if total_len == 0.0 {
+        return vec![points[0]];
+    }
+    let segs: Vec<f64> = points.windows(2).map(|w| haversine_distance_radius(w[0], w[1], radius)).collect();
+    let (mut res, mut target, mut idx, mut start) = (Vec::new(), 0.0, 0, 0.0);
+    while target <= total_len + step_m * 1e-9 {
+        let clamped = target.min(total_len);
+        while idx + 1 < segs.len() && clamped > start + segs[idx] {
+            start += segs[idx];
+            idx += 1;
+        }
+        let pt = if segs[idx] <= 1e-12 {
+            points[idx]
+        } else {
+            let f = ((clamped - start) / segs[idx]).clamp(0.0, 1.0);
+            great_circle_intermediate(points[idx], points[idx + 1], f)
+        };
+        res.push(pt);
+        target += step_m;
+    }
+    res
+}
