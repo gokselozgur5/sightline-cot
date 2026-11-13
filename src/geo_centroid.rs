@@ -21,3 +21,16 @@ pub fn planar_centroid(pts: &[[f64; 2]]) -> Option<[f64; 2]> {
     let inv = 1.0 / (3.0 * area2);
     Some([cx * inv, cy * inv])
 }
+
+const METERS_PER_DEG: f64 = 111_194.926_6;
+
+fn unwrap_lon(lon: f64, ref_lon: f64) -> f64 {
+    let mut d = lon - ref_lon;
+    while d > 180.0 {
+        d -= 360.0;
+    }
+    while d < -180.0 {
+        d += 360.0;
+    }
+    d
+}
