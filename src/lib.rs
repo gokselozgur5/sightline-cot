@@ -20,6 +20,7 @@ pub mod proto;
 pub mod sidc;
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub mod geo_angle;
+pub mod geo_centroid;
 pub mod geo_compass;
 pub mod geo_meridian_arc;
 pub mod geo_radii;
