@@ -26,4 +26,23 @@ impl HelmertParams {
         let t = self.translation;
         std::array::from_fn(|i| t[i] + m[i][0] * p[0] + m[i][1] * p[1] + m[i][2] * p[2])
     }
+
+    /// Exactly inverts [`HelmertParams::apply`] by solving the 3x3 system.
+    pub fn apply_inverse(&self, q: [f64; 3]) -> [f64; 3] {
+        let m = self.matrix();
+        let d: [f64; 3] = std::array::from_fn(|i| q[i] - self.translation[i]);
+        let det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+            - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+            + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+        let solve = |col: usize| {
+            let mut a = m;
+            for (row, v) in a.iter_mut().zip(d) {
+                row[col] = v;
+            }
+            a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1])
+                - a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0])
+                + a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0])
+        };
+        [solve(0) / det, solve(1) / det, solve(2) / det]
+    }
 }
