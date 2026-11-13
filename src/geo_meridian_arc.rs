@@ -17,3 +17,8 @@ fn distance_from_equator(lat: f64) -> f64 {
         + a8 / 8.0 * (8.0 * lat).sin();
     WGS84_A * (1.0 - e2) * s
 }
+
+/// Signed meridian arc length in metres from `lat1_deg` to `lat2_deg`.
+pub fn meridian_arc(lat1_deg: f64, lat2_deg: f64) -> f64 {
+    distance_from_equator(lat2_deg.to_radians()) - distance_from_equator(lat1_deg.to_radians())
+}
