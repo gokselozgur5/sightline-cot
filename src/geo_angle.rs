@@ -9,3 +9,13 @@ pub fn wrap_360(deg: f64) -> f64 {
         w
     }
 }
+
+/// Wraps an angle in degrees into the range (-180, 180].
+pub fn wrap_180(deg: f64) -> f64 {
+    let w = wrap_360(deg);
+    if w > 180.0 {
+        w - 360.0
+    } else {
+        w
+    }
+}
