@@ -31,3 +31,23 @@ impl MgrsPrecision {
         }
     }
 }
+
+/// Truncate an MGRS coordinate string to a coarser precision.
+pub fn truncate_mgrs(mgrs: &str, target: MgrsPrecision) -> Result<String, TruncateError> {
+    let s = mgrs.trim();
+    let num_digits = s.chars().take_while(|c| c.is_ascii_digit()).count();
+    if !(1..=2).contains(&num_digits) || s.len() < num_digits + 3 {
+        return Err(TruncateError::InvalidFormat);
+    }
+    let (prefix, numerical) = s.split_at(num_digits + 3);
+    if numerical.len() % 2 != 0 || !numerical.chars().all(|c| c.is_ascii_digit()) {
+        return Err(TruncateError::InvalidFormat);
+    }
+    let in_digits = numerical.len() / 2;
+    let target_digits = target.digits_per_axis();
+    if target_digits > in_digits {
+        return Err(TruncateError::TargetPrecisionExceedsInput);
+    }
+    let (e, n) = numerical.split_at(in_digits);
+    Ok(format!("{}{}{}", prefix, &e[..target_digits], &n[..target_digits]))
+}
