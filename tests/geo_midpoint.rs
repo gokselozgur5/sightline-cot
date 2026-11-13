@@ -1,0 +1,21 @@
+//! Integration tests for geodesic midpoint.
+
+use sightline_cot::geo_midpoint::geodesic_midpoint;
+
+#[test]
+fn test_geodesic_midpoint_identical_and_equator() {
+    let (lat, lon) = geodesic_midpoint(10.0, 20.0, 10.0, 20.0).unwrap();
+    assert!((lat - 10.0).abs() < 1e-6);
+    assert!((lon - 20.0).abs() < 1e-6);
+
+    let (m_lat, m_lon) = geodesic_midpoint(0.0, 10.0, 0.0, 20.0).unwrap();
+    assert!((m_lat - 0.0).abs() < 1e-6);
+    assert!((m_lon - 15.0).abs() < 1e-6);
+}
+
+#[test]
+fn test_geodesic_midpoint_antimeridian() {
+    let (lat, lon) = geodesic_midpoint(0.0, 170.0, 0.0, -170.0).unwrap();
+    assert!(lat.abs() < 1e-6);
+    assert!((lon.abs() - 180.0).abs() < 1e-6);
+}
