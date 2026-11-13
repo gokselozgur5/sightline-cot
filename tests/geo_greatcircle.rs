@@ -1,4 +1,4 @@
-use sightline_cot::geo_greatcircle::{haversine_distance, EARTH_RADIUS_M};
+use sightline_cot::geo_greatcircle::{haversine_distance, initial_bearing, EARTH_RADIUS_M};
 
 #[test]
 fn test_haversine_identical_and_symmetric() {
@@ -15,4 +15,19 @@ fn test_haversine_antimeridian() {
     let d = haversine_distance(0.0, 179.0, 0.0, -179.0);
     let expected = 2.0 * std::f64::consts::PI / 180.0 * EARTH_RADIUS_M;
     assert!((d - expected).abs() < 1.0);
+}
+
+#[test]
+fn test_initial_bearing_cardinal_directions() {
+    assert_eq!(initial_bearing(0.0, 0.0, 0.0, 0.0), 0.0);
+    assert!((initial_bearing(0.0, 0.0, 10.0, 0.0) - 0.0).abs() < 1e-6);
+    assert!((initial_bearing(0.0, 0.0, 0.0, 10.0) - 90.0).abs() < 1e-6);
+    assert!((initial_bearing(0.0, 0.0, -10.0, 0.0) - 180.0).abs() < 1e-6);
+    assert!((initial_bearing(0.0, 0.0, 0.0, -10.0) - 270.0).abs() < 1e-6);
+}
+
+#[test]
+fn test_initial_bearing_known_route() {
+    let b = initial_bearing(37.7749, -122.4194, 40.7128, -74.0060);
+    assert!((b - 69.9).abs() < 0.2);
 }
