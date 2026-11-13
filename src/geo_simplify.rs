@@ -40,8 +40,16 @@ impl LocalFrame {
 
     /// Unproject [east_m, north_m] to [lat, lon] in degrees.
     pub fn unproject(&self, xy: [f64; 2]) -> [f64; 2] {
-        let d_lat = if self.m_lat.abs() > 1e-12 { xy[1] / self.m_lat } else { 0.0 };
-        let d_lon = if self.m_lon.abs() > 1e-12 { xy[0] / self.m_lon } else { 0.0 };
+        let d_lat = if self.m_lat.abs() > 1e-12 {
+            xy[1] / self.m_lat
+        } else {
+            0.0
+        };
+        let d_lon = if self.m_lon.abs() > 1e-12 {
+            xy[0] / self.m_lon
+        } else {
+            0.0
+        };
         [self.origin_lat + d_lat, self.origin_lon + d_lon]
     }
 }
