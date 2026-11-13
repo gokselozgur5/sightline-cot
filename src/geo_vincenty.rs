@@ -178,3 +178,19 @@ pub fn vincenty_inverse(
         solve_inverse_loop(s_u1, c_u1, s_u2, c_u2, (lon2 - lon1).to_radians())?;
     Ok(compute_inverse_result(sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2))
 }
+
+fn solve_direct_sigma(b: f64, s: f64, a: f64, sigma1: f64) -> (f64, f64, f64) {
+    let mut sigma = s / (WGS84_B * a);
+    let mut cos_2sigma_m = 0.0;
+    for _ in 0..200 {
+        let two_sigma_m = 2.0 * sigma1 + sigma;
+        cos_2sigma_m = two_sigma_m.cos();
+        let delta_sigma = vincenty_delta_sigma(b, sigma.sin(), sigma.cos(), cos_2sigma_m);
+        let sigma_next = s / (WGS84_B * a) + delta_sigma;
+        if (sigma_next - sigma).abs() < 1e-12 {
+            return (sigma_next, two_sigma_m, cos_2sigma_m);
+        }
+        sigma = sigma_next;
+    }
+    (sigma, 2.0 * sigma1 + sigma, cos_2sigma_m)
+}
