@@ -41,3 +41,21 @@ fn resample_1km_at_100m_acceptance() {
         assert!(rel_err < 1e-6, "rel error {rel_err} at {i}");
     }
 }
+
+#[test]
+fn multi_segment_polyline_resample() {
+    let delta = (500.0 / WGS84_EARTH_RADIUS).to_degrees();
+    let line = [[0.0, 0.0], [0.0, delta], [0.0, 2.0 * delta]];
+    assert!((polyline_length(&line) - 1000.0).abs() < 1e-6);
+    let pts = polyline_resample(&line, 100.0);
+    assert_eq!(pts.len(), 11);
+    assert!((pts[0][1] - 0.0).abs() < 1e-9);
+    assert!((pts[10][1] - 2.0 * delta).abs() < 1e-9);
+}
+
+#[test]
+fn resample_invalid_step_returns_copy() {
+    let line = [[0.0, 0.0], [1.0, 1.0]];
+    assert_eq!(polyline_resample(&line, 0.0), line.to_vec());
+    assert_eq!(polyline_resample(&line, -5.0), line.to_vec());
+}
