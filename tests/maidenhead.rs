@@ -40,3 +40,17 @@ fn test_encode_and_error_validation() {
         Err(MaidenheadError::InvalidLength)
     );
 }
+
+#[test]
+fn test_boundary_points_and_invalids() {
+    assert_eq!(encode_maidenhead(90.0, 180.0, 3).unwrap(), "RR99xx");
+    assert_eq!(encode_maidenhead(-90.0, -180.0, 3).unwrap(), "AA00aa");
+    assert_eq!(
+        encode_maidenhead(0.0, 0.0, 4),
+        Err(MaidenheadError::InvalidPrecision)
+    );
+    assert_eq!(
+        decode_maidenhead("ZZ00aa"),
+        Err(MaidenheadError::InvalidCharacter)
+    );
+}
