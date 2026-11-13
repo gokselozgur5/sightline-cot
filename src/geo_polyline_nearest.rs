@@ -82,3 +82,29 @@ fn endpoint_res(pt: [f64; 2], dist: f64, frac: f64) -> PolylineNearest {
         fraction: frac,
     }
 }
+
+fn solve_foot_point(
+    va: [f64; 3],
+    vb: [f64; 3],
+    vq: [f64; 3],
+    n_hat: [f64; 3],
+    seg_len: f64,
+    radius_m: f64,
+) -> Option<PolylineNearest> {
+    let f_hat = project_to_plane(vq, n_hat)?;
+    let d_a = angle_rad(va, vq) * radius_m;
+    let d_b = angle_rad(vb, vq) * radius_m;
+    if dot(cross(va, f_hat), n_hat) < 0.0 {
+        Some(endpoint_res(to_lat_lon(va), d_a, 0.0))
+    } else if dot(cross(f_hat, vb), n_hat) < 0.0 {
+        Some(endpoint_res(to_lat_lon(vb), d_b, 1.0))
+    } else {
+        let frac = (angle_rad(va, f_hat) / seg_len).clamp(0.0, 1.0);
+        Some(PolylineNearest {
+            point: to_lat_lon(f_hat),
+            distance_m: angle_rad(f_hat, vq) * radius_m,
+            segment_index: 0,
+            fraction: frac,
+        })
+    }
+}
