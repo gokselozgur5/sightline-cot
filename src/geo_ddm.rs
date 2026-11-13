@@ -29,3 +29,30 @@ impl core::fmt::Display for DdmError {
 }
 
 impl std::error::Error for DdmError {}
+
+fn tokenize(s: &str) -> Vec<String> {
+    let mut normalized = String::with_capacity(s.len() + 4);
+    let mut prev = ' ';
+    for ch in s.chars() {
+        if matches!(ch, '°' | '\'' | '"' | ',' | ';' | '\t' | '\n') {
+            normalized.push(' ');
+            prev = ' ';
+        } else if ch.is_ascii_alphabetic() {
+            if prev.is_ascii_digit() || prev == '.' {
+                normalized.push(' ');
+            }
+            normalized.push(ch);
+            prev = ch;
+        } else if ch.is_ascii_digit() || ch == '+' || ch == '-' {
+            if prev.is_ascii_alphabetic() {
+                normalized.push(' ');
+            }
+            normalized.push(ch);
+            prev = ch;
+        } else {
+            normalized.push(ch);
+            prev = ch;
+        }
+    }
+    normalized.split_whitespace().map(String::from).collect()
+}
