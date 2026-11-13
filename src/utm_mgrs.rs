@@ -74,3 +74,10 @@ pub fn utm_to_mgrs_with_band(
     append_digits(&mut s.bytes, &mut s.len, n, digits);
     Ok(s)
 }
+
+/// Project a UTM coordinate directly to an MGRS grid string using its implicit band.
+pub fn utm_to_mgrs(utm: &UtmCoord, digits: usize) -> Result<MgrsString, GridError> {
+    let (lat, _) = utm_to_wgs84(utm)?;
+    let band = lat_to_mgrs_band(lat)?;
+    utm_to_mgrs_with_band(utm, band, digits)
+}
