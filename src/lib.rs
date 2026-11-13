@@ -31,7 +31,10 @@ pub mod geo_ddm;
 pub mod geo_destination;
 pub mod geo_greatcircle;
 pub mod geo_haversine;
-pub use geo_haversine::{archav, hav};
+pub use geo_haversine::{
+    archav, hav, haversine_bearing_deg, haversine_bearing_rad, haversine_distance_m,
+    haversine_distance_with_radius,
+};
 pub mod geo_hull;
 pub mod geo_meridian_arc;
 pub mod geo_perimeter;
