@@ -17,3 +17,17 @@ fn to_ecef(lat: f64, lon: f64, h: f64, a: f64, f: f64) -> [f64; 3] {
         (n * (1.0 - e2) + h) * p.sin(),
     ]
 }
+
+#[test]
+fn zero_shift_is_identity() {
+    let s = MolodenskyShift {
+        a: WGS84_A,
+        f: WGS84_F,
+        translation: [0.0; 3],
+        da: 0.0,
+        df: 0.0,
+    };
+    let (lat, lon, h) = s.apply(45.0, -100.0, 250.0);
+    assert!((lat - 45.0).abs() < 1e-12 && (lon + 100.0).abs() < 1e-12);
+    assert!((h - 250.0).abs() < 1e-9);
+}
