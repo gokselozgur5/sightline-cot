@@ -19,4 +19,11 @@ impl HelmertParams {
             [-s * ry, s * rx, s],
         ]
     }
+
+    /// Applies the position-vector transform to an ECEF point.
+    pub fn apply(&self, p: [f64; 3]) -> [f64; 3] {
+        let m = self.matrix();
+        let t = self.translation;
+        std::array::from_fn(|i| t[i] + m[i][0] * p[0] + m[i][1] * p[1] + m[i][2] * p[2])
+    }
 }
