@@ -25,3 +25,17 @@ pub fn haversine_distance_with_radius(p1: [f64; 2], p2: [f64; 2], radius_m: f64)
 pub fn haversine_distance_m(p1: [f64; 2], p2: [f64; 2]) -> f64 {
     haversine_distance_with_radius(p1, p2, MEAN_EARTH_RADIUS_M)
 }
+
+/// Initial bearing in radians clockwise from true north in the range [0, 2*PI).
+pub fn haversine_bearing_rad(from: [f64; 2], to: [f64; 2]) -> f64 {
+    let (lat1, lat2) = (from[0].to_radians(), to[0].to_radians());
+    let d_lon = (to[1] - from[1]).to_radians();
+    let y = d_lon.sin() * lat2.cos();
+    let x = lat1.cos() * lat2.sin() - lat1.sin() * lat2.cos() * d_lon.cos();
+    y.atan2(x).rem_euclid(std::f64::consts::TAU)
+}
+
+/// Initial bearing in degrees clockwise from true north in the range [0, 360).
+pub fn haversine_bearing_deg(from: [f64; 2], to: [f64; 2]) -> f64 {
+    haversine_bearing_rad(from, to).to_degrees()
+}
