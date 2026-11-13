@@ -108,3 +108,29 @@ fn solve_foot_point(
         })
     }
 }
+
+/// Find nearest point on a great-circle segment with custom sphere radius.
+pub fn nearest_point_on_segment_with_radius(
+    a: [f64; 2],
+    b: [f64; 2],
+    query: [f64; 2],
+    radius_m: f64,
+) -> PolylineNearest {
+    let (va, vb, vq) = (
+        to_unit_vec(a[0], a[1]),
+        to_unit_vec(b[0], b[1]),
+        to_unit_vec(query[0], query[1]),
+    );
+    let (n_opt, seg_len) = segment_normal(va, vb);
+    let n_hat = match n_opt {
+        Some(nh) => nh,
+        None => return endpoint_res(a, angle_rad(va, vq) * radius_m, 0.0),
+    };
+    solve_foot_point(va, vb, vq, n_hat, seg_len, radius_m)
+        .unwrap_or_else(|| endpoint_res(a, std::f64::consts::FRAC_PI_2 * radius_m, 0.0))
+}
+
+/// Find nearest point on a great-circle segment using default Earth radius.
+pub fn nearest_point_on_segment(a: [f64; 2], b: [f64; 2], query: [f64; 2]) -> PolylineNearest {
+    nearest_point_on_segment_with_radius(a, b, query, DEFAULT_EARTH_RADIUS_M)
+}
