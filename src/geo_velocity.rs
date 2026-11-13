@@ -11,3 +11,9 @@ pub fn ecef_to_enu_velocity(v: [f64; 3], lat_deg: f64, lon_deg: f64) -> [f64; 3]
     let r = basis(lat_deg, lon_deg);
     r.map(|row| row[0] * v[0] + row[1] * v[1] + row[2] * v[2])
 }
+
+/// Rotate an east, north, up velocity (m/s) into ECEF at the given point.
+pub fn enu_to_ecef_velocity(v: [f64; 3], lat_deg: f64, lon_deg: f64) -> [f64; 3] {
+    let r = basis(lat_deg, lon_deg);
+    [0, 1, 2].map(|j| r[0][j] * v[0] + r[1][j] * v[1] + r[2][j] * v[2])
+}
