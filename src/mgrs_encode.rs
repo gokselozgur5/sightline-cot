@@ -25,7 +25,14 @@ impl Mgrs10Digit {
         let row = chars.next().ok_or(GridError::InvalidLatitude)?;
         let easting: u32 = s[5..10].parse().map_err(|_| GridError::InvalidEasting)?;
         let northing: u32 = s[10..15].parse().map_err(|_| GridError::InvalidNorthing)?;
-        Ok(Self { zone, band, col, row, easting, northing })
+        Ok(Self {
+            zone,
+            band,
+            col,
+            row,
+            easting,
+            northing,
+        })
     }
 }
 
