@@ -9,3 +9,9 @@ pub fn meridian_radius(lat_deg: f64) -> f64 {
     let w = 1.0 - WGS84_E2 * s * s;
     WGS84_A * (1.0 - WGS84_E2) / (w * w.sqrt())
 }
+
+/// Prime-vertical radius of curvature N in metres at `lat_deg` degrees.
+pub fn prime_vertical_radius(lat_deg: f64) -> f64 {
+    let s = lat_deg.to_radians().sin();
+    WGS84_A / (1.0 - WGS84_E2 * s * s).sqrt()
+}
