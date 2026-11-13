@@ -22,7 +22,9 @@ pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub mod geo_angle;
 pub mod geo_compass;
 pub mod geo_crosstrack;
-pub use geo_crosstrack::CrossTrackResult;
+pub use geo_crosstrack::{
+    along_track_distance_m, cross_track_distance_m, cross_track_error, CrossTrackResult,
+};
 pub mod geo_meridian_arc;
 pub mod geo_radii;
 pub mod tracker;

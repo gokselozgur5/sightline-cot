@@ -49,3 +49,11 @@ pub fn along_track_distance_m(start: [f64; 2], end: [f64; 2], point: [f64; 2]) -
     let sign = (theta13 - theta12).cos().signum();
     sign * d_at * MEAN_EARTH_RADIUS_M
 }
+
+/// Compute both cross-track and along-track error to a great circle.
+pub fn cross_track_error(start: [f64; 2], end: [f64; 2], point: [f64; 2]) -> CrossTrackResult {
+    CrossTrackResult {
+        cross_track_m: cross_track_distance_m(start, end, point),
+        along_track_m: along_track_distance_m(start, end, point),
+    }
+}
