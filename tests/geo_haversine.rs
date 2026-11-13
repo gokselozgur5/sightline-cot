@@ -15,3 +15,17 @@ fn test_known_city_pairs_distance_within_half_percent() {
     let rel_nyl = (dist_nyl - ref_nyl).abs() / ref_nyl;
     assert!(rel_nyl < 0.005, "got rel_err {rel_nyl}");
 }
+
+#[test]
+fn test_initial_bearing_cardinal_and_reference_pairs() {
+    let origin = [0.0, 0.0];
+    assert!((haversine_bearing_deg(origin, [10.0, 0.0]) - 0.0).abs() < 1e-6);
+    assert!((haversine_bearing_deg(origin, [0.0, 10.0]) - 90.0).abs() < 1e-6);
+    assert!((haversine_bearing_deg([10.0, 0.0], origin) - 180.0).abs() < 1e-6);
+    assert!((haversine_bearing_deg([0.0, 10.0], origin) - 270.0).abs() < 1e-6);
+
+    let london = [51.5074, -0.1278];
+    let paris = [48.8566, 2.3522];
+    let b = haversine_bearing_deg(london, paris);
+    assert!((b - 148.12).abs() < 0.1, "got bearing {b}");
+}
