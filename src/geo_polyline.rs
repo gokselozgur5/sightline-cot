@@ -40,3 +40,19 @@ pub fn great_circle_intermediate(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2]
     let z = sa * lat1.sin() + sb * lat2.sin();
     [z.atan2((x * x + y * y).sqrt()).to_degrees(), y.atan2(x).to_degrees()]
 }
+
+/// Total length in metres of a polyline with a custom sphere radius.
+pub fn polyline_length_radius(points: &[[f64; 2]], radius: f64) -> f64 {
+    if points.len() < 2 {
+        return 0.0;
+    }
+    points
+        .windows(2)
+        .map(|w| haversine_distance_radius(w[0], w[1], radius))
+        .sum()
+}
+
+/// Total length in metres of a polyline with WGS84 mean earth radius.
+pub fn polyline_length(points: &[[f64; 2]]) -> f64 {
+    polyline_length_radius(points, WGS84_EARTH_RADIUS)
+}
