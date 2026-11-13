@@ -141,6 +141,7 @@ fn wrap_azimuth(deg: f64) -> f64 {
     (deg + 360.0).rem_euclid(360.0)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn compute_inverse_result(
     sigma: f64,
     c2_a: f64,
@@ -213,6 +214,7 @@ fn direct_omega(c: f64, s_alp: f64, sig: f64, s_s: f64, c_s: f64, c_2sm: f64) ->
     (1.0 - c) * WGS84_F * s_alp * (sig + c * s_s * t)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn compute_direct_coords(
     lon1: f64,
     s_u1: f64,
