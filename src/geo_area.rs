@@ -63,3 +63,15 @@ fn project_poly_enu(poly: &[[f64; 2]]) -> Option<Vec<[f64; 2]>> {
             .collect(),
     )
 }
+
+/// Compute the geodetic polygon area in square meters.
+pub fn polygon_area(poly: &[[f64; 2]]) -> Option<f64> {
+    let pts = project_poly_enu(poly)?;
+    planar_polygon_area(&pts)
+}
+
+/// Compute the geodetic polygon perimeter in meters.
+pub fn polygon_perimeter(poly: &[[f64; 2]]) -> Option<f64> {
+    let pts = project_poly_enu(poly)?;
+    planar_polygon_perimeter(&pts)
+}
