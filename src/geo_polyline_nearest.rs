@@ -15,3 +15,14 @@ pub struct PolylineNearest {
     /// Fractional position along the segment in [0.0, 1.0].
     pub fraction: f64,
 }
+
+fn to_unit_vec(lat_deg: f64, lon_deg: f64) -> [f64; 3] {
+    let (phi, lam) = (lat_deg.to_radians(), lon_deg.to_radians());
+    let c = phi.cos();
+    [c * lam.cos(), c * lam.sin(), phi.sin()]
+}
+
+fn to_lat_lon(v: [f64; 3]) -> [f64; 2] {
+    let hyp = (v[0] * v[0] + v[1] * v[1]).sqrt();
+    [v[2].atan2(hyp).to_degrees(), v[1].atan2(v[0]).to_degrees()]
+}
