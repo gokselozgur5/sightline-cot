@@ -66,3 +66,18 @@ fn test_rhumb_polar_destination_and_intermediate() {
     assert!((mid[0] - (-90.0)).abs() < 1e-6);
     assert!((mid[1] - 30.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_rhumb_cardinal_bearings_and_distances() {
+    let p_south = [10.0, 20.0];
+    let p_north = [20.0, 20.0];
+    assert!((rhumb_bearing(p_south, p_north) - 0.0).abs() < 1e-6);
+    assert!((rhumb_bearing(p_north, p_south) - 180.0).abs() < 1e-6);
+
+    let d_meridian = rhumb_distance(p_south, p_north);
+    let expected_meridian = 10.0_f64.to_radians() * WGS84_EARTH_RADIUS;
+    assert!((d_meridian - expected_meridian).abs() < 1e-6);
+
+    let p_west = [20.0, 10.0];
+    assert!((rhumb_bearing(p_north, p_west) - 270.0).abs() < 1e-6);
+}
