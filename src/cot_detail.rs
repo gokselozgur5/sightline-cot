@@ -64,3 +64,29 @@ impl CotGroup {
         )
     }
 }
+
+/// CoT detail payload combining contact and group elements.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct CotDetailPayload {
+    pub contact: Option<CotContact>,
+    pub group: Option<CotGroup>,
+}
+
+impl CotDetailPayload {
+    /// Create an empty detail container.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Attach contact.
+    pub fn with_contact(mut self, contact: CotContact) -> Self {
+        self.contact = Some(contact);
+        self
+    }
+
+    /// Attach group.
+    pub fn with_group(mut self, group: CotGroup) -> Self {
+        self.group = Some(group);
+        self
+    }
+}
