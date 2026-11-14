@@ -38,4 +38,22 @@ impl GeoBbox {
     pub fn contains(&self, lat: f64, lon: f64) -> bool {
         lat >= self.min_lat && lat <= self.max_lat && lon >= self.min_lon && lon <= self.max_lon
     }
+
+    /// Computes the center coordinates of the bounding box.
+    pub fn center(&self) -> [f64; 2] {
+        [
+            (self.min_lat + self.max_lat) * 0.5,
+            (self.min_lon + self.max_lon) * 0.5,
+        ]
+    }
+
+    /// Returns the four corners in counter-clockwise order starting from southwest.
+    pub fn corners(&self) -> [[f64; 2]; 4] {
+        [
+            [self.min_lat, self.min_lon],
+            [self.min_lat, self.max_lon],
+            [self.max_lat, self.max_lon],
+            [self.max_lat, self.min_lon],
+        ]
+    }
 }
