@@ -86,3 +86,12 @@ impl EnuBbox {
         ]
     }
 }
+
+/// Camera frustum bounding volume in local ENU and geodetic frames.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CameraFrustum {
+    pub corners_cam: [[f64; 3]; 8],
+    pub corners_enu: [[f64; 3]; 8],
+    pub enu_bbox: EnuBbox,
+    pub geo_bbox: GeoBbox,
+}
