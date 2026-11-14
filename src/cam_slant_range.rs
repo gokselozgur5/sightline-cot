@@ -28,7 +28,11 @@ pub fn compute_slant_range_and_grazing(
     sensor_pos_m: [f64; 3],
     target_pos_m: [f64; 3],
 ) -> Result<SlantRangeGeometry, CameraError> {
-    if !sensor_pos_m.iter().chain(target_pos_m.iter()).all(|x| x.is_finite()) {
+    if !sensor_pos_m
+        .iter()
+        .chain(target_pos_m.iter())
+        .all(|x| x.is_finite())
+    {
         return Err(CameraError::InvalidParameters);
     }
     let de = target_pos_m[0] - sensor_pos_m[0];
