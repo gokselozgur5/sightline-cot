@@ -34,3 +34,15 @@ fn test_interp_error_cases() {
         Err(InterpError::AntipodalPoints)
     );
 }
+
+#[test]
+fn test_antimeridian_and_polar_midpoint() {
+    let p1 = (10.0, 179.0);
+    let p2 = (10.0, -179.0);
+    let mid = great_circle_midpoint(p1.0, p1.1, p2.0, p2.1).unwrap();
+    assert!((mid.0 - 10.0).abs() < 0.01);
+    assert!((mid.1.abs() - 180.0).abs() < 1e-4);
+
+    let pole_mid = great_circle_midpoint(80.0, 0.0, 80.0, 180.0).unwrap();
+    assert!((pole_mid.0 - 90.0).abs() < 1e-4);
+}
