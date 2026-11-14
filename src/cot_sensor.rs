@@ -30,4 +30,12 @@ impl CotSensor {
             elevation_deg: el,
         })
     }
+
+    /// Render CotSensor as an XML `<sensor>` element string.
+    pub fn to_xml(&self) -> String {
+        format!(
+            "<sensor azimuth=\"{:.2}\" fov=\"{:.2}\" range=\"{:.2}\" elevation=\"{:.2}\"/>",
+            self.azimuth_deg, self.fov_deg, self.range_m, self.elevation_deg
+        )
+    }
 }
