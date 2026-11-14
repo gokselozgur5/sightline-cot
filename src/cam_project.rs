@@ -26,7 +26,13 @@ fn project_pinhole(
     cx: f64,
     cy: f64,
 ) -> Result<(f64, f64), ProjectionError> {
-    if !fx.is_finite() || !fy.is_finite() || fx <= 0.0 || fy <= 0.0 || !cx.is_finite() || !cy.is_finite() {
+    if !fx.is_finite()
+        || !fy.is_finite()
+        || fx <= 0.0
+        || fy <= 0.0
+        || !cx.is_finite()
+        || !cy.is_finite()
+    {
         return Err(ProjectionError::InvalidIntrinsics);
     }
     if !ray.iter().all(|x| x.is_finite()) {
@@ -49,7 +55,15 @@ fn project_fisheye(
     k1: f64,
     k2: f64,
 ) -> Result<(f64, f64), ProjectionError> {
-    if !fx.is_finite() || !fy.is_finite() || fx <= 0.0 || fy <= 0.0 || !cx.is_finite() || !cy.is_finite() || !k1.is_finite() || !k2.is_finite() {
+    if !fx.is_finite()
+        || !fy.is_finite()
+        || fx <= 0.0
+        || fy <= 0.0
+        || !cx.is_finite()
+        || !cy.is_finite()
+        || !k1.is_finite()
+        || !k2.is_finite()
+    {
         return Err(ProjectionError::InvalidIntrinsics);
     }
     if !ray.iter().all(|x| x.is_finite()) {
@@ -72,8 +86,13 @@ use crate::camera::Intrinsics;
 pub fn ray_to_pixel(intrinsics: &Intrinsics, ray: [f64; 3]) -> Result<(f64, f64), ProjectionError> {
     match *intrinsics {
         Intrinsics::Pinhole { fx, fy, cx, cy } => project_pinhole(ray, fx, fy, cx, cy),
-        Intrinsics::EquidistantFisheye { fx, fy, cx, cy, k1, k2 } => {
-            project_fisheye(ray, fx, fy, cx, cy, k1, k2)
-        }
+        Intrinsics::EquidistantFisheye {
+            fx,
+            fy,
+            cx,
+            cy,
+            k1,
+            k2,
+        } => project_fisheye(ray, fx, fy, cx, cy, k1, k2),
     }
 }
