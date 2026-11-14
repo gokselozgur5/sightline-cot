@@ -40,3 +40,24 @@ pub fn segments_intersect(
         None
     }
 }
+
+/// Checks whether a polyline has any self-intersecting segments.
+pub fn polyline_has_self_intersection(points: &[[f64; 2]]) -> bool {
+    let n = points.len();
+    if n < 4 {
+        return false;
+    }
+    let is_closed = (points[0][0] - points[n - 1][0]).abs() < 1e-9
+        && (points[0][1] - points[n - 1][1]).abs() < 1e-9;
+    for i in 0..n - 1 {
+        for j in i + 2..n - 1 {
+            if is_closed && i == 0 && j == n - 2 {
+                continue;
+            }
+            if segments_intersect(points[i], points[i + 1], points[j], points[j + 1]).is_some() {
+                return true;
+            }
+        }
+    }
+    false
+}
