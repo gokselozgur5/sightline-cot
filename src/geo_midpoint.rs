@@ -44,3 +44,17 @@ pub fn geodesic_midpoint(
     lambda_m = (lambda_m + 180.0).rem_euclid(360.0) - 180.0;
     Ok((phi_m, lambda_m))
 }
+
+use crate::geo_vincenty::{vincenty_direct, vincenty_inverse, VincentyError};
+
+impl From<VincentyError> for MidpointError {
+    fn from(err: VincentyError) -> Self {
+        match err {
+            VincentyError::InvalidLatitude => MidpointError::InvalidLatitude,
+            VincentyError::InvalidLongitude => MidpointError::InvalidLongitude,
+            VincentyError::NoConvergence
+            | VincentyError::NegativeDistance
+            | VincentyError::NonFiniteInput => MidpointError::AntipodalPoints,
+        }
+    }
+}
