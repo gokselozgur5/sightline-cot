@@ -39,3 +39,12 @@ fn test_destination_point_with_custom_radius() {
     let (la, _) = destination_point_with_radius(0.0, 0.0, 0.0, 1_000.0, 1_000.0);
     assert!((la - 1.0_f64.to_degrees()).abs() < 1e-6);
 }
+
+#[test]
+fn test_final_bearing_equator_and_cardinals() {
+    use sightline_cot::geo_destination::final_bearing;
+    let b_east = final_bearing(0.0, 0.0, 90.0, 100_000.0);
+    assert!((b_east - 90.0).abs() < 1e-6);
+    let b_north = final_bearing(0.0, 0.0, 0.0, 100_000.0);
+    assert!((b_north - 0.0).abs() < 1e-6);
+}
