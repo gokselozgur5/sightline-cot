@@ -14,3 +14,14 @@ fn test_nadir_slant_range_and_grazing() {
     assert!((geom.grazing_angle_deg() - 90.0).abs() < 1e-9);
     assert!((geom.elevation_angle_deg() - (-90.0)).abs() < 1e-9);
 }
+
+#[test]
+fn test_oblique_45_deg_geometry() {
+    let sensor = [0.0, 0.0, 100.0];
+    let target = [60.0, 80.0, 0.0];
+    let geom = compute_slant_range_and_grazing(sensor, target).unwrap();
+    assert!((geom.ground_range_m - 100.0).abs() < 1e-9);
+    assert!((geom.slant_range_m - (20000.0_f64).sqrt()).abs() < 1e-9);
+    assert!((geom.grazing_angle_deg() - 45.0).abs() < 1e-9);
+    assert!((geom.elevation_angle_deg() - (-45.0)).abs() < 1e-9);
+}
