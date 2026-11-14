@@ -15,6 +15,7 @@ pub mod los;
 pub mod maidenhead;
 pub mod mgrs;
 pub mod mgrs_encode;
+pub mod mgrs_truncate;
 pub use mgrs::{
     format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, utm_to_wgs84, wgs84_to_utm, GridError,
     MgrsString, UtmCoord,
