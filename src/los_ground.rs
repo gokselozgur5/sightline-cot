@@ -31,3 +31,19 @@ pub struct LosRay {
     pub origin: [f64; 3],
     pub direction: [f64; 3],
 }
+
+impl LosRay {
+    /// Create and validate a line-of-sight ray.
+    pub fn new(origin: [f64; 3], direction: [f64; 3]) -> Result<Self, LosGroundError> {
+        if !origin.iter().all(|x| x.is_finite()) || !direction.iter().all(|x| x.is_finite()) {
+            return Err(LosGroundError::NonFiniteInput);
+        }
+        let mag_sq = direction[0] * direction[0]
+            + direction[1] * direction[1]
+            + direction[2] * direction[2];
+        if mag_sq <= 1e-18 {
+            return Err(LosGroundError::DegenerateRayDirection);
+        }
+        Ok(Self { origin, direction })
+    }
+}
