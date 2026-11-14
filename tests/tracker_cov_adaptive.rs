@@ -42,6 +42,3 @@ fn test_scale_measurement_variance() {
     assert!(scale_measurement_variance(-1.0, 5.0, &cfg).is_err());
     assert!(scale_measurement_variance(r_base, -1.0, &cfg).is_err());
 }
-
-
-

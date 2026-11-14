@@ -69,6 +69,3 @@ pub fn scale_measurement_variance(
     let scale = compute_adaptive_scale(d2, cfg)?;
     Ok(r_var * scale)
 }
-
-
-
