@@ -55,3 +55,15 @@ fn test_non_finite_and_degenerate_inputs_rejected() {
         Err(LosGroundError::NonFiniteInput)
     );
 }
+
+use sightline_cot::los_ground::intersect_sloped_plane;
+
+#[test]
+fn test_sloped_plane_intersection() {
+    let origin = [0.0, 0.0, 100.0];
+    let dir = [0.0, 0.0, -1.0];
+    let ray = LosRay::new(origin, dir).unwrap();
+    let hit = intersect_sloped_plane(&ray, [0.0, 0.0, 10.0], 0.1, 0.0).unwrap();
+    assert_eq!(hit.point, [0.0, 0.0, 10.0]);
+    assert!((hit.slant_range_m - 90.0).abs() < 1e-9);
+}
