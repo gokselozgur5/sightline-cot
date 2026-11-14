@@ -53,9 +53,15 @@ impl Ellipsoid {
     pub fn inv_f(&self) -> f64 {
         self.inv_f
     }
-    pub fn e2(&self) -> f64 { self.f * (2.0 - self.f) }
-    pub fn e(&self) -> f64 { self.e2().sqrt() }
-    pub fn e_prime2(&self) -> f64 { self.e2() / (1.0 - self.e2()) }
+    pub fn e2(&self) -> f64 {
+        self.f * (2.0 - self.f)
+    }
+    pub fn e(&self) -> f64 {
+        self.e2().sqrt()
+    }
+    pub fn e_prime2(&self) -> f64 {
+        self.e2() / (1.0 - self.e2())
+    }
 
     pub fn meridian_radius(&self, lat_deg: f64) -> f64 {
         let s = lat_deg.to_radians().sin();
