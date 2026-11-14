@@ -1,5 +1,5 @@
 use sightline_cot::camera::enu_to_geodetic;
-use sightline_cot::geo_enu::geodetic_to_enu;
+use sightline_cot::geo_enu::{geodetic_to_enu, EnuError};
 
 #[test]
 fn test_geodetic_to_enu_offsets() {
@@ -20,4 +20,20 @@ fn test_geodetic_to_enu_offsets() {
             assert!((dx * dx + dy * dy + dz * dz).sqrt() < 1e-4);
         }
     }
+}
+
+#[test]
+fn test_geodetic_to_enu_error_handling() {
+    assert_eq!(
+        geodetic_to_enu(f64::NAN, 0.0, 0.0, 0.0, 0.0, 0.0),
+        Err(EnuError::NonFinite)
+    );
+    assert_eq!(
+        geodetic_to_enu(95.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        Err(EnuError::LatitudeOutOfRange)
+    );
+    assert_eq!(
+        geodetic_to_enu(0.0, 0.0, 0.0, -91.0, 0.0, 0.0),
+        Err(EnuError::LatitudeOutOfRange)
+    );
 }
