@@ -54,3 +54,26 @@ impl DemRaster {
         Ok(())
     }
 }
+
+impl DemRaster {
+    /// Construct a validated DemRaster grid.
+    pub fn new(
+        e0: f64,
+        n0: f64,
+        step: f64,
+        cols: usize,
+        rows: usize,
+        elevations: Vec<Option<f64>>,
+    ) -> Result<Self, DemError> {
+        Self::validate(e0, n0, step, cols, rows, elevations.len())?;
+        let (origin_e_m, origin_n_m, cell_step_m) = (e0, n0, step);
+        Ok(Self {
+            origin_e_m,
+            origin_n_m,
+            cell_step_m,
+            cols,
+            rows,
+            elevations,
+        })
+    }
+}
