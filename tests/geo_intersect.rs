@@ -40,13 +40,7 @@ fn test_bowtie_polyline_self_intersection() {
 
 #[test]
 fn test_closed_square_no_self_intersection() {
-    let square = [
-        [0.0, 0.0],
-        [0.0, 1.0],
-        [1.0, 1.0],
-        [1.0, 0.0],
-        [0.0, 0.0],
-    ];
+    let square = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]];
     assert!(!polyline_has_self_intersection(&square));
     assert!(find_self_intersections(&square).is_empty());
 }

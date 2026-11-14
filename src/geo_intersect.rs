@@ -13,7 +13,12 @@ fn unwrap_lon(lon: f64, reference: f64) -> f64 {
 }
 
 /// Computes the intersection point between two line segments if they intersect.
-pub fn segments_intersect(p1: [f64; 2], p2: [f64; 2], p3: [f64; 2], p4: [f64; 2]) -> Option<[f64; 2]> {
+pub fn segments_intersect(
+    p1: [f64; 2],
+    p2: [f64; 2],
+    p3: [f64; 2],
+    p4: [f64; 2],
+) -> Option<[f64; 2]> {
     let (lat1, lon1) = (p1[0], p1[1]);
     let (lat2, lon2) = (p2[0], unwrap_lon(p2[1], lon1));
     let (lat3, lon3) = (p3[0], unwrap_lon(p3[1], lon1));
@@ -71,7 +76,9 @@ pub fn find_self_intersections(points: &[[f64; 2]]) -> Vec<SegmentIntersection> 
             if is_closed && i == 0 && j == n - 2 {
                 continue;
             }
-            if let Some(point) = segments_intersect(points[i], points[i + 1], points[j], points[j + 1]) {
+            if let Some(point) =
+                segments_intersect(points[i], points[i + 1], points[j], points[j + 1])
+            {
                 intersections.push(SegmentIntersection {
                     segment_a: i,
                     segment_b: j,
