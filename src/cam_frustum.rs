@@ -139,3 +139,28 @@ fn transform_frustum_corners(
     }
     (enu, geo)
 }
+
+impl CameraFrustum {
+    /// Compute frustum bounding volume in local ENU and geodetic frames.
+    pub fn compute(
+        cam: &Intrinsics,
+        pose: &CameraPose,
+        w: f64,
+        h: f64,
+        near_m: f64,
+        far_m: f64,
+        ref_lat: f64,
+        ref_lon: f64,
+        ref_hae: f64,
+    ) -> Result<Self, FrustumError> {
+        if !check_inputs(w, h, near_m, far_m, ref_lat, ref_lon, ref_hae) {
+            return Err(FrustumError::InvalidParameters);
+        }
+        let corners_cam = compute_cam_corners(cam, w, h, near_m, far_m)?;
+        let (corners_enu, geo_pts) =
+            transform_frustum_corners(pose, &corners_cam, ref_lat, ref_lon, ref_hae);
+        let enu_bbox = EnuBbox::from_points(&corners_enu).ok_or(FrustumError::InvalidParameters)?;
+        let geo_bbox = GeoBbox::from_points(&geo_pts).ok_or(FrustumError::InvalidParameters)?;
+        Ok(Self { corners_cam, corners_enu, enu_bbox, geo_bbox })
+    }
+}
