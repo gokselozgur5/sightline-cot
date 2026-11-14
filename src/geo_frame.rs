@@ -127,4 +127,28 @@ impl LocalFrame {
         let p_ecef = geodetic_to_ecef(lat_deg, lon_deg, hae_m);
         self.ecef_to_enu(p_ecef)
     }
+
+    /// Convert local ENU offset in meters to ECEF coordinates.
+    pub fn enu_to_ecef(&self, enu_m: [f64; 3]) -> Result<[f64; 3], GeoFrameError> {
+        if !enu_m[0].is_finite() || !enu_m[1].is_finite() || !enu_m[2].is_finite() {
+            return Err(GeoFrameError::NonFinite);
+        }
+        let (e, n, u) = (enu_m[0], enu_m[1], enu_m[2]);
+        let dx = -self.sin_lon * e - self.sin_lat * self.cos_lon * n
+            + self.cos_lat * self.cos_lon * u;
+        let dy = self.cos_lon * e - self.sin_lat * self.sin_lon * n
+            + self.cos_lat * self.sin_lon * u;
+        let dz = self.cos_lat * n + self.sin_lat * u;
+        Ok([
+            self.origin_ecef[0] + dx,
+            self.origin_ecef[1] + dy,
+            self.origin_ecef[2] + dz,
+        ])
+    }
+
+    /// Convert local ENU offset in meters to geodetic coordinates (lat, lon, hae).
+    pub fn enu_to_geodetic(&self, enu_m: [f64; 3]) -> Result<(f64, f64, f64), GeoFrameError> {
+        let ecef = self.enu_to_ecef(enu_m)?;
+        Ok(ecef_to_geodetic(ecef[0], ecef[1], ecef[2]))
+    }
 }
