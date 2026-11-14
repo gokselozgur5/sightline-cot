@@ -52,3 +52,10 @@ pub fn great_circle_intermediate(
     let lon = (y.atan2(x).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
     Ok((lat, lon))
 }
+
+/// Compute great-circle midpoint between two geodetic coordinates.
+pub fn great_circle_midpoint(
+    lat1: f64, lon1: f64, lat2: f64, lon2: f64,
+) -> Result<(f64, f64), InterpError> {
+    great_circle_intermediate(lat1, lon1, lat2, lon2, 0.5)
+}
