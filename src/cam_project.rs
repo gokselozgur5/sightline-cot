@@ -65,3 +65,15 @@ fn project_fisheye(
     let scale = r_d / r_xy;
     Ok((cx + fx * ray[0] * scale, cy + fy * ray[1] * scale))
 }
+
+use crate::camera::Intrinsics;
+
+/// Forward project a unit ray in camera frame to pixel coordinates (u, v).
+pub fn ray_to_pixel(intrinsics: &Intrinsics, ray: [f64; 3]) -> Result<(f64, f64), ProjectionError> {
+    match *intrinsics {
+        Intrinsics::Pinhole { fx, fy, cx, cy } => project_pinhole(ray, fx, fy, cx, cy),
+        Intrinsics::EquidistantFisheye { fx, fy, cx, cy, k1, k2 } => {
+            project_fisheye(ray, fx, fy, cx, cy, k1, k2)
+        }
+    }
+}
