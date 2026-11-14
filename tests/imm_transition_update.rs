@@ -1,4 +1,4 @@
-use sightline_cot::imm::{ImmConfig, ImmFilter, NUM_MODELS};
+use sightline_cot::imm::{ImmConfig, ImmFilter};
 use sightline_cot::imm_transition::{
     adaptive_transition_matrix, update_transition_matrix, validate_transition_row,
     TransitionUpdateError,
