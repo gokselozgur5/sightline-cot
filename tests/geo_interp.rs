@@ -46,3 +46,20 @@ fn test_antimeridian_and_polar_midpoint() {
     let pole_mid = great_circle_midpoint(80.0, 0.0, 80.0, 180.0).unwrap();
     assert!((pole_mid.0 - 90.0).abs() < 1e-4);
 }
+
+#[test]
+fn test_identical_endpoints_and_boundary_fractions() {
+    let p = (37.7749, -122.4194);
+    let mid_same = great_circle_midpoint(p.0, p.1, p.0, p.1).unwrap();
+    assert!((mid_same.0 - p.0).abs() < 1e-6);
+    assert!((mid_same.1 - p.1).abs() < 1e-6);
+
+    let p2 = (34.0522, -118.2437);
+    let start = great_circle_intermediate(p.0, p.1, p2.0, p2.1, 0.0).unwrap();
+    assert!((start.0 - p.0).abs() < 1e-6);
+    assert!((start.1 - p.1).abs() < 1e-6);
+
+    let end = great_circle_intermediate(p.0, p.1, p2.0, p2.1, 1.0).unwrap();
+    assert!((end.0 - p2.0).abs() < 1e-6);
+    assert!((end.1 - p2.1).abs() < 1e-6);
+}
