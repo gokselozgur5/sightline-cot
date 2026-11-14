@@ -53,3 +53,16 @@ fn test_rhumb_coincident_points_at_south_pole() {
     assert!(!b.is_nan(), "bearing is NaN");
     assert_eq!(b, 0.0);
 }
+
+#[test]
+fn test_rhumb_polar_destination_and_intermediate() {
+    let south_pole = [-90.0, 0.0];
+    let dest = rhumb_destination(south_pole, 90.0, 1000.0);
+    assert!(!dest[0].is_nan() && !dest[1].is_nan());
+    assert!((dest[0] - (-90.0)).abs() < 1e-6);
+
+    let mid = rhumb_intermediate(south_pole, [-90.0, 60.0], 0.5);
+    assert!(!mid[0].is_nan() && !mid[1].is_nan());
+    assert!((mid[0] - (-90.0)).abs() < 1e-6);
+    assert!((mid[1] - 30.0).abs() < 1e-6);
+}
