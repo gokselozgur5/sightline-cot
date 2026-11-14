@@ -59,3 +59,17 @@ fn extract_sensor_tag(xml: &str) -> Result<&str, CotError> {
         .ok_or_else(|| CotError::InvalidXml("unclosed <sensor tag".into()))?;
     Ok(&xml[start..=start + end])
 }
+
+fn parse_attr(tag: &str, attr: &'static str) -> Result<f64, CotError> {
+    let needle = format!("{attr}=\"");
+    let start = tag
+        .find(&needle)
+        .ok_or(CotError::MissingAttribute(attr))?
+        + needle.len();
+    let end = tag[start..]
+        .find('"')
+        .ok_or_else(|| CotError::InvalidXml("unclosed quote".into()))?;
+    tag[start..start + end]
+        .parse::<f64>()
+        .map_err(|_| CotError::InvalidNumber(attr))
+}
