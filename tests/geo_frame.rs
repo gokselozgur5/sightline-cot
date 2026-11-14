@@ -56,3 +56,16 @@ fn test_geo_frame_2d_and_enu_consistency() {
         assert!((unp.1 - pt[1]).abs() < 1e-7);
     }
 }
+
+#[test]
+fn test_geo_frame_ecef_roundtrip() {
+    let frame = LocalFrame::new(-45.0, 170.0, 200.0).unwrap();
+    let offsets = [[0.0, 0.0, 0.0], [500.0, -300.0, 50.0], [-1000.0, 2000.0, -100.0]];
+    for &enu in &offsets {
+        let ecef = frame.enu_to_ecef(enu).unwrap();
+        let enu_back = frame.ecef_to_enu(ecef).unwrap();
+        assert!((enu[0] - enu_back[0]).abs() < 1e-9);
+        assert!((enu[1] - enu_back[1]).abs() < 1e-9);
+        assert!((enu[2] - enu_back[2]).abs() < 1e-9);
+    }
+}
