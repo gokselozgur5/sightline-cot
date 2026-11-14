@@ -56,4 +56,20 @@ impl GeoBbox {
             [self.max_lat, self.min_lon],
         ]
     }
+
+    /// Checks if this bounding box intersects another bounding box.
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.min_lat <= other.max_lat
+            && self.max_lat >= other.min_lat
+            && self.min_lon <= other.max_lon
+            && self.max_lon >= other.min_lon
+    }
+
+    /// Expands this bounding box to include a given point.
+    pub fn expand(&mut self, lat: f64, lon: f64) {
+        self.min_lat = self.min_lat.min(lat);
+        self.max_lat = self.max_lat.max(lat);
+        self.min_lon = self.min_lon.min(lon);
+        self.max_lon = self.max_lon.max(lon);
+    }
 }
