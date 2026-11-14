@@ -17,6 +17,13 @@ impl Ellipsoid {
         Self { a, b, f, inv_f }
     }
 
+    /// Create an ellipsoid from semi-major axis and flattening.
+    pub const fn from_a_f(a: f64, f: f64) -> Self {
+        let inv_f = 1.0 / f;
+        let b = a * (1.0 - f);
+        Self { a, b, f, inv_f }
+    }
+
     pub const WGS84: Self = Self::from_a_inv_f(6_378_137.0, 298.257_223_563);
     pub const GRS80: Self = Self::from_a_inv_f(6_378_137.0, 298.257_222_101);
     pub const WGS72: Self = Self::from_a_inv_f(6_378_135.0, 298.26);
