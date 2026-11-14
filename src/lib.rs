@@ -61,8 +61,8 @@ pub mod geo_radii;
 pub mod geo_rhumb;
 pub mod geo_simplify;
 pub use geo_simplify::{simplify_polyline, LocalFrame};
-pub mod geo_sphere;
 pub mod cam_distorted_pinhole;
+pub mod geo_sphere;
 pub mod tracker;
 pub mod tracker_cov_adaptive;
 pub use tracker_cov_adaptive::{
