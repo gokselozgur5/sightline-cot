@@ -150,6 +150,7 @@ fn transform_frustum_corners(
 
 impl CameraFrustum {
     /// Compute frustum bounding volume in local ENU and geodetic frames.
+    #[allow(clippy::too_many_arguments)]
     pub fn compute(
         cam: &Intrinsics,
         pose: &CameraPose,
