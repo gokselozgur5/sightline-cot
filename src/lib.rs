@@ -1,8 +1,8 @@
 //! Sightline CoT core library
 
+pub mod cam_frustum;
 pub mod cam_project;
 pub mod camera;
-pub mod cam_frustum;
 pub mod classifier;
 pub mod cot;
 pub mod cot_sensor;
