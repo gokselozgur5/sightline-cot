@@ -92,3 +92,22 @@ pub fn intersect_ground_plane(
     let slant_range_m = (dx * dx + dy * dy + dz * dz).sqrt();
     Ok(LosGroundIntersection { point, slant_range_m, t })
 }
+
+fn sloped_plane_t(
+    ray: &LosRay,
+    ref_pt: [f64; 3],
+    ge: f64,
+    gn: f64,
+) -> Result<f64, LosGroundError> {
+    let denom = ray.direction[2] - ge * ray.direction[0] - gn * ray.direction[1];
+    if denom.abs() <= 1e-12 {
+        return Err(LosGroundError::RayAboveOrParallelGround);
+    }
+    let num = ref_pt[2] - ray.origin[2] + ge * (ray.origin[0] - ref_pt[0])
+        + gn * (ray.origin[1] - ref_pt[1]);
+    let t = num / denom;
+    if t < 0.0 {
+        return Err(LosGroundError::RayAboveOrParallelGround);
+    }
+    Ok(t)
+}
