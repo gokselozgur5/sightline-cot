@@ -32,3 +32,10 @@ fn test_polar_departure_bearing_longitude() {
     let (_, lo_s) = destination_point(-90.0, 0.0, 45.0, 100_000.0);
     assert!((lo_s - 45.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_destination_point_with_custom_radius() {
+    use sightline_cot::geo_destination::destination_point_with_radius;
+    let (la, _) = destination_point_with_radius(0.0, 0.0, 0.0, 1_000.0, 1_000.0);
+    assert!((la - 1.0_f64.to_degrees()).abs() < 1e-6);
+}
