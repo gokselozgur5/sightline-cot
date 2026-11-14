@@ -134,3 +134,17 @@ pub fn intersect_sloped_plane(
     let slant_range_m = (dx * dx + dy * dy + dz * dz).sqrt();
     Ok(LosGroundIntersection { point, slant_range_m, t })
 }
+
+use crate::camera::CameraPose;
+
+/// Back-project camera optical line of sight to ground plane.
+pub fn camera_los_ground(
+    pose: &CameraPose,
+    ray_cam: [f64; 3],
+    ground_up_m: f64,
+) -> Result<LosGroundIntersection, LosGroundError> {
+    let ray_enu = pose.transform_ray(ray_cam);
+    let cam_origin = [0.0, 0.0, pose.cam_up_m];
+    let los_ray = LosRay::new(cam_origin, ray_enu)?;
+    intersect_ground_plane(&los_ray, ground_up_m)
+}
