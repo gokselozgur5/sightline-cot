@@ -27,6 +27,7 @@ pub mod geo_area;
 pub mod geo_centroid;
 pub mod geo_compass;
 pub mod geo_greatcircle;
+pub mod geo_destination;
 pub mod geo_hull;
 pub mod geo_meridian_arc;
 pub mod geo_perimeter;
