@@ -52,9 +52,11 @@ pub mod geo_radii;
 pub mod geo_rhumb;
 pub mod geo_simplify;
 pub use geo_simplify::{simplify_polyline, LocalFrame};
+pub mod cam_distorted_pinhole;
 pub mod tracker;
 pub mod utm_mgrs;
 pub mod utm_string;
+pub use cam_distorted_pinhole::DistortedPinhole;
 
 pub const VERSION: &str = "0.1.0";
 
