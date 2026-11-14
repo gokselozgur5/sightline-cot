@@ -75,3 +75,5 @@ pub fn geodetic_to_enu(
     let p_ecef = geodetic_to_ecef(lat_deg, lon_deg, hae_m);
     Ok(ecef_to_enu(p_ecef, ref_lat_deg, ref_lon_deg, ref_hae_m))
 }
+
+pub use crate::camera::enu_to_geodetic;
