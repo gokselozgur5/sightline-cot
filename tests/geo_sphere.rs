@@ -28,3 +28,11 @@ fn test_haversine_antimeridian_and_antipodal() {
     let d_pole = haversine_distance(90.0, 0.0, -90.0, 0.0);
     assert!((d_pole - std::f64::consts::PI * EARTH_RADIUS_M).abs() < 1.0);
 }
+
+#[test]
+fn test_initial_bearing_routes_and_antimeridian() {
+    let b = initial_bearing(37.7749, -122.4194, 40.7128, -74.0060);
+    assert!((b - 69.9).abs() < 0.2);
+    let b_anti = initial_bearing(0.0, 179.0, 0.0, -179.0);
+    assert!((b_anti - 90.0).abs() < 1e-6);
+}
