@@ -3,7 +3,11 @@ use sightline_cot::geo_enu::{geodetic_to_enu, EnuError};
 
 #[test]
 fn test_geodetic_to_enu_offsets() {
-    let origins = [(37.77, -122.41, 50.0), (0.0, 0.0, 0.0), (-45.0, 170.0, 200.0)];
+    let origins = [
+        (37.77, -122.41, 50.0),
+        (0.0, 0.0, 0.0),
+        (-45.0, 170.0, 200.0),
+    ];
     let offsets: &[[f64; 3]] = &[
         [0.0, 0.0, 0.0],
         [100.0, -50.0, 10.0],
