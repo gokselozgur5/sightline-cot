@@ -151,4 +151,28 @@ impl LocalFrame {
         let ecef = self.enu_to_ecef(enu_m)?;
         Ok(ecef_to_geodetic(ecef[0], ecef[1], ecef[2]))
     }
+
+    /// Batch project geodetic coordinates `[lat_deg, lon_deg, hae_m]` to ENU offsets.
+    pub fn geodetic_to_enu_batch(
+        &self,
+        coords: &[[f64; 3]],
+    ) -> Result<Vec<[f64; 3]>, GeoFrameError> {
+        let mut out = Vec::with_capacity(coords.len());
+        for c in coords {
+            out.push(self.geodetic_to_enu(c[0], c[1], c[2])?);
+        }
+        Ok(out)
+    }
+
+    /// Batch convert local ENU offsets `[e, n, u]` to geodetic coordinates.
+    pub fn enu_to_geodetic_batch(
+        &self,
+        enu_coords: &[[f64; 3]],
+    ) -> Result<Vec<(f64, f64, f64)>, GeoFrameError> {
+        let mut out = Vec::with_capacity(enu_coords.len());
+        for enu in enu_coords {
+            out.push(self.enu_to_geodetic(*enu)?);
+        }
+        Ok(out)
+    }
 }
