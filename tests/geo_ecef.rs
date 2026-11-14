@@ -44,3 +44,14 @@ fn test_global_locations_roundtrip() {
         assert!((hae1 - hae0).abs() < 1e-3);
     }
 }
+
+#[test]
+fn test_ecef_point_to_geodetic() {
+    use sightline_cot::geo_ecef::ecef_point_to_geodetic;
+
+    let pt = geodetic_to_ecef(35.6762, 139.6503, 40.0);
+    let (lat, lon, hae) = ecef_point_to_geodetic(pt);
+    assert!((lat - 35.6762).abs() < 1e-7);
+    assert!((lon - 139.6503).abs() < 1e-7);
+    assert!((hae - 40.0).abs() < 1e-3);
+}
