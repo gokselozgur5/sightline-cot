@@ -1,6 +1,8 @@
 //! Sightline CoT core library
 
 pub mod cam_project;
+pub mod cam_slant_range;
+pub use cam_slant_range::{compute_slant_range_and_grazing, slant_range_for_pixel, slant_range_from_pose_and_ground, SlantRangeGeometry};
 pub mod camera;
 pub mod cam_frustum;
 pub mod classifier;
