@@ -13,7 +13,11 @@ fn test_zero_distance_and_cardinals() {
 
 #[test]
 fn test_roundtrip_and_antimeridian() {
-    for (lat, lon, b) in [(37.7, -122.4, 45.0), (0.0, 179.9, 90.0), (-30.0, -179.9, 270.0)] {
+    for (lat, lon, b) in [
+        (37.7, -122.4, 45.0),
+        (0.0, 179.9, 90.0),
+        (-30.0, -179.9, 270.0),
+    ] {
         let d = 50_000.0;
         let (la, lo) = destination_point(lat, lon, b, d);
         assert!((haversine_distance(lat, lon, la, lo) - d).abs() / d < 1e-6);
