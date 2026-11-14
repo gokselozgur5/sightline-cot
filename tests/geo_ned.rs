@@ -14,3 +14,16 @@ fn test_enu_ned_axis_rotations() {
     assert_eq!(ned_to_enu([1.0, 0.0, 0.0]), north);
     assert_eq!(ned_to_enu([0.0, 0.0, -1.0]), up);
 }
+
+#[test]
+fn test_enu_ned_roundtrip_vectors() {
+    let vectors = [
+        [0.0, 0.0, 0.0],
+        [123.4, -567.8, 90.1],
+        [-1000.0, 2500.0, -350.0],
+    ];
+    for &v in &vectors {
+        assert_eq!(ned_to_enu(enu_to_ned(v)), v);
+        assert_eq!(enu_to_ned(ned_to_enu(v)), v);
+    }
+}
