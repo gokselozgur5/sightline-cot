@@ -38,3 +38,29 @@ impl CotContact {
         }
     }
 }
+
+/// Group affiliation detail element in CoT 2.0 XML.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CotGroup {
+    pub name: String,
+    pub role: String,
+}
+
+impl CotGroup {
+    /// Create a new CotGroup element.
+    pub fn new(name: impl Into<String>, role: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            role: role.into(),
+        }
+    }
+
+    /// Render group detail as XML snippet.
+    pub fn to_xml(&self) -> String {
+        format!(
+            r#"<__group name="{}" role="{}"/>"#,
+            escape_xml_attr(&self.name),
+            escape_xml_attr(&self.role)
+        )
+    }
+}
