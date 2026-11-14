@@ -1,6 +1,4 @@
-use sightline_cot::los_ground::{
-    intersect_ground_plane, LosGroundError, LosRay,
-};
+use sightline_cot::los_ground::{intersect_ground_plane, LosGroundError, LosRay};
 
 #[test]
 fn test_nadir_ground_intersection() {
