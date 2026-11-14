@@ -90,3 +90,21 @@ impl CotDetailPayload {
         self
     }
 }
+
+impl CotDetailPayload {
+    /// Format full detail XML wrapper tag.
+    pub fn to_xml(&self) -> String {
+        let mut inner = String::new();
+        if let Some(c) = &self.contact {
+            inner.push_str(&c.to_xml());
+        }
+        if let Some(g) = &self.group {
+            inner.push_str(&g.to_xml());
+        }
+        if inner.is_empty() {
+            "<detail/>".to_string()
+        } else {
+            format!("<detail>{inner}</detail>")
+        }
+    }
+}
