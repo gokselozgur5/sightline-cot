@@ -13,3 +13,16 @@ pub fn enu_to_ned(enu: [f64; 3]) -> [f64; 3] {
 pub fn ned_to_enu(ned: [f64; 3]) -> [f64; 3] {
     [ned[1], ned[0], -ned[2]]
 }
+
+/// Convert Geodetic coordinates (lat, lon, hae) to local NED offset from reference origin.
+pub fn geodetic_to_ned(
+    lat_deg: f64,
+    lon_deg: f64,
+    hae_m: f64,
+    ref_lat_deg: f64,
+    ref_lon_deg: f64,
+    ref_hae_m: f64,
+) -> Result<[f64; 3], EnuError> {
+    crate::geo_enu::geodetic_to_enu(lat_deg, lon_deg, hae_m, ref_lat_deg, ref_lon_deg, ref_hae_m)
+        .map(enu_to_ned)
+}
