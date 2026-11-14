@@ -25,3 +25,18 @@ pub fn validate_transition_row(row: &[f64; NUM_MODELS], tol: f64) -> Result<(), 
     }
     Ok(())
 }
+
+use crate::imm::ImmFilter;
+
+/// Updates the transition matrix of an IMM filter with strict validation.
+pub fn update_transition_matrix(
+    filter: &mut ImmFilter,
+    new_mat: [[f64; NUM_MODELS]; NUM_MODELS],
+    tol: f64,
+) -> Result<(), TransitionUpdateError> {
+    for row in &new_mat {
+        validate_transition_row(row, tol)?;
+    }
+    filter.trans_mat = new_mat;
+    Ok(())
+}
