@@ -38,9 +38,8 @@ impl LosRay {
         if !origin.iter().all(|x| x.is_finite()) || !direction.iter().all(|x| x.is_finite()) {
             return Err(LosGroundError::NonFiniteInput);
         }
-        let mag_sq = direction[0] * direction[0]
-            + direction[1] * direction[1]
-            + direction[2] * direction[2];
+        let mag_sq =
+            direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2];
         if mag_sq <= 1e-18 {
             return Err(LosGroundError::DegenerateRayDirection);
         }
@@ -90,20 +89,20 @@ pub fn intersect_ground_plane(
     let dy = point[1] - ray.origin[1];
     let dz = point[2] - ray.origin[2];
     let slant_range_m = (dx * dx + dy * dy + dz * dz).sqrt();
-    Ok(LosGroundIntersection { point, slant_range_m, t })
+    Ok(LosGroundIntersection {
+        point,
+        slant_range_m,
+        t,
+    })
 }
 
-fn sloped_plane_t(
-    ray: &LosRay,
-    ref_pt: [f64; 3],
-    ge: f64,
-    gn: f64,
-) -> Result<f64, LosGroundError> {
+fn sloped_plane_t(ray: &LosRay, ref_pt: [f64; 3], ge: f64, gn: f64) -> Result<f64, LosGroundError> {
     let denom = ray.direction[2] - ge * ray.direction[0] - gn * ray.direction[1];
     if denom.abs() <= 1e-12 {
         return Err(LosGroundError::RayAboveOrParallelGround);
     }
-    let num = ref_pt[2] - ray.origin[2] + ge * (ray.origin[0] - ref_pt[0])
+    let num = ref_pt[2] - ray.origin[2]
+        + ge * (ray.origin[0] - ref_pt[0])
         + gn * (ray.origin[1] - ref_pt[1]);
     let t = num / denom;
     if t < 0.0 {
@@ -132,7 +131,11 @@ pub fn intersect_sloped_plane(
     let dy = point[1] - ray.origin[1];
     let dz = point[2] - ray.origin[2];
     let slant_range_m = (dx * dx + dy * dy + dz * dz).sqrt();
-    Ok(LosGroundIntersection { point, slant_range_m, t })
+    Ok(LosGroundIntersection {
+        point,
+        slant_range_m,
+        t,
+    })
 }
 
 use crate::camera::CameraPose;
