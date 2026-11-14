@@ -129,3 +129,21 @@ impl DemRaster {
         self.sample(e_m, n_m)
     }
 }
+
+impl From<&crate::camera::DemGrid> for DemRaster {
+    fn from(grid: &crate::camera::DemGrid) -> Self {
+        Self {
+            origin_e_m: grid.origin_e_m,
+            origin_n_m: grid.origin_n_m,
+            cell_step_m: grid.cell_step_m,
+            cols: grid.cols,
+            rows: grid.rows,
+            elevations: grid.elevations.iter().map(|&h| Some(h)).collect(),
+        }
+    }
+}
+
+/// Standalone helper for bilinear sampling.
+pub fn sample_dem_bilinear(dem: &DemRaster, e_m: f64, n_m: f64) -> Option<f64> {
+    dem.sample(e_m, n_m)
+}
