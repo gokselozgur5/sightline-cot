@@ -25,6 +25,14 @@ impl Ellipsoid {
     pub const fn grs80() -> Self { Self::GRS80 }
     pub const fn wgs72() -> Self { Self::WGS72 }
     pub const fn new(a: f64, inv_f: f64) -> Self { Self::from_a_inv_f(a, inv_f) }
+
+    pub fn a(&self) -> f64 { self.a }
+    pub fn b(&self) -> f64 { self.b }
+    pub fn f(&self) -> f64 { self.f }
+    pub fn inv_f(&self) -> f64 { self.inv_f }
+    pub fn e2(&self) -> f64 { self.f * (2.0 - self.f) }
+    pub fn e(&self) -> f64 { self.e2().sqrt() }
+    pub fn e_prime2(&self) -> f64 { self.e2() / (1.0 - self.e2()) }
 }
 
 pub const WGS84: Ellipsoid = Ellipsoid::WGS84;
