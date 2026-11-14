@@ -23,3 +23,18 @@ fn test_oblique_ground_intersection() {
     let expected_range = (500.0f64.powi(2) * 3.0).sqrt();
     assert!((hit.slant_range_m - expected_range).abs() < 1e-6);
 }
+
+#[test]
+fn test_horizontal_and_upward_rays_rejected() {
+    let origin = [0.0, 0.0, 100.0];
+    let horiz = LosRay::new(origin, [1.0, 0.0, 0.0]).unwrap();
+    assert_eq!(
+        intersect_ground_plane(&horiz, 0.0),
+        Err(LosGroundError::RayAboveOrParallelGround)
+    );
+    let upward = LosRay::new(origin, [0.0, 0.0, 1.0]).unwrap();
+    assert_eq!(
+        intersect_ground_plane(&upward, 0.0),
+        Err(LosGroundError::RayAboveOrParallelGround)
+    );
+}
