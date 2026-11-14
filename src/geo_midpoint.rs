@@ -58,3 +58,11 @@ impl From<VincentyError> for MidpointError {
         }
     }
 }
+
+fn validate_fraction(f: f64) -> Result<(), MidpointError> {
+    if !f.is_finite() || !(0.0..=1.0).contains(&f) {
+        Err(MidpointError::AntipodalPoints)
+    } else {
+        Ok(())
+    }
+}
