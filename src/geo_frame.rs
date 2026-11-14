@@ -110,4 +110,21 @@ impl LocalFrame {
             + self.sin_lat * dz;
         Ok([e, n, u])
     }
+
+    /// Convert geodetic coordinates to local ENU offset in meters.
+    pub fn geodetic_to_enu(
+        &self,
+        lat_deg: f64,
+        lon_deg: f64,
+        hae_m: f64,
+    ) -> Result<[f64; 3], GeoFrameError> {
+        if !lat_deg.is_finite() || !lon_deg.is_finite() || !hae_m.is_finite() {
+            return Err(GeoFrameError::NonFinite);
+        }
+        if !(-90.0..=90.0).contains(&lat_deg) {
+            return Err(GeoFrameError::LatitudeOutOfRange);
+        }
+        let p_ecef = geodetic_to_ecef(lat_deg, lon_deg, hae_m);
+        self.ecef_to_enu(p_ecef)
+    }
 }
