@@ -3,6 +3,7 @@
 pub mod camera;
 pub mod classifier;
 pub mod cot;
+pub mod dem_bilinear;
 pub mod ffi;
 pub mod geo_helmert;
 pub mod geo_molodensky;
