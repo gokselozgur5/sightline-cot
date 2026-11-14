@@ -43,6 +43,7 @@ pub mod geo_centroid;
 pub mod geo_compass;
 pub mod geo_cross_track;
 pub mod geo_ddm;
+pub mod geo_enu;
 pub mod geo_destination;
 pub mod geo_greatcircle;
 pub mod geo_haversine;
