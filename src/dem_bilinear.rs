@@ -94,3 +94,17 @@ impl DemRaster {
         Self::new(e0, n0, step, cols, rows, elevations)
     }
 }
+
+impl DemRaster {
+    /// Check if coordinates fall within the grid coverage.
+    pub fn contains_en(&self, e_m: f64, n_m: f64) -> bool {
+        let max_e = self.origin_e_m + (self.cols - 1) as f64 * self.cell_step_m;
+        let max_n = self.origin_n_m + (self.rows - 1) as f64 * self.cell_step_m;
+        e_m >= self.origin_e_m && e_m <= max_e && n_m >= self.origin_n_m && n_m <= max_n
+    }
+
+    /// Retrieve elevation at discrete grid coordinates (col, row).
+    pub fn get_node(&self, col: usize, row: usize) -> Option<f64> {
+        (col < self.cols && row < self.rows).then(|| self.elevations[row * self.cols + col])?
+    }
+}
