@@ -33,4 +33,15 @@ fn test_adaptive_scale_bounds() {
     assert_eq!(compute_adaptive_scale(100.0, &cfg).unwrap(), 10.0);
 }
 
+#[test]
+fn test_scale_measurement_variance() {
+    let cfg = AdaptiveCovarianceConfig::default();
+    let r_base = 4.0;
+    let scaled = scale_measurement_variance(r_base, 11.982, &cfg).unwrap();
+    assert!((scaled - 8.0).abs() < 1e-4);
+    assert!(scale_measurement_variance(-1.0, 5.0, &cfg).is_err());
+    assert!(scale_measurement_variance(r_base, -1.0, &cfg).is_err());
+}
+
+
 
