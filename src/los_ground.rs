@@ -74,3 +74,21 @@ fn check_ray_ground_t(ray: &LosRay, ground_up_m: f64) -> Result<f64, LosGroundEr
     }
     Ok(t)
 }
+
+/// Intersect line-of-sight ray with horizontal ground plane at `ground_up_m`.
+pub fn intersect_ground_plane(
+    ray: &LosRay,
+    ground_up_m: f64,
+) -> Result<LosGroundIntersection, LosGroundError> {
+    let t = check_ray_ground_t(ray, ground_up_m)?;
+    let point = [
+        ray.origin[0] + t * ray.direction[0],
+        ray.origin[1] + t * ray.direction[1],
+        ground_up_m,
+    ];
+    let dx = point[0] - ray.origin[0];
+    let dy = point[1] - ray.origin[1];
+    let dz = point[2] - ray.origin[2];
+    let slant_range_m = (dx * dx + dy * dy + dz * dz).sqrt();
+    Ok(LosGroundIntersection { point, slant_range_m, t })
+}
