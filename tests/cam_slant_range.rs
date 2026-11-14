@@ -1,0 +1,16 @@
+use sightline_cot::cam_slant_range::{
+    compute_slant_range_and_grazing, slant_range_for_pixel, slant_range_from_pose_and_ground,
+};
+use sightline_cot::camera::{CameraError, CameraPose, Intrinsics};
+use std::f64::consts::PI;
+
+#[test]
+fn test_nadir_slant_range_and_grazing() {
+    let sensor = [0.0, 0.0, 100.0];
+    let target = [0.0, 0.0, 0.0];
+    let geom = compute_slant_range_and_grazing(sensor, target).unwrap();
+    assert!((geom.slant_range_m - 100.0).abs() < 1e-9);
+    assert!((geom.ground_range_m - 0.0).abs() < 1e-9);
+    assert!((geom.grazing_angle_deg() - 90.0).abs() < 1e-9);
+    assert!((geom.elevation_angle_deg() - (-90.0)).abs() < 1e-9);
+}
