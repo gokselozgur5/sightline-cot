@@ -41,10 +41,18 @@ impl Ellipsoid {
         Self::from_a_inv_f(a, inv_f)
     }
 
-    pub fn a(&self) -> f64 { self.a }
-    pub fn b(&self) -> f64 { self.b }
-    pub fn f(&self) -> f64 { self.f }
-    pub fn inv_f(&self) -> f64 { self.inv_f }
+    pub fn a(&self) -> f64 {
+        self.a
+    }
+    pub fn b(&self) -> f64 {
+        self.b
+    }
+    pub fn f(&self) -> f64 {
+        self.f
+    }
+    pub fn inv_f(&self) -> f64 {
+        self.inv_f
+    }
     pub fn e2(&self) -> f64 { self.f * (2.0 - self.f) }
     pub fn e(&self) -> f64 { self.e2().sqrt() }
     pub fn e_prime2(&self) -> f64 { self.e2() / (1.0 - self.e2()) }
