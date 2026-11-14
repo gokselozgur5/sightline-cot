@@ -19,3 +19,22 @@ pub fn geodetic_to_ecef(lat_deg: f64, lon_deg: f64, hae_m: f64) -> [f64; 3] {
     let z = (n * (1.0 - WGS84_E2) + hae_m) * s_lat;
     [x, y, z]
 }
+
+/// Convert WGS84 ECEF coordinates in meters to geodetic coordinates.
+pub fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
+    let p = (x * x + y * y).sqrt();
+    let lon_rad = y.atan2(x);
+    let theta = (z * WGS84_A).atan2(p * WGS84_B);
+    let (s_th, c_th) = (theta.sin(), theta.cos());
+    let num = z + WGS84_E_PRIME2 * WGS84_B * s_th * s_th * s_th;
+    let den = p - WGS84_E2 * WGS84_A * c_th * c_th * c_th;
+    let lat_rad = num.atan2(den);
+    let s_lat = lat_rad.sin();
+    let n = WGS84_A / (1.0 - WGS84_E2 * s_lat * s_lat).sqrt();
+    let hae_m = if p > 1e-6 {
+        p / lat_rad.cos() - n
+    } else {
+        z.abs() - WGS84_B
+    };
+    (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
+}
