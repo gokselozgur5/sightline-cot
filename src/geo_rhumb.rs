@@ -8,8 +8,11 @@ fn unwrap_lon_diff(lon1_deg: f64, lon2_deg: f64) -> f64 {
     ((lon2_deg - lon1_deg + 540.0).rem_euclid(360.0) - 180.0).to_radians()
 }
 
+const MAX_MERCATOR_LAT: f64 = FRAC_PI_2 - 1e-15;
+
 fn mercator_lat(lat_rad: f64) -> f64 {
-    (FRAC_PI_4 + lat_rad / 2.0).tan().ln()
+    let clamped = lat_rad.clamp(-MAX_MERCATOR_LAT, MAX_MERCATOR_LAT);
+    (FRAC_PI_4 + clamped / 2.0).tan().ln()
 }
 
 /// Computes the rhumb line distance between two geodetic points with a custom sphere radius.
