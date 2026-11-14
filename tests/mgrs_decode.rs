@@ -30,4 +30,5 @@ fn test_decode_mgrs_errors() {
         Err(MgrsDecodeError::InvalidSquare)
     );
     assert_eq!(decode_mgrs("31NEA123"), Err(MgrsDecodeError::InvalidDigits));
+    assert!(decode_mgrs("31NA°12345").is_err());
 }
