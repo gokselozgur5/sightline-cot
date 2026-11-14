@@ -65,3 +65,24 @@ impl EnuBbox {
         })
     }
 }
+
+impl EnuBbox {
+    /// Check whether a 3D ENU point lies within or on the bounding box.
+    pub fn contains(&self, p: [f64; 3]) -> bool {
+        p[0] >= self.min_e
+            && p[0] <= self.max_e
+            && p[1] >= self.min_n
+            && p[1] <= self.max_n
+            && p[2] >= self.min_u
+            && p[2] <= self.max_u
+    }
+
+    /// Center of the 3D bounding box.
+    pub fn center(&self) -> [f64; 3] {
+        [
+            (self.min_e + self.max_e) * 0.5,
+            (self.min_n + self.max_n) * 0.5,
+            (self.min_u + self.max_u) * 0.5,
+        ]
+    }
+}
