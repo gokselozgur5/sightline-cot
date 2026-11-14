@@ -55,3 +55,16 @@ pub(crate) fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
     };
     (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
 }
+
+/// Local tangent frame caching reference geodetic coordinates, trigonometry, and ECEF origin.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LocalFrame {
+    pub origin_lat_deg: f64,
+    pub origin_lon_deg: f64,
+    pub origin_hae_m: f64,
+    pub sin_lat: f64,
+    pub cos_lat: f64,
+    pub sin_lon: f64,
+    pub cos_lon: f64,
+    pub origin_ecef: [f64; 3],
+}
