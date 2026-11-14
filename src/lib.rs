@@ -43,7 +43,9 @@ pub mod geo_centroid;
 pub mod geo_compass;
 pub mod geo_cross_track;
 pub mod geo_crosstrack;
-pub use geo_crosstrack::cross_track_distance_m;
+pub use geo_crosstrack::{
+    along_track_distance_m, cross_track_distance_m, cross_track_error, CrossTrackResult,
+};
 pub mod geo_ddm;
 pub mod geo_destination;
 pub mod geo_enu;
