@@ -27,3 +27,16 @@ fn test_enu_ned_roundtrip_vectors() {
         assert_eq!(enu_to_ned(ned_to_enu(v)), v);
     }
 }
+
+#[test]
+fn test_geodetic_ned_roundtrip() {
+    use sightline_cot::geo_ned::{geodetic_to_ned, ned_to_geodetic};
+
+    let (r_lat, r_lon, r_hae) = (37.77, -122.41, 50.0);
+    let ned_in = [250.0, -150.0, -45.0];
+    let (lat, lon, hae) = ned_to_geodetic(ned_in, r_lat, r_lon, r_hae);
+    let ned_out = geodetic_to_ned(lat, lon, hae, r_lat, r_lon, r_hae).unwrap();
+    for i in 0..3 {
+        assert!((ned_out[i] - ned_in[i]).abs() < 1e-4);
+    }
+}
