@@ -49,3 +49,13 @@ impl CotSensor {
         Self::new(az, fov, rng, el)
     }
 }
+
+fn extract_sensor_tag(xml: &str) -> Result<&str, CotError> {
+    let start = xml
+        .find("<sensor")
+        .ok_or_else(|| CotError::InvalidXml("missing <sensor tag".into()))?;
+    let end = xml[start..]
+        .find('>')
+        .ok_or_else(|| CotError::InvalidXml("unclosed <sensor tag".into()))?;
+    Ok(&xml[start..=start + end])
+}
