@@ -15,6 +15,7 @@ pub mod geo_vincenty;
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
+pub mod imm_transition;
 pub mod los;
 pub mod los_ground;
 pub mod maidenhead;
