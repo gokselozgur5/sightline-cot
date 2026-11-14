@@ -94,4 +94,20 @@ impl LocalFrame {
             origin_ecef,
         })
     }
+
+    /// Convert an ECEF coordinate to local ENU offset using cached frame parameters.
+    pub fn ecef_to_enu(&self, p_ecef: [f64; 3]) -> Result<[f64; 3], GeoFrameError> {
+        if !p_ecef[0].is_finite() || !p_ecef[1].is_finite() || !p_ecef[2].is_finite() {
+            return Err(GeoFrameError::NonFinite);
+        }
+        let dx = p_ecef[0] - self.origin_ecef[0];
+        let dy = p_ecef[1] - self.origin_ecef[1];
+        let dz = p_ecef[2] - self.origin_ecef[2];
+        let e = -self.sin_lon * dx + self.cos_lon * dy;
+        let n = -self.sin_lat * self.cos_lon * dx - self.sin_lat * self.sin_lon * dy
+            + self.cos_lat * dz;
+        let u = self.cos_lat * self.cos_lon * dx + self.cos_lat * self.sin_lon * dy
+            + self.sin_lat * dz;
+        Ok([e, n, u])
+    }
 }
