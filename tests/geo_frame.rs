@@ -15,12 +15,27 @@ fn test_geo_frame_cached_trig_and_projection() {
 fn test_geo_frame_error_handling() {
     use sightline_cot::geo_frame::GeoFrameError;
 
-    assert_eq!(LocalFrame::new(f64::NAN, 0.0, 0.0), Err(GeoFrameError::NonFinite));
-    assert_eq!(LocalFrame::new(95.0, 0.0, 0.0), Err(GeoFrameError::LatitudeOutOfRange));
+    assert_eq!(
+        LocalFrame::new(f64::NAN, 0.0, 0.0),
+        Err(GeoFrameError::NonFinite)
+    );
+    assert_eq!(
+        LocalFrame::new(95.0, 0.0, 0.0),
+        Err(GeoFrameError::LatitudeOutOfRange)
+    );
     let frame = LocalFrame::new(0.0, 0.0, 0.0).unwrap();
-    assert_eq!(frame.geodetic_to_enu(f64::NAN, 0.0, 0.0), Err(GeoFrameError::NonFinite));
-    assert_eq!(frame.geodetic_to_enu(95.0, 0.0, 0.0), Err(GeoFrameError::LatitudeOutOfRange));
-    assert_eq!(frame.enu_to_geodetic([f64::NAN, 0.0, 0.0]), Err(GeoFrameError::NonFinite));
+    assert_eq!(
+        frame.geodetic_to_enu(f64::NAN, 0.0, 0.0),
+        Err(GeoFrameError::NonFinite)
+    );
+    assert_eq!(
+        frame.geodetic_to_enu(95.0, 0.0, 0.0),
+        Err(GeoFrameError::LatitudeOutOfRange)
+    );
+    assert_eq!(
+        frame.enu_to_geodetic([f64::NAN, 0.0, 0.0]),
+        Err(GeoFrameError::NonFinite)
+    );
 }
 
 #[test]
