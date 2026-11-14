@@ -45,3 +45,29 @@ fn test_geodesic_midpoint_ellipsoid_failing_repro() {
     let res = geodesic_midpoint_ellipsoid(0.0, 10.0, 0.0, 20.0, 0.5);
     assert!(res.is_ok());
 }
+
+#[test]
+fn test_geodesic_midpoint_ellipsoid_endpoints_and_equidistant() {
+    use sightline_cot::geo_midpoint::geodesic_midpoint_ellipsoid;
+    use sightline_cot::geo_vincenty::vincenty_inverse;
+
+    let (lat1, lon1) = (10.0, 20.0);
+    let (lat2, lon2) = (12.0, 25.0);
+
+    let (start_lat, start_lon) = geodesic_midpoint_ellipsoid(lat1, lon1, lat2, lon2, 0.0).unwrap();
+    assert!((start_lat - lat1).abs() < 1e-9);
+    assert!((start_lon - lon1).abs() < 1e-9);
+
+    let (end_lat, end_lon) = geodesic_midpoint_ellipsoid(lat1, lon1, lat2, lon2, 1.0).unwrap();
+    assert!((end_lat - lat2).abs() < 1e-9);
+    assert!((end_lon - lon2).abs() < 1e-9);
+
+    let (mid_lat, mid_lon) = geodesic_midpoint_ellipsoid(lat1, lon1, lat2, lon2, 0.5).unwrap();
+    let d1 = vincenty_inverse(lat1, lon1, mid_lat, mid_lon)
+        .unwrap()
+        .distance_m;
+    let d2 = vincenty_inverse(mid_lat, mid_lon, lat2, lon2)
+        .unwrap()
+        .distance_m;
+    assert!((d1 - d2).abs() < 1e-6);
+}
