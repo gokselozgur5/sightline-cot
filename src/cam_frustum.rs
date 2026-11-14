@@ -39,3 +39,29 @@ pub struct EnuBbox {
     pub max_n: f64,
     pub max_u: f64,
 }
+
+impl EnuBbox {
+    /// Create an EnuBbox enclosing a slice of 3D points.
+    pub fn from_points(points: &[[f64; 3]]) -> Option<Self> {
+        let first = points.first()?;
+        let (mut min_e, mut max_e) = (first[0], first[0]);
+        let (mut min_n, mut max_n) = (first[1], first[1]);
+        let (mut min_u, mut max_u) = (first[2], first[2]);
+        for p in &points[1..] {
+            min_e = min_e.min(p[0]);
+            max_e = max_e.max(p[0]);
+            min_n = min_n.min(p[1]);
+            max_n = max_n.max(p[1]);
+            min_u = min_u.min(p[2]);
+            max_u = max_u.max(p[2]);
+        }
+        Some(Self {
+            min_e,
+            min_n,
+            min_u,
+            max_e,
+            max_n,
+            max_u,
+        })
+    }
+}
