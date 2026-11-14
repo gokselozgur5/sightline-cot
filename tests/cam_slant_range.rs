@@ -40,3 +40,22 @@ fn test_slant_range_from_pose_and_ground() {
     assert!((geom.slant_range_m - 141.421356237).abs() < 1e-6);
     assert!((geom.grazing_angle_deg() - 45.0).abs() < 1e-9);
 }
+
+#[test]
+fn test_slant_range_for_pixel_end_to_end() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 500.0,
+        cy: 500.0,
+    };
+    let pose = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: 100.0,
+    };
+    let geom = slant_range_for_pixel(&cam, &pose, 500.0, 500.0, 0.0).unwrap();
+    assert!((geom.slant_range_m - 100.0).abs() < 1e-6);
+    assert!((geom.grazing_angle_deg() - 90.0).abs() < 1e-6);
+}
