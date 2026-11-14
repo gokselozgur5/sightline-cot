@@ -106,8 +106,8 @@ impl LocalFrame {
         let e = -self.sin_lon * dx + self.cos_lon * dy;
         let n = -self.sin_lat * self.cos_lon * dx - self.sin_lat * self.sin_lon * dy
             + self.cos_lat * dz;
-        let u = self.cos_lat * self.cos_lon * dx + self.cos_lat * self.sin_lon * dy
-            + self.sin_lat * dz;
+        let u =
+            self.cos_lat * self.cos_lon * dx + self.cos_lat * self.sin_lon * dy + self.sin_lat * dz;
         Ok([e, n, u])
     }
 
@@ -134,10 +134,10 @@ impl LocalFrame {
             return Err(GeoFrameError::NonFinite);
         }
         let (e, n, u) = (enu_m[0], enu_m[1], enu_m[2]);
-        let dx = -self.sin_lon * e - self.sin_lat * self.cos_lon * n
-            + self.cos_lat * self.cos_lon * u;
-        let dy = self.cos_lon * e - self.sin_lat * self.sin_lon * n
-            + self.cos_lat * self.sin_lon * u;
+        let dx =
+            -self.sin_lon * e - self.sin_lat * self.cos_lon * n + self.cos_lat * self.cos_lon * u;
+        let dy =
+            self.cos_lon * e - self.sin_lat * self.sin_lon * n + self.cos_lat * self.sin_lon * u;
         let dz = self.cos_lat * n + self.sin_lat * u;
         Ok([
             self.origin_ecef[0] + dx,
