@@ -35,3 +35,18 @@ fn geodetic_to_ecef(lat_deg: f64, lon_deg: f64, hae_m: f64) -> [f64; 3] {
     let z = (n * (1.0 - WGS84_E2) + hae_m) * s_lat;
     [x, y, z]
 }
+
+fn ecef_to_enu(p_ecef: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f64; 3] {
+    let ref_ecef = geodetic_to_ecef(ref_lat, ref_lon, ref_hae);
+    let (s_lat, c_lat) = (ref_lat.to_radians().sin(), ref_lat.to_radians().cos());
+    let (s_lon, c_lon) = (ref_lon.to_radians().sin(), ref_lon.to_radians().cos());
+    let (dx, dy, dz) = (
+        p_ecef[0] - ref_ecef[0],
+        p_ecef[1] - ref_ecef[1],
+        p_ecef[2] - ref_ecef[2],
+    );
+    let e = -s_lon * dx + c_lon * dy;
+    let n = -s_lat * c_lon * dx - s_lat * s_lon * dy + c_lat * dz;
+    let u = c_lat * c_lon * dx + c_lat * s_lon * dy + s_lat * dz;
+    [e, n, u]
+}
