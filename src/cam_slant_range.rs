@@ -57,3 +57,16 @@ pub fn slant_range_from_pose_and_ground(
     let sensor_pos = [0.0, 0.0, pose.cam_up_m];
     compute_slant_range_and_grazing(sensor_pos, ground_pt_enu)
 }
+
+/// Compute slant geometry directly for a pixel observation given camera and pose.
+pub fn slant_range_for_pixel(
+    intrinsics: &crate::camera::Intrinsics,
+    pose: &crate::camera::CameraPose,
+    u: f64,
+    v: f64,
+    ground_up_m: f64,
+) -> Result<SlantRangeGeometry, CameraError> {
+    let ray_cam = intrinsics.pixel_to_ray(u, v)?;
+    let ground_pt = crate::camera::intersect_ground(ray_cam, pose, ground_up_m)?;
+    slant_range_from_pose_and_ground(pose, ground_pt)
+}
