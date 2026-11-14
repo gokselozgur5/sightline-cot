@@ -56,7 +56,10 @@ pub use geo_simplify::{simplify_polyline, LocalFrame};
 pub mod cam_distorted_pinhole;
 pub mod tracker;
 pub mod tracker_cov_adaptive;
-pub use tracker_cov_adaptive::{AdaptiveCovarianceConfig, AdaptiveCovarianceError};
+pub use tracker_cov_adaptive::{
+    compute_adaptive_scale, scale_measurement_variance, AdaptiveCovarianceConfig,
+    AdaptiveCovarianceError,
+};
 pub mod utm_mgrs;
 pub mod utm_string;
 pub use cam_distorted_pinhole::DistortedPinhole;
