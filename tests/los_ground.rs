@@ -38,3 +38,20 @@ fn test_horizontal_and_upward_rays_rejected() {
         Err(LosGroundError::RayAboveOrParallelGround)
     );
 }
+
+#[test]
+fn test_non_finite_and_degenerate_inputs_rejected() {
+    assert_eq!(
+        LosRay::new([f64::NAN, 0.0, 0.0], [0.0, 0.0, -1.0]),
+        Err(LosGroundError::NonFiniteInput)
+    );
+    assert_eq!(
+        LosRay::new([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]),
+        Err(LosGroundError::DegenerateRayDirection)
+    );
+    let valid_ray = LosRay::new([0.0, 0.0, 100.0], [0.0, 0.0, -1.0]).unwrap();
+    assert_eq!(
+        intersect_ground_plane(&valid_ray, f64::INFINITY),
+        Err(LosGroundError::NonFiniteInput)
+    );
+}
