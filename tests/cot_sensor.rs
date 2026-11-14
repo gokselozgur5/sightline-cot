@@ -11,3 +11,11 @@ fn test_sensor_fov_roundtrip() {
     let parsed = CotSensor::parse(&xml).unwrap();
     assert_eq!(parsed, sensor);
 }
+
+#[test]
+fn test_sensor_rejects_fov_outside_range() {
+    assert!(CotSensor::new(0.0, -0.1, 100.0, 0.0).is_err());
+    assert!(CotSensor::new(0.0, 360.1, 100.0, 0.0).is_err());
+    assert!(CotSensor::new(0.0, 0.0, 100.0, 0.0).is_ok());
+    assert!(CotSensor::new(0.0, 360.0, 100.0, 0.0).is_ok());
+}
