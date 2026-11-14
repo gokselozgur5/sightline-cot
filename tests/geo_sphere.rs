@@ -18,3 +18,13 @@ fn test_initial_bearing_cardinal_directions() {
     assert!((initial_bearing(0.0, 0.0, -10.0, 0.0) - 180.0).abs() < 1e-6);
     assert!((initial_bearing(0.0, 0.0, 0.0, -10.0) - 270.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_haversine_antimeridian_and_antipodal() {
+    use sightline_cot::geo_sphere::EARTH_RADIUS_M;
+    let d = haversine_distance(0.0, 179.0, 0.0, -179.0);
+    let expected = 2.0 * std::f64::consts::PI / 180.0 * EARTH_RADIUS_M;
+    assert!((d - expected).abs() < 1.0);
+    let d_pole = haversine_distance(90.0, 0.0, -90.0, 0.0);
+    assert!((d_pole - std::f64::consts::PI * EARTH_RADIUS_M).abs() < 1.0);
+}
