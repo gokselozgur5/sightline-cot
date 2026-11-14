@@ -31,3 +31,11 @@ fn test_decode_mgrs_errors() {
     );
     assert_eq!(decode_mgrs("31NEA123"), Err(MgrsDecodeError::InvalidDigits));
 }
+
+#[test]
+fn test_decode_mgrs_non_ascii_rejected() {
+    assert_eq!(
+        decode_mgrs("31NA\u{00b0}12345"),
+        Err(MgrsDecodeError::InvalidSquare)
+    );
+}
