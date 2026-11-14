@@ -28,7 +28,11 @@ pub(crate) fn validate_fraction(f: f64) -> Result<(), InterpError> {
 
 /// Compute great-circle intermediate point at fraction `f` in [0, 1].
 pub fn great_circle_intermediate(
-    lat1: f64, lon1: f64, lat2: f64, lon2: f64, f: f64,
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
+    f: f64,
 ) -> Result<(f64, f64), InterpError> {
     validate_coords(lat1, lon1)?;
     validate_coords(lat2, lon2)?;
@@ -47,7 +51,11 @@ pub fn great_circle_intermediate(
         return Ok((lat1, lon1));
     }
     let (a, b) = (((1.0 - f) * d).sin() / d.sin(), (f * d).sin() / d.sin());
-    let (x, y, z) = (a * v1[0] + b * v2[0], a * v1[1] + b * v2[1], a * v1[2] + b * v2[2]);
+    let (x, y, z) = (
+        a * v1[0] + b * v2[0],
+        a * v1[1] + b * v2[1],
+        a * v1[2] + b * v2[2],
+    );
     let lat = z.atan2((x * x + y * y).sqrt()).to_degrees();
     let lon = (y.atan2(x).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
     Ok((lat, lon))
@@ -55,7 +63,10 @@ pub fn great_circle_intermediate(
 
 /// Compute great-circle midpoint between two geodetic coordinates.
 pub fn great_circle_midpoint(
-    lat1: f64, lon1: f64, lat2: f64, lon2: f64,
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
 ) -> Result<(f64, f64), InterpError> {
     great_circle_intermediate(lat1, lon1, lat2, lon2, 0.5)
 }
