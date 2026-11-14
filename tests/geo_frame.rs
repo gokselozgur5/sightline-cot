@@ -39,3 +39,20 @@ fn test_geo_frame_batch_roundtrip() {
         assert!((orig[2] - res.2).abs() < 1e-3);
     }
 }
+
+#[test]
+fn test_geo_frame_2d_and_enu_consistency() {
+    use sightline_cot::geo_enu::geodetic_to_enu;
+
+    let frame = LocalFrame::new(37.77, -122.41, 50.0).unwrap();
+    let pts = [[37.78, -122.40], [37.76, -122.42]];
+    let proj = frame.project_2d_batch(&pts).unwrap();
+    for (pt, p2d) in pts.iter().zip(proj.iter()) {
+        let enu_ref = geodetic_to_enu(pt[0], pt[1], 0.0, 37.77, -122.41, 50.0).unwrap();
+        assert!((p2d[0] - enu_ref[0]).abs() < 1e-6);
+        assert!((p2d[1] - enu_ref[1]).abs() < 1e-6);
+        let unp = frame.unproject_2d(p2d[0], p2d[1]).unwrap();
+        assert!((unp.0 - pt[0]).abs() < 1e-7);
+        assert!((unp.1 - pt[1]).abs() < 1e-7);
+    }
+}
