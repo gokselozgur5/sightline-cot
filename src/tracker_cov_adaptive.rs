@@ -57,4 +57,18 @@ pub fn compute_adaptive_scale(
     Ok(scale)
 }
 
+/// Scale measurement noise variance R adaptively using Mahalanobis distance.
+pub fn scale_measurement_variance(
+    r_var: f64,
+    d2: f64,
+    cfg: &AdaptiveCovarianceConfig,
+) -> Result<f64, AdaptiveCovarianceError> {
+    if !r_var.is_finite() || r_var <= 0.0 {
+        return Err(AdaptiveCovarianceError::NonFiniteInput);
+    }
+    let scale = compute_adaptive_scale(d2, cfg)?;
+    Ok(r_var * scale)
+}
+
+
 
