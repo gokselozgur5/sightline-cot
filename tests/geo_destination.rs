@@ -24,3 +24,11 @@ fn test_roundtrip_and_antimeridian() {
         assert!((-180.0..=180.0).contains(&lo));
     }
 }
+
+#[test]
+fn test_polar_departure_bearing_longitude() {
+    let (_, lo_n) = destination_point(90.0, 0.0, 135.0, 100_000.0);
+    assert!((lo_n - 135.0).abs() < 1e-6);
+    let (_, lo_s) = destination_point(-90.0, 0.0, 45.0, 100_000.0);
+    assert!((lo_s - 45.0).abs() < 1e-6);
+}
