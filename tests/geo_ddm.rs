@@ -70,3 +70,12 @@ fn test_ddm_error_cases() {
         Err(DdmError::ConflictingHemisphere)
     );
 }
+
+#[test]
+fn test_ddm_unsigned_first_prefix_second() {
+    let (lat, lon) = parse_ddm("40 26.767, W 79 58.933").unwrap();
+    let expected_lat = 40.0 + 26.767 / 60.0;
+    let expected_lon = -(79.0 + 58.933 / 60.0);
+    assert!((lat - expected_lat).abs() < 1e-6);
+    assert!((lon - expected_lon).abs() < 1e-6);
+}
