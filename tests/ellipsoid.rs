@@ -16,3 +16,15 @@ fn test_ellipsoid_constructors() {
     assert_eq!(Ellipsoid::grs80(), GRS80);
     assert_eq!(Ellipsoid::wgs72(), WGS72);
 }
+
+#[test]
+fn test_ellipsoid_parameter_accessors() {
+    let e = Ellipsoid::wgs84();
+    assert_eq!(e.a(), 6_378_137.0);
+    assert_eq!(e.inv_f(), 298.257_223_563);
+    assert!((e.b() - 6_356_752.314_245).abs() < 1e-4);
+    assert!((e.f() - 1.0 / 298.257_223_563).abs() < 1e-12);
+    assert!((e.e2() - 0.006_694_379_990_14).abs() < 1e-12);
+    assert!((e.e() - 0.081_819_190_842).abs() < 1e-10);
+    assert!((e.e_prime2() - 0.006_739_496_742).abs() < 1e-10);
+}
