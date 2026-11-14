@@ -121,3 +121,21 @@ fn compute_cam_corners(
     }
     Ok(corners)
 }
+
+fn transform_frustum_corners(
+    pose: &CameraPose,
+    c_cam: &[[f64; 3]; 8],
+    r_lat: f64,
+    r_lon: f64,
+    r_hae: f64,
+) -> ([[f64; 3]; 8], [[f64; 2]; 8]) {
+    let mut enu = [[0.0; 3]; 8];
+    let mut geo = [[0.0; 2]; 8];
+    for (i, c) in c_cam.iter().enumerate() {
+        let p = pose.transform_ray(*c);
+        enu[i] = [p[0], p[1], p[2] + pose.cam_up_m];
+        let (lat, lon, _) = enu_to_geodetic(enu[i], r_lat, r_lon, r_hae);
+        geo[i] = [lat, lon];
+    }
+    (enu, geo)
+}
