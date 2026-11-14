@@ -11,16 +11,22 @@ fn test_adaptive_covariance_config_defaults() {
 
 #[test]
 fn test_adaptive_covariance_config_invalid() {
-    let mut cfg = AdaptiveCovarianceConfig::default();
-    cfg.gate_threshold = -1.0;
+    let cfg = AdaptiveCovarianceConfig {
+        gate_threshold: -1.0,
+        ..Default::default()
+    };
     assert_eq!(cfg.validate(), Err(AdaptiveCovarianceError::InvalidConfig));
 
-    let mut cfg2 = AdaptiveCovarianceConfig::default();
-    cfg2.min_scale = 0.5;
+    let cfg2 = AdaptiveCovarianceConfig {
+        min_scale: 0.5,
+        ..Default::default()
+    };
     assert_eq!(cfg2.validate(), Err(AdaptiveCovarianceError::InvalidConfig));
 
-    let mut cfg3 = AdaptiveCovarianceConfig::default();
-    cfg3.max_scale = 0.9;
+    let cfg3 = AdaptiveCovarianceConfig {
+        max_scale: 0.9,
+        ..Default::default()
+    };
     assert_eq!(cfg3.validate(), Err(AdaptiveCovarianceError::InvalidConfig));
 }
 
