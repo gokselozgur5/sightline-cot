@@ -26,3 +26,21 @@ fn test_poles_and_singularity() {
     let (lat_s, _, hae_s) = ecef_to_geodetic(south[0], south[1], south[2]);
     assert!((lat_s + 90.0).abs() < 1e-9 && (hae_s - 100.0).abs() < 1e-4);
 }
+
+#[test]
+fn test_global_locations_roundtrip() {
+    let cases = [
+        (37.7749, -122.4194, 50.0),
+        (51.5074, -0.1278, 15.0),
+        (-33.8688, 151.2093, 20.0),
+        (27.9881, 86.9250, 8848.86),
+        (31.5, 35.5, -430.0),
+    ];
+    for (lat0, lon0, hae0) in cases {
+        let ecef = geodetic_to_ecef(lat0, lon0, hae0);
+        let (lat1, lon1, hae1) = ecef_to_geodetic(ecef[0], ecef[1], ecef[2]);
+        assert!((lat1 - lat0).abs() < 1e-7);
+        assert!((lon1 - lon0).abs() < 1e-7);
+        assert!((hae1 - hae0).abs() < 1e-3);
+    }
+}
