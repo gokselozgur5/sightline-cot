@@ -10,7 +10,10 @@ pub enum TransitionUpdateError {
 use crate::imm::NUM_MODELS;
 
 /// Validates whether a row represents a valid probability distribution.
-pub fn validate_transition_row(row: &[f64; NUM_MODELS], tol: f64) -> Result<(), TransitionUpdateError> {
+pub fn validate_transition_row(
+    row: &[f64; NUM_MODELS],
+    tol: f64,
+) -> Result<(), TransitionUpdateError> {
     for &p in row.iter() {
         if !p.is_finite() {
             return Err(TransitionUpdateError::NonFinite);

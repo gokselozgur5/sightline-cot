@@ -29,11 +29,7 @@ fn test_validate_transition_row_errors() {
 #[test]
 fn test_update_transition_matrix_valid_and_invalid() {
     let mut imm = ImmFilter::new([0.0; 3], ImmConfig::default());
-    let valid_mat = [
-        [0.7, 0.2, 0.1],
-        [0.1, 0.8, 0.1],
-        [0.1, 0.2, 0.7],
-    ];
+    let valid_mat = [[0.7, 0.2, 0.1], [0.1, 0.8, 0.1], [0.1, 0.2, 0.7]];
     assert!(update_transition_matrix(&mut imm, valid_mat, 1e-6).is_ok());
     assert_eq!(imm.trans_mat, valid_mat);
 
