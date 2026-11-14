@@ -17,7 +17,7 @@ fn test_equator_prime_meridian_roundtrip() {
 fn test_poles_and_singularity() {
     let north = geodetic_to_ecef(90.0, 0.0, 0.0);
     assert!(north[0].abs() < 1e-3 && north[1].abs() < 1e-3);
-    assert!((north[2] - 6_356_752.3142).abs() < 1e-3);
+    assert!((north[2] - 6_356_752.314_2).abs() < 1e-3);
 
     let (lat_n, _, hae_n) = ecef_to_geodetic(north[0], north[1], north[2]);
     assert!((lat_n - 90.0).abs() < 1e-9 && hae_n.abs() < 1e-4);
