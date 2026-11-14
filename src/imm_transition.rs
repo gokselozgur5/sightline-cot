@@ -40,3 +40,26 @@ pub fn update_transition_matrix(
     filter.trans_mat = new_mat;
     Ok(())
 }
+
+/// Computes adaptive transition matrix based on sojourn times (in seconds).
+pub fn adaptive_transition_matrix(
+    sojourn_times_s: [f64; NUM_MODELS],
+    dt: f64,
+) -> Result<[[f64; NUM_MODELS]; NUM_MODELS], TransitionUpdateError> {
+    if !dt.is_finite() || dt <= 0.0 {
+        return Err(TransitionUpdateError::NonFinite);
+    }
+    let mut mat = [[0.0; NUM_MODELS]; NUM_MODELS];
+    for (i, &tau) in sojourn_times_s.iter().enumerate() {
+        if !tau.is_finite() || tau <= dt {
+            return Err(TransitionUpdateError::InvalidProbability);
+        }
+        let p_ii = 1.0 - (dt / tau);
+        let p_ij = (dt / tau) / ((NUM_MODELS - 1) as f64);
+        for j in 0..NUM_MODELS {
+            mat[i][j] = if i == j { p_ii } else { p_ij };
+        }
+        validate_transition_row(&mat[i], 1e-6)?;
+    }
+    Ok(mat)
+}
