@@ -40,3 +40,21 @@ impl AdaptiveCovarianceConfig {
     }
 }
 
+/// Compute adaptive covariance scale factor from Mahalanobis d2 distance.
+pub fn compute_adaptive_scale(
+    d2: f64,
+    cfg: &AdaptiveCovarianceConfig,
+) -> Result<f64, AdaptiveCovarianceError> {
+    cfg.validate()?;
+    if !d2.is_finite() || d2 < 0.0 {
+        return Err(AdaptiveCovarianceError::NonFiniteInput);
+    }
+    if d2 <= cfg.gate_threshold {
+        return Ok(cfg.min_scale);
+    }
+    let ratio = d2 / cfg.gate_threshold;
+    let scale = (cfg.min_scale * ratio).min(cfg.max_scale);
+    Ok(scale)
+}
+
+
