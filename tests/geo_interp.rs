@@ -1,6 +1,4 @@
-use sightline_cot::geo_interp::{
-    great_circle_intermediate, great_circle_midpoint, InterpError,
-};
+use sightline_cot::geo_interp::{great_circle_intermediate, great_circle_midpoint, InterpError};
 
 #[test]
 fn test_equator_midpoint_and_fraction() {
