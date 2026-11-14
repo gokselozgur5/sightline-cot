@@ -56,6 +56,7 @@ pub mod geo_dms;
 pub mod geo_destination;
 pub mod geo_enu;
 pub mod geo_frame;
+pub mod geo_ecef;
 pub mod geo_greatcircle;
 pub mod geo_haversine;
 pub use geo_haversine::{
