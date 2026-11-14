@@ -28,3 +28,14 @@ fn test_linear_between_and_planar_surface() {
     let expected = 10.0 + 2.0 * e + 4.0 * n;
     assert!((dem.sample(e, n).unwrap() - expected).abs() < 1e-9);
 }
+
+#[test]
+fn test_nodata_corner_returns_none() {
+    let mut elev = vec![Some(10.0); 9];
+    elev[4] = None;
+    let dem = DemRaster::new(0.0, 0.0, 10.0, 3, 3, elev).unwrap();
+    assert_eq!(dem.sample(5.0, 5.0), None);
+    assert_eq!(dem.sample(15.0, 5.0), None);
+    assert_eq!(dem.sample(5.0, 15.0), None);
+    assert_eq!(dem.sample(15.0, 15.0), None);
+}
