@@ -39,3 +39,15 @@ fn test_nodata_corner_returns_none() {
     assert_eq!(dem.sample(5.0, 15.0), None);
     assert_eq!(dem.sample(15.0, 15.0), None);
 }
+
+#[test]
+fn test_nodata_from_raw_and_out_of_bounds() {
+    let raw = [10.0, -9999.0, f64::NAN, 40.0];
+    let dem = DemRaster::from_f64(0.0, 0.0, 5.0, 2, 2, &raw, Some(-9999.0)).unwrap();
+    assert_eq!(dem.get_node(1, 0), None);
+    assert_eq!(dem.get_node(0, 1), None);
+    assert_eq!(dem.sample(2.5, 2.5), None);
+    assert_eq!(dem.sample(-1.0, 2.0), None);
+    assert_eq!(dem.sample(2.0, 10.0), None);
+    assert_eq!(dem.sample(f64::NAN, 2.0), None);
+}
