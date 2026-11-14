@@ -24,3 +24,13 @@ fn test_adaptive_covariance_config_invalid() {
     assert_eq!(cfg3.validate(), Err(AdaptiveCovarianceError::InvalidConfig));
 }
 
+#[test]
+fn test_adaptive_scale_bounds() {
+    let cfg = AdaptiveCovarianceConfig::default();
+    assert_eq!(compute_adaptive_scale(0.0, &cfg).unwrap(), 1.0);
+    assert_eq!(compute_adaptive_scale(5.991, &cfg).unwrap(), 1.0);
+    assert_eq!(compute_adaptive_scale(59.91, &cfg).unwrap(), 10.0);
+    assert_eq!(compute_adaptive_scale(100.0, &cfg).unwrap(), 10.0);
+}
+
+
