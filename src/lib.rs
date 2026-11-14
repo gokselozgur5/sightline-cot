@@ -72,6 +72,8 @@ pub use tracker_cov_adaptive::{
 pub mod utm_mgrs;
 pub mod utm_string;
 pub use cam_distorted_pinhole::DistortedPinhole;
+pub mod ellipsoid;
+pub use ellipsoid::{Ellipsoid, GRS80, WGS72, WGS84};
 
 pub const VERSION: &str = "0.1.0";
 
