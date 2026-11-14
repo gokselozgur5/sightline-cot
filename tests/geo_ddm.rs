@@ -70,3 +70,13 @@ fn test_ddm_error_cases() {
         Err(DdmError::ConflictingHemisphere)
     );
 }
+
+#[test]
+fn test_ddm_prefix_hemisphere_second_component() {
+    let s = "40 26.767, W 79 58.933";
+    let (lat, lon) = parse_ddm(s).expect("parse 5-token prefix hemi");
+    let exp_lat = 40.0 + 26.767 / 60.0;
+    let exp_lon = -(79.0 + 58.933 / 60.0);
+    assert!((lat - exp_lat).abs() < 1e-6);
+    assert!((lon - exp_lon).abs() < 1e-6);
+}
