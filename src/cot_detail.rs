@@ -24,3 +24,17 @@ impl CotContact {
         self
     }
 }
+
+impl CotContact {
+    /// Render contact detail as XML snippet.
+    pub fn to_xml(&self) -> String {
+        let cs = escape_xml_attr(&self.callsign);
+        match &self.endpoint {
+            Some(ep) => format!(
+                r#"<contact callsign="{cs}" endpoint="{}"/>"#,
+                escape_xml_attr(ep)
+            ),
+            None => format!(r#"<contact callsign="{cs}"/>"#),
+        }
+    }
+}
