@@ -71,3 +71,18 @@ fn test_geodesic_midpoint_ellipsoid_endpoints_and_equidistant() {
         .distance_m;
     assert!((d1 - d2).abs() < 1e-6);
 }
+
+#[test]
+fn test_geodesic_midpoint_ellipsoid_antimeridian_and_antipodal() {
+    use sightline_cot::geo_midpoint::{geodesic_midpoint_ellipsoid, MidpointError};
+
+    let (lat, lon) = geodesic_midpoint_ellipsoid(0.0, 170.0, 0.0, -170.0, 0.5).unwrap();
+    assert!(lat.abs() < 1e-6);
+    assert!((lon.abs() - 180.0).abs() < 1e-6);
+
+    let antipodal = geodesic_midpoint_ellipsoid(0.0, 0.0, 0.0, 180.0, 0.5);
+    assert_eq!(antipodal, Err(MidpointError::AntipodalPoints));
+
+    let invalid_frac = geodesic_midpoint_ellipsoid(0.0, 0.0, 10.0, 10.0, 1.5);
+    assert_eq!(invalid_frac, Err(MidpointError::AntipodalPoints));
+}
