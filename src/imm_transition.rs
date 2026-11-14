@@ -59,8 +59,8 @@ pub fn adaptive_transition_matrix(
         }
         let p_ii = 1.0 - (dt / tau);
         let p_ij = (dt / tau) / ((NUM_MODELS - 1) as f64);
-        for j in 0..NUM_MODELS {
-            mat[i][j] = if i == j { p_ii } else { p_ij };
+        for (j, cell) in mat[i].iter_mut().enumerate() {
+            *cell = if i == j { p_ii } else { p_ij };
         }
         validate_transition_row(&mat[i], 1e-6)?;
     }
