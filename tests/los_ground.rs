@@ -67,3 +67,21 @@ fn test_sloped_plane_intersection() {
     assert_eq!(hit.point, [0.0, 0.0, 10.0]);
     assert!((hit.slant_range_m - 90.0).abs() < 1e-9);
 }
+
+use sightline_cot::camera::CameraPose;
+use sightline_cot::los_ground::camera_los_ground;
+
+#[test]
+fn test_camera_los_ground_nadir() {
+    let pose = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: 500.0,
+    };
+    let hit = camera_los_ground(&pose, [0.0, 0.0, 1.0], 0.0).unwrap();
+    assert!((hit.point[0]).abs() < 1e-9);
+    assert!((hit.point[1]).abs() < 1e-9);
+    assert!((hit.point[2]).abs() < 1e-9);
+    assert!((hit.slant_range_m - 500.0).abs() < 1e-9);
+}
