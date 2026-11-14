@@ -99,10 +99,18 @@ pub struct CameraFrustum {
 use crate::camera::enu_to_geodetic;
 
 fn check_inputs(w: f64, h: f64, n: f64, f: f64, lat: f64, lon: f64, hae: f64) -> bool {
-    w.is_finite() && w > 0.0 && h.is_finite() && h > 0.0
-        && n.is_finite() && n > 0.0 && f.is_finite() && f > n
-        && lat.is_finite() && (-90.0..=90.0).contains(&lat)
-        && lon.is_finite() && hae.is_finite()
+    w.is_finite()
+        && w > 0.0
+        && h.is_finite()
+        && h > 0.0
+        && n.is_finite()
+        && n > 0.0
+        && f.is_finite()
+        && f > n
+        && lat.is_finite()
+        && (-90.0..=90.0).contains(&lat)
+        && lon.is_finite()
+        && hae.is_finite()
 }
 
 fn compute_cam_corners(
@@ -161,6 +169,11 @@ impl CameraFrustum {
             transform_frustum_corners(pose, &corners_cam, ref_lat, ref_lon, ref_hae);
         let enu_bbox = EnuBbox::from_points(&corners_enu).ok_or(FrustumError::InvalidParameters)?;
         let geo_bbox = GeoBbox::from_points(&geo_pts).ok_or(FrustumError::InvalidParameters)?;
-        Ok(Self { corners_cam, corners_enu, enu_bbox, geo_bbox })
+        Ok(Self {
+            corners_cam,
+            corners_enu,
+            enu_bbox,
+            geo_bbox,
+        })
     }
 }
