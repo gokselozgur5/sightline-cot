@@ -61,6 +61,7 @@ pub mod geo_interp;
 pub mod geo_intersect;
 pub mod geo_meridian_arc;
 pub mod geo_midpoint;
+pub mod geo_ned;
 pub mod geo_perimeter;
 pub mod geo_polyline;
 pub mod geo_polyline_nearest;
