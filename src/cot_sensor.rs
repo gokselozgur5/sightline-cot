@@ -20,6 +20,12 @@ impl CotSensor {
         if !(0.0..=360.0).contains(&fov) {
             return Err(CotError::CoordinateOutOfBounds("fov in [0.0, 360.0]"));
         }
+        if !(0.0..=360.0).contains(&az) {
+            return Err(CotError::CoordinateOutOfBounds("azimuth in [0.0, 360.0]"));
+        }
+        if !(-90.0..=90.0).contains(&el) {
+            return Err(CotError::CoordinateOutOfBounds("elevation in [-90.0, 90.0]"));
+        }
         if rng < 0.0 {
             return Err(CotError::CoordinateOutOfBounds("range >= 0.0"));
         }
