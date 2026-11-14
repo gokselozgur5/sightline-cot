@@ -12,6 +12,7 @@ pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
 pub mod los;
+pub mod los_ground;
 pub mod maidenhead;
 pub mod mgrs;
 pub mod mgrs_decode;
