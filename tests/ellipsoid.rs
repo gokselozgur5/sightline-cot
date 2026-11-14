@@ -38,3 +38,11 @@ fn test_ellipsoid_radii_of_curvature() {
     assert!((e.prime_vertical_radius(90.0) - 6_399_593.626).abs() < 1e-2);
     assert!((e.mean_radius() - 6_371_008.771).abs() < 1e-2);
 }
+
+#[test]
+fn test_from_a_f_and_other_ellipsoids() {
+    let custom = Ellipsoid::from_a_f(6_378_137.0, 1.0 / 298.257_223_563);
+    assert_eq!(custom, Ellipsoid::wgs84());
+    assert!((GRS80.b() - 6_356_752.314_140).abs() < 1e-4);
+    assert!((WGS72.b() - 6_356_750.520_016).abs() < 1e-4);
+}
