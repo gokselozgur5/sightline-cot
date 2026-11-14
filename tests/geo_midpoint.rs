@@ -37,3 +37,11 @@ fn test_geodesic_midpoint_errors() {
         Err(MidpointError::InvalidLongitude)
     );
 }
+
+#[test]
+fn test_geodesic_midpoint_ellipsoid_failing_repro() {
+    use sightline_cot::geo_midpoint::geodesic_midpoint_ellipsoid;
+
+    let res = geodesic_midpoint_ellipsoid(0.0, 10.0, 0.0, 20.0, 0.5);
+    assert!(res.is_ok());
+}
