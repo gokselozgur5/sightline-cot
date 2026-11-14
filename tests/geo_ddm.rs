@@ -79,3 +79,14 @@ fn test_ddm_unsigned_first_prefix_second() {
     assert!((lat - expected_lat).abs() < 1e-6);
     assert!((lon - expected_lon).abs() < 1e-6);
 }
+
+#[test]
+fn test_ddm_suffix_hemisphere_first_component() {
+    let (lat1, lon1) = parse_ddm("40 26.767 N, 79 58.933").unwrap();
+    let (lat2, lon2) = parse_ddm("40 26.767 N -79 58.933").unwrap();
+    let expected_lat = 40.0 + 26.767 / 60.0;
+    assert!((lat1 - expected_lat).abs() < 1e-6);
+    assert!((lat2 - expected_lat).abs() < 1e-6);
+    assert!((lon1 - (79.0 + 58.933 / 60.0)).abs() < 1e-6);
+    assert!((lon2 - (-(79.0 + 58.933 / 60.0))).abs() < 1e-6);
+}
