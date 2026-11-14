@@ -50,3 +50,28 @@ fn ecef_to_enu(p_ecef: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f
     let u = c_lat * c_lon * dx + c_lat * s_lon * dy + s_lat * dz;
     [e, n, u]
 }
+
+/// Convert Geodetic coordinates (lat, lon, hae) to local ENU offset from reference origin.
+pub fn geodetic_to_enu(
+    lat_deg: f64,
+    lon_deg: f64,
+    hae_m: f64,
+    ref_lat_deg: f64,
+    ref_lon_deg: f64,
+    ref_hae_m: f64,
+) -> Result<[f64; 3], EnuError> {
+    if !lat_deg.is_finite()
+        || !lon_deg.is_finite()
+        || !hae_m.is_finite()
+        || !ref_lat_deg.is_finite()
+        || !ref_lon_deg.is_finite()
+        || !ref_hae_m.is_finite()
+    {
+        return Err(EnuError::NonFinite);
+    }
+    if !(-90.0..=90.0).contains(&lat_deg) || !(-90.0..=90.0).contains(&ref_lat_deg) {
+        return Err(EnuError::LatitudeOutOfRange);
+    }
+    let p_ecef = geodetic_to_ecef(lat_deg, lon_deg, hae_m);
+    Ok(ecef_to_enu(p_ecef, ref_lat_deg, ref_lon_deg, ref_hae_m))
+}
