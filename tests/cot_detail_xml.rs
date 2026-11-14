@@ -1,4 +1,4 @@
-use sightline_cot::cot_detail::{CotContact, CotGroup, CotDetailPayload};
+use sightline_cot::cot_detail::{CotContact, CotDetailPayload, CotGroup};
 
 #[test]
 fn test_cot_contact_to_xml() {
@@ -12,10 +12,7 @@ fn test_cot_contact_to_xml() {
 #[test]
 fn test_cot_group_to_xml() {
     let g = CotGroup::new("Blue", "Team Lead");
-    assert_eq!(
-        g.to_xml(),
-        r#"<__group name="Blue" role="Team Lead"/>"#
-    );
+    assert_eq!(g.to_xml(), r#"<__group name="Blue" role="Team Lead"/>"#);
 }
 
 #[test]
