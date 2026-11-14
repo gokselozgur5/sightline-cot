@@ -175,4 +175,25 @@ impl LocalFrame {
         }
         Ok(out)
     }
+
+    /// Project 2D coordinates (lat_deg, lon_deg at hae = 0) to local [east_m, north_m].
+    pub fn project_2d(&self, lat_deg: f64, lon_deg: f64) -> Result<[f64; 2], GeoFrameError> {
+        let enu = self.geodetic_to_enu(lat_deg, lon_deg, 0.0)?;
+        Ok([enu[0], enu[1]])
+    }
+
+    /// Batch project 2D coordinates `[lat_deg, lon_deg]` to `[east_m, north_m]`.
+    pub fn project_2d_batch(&self, pts: &[[f64; 2]]) -> Result<Vec<[f64; 2]>, GeoFrameError> {
+        let mut out = Vec::with_capacity(pts.len());
+        for p in pts {
+            out.push(self.project_2d(p[0], p[1])?);
+        }
+        Ok(out)
+    }
+
+    /// Unproject 2D planar coordinates [east_m, north_m] to (lat_deg, lon_deg).
+    pub fn unproject_2d(&self, east_m: f64, north_m: f64) -> Result<(f64, f64), GeoFrameError> {
+        let (lat, lon, _) = self.enu_to_geodetic([east_m, north_m, 0.0])?;
+        Ok((lat, lon))
+    }
 }
