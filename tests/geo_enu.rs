@@ -37,3 +37,14 @@ fn test_geodetic_to_enu_error_handling() {
         Err(EnuError::LatitudeOutOfRange)
     );
 }
+
+#[test]
+fn test_geo_enu_module_reexport() {
+    use sightline_cot::geo_enu::enu_to_geodetic;
+
+    let (lat, lon, hae) = enu_to_geodetic([100.0, 200.0, 10.0], 45.0, 9.0, 100.0);
+    let enu = geodetic_to_enu(lat, lon, hae, 45.0, 9.0, 100.0).unwrap();
+    assert!((enu[0] - 100.0).abs() < 1e-4);
+    assert!((enu[1] - 200.0).abs() < 1e-4);
+    assert!((enu[2] - 10.0).abs() < 1e-4);
+}
