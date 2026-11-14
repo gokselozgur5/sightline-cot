@@ -2,13 +2,16 @@
 
 pub mod cam_project;
 pub mod cam_slant_range;
-pub use cam_slant_range::{compute_slant_range_and_grazing, slant_range_for_pixel, slant_range_from_pose_and_ground, SlantRangeGeometry};
-pub mod camera;
+pub use cam_slant_range::{
+    compute_slant_range_and_grazing, slant_range_for_pixel, slant_range_from_pose_and_ground,
+    SlantRangeGeometry,
+};
 pub mod cam_frustum;
+pub mod camera;
 pub mod classifier;
 pub mod cot;
-pub mod cot_sensor;
 pub mod cot_detail;
+pub mod cot_sensor;
 pub mod dem_bilinear;
 pub mod ffi;
 pub mod geo_helmert;
