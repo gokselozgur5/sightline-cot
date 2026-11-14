@@ -66,3 +66,30 @@ fn validate_fraction(f: f64) -> Result<(), MidpointError> {
         Ok(())
     }
 }
+
+/// Compute intermediate point along geodesic on WGS84 ellipsoid.
+pub fn geodesic_midpoint_ellipsoid(
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
+    fraction: f64,
+) -> Result<(f64, f64), MidpointError> {
+    validate_coords(lat1, lon1)?;
+    validate_coords(lat2, lon2)?;
+    validate_fraction(fraction)?;
+    if fraction == 0.0 {
+        return Ok((lat1, lon1));
+    }
+    if fraction == 1.0 {
+        return Ok((lat2, lon2));
+    }
+    let inv = vincenty_inverse(lat1, lon1, lat2, lon2)?;
+    let d = vincenty_direct(
+        lat1,
+        lon1,
+        inv.forward_azimuth_deg,
+        inv.distance_m * fraction,
+    )?;
+    Ok((d.lat_deg, d.lon_deg))
+}
