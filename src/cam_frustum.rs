@@ -25,3 +25,17 @@ impl From<CameraError> for FrustumError {
         Self::Camera(err)
     }
 }
+
+use crate::camera::{CameraPose, Intrinsics};
+use crate::geo_bbox::GeoBbox;
+
+/// Axis-aligned bounding box in 3D ENU frame [min_east, min_north, min_up] to [max_east, max_north, max_up].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct EnuBbox {
+    pub min_e: f64,
+    pub min_n: f64,
+    pub min_u: f64,
+    pub max_e: f64,
+    pub max_n: f64,
+    pub max_u: f64,
+}
