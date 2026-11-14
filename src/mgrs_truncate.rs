@@ -41,3 +41,14 @@ fn validate_mgrs_10digit(s: &str) -> Result<(&str, &str, &str), GridError> {
     }
     Ok((&s[0..5], &s[5..10], &s[10..15]))
 }
+
+/// Truncate a 10-digit MGRS string to the given target precision.
+pub fn truncate_mgrs(mgrs: &str, precision: MgrsPrecision) -> Result<String, GridError> {
+    let (prefix, easting, northing) = validate_mgrs_10digit(mgrs)?;
+    let d = precision.digits_per_axis();
+    let mut out = String::with_capacity(5 + 2 * d);
+    out.push_str(prefix);
+    out.push_str(&easting[..d]);
+    out.push_str(&northing[..d]);
+    Ok(out)
+}
