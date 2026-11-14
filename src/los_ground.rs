@@ -10,3 +10,17 @@ pub enum LosGroundError {
     /// One or more coordinates or vector components are non-finite.
     NonFiniteInput,
 }
+
+impl core::fmt::Display for LosGroundError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RayAboveOrParallelGround => {
+                write!(f, "ray is pointing above or parallel to ground")
+            }
+            Self::DegenerateRayDirection => write!(f, "ray direction vector is degenerate"),
+            Self::NonFiniteInput => write!(f, "input coordinates are non-finite"),
+        }
+    }
+}
+
+impl std::error::Error for LosGroundError {}
