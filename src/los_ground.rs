@@ -58,3 +58,19 @@ pub struct LosGroundIntersection {
     /// Distance parameter t along the ray direction vector.
     pub t: f64,
 }
+
+fn check_ray_ground_t(ray: &LosRay, ground_up_m: f64) -> Result<f64, LosGroundError> {
+    if !ground_up_m.is_finite() {
+        return Err(LosGroundError::NonFiniteInput);
+    }
+    let dz = ray.direction[2];
+    let delta_z = ground_up_m - ray.origin[2];
+    if (dz >= -1e-9 && delta_z <= 0.0) || (dz <= 1e-9 && delta_z >= 0.0) {
+        return Err(LosGroundError::RayAboveOrParallelGround);
+    }
+    let t = delta_z / dz;
+    if t < 0.0 {
+        return Err(LosGroundError::RayAboveOrParallelGround);
+    }
+    Ok(t)
+}
