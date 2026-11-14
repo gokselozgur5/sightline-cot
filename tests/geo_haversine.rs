@@ -790,3 +790,27 @@ fn test_haversine() {
     let (distance, bearing) = haversine(47.6062, -122.3321, 40.7128, -74.0060);
 
     assert!((distance - 192.2).abs() < 0.05); // 192.2 km
+    assert!((bearing - 166.8).abs() < 0.05); // 166.8 degrees
+
+    let (distance, bearing) = haversine(47.6062, -122.3321, 34.0522, -118.2437);
+
+    assert!((distance - 192.2).abs() < 0.05); // 192.2 km
+    assert!((bearing - 166.8).abs() < 0.05); // 166.8 degrees
+
+    let (distance, bearing) = haversine(47.6062, -122.3321, 40.7128, -74.0060);
+
+    assert!((distance - 192.2).abs() < 0.05); // 192.2 km
+    assert!((bearing - 166.8).abs() < 0.05); // 166.8 degrees
+
+    let (distance, bearing) = haversine(47.6062, -122.3321, 34.0522, -118.2437);
+
+    assert!((distance - 192.2).abs() < 0.05); // 192.2 km
+    assert!((bearing - 166.8).abs() < 0.05); // 166.8 degrees
+
+    let (distance, bearing) = haversine(47.6062, -122.3321, 40.7128, -74.0060);
+
+    assert!((distance - 192.2).abs() < 0.05); // 192.2 km
+    assert!((bearing - 166.8).abs() < 0.05); // 166.8 degrees
+
+    let (distance, bearing) = haversine(47.6062, -122.3321, 34.0522, -118.2437);
+
