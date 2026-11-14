@@ -47,3 +47,14 @@ impl LosRay {
         Ok(Self { origin, direction })
     }
 }
+
+/// Result of a successful line-of-sight ground intersection.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LosGroundIntersection {
+    /// 3D coordinates of intersection [east, north, up].
+    pub point: [f64; 3],
+    /// Slant range from origin to ground point in meters.
+    pub slant_range_m: f64,
+    /// Distance parameter t along the ray direction vector.
+    pub t: f64,
+}
