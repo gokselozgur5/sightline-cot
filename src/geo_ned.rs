@@ -26,3 +26,13 @@ pub fn geodetic_to_ned(
     crate::geo_enu::geodetic_to_enu(lat_deg, lon_deg, hae_m, ref_lat_deg, ref_lon_deg, ref_hae_m)
         .map(enu_to_ned)
 }
+
+/// Convert local NED offset from reference origin to Geodetic coordinates (lat, lon, hae).
+pub fn ned_to_geodetic(
+    ned: [f64; 3],
+    ref_lat_deg: f64,
+    ref_lon_deg: f64,
+    ref_hae_m: f64,
+) -> (f64, f64, f64) {
+    crate::camera::enu_to_geodetic(ned_to_enu(ned), ref_lat_deg, ref_lon_deg, ref_hae_m)
+}
