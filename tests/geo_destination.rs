@@ -48,3 +48,14 @@ fn test_final_bearing_equator_and_cardinals() {
     let b_north = final_bearing(0.0, 0.0, 0.0, 100_000.0);
     assert!((b_north - 0.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_final_bearing_matches_reverse_initial_bearing() {
+    use sightline_cot::geo_destination::final_bearing;
+    use sightline_cot::geo_greatcircle::initial_bearing;
+    let (lat1, lon1, b1, d) = (37.7, -122.4, 45.0, 500_000.0);
+    let (lat2, lon2) = destination_point(lat1, lon1, b1, d);
+    let fb = final_bearing(lat1, lon1, b1, d);
+    let rev_b = (initial_bearing(lat2, lon2, lat1, lon1) + 180.0) % 360.0;
+    assert!((fb - rev_b).abs() < 1e-4);
+}
