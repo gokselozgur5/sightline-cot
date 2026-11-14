@@ -33,6 +33,23 @@ impl Ellipsoid {
     pub fn e2(&self) -> f64 { self.f * (2.0 - self.f) }
     pub fn e(&self) -> f64 { self.e2().sqrt() }
     pub fn e_prime2(&self) -> f64 { self.e2() / (1.0 - self.e2()) }
+
+    pub fn meridian_radius(&self, lat_deg: f64) -> f64 {
+        let s = lat_deg.to_radians().sin();
+        let e2 = self.e2();
+        let w = 1.0 - e2 * s * s;
+        self.a * (1.0 - e2) / (w * w.sqrt())
+    }
+
+    pub fn prime_vertical_radius(&self, lat_deg: f64) -> f64 {
+        let s = lat_deg.to_radians().sin();
+        let e2 = self.e2();
+        self.a / (1.0 - e2 * s * s).sqrt()
+    }
+
+    pub fn mean_radius(&self) -> f64 {
+        (2.0 * self.a + self.b) / 3.0
+    }
 }
 
 pub const WGS84: Ellipsoid = Ellipsoid::WGS84;
