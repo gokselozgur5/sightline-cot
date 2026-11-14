@@ -104,3 +104,20 @@ fn check_inputs(w: f64, h: f64, n: f64, f: f64, lat: f64, lon: f64, hae: f64) ->
         && lat.is_finite() && (-90.0..=90.0).contains(&lat)
         && lon.is_finite() && hae.is_finite()
 }
+
+fn compute_cam_corners(
+    cam: &Intrinsics,
+    w: f64,
+    h: f64,
+    near_m: f64,
+    far_m: f64,
+) -> Result<[[f64; 3]; 8], FrustumError> {
+    let px = [[0.0, 0.0], [w, 0.0], [w, h], [0.0, h]];
+    let mut corners = [[0.0; 3]; 8];
+    for (i, p) in px.iter().enumerate() {
+        let ray = cam.pixel_to_ray(p[0], p[1])?;
+        corners[i] = [ray[0] * near_m, ray[1] * near_m, ray[2] * near_m];
+        corners[i + 4] = [ray[0] * far_m, ray[1] * far_m, ray[2] * far_m];
+    }
+    Ok(corners)
+}
