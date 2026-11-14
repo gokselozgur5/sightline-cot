@@ -74,8 +74,14 @@ fn split_components(toks: &[String]) -> Result<(&[String], &[String]), DdmError>
         5 => {
             if parse_hemi(&toks[0]).is_some() {
                 Ok((&toks[0..3], &toks[3..5]))
-            } else if parse_hemi(&toks[2]).is_some() || parse_hemi(&toks[4]).is_some() {
+            } else if parse_hemi(&toks[4]).is_some() {
                 Ok((&toks[0..2], &toks[2..5]))
+            } else if let Some(h) = parse_hemi(&toks[2]) {
+                if toks[3].starts_with('-') || toks[3].starts_with('+') || matches!(h, 'N' | 'S') {
+                    Ok((&toks[0..3], &toks[3..5]))
+                } else {
+                    Ok((&toks[0..2], &toks[2..5]))
+                }
             } else {
                 Err(DdmError::InvalidFormat)
             }
