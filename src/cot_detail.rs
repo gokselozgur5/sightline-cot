@@ -1,6 +1,7 @@
 //! CoT XML detail formatter.
 
 use crate::cot::escape_xml_attr;
+use crate::cot_sensor::CotSensor;
 
 /// Contact detail schema element in CoT 2.0 XML.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,10 +67,11 @@ impl CotGroup {
 }
 
 /// CoT detail payload combining contact and group elements.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct CotDetailPayload {
     pub contact: Option<CotContact>,
     pub group: Option<CotGroup>,
+    pub sensor: Option<CotSensor>,
 }
 
 impl CotDetailPayload {
@@ -89,6 +91,12 @@ impl CotDetailPayload {
         self.group = Some(group);
         self
     }
+
+    /// Attach sensor detail.
+    pub fn with_sensor(mut self, sensor: CotSensor) -> Self {
+        self.sensor = Some(sensor);
+        self
+    }
 }
 
 impl CotDetailPayload {
@@ -100,6 +108,9 @@ impl CotDetailPayload {
         }
         if let Some(g) = &self.group {
             inner.push_str(&g.to_xml());
+        }
+        if let Some(s) = &self.sensor {
+            inner.push_str(&s.to_xml());
         }
         if inner.is_empty() {
             "<detail/>".to_string()
