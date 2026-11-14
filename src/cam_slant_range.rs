@@ -48,3 +48,12 @@ pub fn compute_slant_range_and_grazing(
         elevation_angle_rad,
     })
 }
+
+/// Compute slant range and grazing angle from camera pose and ground intersection.
+pub fn slant_range_from_pose_and_ground(
+    pose: &crate::camera::CameraPose,
+    ground_pt_enu: [f64; 3],
+) -> Result<SlantRangeGeometry, CameraError> {
+    let sensor_pos = [0.0, 0.0, pose.cam_up_m];
+    compute_slant_range_and_grazing(sensor_pos, ground_pt_enu)
+}
