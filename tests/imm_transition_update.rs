@@ -45,3 +45,15 @@ fn test_update_transition_matrix_valid_and_invalid() {
     );
     assert_eq!(imm.trans_mat, valid_mat);
 }
+
+#[test]
+fn test_adaptive_transition_matrix() {
+    let sojourn = [10.0, 5.0, 4.0];
+    let dt = 0.5;
+    let res = adaptive_transition_matrix(sojourn, dt).unwrap();
+    for (i, row) in res.iter().enumerate() {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1e-6);
+        let expected_diag = 1.0 - (dt / sojourn[i]);
+        assert!((row[i] - expected_diag).abs() < 1e-6);
+    }
+}
