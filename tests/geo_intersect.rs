@@ -51,3 +51,9 @@ fn test_closed_square_no_self_intersection() {
     assert!(!polyline_has_self_intersection(&square));
     assert!(find_self_intersections(&square).is_empty());
 }
+
+#[test]
+fn test_antipodal_antimeridian_no_intersection() {
+    let a = segments_intersect([0.0, 0.0], [10.0, 0.0], [5.0, -165.0], [5.0, 175.0]);
+    assert!(a.is_none());
+}
