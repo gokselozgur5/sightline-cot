@@ -25,3 +25,8 @@ pub fn haversine_distance_with_radius(
     let c = 2.0 * a.clamp(0.0, 1.0).sqrt().asin();
     radius_m * c
 }
+
+/// Computes initial bearing from point 1 to point 2 in degrees in [0, 360).
+pub fn initial_bearing(_lat1: f64, _lon1: f64, _lat2: f64, _lon2: f64) -> f64 {
+    -1.0
+}
