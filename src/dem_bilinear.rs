@@ -77,3 +77,20 @@ impl DemRaster {
         })
     }
 }
+
+impl DemRaster {
+    /// Create DemRaster from raw floats mapping NaN and sentinel to None.
+    pub fn from_f64(
+        e0: f64,
+        n0: f64,
+        step: f64,
+        cols: usize,
+        rows: usize,
+        raw: &[f64],
+        nodata: Option<f64>,
+    ) -> Result<Self, DemError> {
+        let is_nd = |h: f64| !h.is_finite() || nodata.map_or(false, |nd| (h - nd).abs() < 1e-6);
+        let elevations = raw.iter().map(|&h| (!is_nd(h)).then_some(h)).collect();
+        Self::new(e0, n0, step, cols, rows, elevations)
+    }
+}
