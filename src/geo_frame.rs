@@ -68,3 +68,30 @@ pub struct LocalFrame {
     pub cos_lon: f64,
     pub origin_ecef: [f64; 3],
 }
+
+impl LocalFrame {
+    /// Construct a new LocalFrame caching reference trigonometry and ECEF coordinates.
+    pub fn new(lat_deg: f64, lon_deg: f64, hae_m: f64) -> Result<Self, GeoFrameError> {
+        if !lat_deg.is_finite() || !lon_deg.is_finite() || !hae_m.is_finite() {
+            return Err(GeoFrameError::NonFinite);
+        }
+        if !(-90.0..=90.0).contains(&lat_deg) {
+            return Err(GeoFrameError::LatitudeOutOfRange);
+        }
+        let lat_rad = lat_deg.to_radians();
+        let lon_rad = lon_deg.to_radians();
+        let (sin_lat, cos_lat) = (lat_rad.sin(), lat_rad.cos());
+        let (sin_lon, cos_lon) = (lon_rad.sin(), lon_rad.cos());
+        let origin_ecef = geodetic_to_ecef(lat_deg, lon_deg, hae_m);
+        Ok(Self {
+            origin_lat_deg: lat_deg,
+            origin_lon_deg: lon_deg,
+            origin_hae_m: hae_m,
+            sin_lat,
+            cos_lat,
+            sin_lon,
+            cos_lon,
+            origin_ecef,
+        })
+    }
+}
