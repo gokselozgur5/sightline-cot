@@ -72,9 +72,9 @@ fn split_components(toks: &[String]) -> Result<(&[String], &[String]), DdmError>
         4 => Ok((&toks[0..2], &toks[2..4])),
         6 => Ok((&toks[0..3], &toks[3..6])),
         5 => {
-            if parse_hemi(&toks[0]).is_some() || parse_hemi(&toks[2]).is_some() {
+            if parse_hemi(&toks[0]).is_some() {
                 Ok((&toks[0..3], &toks[3..5]))
-            } else if parse_hemi(&toks[4]).is_some() {
+            } else if parse_hemi(&toks[2]).is_some() || parse_hemi(&toks[4]).is_some() {
                 Ok((&toks[0..2], &toks[2..5]))
             } else {
                 Err(DdmError::InvalidFormat)
