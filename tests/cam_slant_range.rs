@@ -59,3 +59,19 @@ fn test_slant_range_for_pixel_end_to_end() {
     assert!((geom.slant_range_m - 100.0).abs() < 1e-6);
     assert!((geom.grazing_angle_deg() - 90.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_slant_range_error_handling() {
+    let sensor = [f64::NAN, 0.0, 100.0];
+    let target = [0.0, 0.0, 0.0];
+    assert_eq!(
+        compute_slant_range_and_grazing(sensor, target),
+        Err(CameraError::InvalidParameters)
+    );
+
+    let same_pos = [10.0, 20.0, 30.0];
+    assert_eq!(
+        compute_slant_range_and_grazing(same_pos, same_pos),
+        Err(CameraError::InvalidParameters)
+    );
+}
