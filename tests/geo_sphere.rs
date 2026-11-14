@@ -1,4 +1,4 @@
-use sightline_cot::geo_sphere::haversine_distance;
+use sightline_cot::geo_sphere::{haversine_distance, initial_bearing};
 
 #[test]
 fn test_haversine_identical_and_symmetric() {
@@ -8,4 +8,13 @@ fn test_haversine_identical_and_symmetric() {
     let d2 = haversine_distance(48.8566, 2.3522, 51.5074, -0.1278);
     assert!((d1 - d2).abs() < 1e-9);
     assert!((d1 - 343_500.0).abs() < 2_000.0);
+}
+
+#[test]
+fn test_initial_bearing_cardinal_directions() {
+    assert_eq!(initial_bearing(0.0, 0.0, 0.0, 0.0), 0.0);
+    assert!((initial_bearing(0.0, 0.0, 10.0, 0.0) - 0.0).abs() < 1e-6);
+    assert!((initial_bearing(0.0, 0.0, 0.0, 10.0) - 90.0).abs() < 1e-6);
+    assert!((initial_bearing(0.0, 0.0, -10.0, 0.0) - 180.0).abs() < 1e-6);
+    assert!((initial_bearing(0.0, 0.0, 0.0, -10.0) - 270.0).abs() < 1e-6);
 }
