@@ -371,7 +371,7 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         if xml.len() + 1 > cap {
             return SIGHTLINE_ERR_BUFFER;
         }
-        std::ptr::copy_nonoverlapping(xml.as_ptr(), buf as *mut u8, xml.len());
+        std::ptr::copy_nonoverlapping(xml.as_ptr(), buf.cast::<u8>(), xml.len());
         *buf.add(xml.len()) = 0;
         SIGHTLINE_OK
     })
