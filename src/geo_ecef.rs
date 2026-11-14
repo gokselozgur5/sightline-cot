@@ -38,3 +38,8 @@ pub fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
     };
     (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
 }
+
+/// Convert ECEF coordinate array `[x, y, z]` in meters to geodetic coordinates.
+pub fn ecef_point_to_geodetic(p: [f64; 3]) -> (f64, f64, f64) {
+    ecef_to_geodetic(p[0], p[1], p[2])
+}
