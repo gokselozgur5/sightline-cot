@@ -51,3 +51,24 @@ fn test_nodata_from_raw_and_out_of_bounds() {
     assert_eq!(dem.sample(2.0, 10.0), None);
     assert_eq!(dem.sample(f64::NAN, 2.0), None);
 }
+
+#[test]
+fn test_validation_errors_and_camera_grid_conversion() {
+    let d = vec![None; 4];
+    assert_eq!(
+        DemRaster::new(0.0, 0.0, 0.0, 2, 2, d.clone()),
+        Err(DemError::InvalidStep)
+    );
+    assert_eq!(
+        DemRaster::new(0.0, 0.0, 1.0, 1, 2, d.clone()),
+        Err(DemError::InvalidDimensions)
+    );
+    assert_eq!(
+        DemRaster::new(0.0, 0.0, 1.0, 2, 2, vec![None; 3]),
+        Err(DemError::DataLengthMismatch)
+    );
+    let raw = vec![10.0, 20.0, 30.0, 40.0];
+    let cam = sightline_cot::camera::DemGrid::new(0.0, 0.0, 10.0, 2, 2, raw).unwrap();
+    let raster = DemRaster::from(&cam);
+    assert_eq!(raster.sample(5.0, 5.0), cam.elevation_at(5.0, 5.0));
+}
