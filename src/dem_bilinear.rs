@@ -35,3 +35,22 @@ pub struct DemRaster {
 
 pub type DemBilinearSampler = DemRaster;
 pub type DemBilinear = DemRaster;
+
+impl DemRaster {
+    /// Validate grid parameters prior to construction.
+    fn validate(e0: f64, n0: f64, step: f64, c: usize, r: usize, n: usize) -> Result<(), DemError> {
+        if !e0.is_finite() || !n0.is_finite() {
+            return Err(DemError::NonFiniteCoordinate);
+        }
+        if !step.is_finite() || step <= 0.0 {
+            return Err(DemError::InvalidStep);
+        }
+        if c < 2 || r < 2 {
+            return Err(DemError::InvalidDimensions);
+        }
+        if n != c * r {
+            return Err(DemError::DataLengthMismatch);
+        }
+        Ok(())
+    }
+}
