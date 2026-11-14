@@ -40,3 +40,18 @@ fn test_geodetic_ned_roundtrip() {
         assert!((ned_out[i] - ned_in[i]).abs() < 1e-4);
     }
 }
+
+#[test]
+fn test_geodetic_to_ned_errors() {
+    use sightline_cot::geo_enu::EnuError;
+    use sightline_cot::geo_ned::geodetic_to_ned;
+
+    assert_eq!(
+        geodetic_to_ned(f64::NAN, 0.0, 0.0, 0.0, 0.0, 0.0),
+        Err(EnuError::NonFinite)
+    );
+    assert_eq!(
+        geodetic_to_ned(95.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        Err(EnuError::LatitudeOutOfRange)
+    );
+}
