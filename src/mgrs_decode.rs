@@ -52,6 +52,9 @@ fn decode_100k_row(zone: u8, row: u8) -> Result<f64, MgrsDecodeError> {
 
 fn parse_components(s: &str) -> Result<(u8, char, u8, u8, &str), MgrsDecodeError> {
     let s = s.trim();
+    if !s.is_ascii() {
+        return Err(MgrsDecodeError::InvalidSquare);
+    }
     if s.len() < 3 {
         return Err(MgrsDecodeError::InvalidLength);
     }
