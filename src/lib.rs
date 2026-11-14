@@ -6,6 +6,7 @@ pub mod cam_frustum;
 pub mod classifier;
 pub mod cot;
 pub mod cot_sensor;
+pub mod dem_bilinear;
 pub mod ffi;
 pub mod geo_helmert;
 pub mod geo_molodensky;
