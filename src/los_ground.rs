@@ -24,3 +24,10 @@ impl core::fmt::Display for LosGroundError {
 }
 
 impl std::error::Error for LosGroundError {}
+
+/// 3D ray defined by origin point and direction vector.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LosRay {
+    pub origin: [f64; 3],
+    pub direction: [f64; 3],
+}
