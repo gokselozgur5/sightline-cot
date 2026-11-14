@@ -42,3 +42,14 @@ fn test_rhumb_destination_and_intermediate_roundtrip() {
     assert!((d1 - dist / 2.0).abs() < 1e-4);
     assert!((d2 - dist / 2.0).abs() < 1e-4);
 }
+
+#[test]
+fn test_rhumb_coincident_points_at_south_pole() {
+    let p = [-90.0, 0.0];
+    let d = rhumb_distance(p, p);
+    assert!(!d.is_nan(), "distance is NaN");
+    assert_eq!(d, 0.0);
+    let b = rhumb_bearing(p, p);
+    assert!(!b.is_nan(), "bearing is NaN");
+    assert_eq!(b, 0.0);
+}
