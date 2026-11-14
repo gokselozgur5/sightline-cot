@@ -28,3 +28,13 @@ fn test_ellipsoid_parameter_accessors() {
     assert!((e.e() - 0.081_819_190_842).abs() < 1e-10);
     assert!((e.e_prime2() - 0.006_739_496_742).abs() < 1e-10);
 }
+
+#[test]
+fn test_ellipsoid_radii_of_curvature() {
+    let e = Ellipsoid::wgs84();
+    assert!((e.meridian_radius(0.0) - 6_335_439.327).abs() < 1e-2);
+    assert!((e.prime_vertical_radius(0.0) - 6_378_137.0).abs() < 1e-4);
+    assert!((e.meridian_radius(90.0) - 6_399_593.626).abs() < 1e-2);
+    assert!((e.prime_vertical_radius(90.0) - 6_399_593.626).abs() < 1e-2);
+    assert!((e.mean_radius() - 6_371_008.771).abs() < 1e-2);
+}
