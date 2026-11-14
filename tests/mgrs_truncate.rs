@@ -15,3 +15,11 @@ fn test_truncate_mgrs_success() {
     let p = MgrsPrecision::TenKilometers;
     assert_eq!(truncate_mgrs(s, p).unwrap(), "31NEA16");
 }
+
+#[test]
+fn test_truncate_mgrs_invalid() {
+    let p = MgrsPrecision::TenKilometers;
+    assert!(truncate_mgrs("31NEA1234", p).is_err());
+    assert!(truncate_mgrs("31NEA1234567890EXTRA", p).is_err());
+    assert!(truncate_mgrs("00NEA1234567890", p).is_err());
+}
