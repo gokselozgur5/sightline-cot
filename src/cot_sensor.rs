@@ -38,4 +38,14 @@ impl CotSensor {
             self.azimuth_deg, self.fov_deg, self.range_m, self.elevation_deg
         )
     }
+
+    /// Parse a `<sensor .../>` element string into a CotSensor.
+    pub fn parse(xml: &str) -> Result<Self, CotError> {
+        let tag = extract_sensor_tag(xml)?;
+        let az = parse_attr(tag, "azimuth")?;
+        let fov = parse_attr(tag, "fov")?;
+        let rng = parse_attr(tag, "range")?;
+        let el = parse_attr(tag, "elevation")?;
+        Self::new(az, fov, rng, el)
+    }
 }
