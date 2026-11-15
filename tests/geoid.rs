@@ -62,3 +62,14 @@ fn test_orthometric_ellipsoidal_roundtrip() {
     let recovered_h = grid.ellipsoidal_to_orthometric(lat, lon, ellipsoidal_h).unwrap();
     assert!((recovered_h - orthometric_h).abs() < 1e-9);
 }
+
+#[test]
+fn test_from_f64_sentinel() {
+    let raw = [20.0, -9999.0, f64::NAN, 50.0];
+    let grid = GeoidGrid::from_f64_uniform(0.0, 0.0, 1.0, 2, 2, &raw, Some(-9999.0)).unwrap();
+    assert_eq!(grid.get_node(1, 0), None);
+    assert_eq!(grid.get_node(0, 1), None);
+    assert_eq!(grid.get_node(0, 0), Some(20.0));
+    assert_eq!(grid.get_node(1, 1), Some(50.0));
+    assert_eq!(grid.undulation(0.5, 0.5), None);
+}
