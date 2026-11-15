@@ -47,3 +47,30 @@ pub struct ParsedMgrs {
     pub northing: u32,
     pub precision: usize,
 }
+
+impl ParsedMgrs {
+    /// Return the grid cell resolution in meters.
+    pub fn resolution_meters(&self) -> f64 {
+        match self.precision {
+            0 => 100_000.0,
+            1 => 10_000.0,
+            2 => 1_000.0,
+            3 => 100.0,
+            4 => 10.0,
+            _ => 1.0,
+        }
+    }
+
+    /// Format as compact MGRS string.
+    pub fn format_compact(&self) -> String {
+        if self.precision == 0 {
+            format!("{:02}{}{}{}", self.zone, self.band, self.col, self.row)
+        } else {
+            let p = self.precision;
+            format!(
+                "{:02}{}{}{}{:0width$}{:0width$}",
+                self.zone, self.band, self.col, self.row, self.easting, self.northing, width = p
+            )
+        }
+    }
+}
