@@ -60,3 +60,6 @@ pub const GRS80_FLATTENING: f64 = 1.0 / 298.257222101;
 
 /// Standard nautical mile in meters.
 pub const NAUTICAL_MILE_M: f64 = 1852.0;
+
+/// International foot to meters conversion factor.
+pub const FEET_TO_METERS: f64 = 0.3048;
