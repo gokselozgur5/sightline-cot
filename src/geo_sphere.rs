@@ -158,3 +158,8 @@ pub fn time_to_go_sec(dist_m: f64, speed_mps: f64) -> Option<f64> {
 pub fn is_valid_cog_deg(cog_deg: f64) -> bool {
     cog_deg.is_finite() && cog_deg >= 0.0 && cog_deg < 360.0
 }
+
+/// Checks whether speed over ground in m/s is non-negative and finite.
+pub fn is_valid_sog_mps(sog_mps: f64) -> bool {
+    sog_mps.is_finite() && sog_mps >= 0.0
+}
