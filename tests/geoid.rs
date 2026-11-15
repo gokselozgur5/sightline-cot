@@ -51,3 +51,14 @@ fn test_nodata_corner_rejection() {
     assert_eq!(grid.undulation(11.5, 21.5), None);
     assert_eq!(grid.undulation(9.0, 20.0), None);
 }
+
+#[test]
+fn test_orthometric_ellipsoidal_roundtrip() {
+    let vals = vec![Some(25.0), Some(27.0), Some(29.0), Some(31.0)];
+    let grid = GeoidGrid::new_uniform(35.0, 45.0, 0.5, 2, 2, vals).unwrap();
+    let (lat, lon) = (35.2, 45.3);
+    let orthometric_h = 1250.5;
+    let ellipsoidal_h = grid.orthometric_to_ellipsoidal(lat, lon, orthometric_h).unwrap();
+    let recovered_h = grid.ellipsoidal_to_orthometric(lat, lon, ellipsoidal_h).unwrap();
+    assert!((recovered_h - orthometric_h).abs() < 1e-9);
+}
