@@ -182,3 +182,17 @@ impl GeoidGrid {
         Self::new(min_lat_deg, min_lon_deg, lat_step_deg, lon_step_deg, cols, rows, undulations)
     }
 }
+
+impl GeoidGrid {
+    pub fn from_f64_uniform(
+        min_lat_deg: f64,
+        min_lon_deg: f64,
+        step_deg: f64,
+        cols: usize,
+        rows: usize,
+        raw: &[f64],
+        nodata: Option<f64>,
+    ) -> Result<Self, GeoidError> {
+        Self::from_f64(min_lat_deg, min_lon_deg, step_deg, step_deg, cols, rows, raw, nodata)
+    }
+}
