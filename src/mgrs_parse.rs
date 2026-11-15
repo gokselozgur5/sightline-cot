@@ -27,3 +27,23 @@ impl core::fmt::Display for MgrsParseError {
         }
     }
 }
+
+impl std::error::Error for MgrsParseError {}
+
+impl From<GridError> for MgrsParseError {
+    fn from(err: GridError) -> Self {
+        Self::Grid(err)
+    }
+}
+
+/// Parsed MGRS coordinate representation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ParsedMgrs {
+    pub zone: u8,
+    pub band: char,
+    pub col: char,
+    pub row: char,
+    pub easting: u32,
+    pub northing: u32,
+    pub precision: usize,
+}
