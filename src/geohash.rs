@@ -47,3 +47,31 @@ fn validate_coords(lat: f64, lon: f64, precision: usize) -> Result<(), GeohashEr
     }
     Ok(())
 }
+
+/// Encodes latitude and longitude into a geohash string with given precision.
+pub fn encode(lat: f64, lon: f64, precision: usize) -> Result<String, GeohashError> {
+    validate_coords(lat, lon, precision)?;
+    let (mut lat_r, mut lon_r) = ([-90.0, 90.0], [-180.0, 180.0]);
+    let (mut bits, mut bit_count, mut is_lon) = (0u8, 0, true);
+    let mut out = String::with_capacity(precision);
+    while out.len() < precision {
+        let (r, val) = if is_lon { (&mut lon_r, lon) } else { (&mut lat_r, lat) };
+        let mid = (r[0] + r[1]) * 0.5;
+        let bit = u8::from(val >= mid);
+        bits = (bits << 1) | bit;
+        r[(1 - bit) as usize] = mid;
+        is_lon = !is_lon;
+        bit_count += 1;
+        if bit_count == 5 {
+            out.push(BASE32_CHARS[bits as usize] as char);
+            bits = 0;
+            bit_count = 0;
+        }
+    }
+    Ok(out)
+}
+
+/// Alias for [`encode`].
+pub fn encode_geohash(lat: f64, lon: f64, precision: usize) -> Result<String, GeohashError> {
+    encode(lat, lon, precision)
+}
