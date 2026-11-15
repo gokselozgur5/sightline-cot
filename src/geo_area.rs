@@ -116,3 +116,20 @@ pub fn spherical_polygon_excess(poly: &[[f64; 2]]) -> Option<f64> {
     }
     Some((2.0 * std::f64::consts::PI - sum_alpha.abs()).abs())
 }
+
+/// Mean spherical Earth radius in meters (IUGG standard).
+pub const EARTH_RADIUS_M: f64 = 6_371_008.8;
+
+/// Compute spherical polygon surface area with a custom sphere radius.
+pub fn spherical_polygon_area_with_radius(poly: &[[f64; 2]], radius_m: f64) -> Option<f64> {
+    if !radius_m.is_finite() || radius_m <= 0.0 {
+        return None;
+    }
+    let excess = spherical_polygon_excess(poly)?;
+    Some(excess * radius_m * radius_m)
+}
+
+/// Compute spherical polygon surface area in square meters.
+pub fn spherical_polygon_area(poly: &[[f64; 2]]) -> Option<f64> {
+    spherical_polygon_area_with_radius(poly, EARTH_RADIUS_M)
+}
