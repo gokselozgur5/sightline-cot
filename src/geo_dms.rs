@@ -99,3 +99,28 @@ impl Dms {
         Ok(Self { degrees: deg, minutes: min, seconds: sec, hemisphere })
     }
 }
+
+impl core::fmt::Display for Dms {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{}° {:02}' {:05.2}\" {}",
+            self.degrees, self.minutes, self.seconds, self.hemisphere
+        )
+    }
+}
+
+/// Format decimal latitude into standard DMS representation.
+pub fn format_dms_lat(lat: f64) -> Result<String, DmsError> {
+    Ok(Dms::from_degrees_lat(lat)?.to_string())
+}
+
+/// Format decimal longitude into standard DMS representation.
+pub fn format_dms_lon(lon: f64) -> Result<String, DmsError> {
+    Ok(Dms::from_degrees_lon(lon)?.to_string())
+}
+
+/// Format lat/lon into standard DMS representation.
+pub fn format_dms(lat: f64, lon: f64) -> Result<String, DmsError> {
+    Ok(format!("{}, {}", format_dms_lat(lat)?, format_dms_lon(lon)?))
+}
