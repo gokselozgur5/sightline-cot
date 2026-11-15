@@ -64,3 +64,18 @@ fn test_parse_mgrs_single_digit_zone_and_from_str() {
     let p2 = parse_mgrs("04QFJ12345678").unwrap();
     assert_eq!(p1, p2);
 }
+
+#[test]
+fn test_parse_mgrs_errors() {
+    use sightline_cot::mgrs_parse::MgrsParseError;
+
+    assert_eq!(parse_mgrs(""), Err(MgrsParseError::EmptyInput));
+    assert_eq!(parse_mgrs("   "), Err(MgrsParseError::EmptyInput));
+    assert_eq!(parse_mgrs("00NEA1234"), Err(MgrsParseError::InvalidZone));
+    assert_eq!(parse_mgrs("61NEA1234"), Err(MgrsParseError::InvalidZone));
+    assert_eq!(parse_mgrs("31IEA1234"), Err(MgrsParseError::InvalidBand));
+    assert_eq!(parse_mgrs("31N1A1234"), Err(MgrsParseError::InvalidSquare));
+    assert_eq!(parse_mgrs("31NEA123"), Err(MgrsParseError::InvalidDigits));
+    assert_eq!(parse_mgrs("31NEA 12 345"), Err(MgrsParseError::InvalidDigits));
+    assert_eq!(parse_mgrs("31NEA123456789012"), Err(MgrsParseError::InvalidDigits));
+}
