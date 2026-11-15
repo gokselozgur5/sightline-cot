@@ -91,7 +91,10 @@ fn test_parse_malformed_grids() {
     );
     assert_eq!(
         parse_geoid_ascii("ncols 2 nrows 2 xllcorner 0 yllcorner 0 cellsize 1.0 1.0 2.0"),
-        Err(GeoidError::DataCountMismatch { expected: 4, found: 2 })
+        Err(GeoidError::DataCountMismatch {
+            expected: 4,
+            found: 2
+        })
     );
     assert_eq!(
         parse_geoid_ascii("ncols abc nrows 2 xllcorner 0 yllcorner 0 cellsize 1.0 1 2 3 4"),
