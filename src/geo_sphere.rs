@@ -143,3 +143,8 @@ pub fn horizon_distance_m(height_m: f64, radius_m: f64) -> f64 {
 pub fn line_of_sight_m(h1_m: f64, h2_m: f64, radius_m: f64) -> f64 {
     horizon_distance_m(h1_m, radius_m) + horizon_distance_m(h2_m, radius_m)
 }
+
+/// Computes speed in m/s given distance in meters and time in seconds.
+pub fn speed_mps(dist_m: f64, dt_sec: f64) -> Option<f64> {
+    if dt_sec > 0.0 { Some(dist_m / dt_sec) } else { None }
+}
