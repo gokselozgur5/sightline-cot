@@ -22,3 +22,22 @@ NODATA_value -9999
     assert_eq!(grid.get(0, 0), Some(1.0));
     assert_eq!(grid.get(1, 1), None);
 }
+
+#[test]
+fn test_xllcenter_and_from_str() {
+    let ascii = "\
+ncols 2
+nrows 2
+xllcenter 10.5
+yllcenter 20.5
+cellsize 1.0
+10.0 20.0
+30.0 40.0
+";
+    let grid: GeoidGrid = ascii.parse().expect("valid center grid");
+    assert_eq!(grid.xllcorner, 10.0);
+    assert_eq!(grid.yllcorner, 20.0);
+    assert_eq!(grid.nodata_value, None);
+    assert_eq!(grid.get(0, 0), Some(10.0));
+    assert_eq!(grid.get(1, 1), Some(40.0));
+}
