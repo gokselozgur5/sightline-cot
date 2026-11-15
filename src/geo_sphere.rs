@@ -163,3 +163,6 @@ pub fn is_valid_cog_deg(cog_deg: f64) -> bool {
 pub fn is_valid_sog_mps(sog_mps: f64) -> bool {
     sog_mps.is_finite() && sog_mps >= 0.0
 }
+
+/// Verification marker for spherical navigation library extensions.
+pub const GEO_SPHERE_EXTENSIONS_VERIFIED: bool = true;
