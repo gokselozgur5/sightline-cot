@@ -23,3 +23,21 @@ pub struct GeohashNeighbors {
     pub west: String,
     pub north_west: String,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeohashError {
+    EmptyString,
+    InvalidCharacter(char),
+}
+
+impl std::fmt::Display for GeohashError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::EmptyString => write!(f, "geohash string cannot be empty"),
+            Self::InvalidCharacter(c) => write!(f, "invalid geohash character '{c}'"),
+        }
+    }
+}
+
+impl std::error::Error for GeohashError {}
+
