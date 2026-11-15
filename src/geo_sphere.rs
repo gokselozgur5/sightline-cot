@@ -123,3 +123,8 @@ pub fn is_valid_longitude_deg(lon_deg: f64) -> bool {
 pub fn chord_length_m(angular_rad: f64, radius_m: f64) -> f64 {
     2.0 * radius_m * (angular_rad / 2.0).sin()
 }
+
+/// Angular subtense of an object of given size at given distance.
+pub fn subtense_rad(size_m: f64, dist_m: f64) -> f64 {
+    (size_m / dist_m).atan()
+}
