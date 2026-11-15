@@ -73,3 +73,22 @@ fn test_dms_error_cases() {
     assert_eq!(parse_dms("-37 10 10 N W 122 10 10"), Err(DmsError::ConflictingHemisphere));
     assert_eq!(parse_dms("N 37 10 10 N 45 10 10"), Err(DmsError::ConflictingHemisphere));
 }
+
+use sightline_cot::geo_dms::{parse_dms_lat, parse_dms_lon, Dms};
+
+#[test]
+fn test_dms_struct_and_component_parsing() {
+    let dms = Dms::new(37, 46, 29.8, 'N').expect("dms new");
+    assert_eq!(dms.degrees, 37);
+    assert_eq!(dms.minutes, 46);
+    assert!((dms.seconds - 29.8).abs() < 1e-6);
+    assert_eq!(dms.hemisphere, 'N');
+    let deg = dms.to_degrees();
+    assert!((deg - (37.0 + 46.0 / 60.0 + 29.8 / 3600.0)).abs() < 1e-6);
+    let lat = parse_dms_lat("37° 46' 29.8\" N").expect("parse lat");
+    let lon = parse_dms_lon("122° 25' 10.0\" W").expect("parse lon");
+    assert!((lat - deg).abs() < 1e-6);
+    assert!(lon < 0.0);
+    let dms_from_str: Dms = "37° 46' 29.8\" N".parse().expect("from_str");
+    assert_eq!(dms_from_str.degrees, 37);
+}
