@@ -119,4 +119,20 @@ impl AsciiHeader {
             .ok_or(GeoidError::MissingHeader("yllcorner"))?;
         Ok((cols, rows, x0, y0, step, self.nodata))
     }
+
+    fn set_field(&mut self, key: &str, val: &str) -> Result<bool, GeoidError> {
+        let err = |_| GeoidError::InvalidHeader(val.into());
+        match key.to_ascii_lowercase().as_str() {
+            "ncols" => self.cols = Some(val.parse().map_err(err)?),
+            "nrows" => self.rows = Some(val.parse().map_err(err)?),
+            "xllcorner" => self.xcorner = Some(val.parse().map_err(err)?),
+            "yllcorner" => self.ycorner = Some(val.parse().map_err(err)?),
+            "xllcenter" => self.xcenter = Some(val.parse().map_err(err)?),
+            "yllcenter" => self.ycenter = Some(val.parse().map_err(err)?),
+            "cellsize" | "dx" | "dy" => self.cellsize = Some(val.parse().map_err(err)?),
+            "nodata_value" | "nodata" => self.nodata = Some(val.parse().map_err(err)?),
+            _ => return Ok(false),
+        }
+        Ok(true)
+    }
 }
