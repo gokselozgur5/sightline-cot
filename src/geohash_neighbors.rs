@@ -41,3 +41,20 @@ impl std::fmt::Display for GeohashError {
 
 impl std::error::Error for GeohashError {}
 
+const BASE32: &[u8; 32] = b"0123456789bcdefghjkmnpqrstuvwxyz";
+
+const BORDERS: [(&[u8], &[u8]); 4] = [
+    (b"prxz", b"bcfguvyz"),
+    (b"028b", b"0145hjnp"),
+    (b"bcfguvyz", b"prxz"),
+    (b"0145hjnp", b"028b"),
+];
+
+const NEIGHBORS: [(&[u8; 32], &[u8; 32]); 4] = [
+    (b"p0r21436x8zb9dcf5h7kjnmqesgutwvy", b"bc01fg45238967deuvhjyznpkmstqrwx"),
+    (b"14365h7k9dcfesgujnmqp0r2twvyx8zb", b"238967debc01fg45kmstqrwxuvhjyznp"),
+    (b"bc01fg45238967deuvhjyznpkmstqrwx", b"p0r21436x8zb9dcf5h7kjnmqesgutwvy"),
+    (b"238967debc01fg45kmstqrwxuvhjyznp", b"14365h7k9dcfesgujnmqp0r2twvyx8zb"),
+];
+
+
