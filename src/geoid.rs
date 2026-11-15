@@ -223,3 +223,18 @@ impl GeoidGrid {
         }
     }
 }
+
+impl GeoidGrid {
+    pub fn sample(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        if !self.contains(lat_deg, lon_deg) {
+            return None;
+        }
+        let u = ((lon_deg - self.min_lon_deg) / self.lon_step_deg).max(0.0);
+        let v = ((lat_deg - self.min_lat_deg) / self.lat_step_deg).max(0.0);
+        let (c0, r0) = ((u.floor() as usize).min(self.cols - 2), (v.floor() as usize).min(self.rows - 2));
+        let (s, t) = ((u - c0 as f64).clamp(0.0, 1.0), (v - r0 as f64).clamp(0.0, 1.0));
+        let (z00, z10) = (self.get_node(c0, r0)?, self.get_node(c0 + 1, r0)?);
+        let (z01, z11) = (self.get_node(c0, r0 + 1)?, self.get_node(c0 + 1, r0 + 1)?);
+        Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
+    }
+}
