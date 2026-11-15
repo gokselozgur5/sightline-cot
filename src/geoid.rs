@@ -106,3 +106,15 @@ pub struct GeoidGrid {
 
 pub type GeoidBilinearGrid = GeoidGrid;
 pub type BilinearGeoidGrid = GeoidGrid;
+
+impl GeoidGrid {
+    fn validate_coords(lat0: f64, lon0: f64, dlat: f64, dlon: f64) -> Result<(), GeoidError> {
+        if !lat0.is_finite() || !lon0.is_finite() {
+            return Err(GeoidError::NonFiniteCoordinate);
+        }
+        if !dlat.is_finite() || dlat <= 0.0 || !dlon.is_finite() || dlon <= 0.0 {
+            return Err(GeoidError::InvalidStep);
+        }
+        Ok(())
+    }
+}
