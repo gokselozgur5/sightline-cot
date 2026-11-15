@@ -33,3 +33,12 @@ impl core::fmt::Display for DmsError {
 }
 
 impl std::error::Error for DmsError {}
+
+/// Represents a coordinate component in degrees, minutes, and seconds with hemisphere.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Dms {
+    pub degrees: u32,
+    pub minutes: u32,
+    pub seconds: f64,
+    pub hemisphere: char,
+}
