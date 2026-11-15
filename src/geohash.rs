@@ -22,3 +22,15 @@ impl std::fmt::Display for GeohashError {
 }
 
 impl std::error::Error for GeohashError {}
+
+pub use crate::geo_bbox::GeoBbox;
+
+const BASE32_CHARS: &[u8; 32] = b"0123456789bcdefghjkmnpqrstuvwxyz";
+
+fn char_to_value(c: char) -> Result<u8, GeohashError> {
+    let lower = c.to_ascii_lowercase();
+    match BASE32_CHARS.iter().position(|&b| b == lower as u8) {
+        Some(idx) => Ok(idx as u8),
+        None => Err(GeohashError::InvalidCharacter(c)),
+    }
+}
