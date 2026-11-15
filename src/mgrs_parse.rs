@@ -146,3 +146,28 @@ fn band_approx_northing(band: char) -> Result<(char, f64), MgrsParseError> {
     };
     Ok((hemi, n))
 }
+
+fn extract_parts(s: &str) -> Result<(String, String), MgrsParseError> {
+    let s = s.trim();
+    if s.is_empty() {
+        return Err(MgrsParseError::EmptyInput);
+    }
+    if !s.is_ascii() {
+        return Err(MgrsParseError::InvalidSquare);
+    }
+    let tokens: Vec<&str> = s.split_whitespace().collect();
+    if tokens.len() >= 2 {
+        let last = tokens[tokens.len() - 1];
+        let prev = tokens[tokens.len() - 2];
+        if last.chars().all(|c| c.is_ascii_digit()) && prev.chars().all(|c| c.is_ascii_digit()) {
+            if last.len() != prev.len() || last.len() > 5 {
+                return Err(MgrsParseError::InvalidDigits);
+            }
+            let prefix = tokens[..tokens.len() - 2].concat();
+            let digits = format!("{prev}{last}");
+            return Ok((prefix, digits));
+        }
+    }
+    let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
+    split_compact(&compact)
+}
