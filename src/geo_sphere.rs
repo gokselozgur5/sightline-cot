@@ -45,3 +45,6 @@ pub const WGS84_SEMI_MINOR_RADIUS_M: f64 = 6_356_752.314245;
 
 /// WGS84 flattening factor.
 pub const WGS84_FLATTENING: f64 = 1.0 / 298.257223563;
+
+/// WGS84 first eccentricity squared.
+pub const WGS84_FIRST_ECCENTRICITY_SQ: f64 = 0.00669437999014;
