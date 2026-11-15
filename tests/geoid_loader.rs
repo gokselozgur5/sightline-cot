@@ -76,7 +76,8 @@ nodata_value -9999
     let grid = parse_geoid_ascii(ascii).unwrap();
     assert_eq!(grid.undulation_at(1.0, 1.0), None);
     assert_eq!(grid.undulation_at(0.5, 0.5), None);
-    assert_eq!(grid.undulation_at(0.0, 0.0), Some(30.0));
+    assert_eq!(grid.undulation_at(0.0, 0.0), None);
+    assert_eq!(grid.get(0, 1), Some(30.0));
     assert_eq!(grid.undulation_at(-0.1, 0.5), None);
     assert_eq!(grid.undulation_at(0.5, 2.5), None);
 }
