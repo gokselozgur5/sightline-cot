@@ -73,3 +73,15 @@ fn test_from_f64_sentinel() {
     assert_eq!(grid.get_node(1, 1), Some(50.0));
     assert_eq!(grid.undulation(0.5, 0.5), None);
 }
+
+use sightline_cot::geoid::GeoidError;
+
+#[test]
+fn test_grid_validation_errors() {
+    let u = vec![None; 4];
+    assert_eq!(GeoidGrid::new_uniform(0.0, 0.0, 0.0, 2, 2, u.clone()), Err(GeoidError::InvalidStep));
+    assert_eq!(GeoidGrid::new_uniform(0.0, 0.0, 1.0, 1, 2, u.clone()), Err(GeoidError::InvalidDimensions));
+    assert_eq!(GeoidGrid::new_uniform(0.0, 0.0, 1.0, 2, 2, vec![None; 3]), Err(GeoidError::DataLengthMismatch));
+    assert_eq!(GeoidGrid::new_uniform(89.5, 0.0, 1.0, 2, 2, u.clone()), Err(GeoidError::InvalidBounds));
+    assert_eq!(GeoidGrid::new_uniform(f64::NAN, 0.0, 1.0, 2, 2, u), Err(GeoidError::NonFiniteCoordinate));
+}
