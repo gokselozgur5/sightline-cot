@@ -118,3 +118,8 @@ pub fn is_valid_latitude_deg(lat_deg: f64) -> bool {
 pub fn is_valid_longitude_deg(lon_deg: f64) -> bool {
     (-180.0..=180.0).contains(&lon_deg)
 }
+
+/// Spherical chord length between two points from angular separation.
+pub fn chord_length_m(angular_rad: f64, radius_m: f64) -> f64 {
+    2.0 * radius_m * (angular_rad / 2.0).sin()
+}
