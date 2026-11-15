@@ -23,3 +23,29 @@ impl std::fmt::Display for GeoidError {
 }
 
 impl std::error::Error for GeoidError {}
+
+/// Trait for geoid separation models converting between heights.
+pub trait GeoidModel {
+    /// Compute geoid undulation (separation N in meters) at geodetic coordinates.
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64>;
+
+    /// Alias for undulation (separation N in meters).
+    fn geoid_height(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        self.undulation(lat_deg, lon_deg)
+    }
+
+    /// Alias for undulation (separation N in meters).
+    fn separation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        self.undulation(lat_deg, lon_deg)
+    }
+
+    /// Convert orthometric height (H, MSL) to ellipsoidal height (h, HAE): h = H + N.
+    fn orthometric_to_ellipsoidal(&self, lat_deg: f64, lon_deg: f64, orthometric_m: f64) -> Option<f64> {
+        self.undulation(lat_deg, lon_deg).map(|n| orthometric_m + n)
+    }
+
+    /// Convert ellipsoidal height (h, HAE) to orthometric height (H, MSL): H = h - N.
+    fn ellipsoidal_to_orthometric(&self, lat_deg: f64, lon_deg: f64, ellipsoidal_m: f64) -> Option<f64> {
+        self.undulation(lat_deg, lon_deg).map(|n| ellipsoidal_m - n)
+    }
+}
