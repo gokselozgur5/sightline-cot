@@ -103,6 +103,7 @@ pub use geohash_neighbors::{
     geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
 pub mod geohash;
+pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
 pub const VERSION: &str = "0.1.0";
 
