@@ -262,3 +262,26 @@ pub fn parse_dms_lat(s: &str) -> Result<f64, DmsError> {
     }
     Ok(val)
 }
+
+/// Parse a longitude string in DMS representation into decimal degrees.
+pub fn parse_dms_lon(s: &str) -> Result<f64, DmsError> {
+    let (val, hemi) = parse_dms_component(s)?;
+    if let Some(h) = hemi {
+        if !matches!(h, 'E' | 'W') {
+            return Err(DmsError::ConflictingHemisphere);
+        }
+    }
+    if !(-180.0..=180.0).contains(&val) {
+        return Err(DmsError::LongitudeOutOfRange);
+    }
+    Ok(val)
+}
+
+impl core::str::FromStr for Dms {
+    type Err = DmsError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (val, hemi) = parse_dms_component(s)?;
+        let h = hemi.unwrap_or(if val >= 0.0 { 'N' } else { 'S' });
+        Self::decompose(val.abs(), h)
+    }
+}
