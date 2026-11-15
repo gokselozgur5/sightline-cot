@@ -47,8 +47,13 @@ pub struct GeoidGrid {
 impl GeoidGrid {
     /// Construct and validate a new GeoidGrid raster instance.
     pub fn new(
-        cols: usize, rows: usize, x0: f64, y0: f64, step: f64,
-        nodata: Option<f64>, data: Vec<Option<f64>>,
+        cols: usize,
+        rows: usize,
+        x0: f64,
+        y0: f64,
+        step: f64,
+        nodata: Option<f64>,
+        data: Vec<Option<f64>>,
     ) -> Result<Self, GeoidError> {
         if cols == 0 || rows == 0 {
             return Err(GeoidError::InvalidDimensions { cols, rows });
@@ -63,7 +68,15 @@ impl GeoidGrid {
             let (expected, found) = (cols * rows, data.len());
             return Err(GeoidError::DataCountMismatch { expected, found });
         }
-        Ok(Self { cols, rows, xllcorner: x0, yllcorner: y0, cellsize: step, nodata_value: nodata, data })
+        Ok(Self {
+            cols,
+            rows,
+            xllcorner: x0,
+            yllcorner: y0,
+            cellsize: step,
+            nodata_value: nodata,
+            data,
+        })
     }
 
     /// Retrieve undulation value at integer grid coordinate (col, row).
