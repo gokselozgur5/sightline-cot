@@ -81,7 +81,10 @@ pub mod utm_mgrs;
 pub mod utm_string;
 pub use cam_distorted_pinhole::DistortedPinhole;
 pub mod geoid;
-pub use geoid::{ConstantGeoid, Geoid, GeoidError, GeoidModel};
+pub use geoid::{
+    ellipsoidal_to_orthometric, orthometric_to_ellipsoidal, sample_geoid_bilinear, ConstantGeoid,
+    Geoid, GeoidBilinearGrid, GeoidError, GeoidGrid, GeoidModel,
+};
 pub mod ellipsoid;
 pub use ellipsoid::{Ellipsoid, GRS80, WGS72, WGS84};
 
