@@ -115,3 +115,22 @@ fn unproject_series(d: f64, t1: f64, eta1_2: f64, ep2: f64, phi1: f64, nu1: f64,
         - (61.0 + 662.0 * t1 + 1320.0 * t1 * t1 + 720.0 * t1 * t1 * t1) * d6 * d / 5040.0) / phi1.cos();
     (lat, dlon)
 }
+
+fn utm_unproject_point_forced(coord: &UtmCoord) -> (f64, f64) {
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    let ep2 = e2 / (1.0 - e2);
+    let y = if coord.hemisphere == 'S' { coord.northing - FALSE_NORTHING_SOUTH } else { coord.northing };
+    let x = coord.easting - FALSE_EASTING;
+    let m = y / UTM_K0;
+    let phi1 = find_footpoint_latitude(m, e2);
+    let sin_phi1 = phi1.sin();
+    let nu1 = WGS84_A / (1.0 - e2 * sin_phi1 * sin_phi1).sqrt();
+    let rho1 = WGS84_A * (1.0 - e2) / (1.0 - e2 * sin_phi1 * sin_phi1).powf(1.5);
+    let d = x / (nu1 * UTM_K0);
+    let (t1, eta1_2) = (phi1.tan().powi(2), ep2 * phi1.cos().powi(2));
+    let (lat_rad, dlon_rad) = unproject_series(d, t1, eta1_2, ep2, phi1, nu1, rho1);
+    let lon0 = zone_central_meridian_rad(coord.zone);
+    let lon_deg = (lon0 + dlon_rad).to_degrees();
+    let lon_norm = ((lon_deg + 180.0).rem_euclid(360.0)) - 180.0;
+    (lat_rad.to_degrees(), lon_norm)
+}
