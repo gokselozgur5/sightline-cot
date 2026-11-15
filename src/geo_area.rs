@@ -92,3 +92,27 @@ fn cross_prod(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
 fn dot_prod(a: [f64; 3], b: [f64; 3]) -> f64 {
     a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 }
+
+/// Compute spherical excess in steradians using Girard's theorem.
+pub fn spherical_polygon_excess(poly: &[[f64; 2]]) -> Option<f64> {
+    let n = poly.len();
+    if n < 3 || poly.iter().flatten().any(|c| !c.is_finite()) {
+        return None;
+    }
+    let vs: Vec<[f64; 3]> = poly.iter().map(|p| to_unit_cartesian(p[0], p[1])).collect();
+    let mut normals = Vec::with_capacity(n);
+    for i in 0..n {
+        let c = cross_prod(vs[i], vs[(i + 1) % n]);
+        let norm = dot_prod(c, c).sqrt();
+        if norm < 1e-15 {
+            return None;
+        }
+        normals.push([c[0] / norm, c[1] / norm, c[2] / norm]);
+    }
+    let mut sum_alpha = 0.0;
+    for i in 0..n {
+        let (np, nc, v) = (normals[(i + n - 1) % n], normals[i], vs[i]);
+        sum_alpha += dot_prod(cross_prod(np, nc), v).atan2(dot_prod(np, nc));
+    }
+    Some((2.0 * std::f64::consts::PI - sum_alpha.abs()).abs())
+}
