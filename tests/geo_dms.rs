@@ -25,3 +25,22 @@ fn test_dms_formatting_and_roundtrip() {
     assert!((lat - parsed_lat).abs() < 1e-4);
     assert!((lon - parsed_lon).abs() < 1e-4);
 }
+
+#[test]
+fn test_dms_format_variants() {
+    let cases = [
+        "37° 46' 29.8\" N, 122° 25' 10.0\" W",
+        "37° 46' 29.8\" N 122° 25' 10.0\" W",
+        "N37° 46' 29.8', W122° 25' 10.0'",
+        "+37 46 29.8, -122 25 10.0",
+    ];
+    let (exp_lat, exp_lon) = (
+        37.0 + 46.0 / 60.0 + 29.8 / 3600.0,
+        -(122.0 + 25.0 / 60.0 + 10.0 / 3600.0),
+    );
+    for s in cases {
+        let (lat, lon) = parse_dms(s).unwrap_or_else(|e| panic!("failed {}: {:?}", s, e));
+        assert!((lat - exp_lat).abs() < 1e-6);
+        assert!((lon - exp_lon).abs() < 1e-6);
+    }
+}
