@@ -30,3 +30,18 @@ fn test_vincenty_direct_zero_distance() {
     assert!((res.lat_deg - 10.0).abs() < 1e-9);
     assert!((res.lon_deg - 20.0).abs() < 1e-9);
 }
+
+use sightline_cot::geo_vincenty_direct::{vincenty_direct_ellipsoid, Ellipsoid};
+
+#[test]
+fn test_vincenty_direct_ellipsoid_grs80_vs_wgs84() {
+    let lat1 = 0.0;
+    let lon1 = 0.0;
+    let bearing = 45.0;
+    let dist = 100_000.0;
+    let wgs = vincenty_direct_ellipsoid(lat1, lon1, bearing, dist, &Ellipsoid::WGS84).unwrap();
+    let grs = vincenty_direct_ellipsoid(lat1, lon1, bearing, dist, &Ellipsoid::GRS80).unwrap();
+    assert!((wgs.lat_deg - grs.lat_deg).abs() < 1e-4);
+    assert!((wgs.lon_deg - grs.lon_deg).abs() < 1e-4);
+    assert!(wgs.reverse_azimuth_deg > 0.0);
+}
