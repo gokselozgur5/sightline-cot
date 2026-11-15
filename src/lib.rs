@@ -18,6 +18,7 @@ pub mod geo_helmert;
 pub mod geo_molodensky;
 pub mod geo_velocity;
 pub mod geo_vincenty;
+pub mod geo_vincenty_direct;
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
