@@ -216,3 +216,29 @@ fn parse_prefix(prefix: &str) -> Result<(u8, char, char, char), MgrsParseError> 
     }
     Ok((zone, band, col, row))
 }
+
+fn parse_numeric_digits(digits: &str) -> Result<(u32, u32, usize), MgrsParseError> {
+    if digits.is_empty() {
+        return Ok((0, 0, 0));
+    }
+    let p = digits.len() / 2;
+    let easting: u32 = digits[..p].parse().map_err(|_| MgrsParseError::InvalidDigits)?;
+    let northing: u32 = digits[p..].parse().map_err(|_| MgrsParseError::InvalidDigits)?;
+    Ok((easting, northing, p))
+}
+
+/// Parse any standard formatted or compact MGRS string into a [`ParsedMgrs`].
+pub fn parse_mgrs(s: &str) -> Result<ParsedMgrs, MgrsParseError> {
+    let (prefix, digits) = extract_parts(s)?;
+    let (zone, band, col, row) = parse_prefix(&prefix)?;
+    let (easting, northing, precision) = parse_numeric_digits(&digits)?;
+    Ok(ParsedMgrs {
+        zone,
+        band,
+        col,
+        row,
+        easting,
+        northing,
+        precision,
+    })
+}
