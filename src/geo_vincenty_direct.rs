@@ -63,3 +63,22 @@ fn solve_direct_sigma(
     }
     (sigma, cos_2sm)
 }
+
+#[allow(clippy::too_many_arguments)]
+fn compute_destination(
+    lon1: f64, s_u1: f64, c_u1: f64, s_alp: f64, c2_alp: f64,
+    alp1: f64, sig: f64, c_2sm: f64, f: f64,
+) -> VincentyDirect {
+    let (s_s, c_s) = (sig.sin(), sig.cos());
+    let x = s_u1 * s_s - c_u1 * c_s * alp1.cos();
+    let num = s_u1 * c_s + c_u1 * s_s * alp1.cos();
+    let den = (1.0 - f) * (s_alp * s_alp + x * x).sqrt();
+    let lat2 = num.atan2(den).to_degrees();
+    let lam = (s_s * alp1.sin()).atan2(c_u1 * c_s - s_u1 * s_s * alp1.cos());
+    let c = f / 16.0 * c2_alp * (4.0 + f * (4.0 - 3.0 * c2_alp));
+    let t = c_2sm + c * c_s * (-1.0 + 2.0 * c_2sm * c_2sm);
+    let omega = (1.0 - c) * f * s_alp * (sig + c * s_s * t);
+    let lon2 = (lon1 + (lam - omega).to_degrees() + 540.0).rem_euclid(360.0) - 180.0;
+    let rev_az = (s_alp.atan2(-x).to_degrees() + 360.0).rem_euclid(360.0);
+    VincentyDirect { lat_deg: lat2, lon_deg: lon2, reverse_azimuth_deg: rev_az }
+}
