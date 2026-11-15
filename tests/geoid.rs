@@ -32,8 +32,8 @@ fn test_exact_at_nodes() {
 fn test_bilinear_planar_surface() {
     let vals = vec![Some(10.0), Some(20.0), Some(30.0), Some(40.0)];
     let grid = GeoidGrid::new_uniform(0.0, 0.0, 1.0, 2, 2, vals).unwrap();
-    assert!((grid.undulation(0.5, 0.0).unwrap() - 15.0).abs() < 1e-9);
-    assert!((grid.undulation(0.0, 0.5).unwrap() - 20.0).abs() < 1e-9);
+    assert!((grid.undulation(0.5, 0.0).unwrap() - 20.0).abs() < 1e-9);
+    assert!((grid.undulation(0.0, 0.5).unwrap() - 15.0).abs() < 1e-9);
     assert!((grid.undulation(0.5, 0.5).unwrap() - 25.0).abs() < 1e-9);
     let (lat, lon) = (0.25, 0.75);
     let expected = 10.0 + 20.0 * lat + 10.0 * lon;
