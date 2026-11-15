@@ -124,3 +124,30 @@ pub fn format_dms_lon(lon: f64) -> Result<String, DmsError> {
 pub fn format_dms(lat: f64, lon: f64) -> Result<String, DmsError> {
     Ok(format!("{}, {}", format_dms_lat(lat)?, format_dms_lon(lon)?))
 }
+
+fn tokenize(s: &str) -> Vec<String> {
+    let mut normalized = String::with_capacity(s.len() + 4);
+    let mut prev = ' ';
+    for ch in s.chars() {
+        if matches!(ch, '°' | '\'' | '"' | '′' | '″' | ',' | ';' | '\t' | '\n') {
+            normalized.push(' ');
+            prev = ' ';
+        } else if ch.is_ascii_alphabetic() {
+            if prev.is_ascii_digit() || prev == '.' {
+                normalized.push(' ');
+            }
+            normalized.push(ch);
+            prev = ch;
+        } else if ch.is_ascii_digit() || ch == '+' || ch == '-' {
+            if prev.is_ascii_alphabetic() {
+                normalized.push(' ');
+            }
+            normalized.push(ch);
+            prev = ch;
+        } else {
+            normalized.push(ch);
+            prev = ch;
+        }
+    }
+    normalized.split_whitespace().map(String::from).collect()
+}
