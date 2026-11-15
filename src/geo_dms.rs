@@ -238,3 +238,27 @@ pub fn parse_dms(s: &str) -> Result<(f64, f64), DmsError> {
     }
     Ok((lat, lon))
 }
+
+/// Parse a single coordinate component from DMS representation.
+pub fn parse_dms_component(s: &str) -> Result<(f64, Option<char>), DmsError> {
+    let trimmed = s.trim();
+    if trimmed.is_empty() {
+        return Err(DmsError::EmptyInput);
+    }
+    let toks = tokenize(trimmed);
+    parse_comp(&toks)
+}
+
+/// Parse a latitude string in DMS representation into decimal degrees.
+pub fn parse_dms_lat(s: &str) -> Result<f64, DmsError> {
+    let (val, hemi) = parse_dms_component(s)?;
+    if let Some(h) = hemi {
+        if !matches!(h, 'N' | 'S') {
+            return Err(DmsError::ConflictingHemisphere);
+        }
+    }
+    if !(-90.0..=90.0).contains(&val) {
+        return Err(DmsError::LatitudeOutOfRange);
+    }
+    Ok(val)
+}
