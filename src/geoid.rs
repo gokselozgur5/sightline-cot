@@ -244,3 +244,7 @@ impl GeoidModel for GeoidGrid {
         self.sample(lat_deg, lon_deg)
     }
 }
+
+pub fn sample_geoid_bilinear(grid: &GeoidGrid, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+    grid.sample(lat_deg, lon_deg)
+}
