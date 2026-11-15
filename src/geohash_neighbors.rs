@@ -121,6 +121,29 @@ pub fn geohash_neighbor(hash: &str, dir: GeohashDirection) -> Result<String, Geo
     }
 }
 
+/// Calculate all 8 surrounding neighbor cells for spatial search.
+pub fn geohash_neighbors(hash: &str) -> Result<GeohashNeighbors, GeohashError> {
+    validate_geohash(hash)?;
+    let north = neighbor_cardinal(hash, 0)?;
+    let south = neighbor_cardinal(hash, 1)?;
+    let east = neighbor_cardinal(hash, 2)?;
+    let west = neighbor_cardinal(hash, 3)?;
+    let north_east = neighbor_cardinal(&north, 2)?;
+    let north_west = neighbor_cardinal(&north, 3)?;
+    let south_east = neighbor_cardinal(&south, 2)?;
+    let south_west = neighbor_cardinal(&south, 3)?;
+    Ok(GeohashNeighbors {
+        north,
+        north_east,
+        east,
+        south_east,
+        south,
+        south_west,
+        west,
+        north_west,
+    })
+}
+
 
 
 
