@@ -75,3 +75,22 @@ pub fn encode(lat: f64, lon: f64, precision: usize) -> Result<String, GeohashErr
 pub fn encode_geohash(lat: f64, lon: f64, precision: usize) -> Result<String, GeohashError> {
     encode(lat, lon, precision)
 }
+
+fn decode_intervals(hash: &str) -> Result<([f64; 2], [f64; 2]), GeohashError> {
+    if hash.is_empty() {
+        return Err(GeohashError::EmptyHash);
+    }
+    let (mut lat_r, mut lon_r) = ([-90.0, 90.0], [-180.0, 180.0]);
+    let mut is_lon = true;
+    for c in hash.chars() {
+        let val = char_to_value(c)?;
+        for i in (0..5).rev() {
+            let bit = (val >> i) & 1;
+            let r = if is_lon { &mut lon_r } else { &mut lat_r };
+            let mid = (r[0] + r[1]) * 0.5;
+            r[(1 - bit) as usize] = mid;
+            is_lon = !is_lon;
+        }
+    }
+    Ok((lat_r, lon_r))
+}
