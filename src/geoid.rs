@@ -196,3 +196,20 @@ impl GeoidGrid {
         Self::from_f64(min_lat_deg, min_lon_deg, step_deg, step_deg, cols, rows, raw, nodata)
     }
 }
+
+impl GeoidGrid {
+    pub fn max_lat_deg(&self) -> f64 {
+        self.min_lat_deg + (self.rows - 1) as f64 * self.lat_step_deg
+    }
+
+    pub fn max_lon_deg(&self) -> f64 {
+        self.min_lon_deg + (self.cols - 1) as f64 * self.lon_step_deg
+    }
+
+    pub fn contains(&self, lat_deg: f64, lon_deg: f64) -> bool {
+        if !lat_deg.is_finite() || !lon_deg.is_finite() {
+            return false;
+        }
+        lat_deg >= self.min_lat_deg && lat_deg <= self.max_lat_deg() && lon_deg >= self.min_lon_deg && lon_deg <= self.max_lon_deg()
+    }
+}
