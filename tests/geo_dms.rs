@@ -66,9 +66,18 @@ fn test_dms_error_cases() {
     assert_eq!(parse_dms(""), Err(DmsError::EmptyInput));
     assert_eq!(parse_dms("   "), Err(DmsError::EmptyInput));
     assert_eq!(parse_dms("37 46"), Err(DmsError::InvalidFormat));
-    assert_eq!(parse_dms("N 37 65 10 W 122 10 10"), Err(DmsError::MinutesOutOfRange));
-    assert_eq!(parse_dms("N 37 10 75 W 122 10 10"), Err(DmsError::SecondsOutOfRange));
-    assert_eq!(parse_dms("N 95 00 00 W 122 10 10"), Err(DmsError::LatitudeOutOfRange));
+    assert_eq!(
+        parse_dms("N 37 65 10 W 122 10 10"),
+        Err(DmsError::MinutesOutOfRange)
+    );
+    assert_eq!(
+        parse_dms("N 37 10 75 W 122 10 10"),
+        Err(DmsError::SecondsOutOfRange)
+    );
+    assert_eq!(
+        parse_dms("N 95 00 00 W 122 10 10"),
+        Err(DmsError::LatitudeOutOfRange)
+    );
     assert_eq!(parse_dms("N 37 00 00 W 185 10 10"), Err(DmsError::LongitudeOutOfRange));
     assert_eq!(parse_dms("-37 10 10 N W 122 10 10"), Err(DmsError::ConflictingHemisphere));
     assert_eq!(parse_dms("N 37 10 10 N 45 10 10"), Err(DmsError::ConflictingHemisphere));
