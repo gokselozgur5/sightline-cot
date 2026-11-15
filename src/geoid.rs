@@ -91,3 +91,18 @@ impl GeoidModel for ConstantGeoid {
         Some(self.undulation_m)
     }
 }
+
+/// Regular 2D geographic grid for bilinear geoid undulation interpolation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GeoidGrid {
+    pub min_lat_deg: f64,
+    pub min_lon_deg: f64,
+    pub lat_step_deg: f64,
+    pub lon_step_deg: f64,
+    pub cols: usize,
+    pub rows: usize,
+    pub undulations: Vec<Option<f64>>,
+}
+
+pub type GeoidBilinearGrid = GeoidGrid;
+pub type BilinearGeoidGrid = GeoidGrid;
