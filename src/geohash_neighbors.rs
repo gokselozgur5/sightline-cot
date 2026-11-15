@@ -94,6 +94,34 @@ fn neighbor_cardinal(hash: &str, dir_idx: usize) -> Result<String, GeohashError>
     Ok(res)
 }
 
+/// Calculate neighbor geohash cell in a specific direction.
+pub fn geohash_neighbor(hash: &str, dir: GeohashDirection) -> Result<String, GeohashError> {
+    validate_geohash(hash)?;
+    match dir {
+        GeohashDirection::North => neighbor_cardinal(hash, 0),
+        GeohashDirection::South => neighbor_cardinal(hash, 1),
+        GeohashDirection::East => neighbor_cardinal(hash, 2),
+        GeohashDirection::West => neighbor_cardinal(hash, 3),
+        GeohashDirection::NorthEast => {
+            let n = neighbor_cardinal(hash, 0)?;
+            neighbor_cardinal(&n, 2)
+        }
+        GeohashDirection::NorthWest => {
+            let n = neighbor_cardinal(hash, 0)?;
+            neighbor_cardinal(&n, 3)
+        }
+        GeohashDirection::SouthEast => {
+            let s = neighbor_cardinal(hash, 1)?;
+            neighbor_cardinal(&s, 2)
+        }
+        GeohashDirection::SouthWest => {
+            let s = neighbor_cardinal(hash, 1)?;
+            neighbor_cardinal(&s, 3)
+        }
+    }
+}
+
+
 
 
 
