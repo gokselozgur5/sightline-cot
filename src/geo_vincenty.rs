@@ -140,6 +140,16 @@ fn solve_inverse_loop(
     Err(VincentyError::NoConvergence)
 }
 
+fn wrap_to_pi(mut rad: f64) -> f64 {
+    while rad > core::f64::consts::PI {
+        rad -= 2.0 * core::f64::consts::PI;
+    }
+    while rad < -core::f64::consts::PI {
+        rad += 2.0 * core::f64::consts::PI;
+    }
+    rad
+}
+
 fn wrap_azimuth(deg: f64) -> f64 {
     (deg + 360.0).rem_euclid(360.0)
 }
@@ -191,8 +201,8 @@ pub fn vincenty_inverse(
     let u1 = ((1.0 - WGS84_F) * lat1.to_radians().tan()).atan();
     let u2 = ((1.0 - WGS84_F) * lat2.to_radians().tan()).atan();
     let (s_u1, c_u1, s_u2, c_u2) = (u1.sin(), u1.cos(), u2.sin(), u2.cos());
-    let (sig, _, c2_a, c_2sm, lam) =
-        solve_inverse_loop(s_u1, c_u1, s_u2, c_u2, (lon2 - lon1).to_radians())?;
+    let l = wrap_to_pi((lon2 - lon1).to_radians());
+    let (sig, _, c2_a, c_2sm, lam) = solve_inverse_loop(s_u1, c_u1, s_u2, c_u2, l)?;
     Ok(compute_inverse_result(
         sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2,
     ))
