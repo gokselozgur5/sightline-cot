@@ -63,3 +63,31 @@ impl<T: GeoidModel + ?Sized> GeoidModel for Box<T> {
 }
 
 pub use GeoidModel as Geoid;
+
+/// Uniform geoid model with constant undulation across valid coordinates.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ConstantGeoid {
+    pub undulation_m: f64,
+}
+
+impl ConstantGeoid {
+    pub const fn new(undulation_m: f64) -> Self {
+        Self { undulation_m }
+    }
+
+    pub const fn zero() -> Self {
+        Self { undulation_m: 0.0 }
+    }
+}
+
+impl GeoidModel for ConstantGeoid {
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        if !lat_deg.is_finite() || !lon_deg.is_finite() {
+            return None;
+        }
+        if !(-90.0..=90.0).contains(&lat_deg) || !(-180.0..=360.0).contains(&lon_deg) {
+            return None;
+        }
+        Some(self.undulation_m)
+    }
+}
