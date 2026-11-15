@@ -33,3 +33,15 @@ fn test_utm_forced_error_cases() {
     assert_eq!(wgs84_to_utm_forced(0.0, 0.0, 0), Err(GridError::InvalidZone));
     assert_eq!(wgs84_to_utm_forced(0.0, 0.0, 61), Err(GridError::InvalidZone));
 }
+
+#[test]
+fn test_utm_forced_southern_and_antimeridian_zones() {
+    let lat = -33.8688;
+    let lon = 151.2093;
+    let forced = wgs84_to_utm_forced(lat, lon, 55).unwrap();
+    assert_eq!(forced.zone, 55);
+    assert_eq!(forced.hemisphere, 'S');
+    let (lat_out, lon_out) = utm_forced_to_wgs84(&forced).unwrap();
+    assert!((lat - lat_out).abs() < 1e-5);
+    assert!((lon - lon_out).abs() < 1e-5);
+}
