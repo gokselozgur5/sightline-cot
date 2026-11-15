@@ -135,3 +135,20 @@ impl GeoidGrid {
         Ok(())
     }
 }
+
+impl GeoidGrid {
+    pub fn new(
+        min_lat_deg: f64,
+        min_lon_deg: f64,
+        lat_step_deg: f64,
+        lon_step_deg: f64,
+        cols: usize,
+        rows: usize,
+        undulations: Vec<Option<f64>>,
+    ) -> Result<Self, GeoidError> {
+        Self::validate(min_lat_deg, min_lon_deg, lat_step_deg, lon_step_deg, cols, rows, undulations.len())?;
+        Ok(Self {
+            min_lat_deg, min_lon_deg, lat_step_deg, lon_step_deg, cols, rows, undulations,
+        })
+    }
+}
