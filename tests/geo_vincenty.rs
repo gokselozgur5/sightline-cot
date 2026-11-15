@@ -47,3 +47,14 @@ fn test_antipodal_and_error_cases() {
         Err(VincentyError::NonFiniteInput)
     );
 }
+
+#[test]
+fn test_polar_coincident_points() {
+    let north = vincenty_inverse(90.0, 0.0, 90.0, 45.0).expect("north pole");
+    assert_eq!(north.distance_m, 0.0);
+    assert_eq!(north.forward_azimuth_deg, 0.0);
+    assert_eq!(north.reverse_azimuth_deg, 0.0);
+
+    let south = vincenty_inverse(-90.0, 10.0, -90.0, -50.0).expect("south pole");
+    assert_eq!(south.distance_m, 0.0);
+}
