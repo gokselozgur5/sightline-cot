@@ -34,3 +34,20 @@ fn test_parse_mgrs_spaced_and_case_insensitive() {
     assert_eq!(p.format_compact(), "31NEA1234567890");
     assert_eq!(p.format_spaced(), "31N EA 12345 67890");
 }
+
+#[test]
+fn test_parse_mgrs_precision_levels() {
+    let cases = [
+        ("31NEA", 0, 100_000.0),
+        ("31NEA12", 1, 10_000.0),
+        ("31NEA1234", 2, 1_000.0),
+        ("31NEA123456", 3, 100.0),
+        ("31NEA12345678", 4, 10.0),
+        ("31NEA1234567890", 5, 1.0),
+    ];
+    for (s, prec, res) in cases {
+        let p = parse_mgrs(s).unwrap();
+        assert_eq!(p.precision, prec);
+        assert!((p.resolution_meters() - res).abs() < 1e-6);
+    }
+}
