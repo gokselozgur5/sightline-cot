@@ -26,3 +26,17 @@ fn test_geohash_neighbors_ezs42() {
     assert_eq!(neighbors.west, "ezefr");
     assert_eq!(neighbors.north_west, "ezefx");
 }
+
+#[test]
+fn test_geohash_errors() {
+    use sightline_cot::geohash_neighbors::GeohashError;
+    assert_eq!(geohash_neighbors(""), Err(GeohashError::EmptyString));
+    assert_eq!(
+        geohash_neighbors("ezs4a"),
+        Err(GeohashError::InvalidCharacter('a'))
+    );
+    assert_eq!(
+        geohash_neighbor("ezs4i", GeohashDirection::North),
+        Err(GeohashError::InvalidCharacter('i'))
+    );
+}
