@@ -39,3 +39,6 @@ pub fn initial_bearing(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     let b = y.atan2(x).to_degrees();
     b.rem_euclid(360.0)
 }
+
+/// WGS84 semi-minor axis polar radius in meters.
+pub const WGS84_SEMI_MINOR_RADIUS_M: f64 = 6_356_752.314245;
