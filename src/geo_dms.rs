@@ -151,3 +151,13 @@ fn tokenize(s: &str) -> Vec<String> {
     }
     normalized.split_whitespace().map(String::from).collect()
 }
+
+fn parse_hemi(tok: &str) -> Option<char> {
+    if tok.len() == 1 {
+        let c = tok.chars().next()?.to_ascii_uppercase();
+        if matches!(c, 'N' | 'S' | 'E' | 'W') {
+            return Some(c);
+        }
+    }
+    None
+}
