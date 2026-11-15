@@ -74,3 +74,31 @@ impl ParsedMgrs {
         }
     }
 }
+
+impl ParsedMgrs {
+    /// Format as spaced MGRS string.
+    pub fn format_spaced(&self) -> String {
+        if self.precision == 0 {
+            format!("{:02}{} {}{}", self.zone, self.band, self.col, self.row)
+        } else {
+            let p = self.precision;
+            format!(
+                "{:02}{} {}{} {:0width$} {:0width$}",
+                self.zone, self.band, self.col, self.row, self.easting, self.northing, width = p
+            )
+        }
+    }
+}
+
+impl core::fmt::Display for ParsedMgrs {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.format_compact())
+    }
+}
+
+impl core::str::FromStr for ParsedMgrs {
+    type Err = MgrsParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        parse_mgrs(s)
+    }
+}
