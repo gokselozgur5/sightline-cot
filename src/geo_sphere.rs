@@ -148,3 +148,8 @@ pub fn line_of_sight_m(h1_m: f64, h2_m: f64, radius_m: f64) -> f64 {
 pub fn speed_mps(dist_m: f64, dt_sec: f64) -> Option<f64> {
     if dt_sec > 0.0 { Some(dist_m / dt_sec) } else { None }
 }
+
+/// Computes estimated time of arrival (seconds) given distance and speed.
+pub fn time_to_go_sec(dist_m: f64, speed_mps: f64) -> Option<f64> {
+    if speed_mps > 0.0 { Some(dist_m / speed_mps) } else { None }
+}
