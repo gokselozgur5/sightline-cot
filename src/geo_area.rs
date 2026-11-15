@@ -75,3 +75,20 @@ pub fn polygon_perimeter(poly: &[[f64; 2]]) -> Option<f64> {
     let pts = project_poly_enu(poly)?;
     planar_polygon_perimeter(&pts)
 }
+
+fn to_unit_cartesian(lat: f64, lon: f64) -> [f64; 3] {
+    let (phi, lam) = (lat.to_radians(), lon.to_radians());
+    [phi.cos() * lam.cos(), phi.cos() * lam.sin(), phi.sin()]
+}
+
+fn cross_prod(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
+    [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    ]
+}
+
+fn dot_prod(a: [f64; 3], b: [f64; 3]) -> f64 {
+    a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+}
