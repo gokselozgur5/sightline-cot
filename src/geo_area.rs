@@ -133,3 +133,28 @@ pub fn spherical_polygon_area_with_radius(poly: &[[f64; 2]], radius_m: f64) -> O
 pub fn spherical_polygon_area(poly: &[[f64; 2]]) -> Option<f64> {
     spherical_polygon_area_with_radius(poly, EARTH_RADIUS_M)
 }
+
+/// Compute spherical polygon perimeter with a custom sphere radius.
+pub fn spherical_polygon_perimeter_with_radius(poly: &[[f64; 2]], radius_m: f64) -> Option<f64> {
+    if !radius_m.is_finite() || radius_m <= 0.0 || poly.len() < 3 {
+        return None;
+    }
+    if poly.iter().flatten().any(|c| !c.is_finite()) {
+        return None;
+    }
+    let vs: Vec<[f64; 3]> = poly.iter().map(|p| to_unit_cartesian(p[0], p[1])).collect();
+    let mut total_rad = 0.0;
+    for i in 0..poly.len() {
+        let (v1, v2) = (vs[i], vs[(i + 1) % poly.len()]);
+        let c = cross_prod(v1, v2);
+        let sin_s = dot_prod(c, c).sqrt();
+        let cos_s = dot_prod(v1, v2);
+        total_rad += sin_s.atan2(cos_s);
+    }
+    Some(total_rad * radius_m)
+}
+
+/// Compute spherical polygon perimeter in meters along great-circle arcs.
+pub fn spherical_polygon_perimeter(poly: &[[f64; 2]]) -> Option<f64> {
+    spherical_polygon_perimeter_with_radius(poly, EARTH_RADIUS_M)
+}
