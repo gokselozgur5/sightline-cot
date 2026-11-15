@@ -43,3 +43,26 @@ pub struct GeoidGrid {
     pub nodata_value: Option<f64>,
     pub data: Vec<Option<f64>>,
 }
+
+impl GeoidGrid {
+    /// Construct and validate a new GeoidGrid raster instance.
+    pub fn new(
+        cols: usize, rows: usize, x0: f64, y0: f64, step: f64,
+        nodata: Option<f64>, data: Vec<Option<f64>>,
+    ) -> Result<Self, GeoidError> {
+        if cols == 0 || rows == 0 {
+            return Err(GeoidError::InvalidDimensions { cols, rows });
+        }
+        if !step.is_finite() || step <= 0.0 {
+            return Err(GeoidError::InvalidCellSize(step));
+        }
+        if !x0.is_finite() || !y0.is_finite() {
+            return Err(GeoidError::InvalidHeader("non-finite origin".into()));
+        }
+        if data.len() != cols * rows {
+            let (expected, found) = (cols * rows, data.len());
+            return Err(GeoidError::DataCountMismatch { expected, found });
+        }
+        Ok(Self { cols, rows, xllcorner: x0, yllcorner: y0, cellsize: step, nodata_value: nodata, data })
+    }
+}
