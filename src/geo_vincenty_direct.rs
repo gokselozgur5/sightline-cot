@@ -41,3 +41,25 @@ fn delta_sigma(b: f64, sin_sig: f64, cos_sig: f64, cos_2sm: f64) -> f64 {
                         * (-3.0 + 4.0 * sin_sig * sin_sig)
                         * (-3.0 + 4.0 * cos2_2sm)))
 }
+
+fn solve_direct_sigma(
+    b_semi: f64,
+    s: f64,
+    a_coeff: f64,
+    sig1: f64,
+    b_coeff: f64,
+) -> (f64, f64) {
+    let mut sigma = s / (b_semi * a_coeff);
+    let mut cos_2sm = 0.0;
+    for _ in 0..200 {
+        let two_sm = 2.0 * sig1 + sigma;
+        cos_2sm = two_sm.cos();
+        let d_sig = delta_sigma(b_coeff, sigma.sin(), sigma.cos(), cos_2sm);
+        let next = s / (b_semi * a_coeff) + d_sig;
+        if (next - sigma).abs() < 1e-12 {
+            return (next, cos_2sm);
+        }
+        sigma = next;
+    }
+    (sigma, cos_2sm)
+}
