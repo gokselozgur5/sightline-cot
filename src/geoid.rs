@@ -152,3 +152,16 @@ impl GeoidGrid {
         })
     }
 }
+
+impl GeoidGrid {
+    pub fn new_uniform(
+        min_lat_deg: f64,
+        min_lon_deg: f64,
+        step_deg: f64,
+        cols: usize,
+        rows: usize,
+        undulations: Vec<Option<f64>>,
+    ) -> Result<Self, GeoidError> {
+        Self::new(min_lat_deg, min_lon_deg, step_deg, step_deg, cols, rows, undulations)
+    }
+}
