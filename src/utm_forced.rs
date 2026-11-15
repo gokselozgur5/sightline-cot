@@ -33,3 +33,17 @@ fn meridian_arc(phi: f64, e2: f64) -> f64 {
     let a6 = 35.0 * e6 / 3072.0;
     WGS84_A * (a0 * phi - a2 * (2.0 * phi).sin() + a4 * (4.0 * phi).sin() - a6 * (6.0 * phi).sin())
 }
+
+fn compute_en_terms(lat: f64, dlon: f64, nu: f64, m: f64, ep2: f64) -> (f64, f64) {
+    let cos_lat = lat.cos();
+    let (t, eta2) = (lat.tan() * lat.tan(), ep2 * cos_lat * cos_lat);
+    let (p, p2) = (dlon * cos_lat, (dlon * cos_lat).powi(2));
+    let (p3, p4, p5, p6, p7) = (p * p2, p2 * p2, p * p2 * p2, p2 * p2 * p2, p * p2 * p2 * p2);
+    let e = FALSE_EASTING + UTM_K0 * nu * (p + (1.0 - t + eta2) * p3 / 6.0
+        + (5.0 - 18.0 * t + t * t + 72.0 * eta2) * p5 / 120.0
+        + (61.0 - 479.0 * t + 179.0 * t * t - t * t * t) * p7 / 5040.0);
+    let n = UTM_K0 * (m + nu * lat.tan() * (p2 / 2.0
+        + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0
+        + (61.0 - 58.0 * t + t * t + 600.0 * eta2) * p6 / 720.0));
+    (e, n)
+}
