@@ -31,3 +31,15 @@ impl std::fmt::Display for GeoidError {
 }
 
 impl std::error::Error for GeoidError {}
+
+/// Regular geoid undulation grid loaded from an ASCII raster.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GeoidGrid {
+    pub cols: usize,
+    pub rows: usize,
+    pub xllcorner: f64,
+    pub yllcorner: f64,
+    pub cellsize: f64,
+    pub nodata_value: Option<f64>,
+    pub data: Vec<Option<f64>>,
+}
