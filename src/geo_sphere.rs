@@ -66,3 +66,6 @@ pub const FEET_TO_METERS: f64 = 0.3048;
 
 /// Meters to international feet conversion factor.
 pub const METERS_TO_FEET: f64 = 1.0 / 0.3048;
+
+/// Knots to meters per second conversion factor.
+pub const KNOTS_TO_MPS: f64 = 1852.0 / 3600.0;
