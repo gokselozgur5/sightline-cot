@@ -165,3 +165,18 @@ pub fn parse_geoid_ascii(ascii: &str) -> Result<GeoidGrid, GeoidError> {
     }
     GeoidGrid::new(cols, rows, x0, y0, step, nodata, data)
 }
+
+impl std::str::FromStr for GeoidGrid {
+    type Err = GeoidError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        parse_geoid_ascii(s)
+    }
+}
+
+impl GeoidGrid {
+    /// Parse an ASCII raster string into a GeoidGrid.
+    pub fn from_ascii(ascii: &str) -> Result<Self, GeoidError> {
+        parse_geoid_ascii(ascii)
+    }
+}
