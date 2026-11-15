@@ -57,3 +57,6 @@ pub const GRS80_SEMI_MAJOR_RADIUS_M: f64 = 6_378_137.0;
 
 /// GRS80 flattening factor.
 pub const GRS80_FLATTENING: f64 = 1.0 / 298.257222101;
+
+/// Standard nautical mile in meters.
+pub const NAUTICAL_MILE_M: f64 = 1852.0;
