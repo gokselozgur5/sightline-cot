@@ -133,6 +133,9 @@ fn solve_inverse_loop(
             return Ok((sigma, s_alp, c2_alp, c_2sm, lam_next));
         }
         lambda = lam_next;
+        if lambda.abs() > core::f64::consts::PI {
+            return Err(VincentyError::NoConvergence);
+        }
     }
     Err(VincentyError::NoConvergence)
 }
