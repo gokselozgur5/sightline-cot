@@ -77,3 +77,8 @@ pub const MPS_TO_KNOTS: f64 = 3600.0 / 1852.0;
 pub fn deg_to_rad_fast(deg: f64) -> f64 {
     deg * (std::f64::consts::PI / 180.0)
 }
+
+/// Radians to degrees factor.
+pub fn rad_to_deg_fast(rad: f64) -> f64 {
+    rad * (180.0 / std::f64::consts::PI)
+}
