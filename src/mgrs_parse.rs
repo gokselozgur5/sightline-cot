@@ -268,3 +268,20 @@ fn resolve_mgrs_northing(base_n: f64, approx_n: f64) -> f64 {
     }
     best_n
 }
+
+impl ParsedMgrs {
+    /// Convert parsed MGRS coordinate to a UTM coordinate centered in the grid cell.
+    pub fn to_utm(&self) -> Result<UtmCoord, MgrsParseError> {
+        let (hemi, approx_n) = band_approx_northing(self.band)?;
+        let col_e = decode_100k_col(self.zone, self.col as u8)?;
+        let row_n = decode_100k_row(self.zone, self.row as u8)?;
+        let (rem_e, rem_n) = cell_center_offset(self.precision, self.easting, self.northing);
+        let northing = resolve_mgrs_northing(row_n + rem_n, approx_n);
+        Ok(UtmCoord {
+            zone: self.zone,
+            hemisphere: hemi,
+            easting: col_e + rem_e,
+            northing,
+        })
+    }
+}
