@@ -165,3 +165,20 @@ impl GeoidGrid {
         Self::new(min_lat_deg, min_lon_deg, step_deg, step_deg, cols, rows, undulations)
     }
 }
+
+impl GeoidGrid {
+    pub fn from_f64(
+        min_lat_deg: f64,
+        min_lon_deg: f64,
+        lat_step_deg: f64,
+        lon_step_deg: f64,
+        cols: usize,
+        rows: usize,
+        raw: &[f64],
+        nodata: Option<f64>,
+    ) -> Result<Self, GeoidError> {
+        let is_nd = |h: f64| !h.is_finite() || nodata.is_some_and(|nd| (h - nd).abs() < 1e-6);
+        let undulations = raw.iter().map(|&h| (!is_nd(h)).then_some(h)).collect();
+        Self::new(min_lat_deg, min_lon_deg, lat_step_deg, lon_step_deg, cols, rows, undulations)
+    }
+}
