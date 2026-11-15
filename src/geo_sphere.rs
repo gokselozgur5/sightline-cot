@@ -48,3 +48,6 @@ pub const WGS84_FLATTENING: f64 = 1.0 / 298.257223563;
 
 /// WGS84 first eccentricity squared.
 pub const WGS84_FIRST_ECCENTRICITY_SQ: f64 = 0.00669437999014;
+
+/// WGS84 second eccentricity squared.
+pub const WGS84_SECOND_ECCENTRICITY_SQ: f64 = 0.00673949674228;
