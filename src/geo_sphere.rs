@@ -98,3 +98,8 @@ pub fn normalize_bearing_pm180(bearing: f64) -> f64 {
 pub fn meters_to_nm(meters: f64) -> f64 {
     meters / NAUTICAL_MILE_M
 }
+
+/// Converts international nautical miles to meters.
+pub fn nm_to_meters(nm: f64) -> f64 {
+    nm * NAUTICAL_MILE_M
+}
