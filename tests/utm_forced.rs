@@ -11,3 +11,15 @@ fn test_utm_forced_across_adjacent_zones() {
     assert!((lat - lat_out).abs() < 1e-5);
     assert!((lon - lon_out).abs() < 1e-5);
 }
+
+#[test]
+fn test_utm_forced_matches_standard_utm_in_native_zone() {
+    let lat = 40.7128;
+    let lon = -74.0060;
+    let std_utm = sightline_cot::wgs84_to_utm(lat, lon).unwrap();
+    let forced = wgs84_to_utm_forced(lat, lon, std_utm.zone).unwrap();
+    assert_eq!(forced.zone, std_utm.zone);
+    assert_eq!(forced.hemisphere, std_utm.hemisphere);
+    assert!((forced.easting - std_utm.easting).abs() < 1e-4);
+    assert!((forced.northing - std_utm.northing).abs() < 1e-4);
+}
