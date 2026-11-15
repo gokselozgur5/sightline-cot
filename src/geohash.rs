@@ -117,3 +117,16 @@ pub fn decode(hash: &str) -> Result<(f64, f64), GeohashError> {
 pub fn decode_geohash(hash: &str) -> Result<(f64, f64), GeohashError> {
     decode(hash)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_internal_sanity() {
+        assert_eq!(encode(0.0, 0.0, 1).unwrap(), "s");
+        let (lat, lon) = decode("s").unwrap();
+        assert_eq!(lat, 22.5);
+        assert_eq!(lon, 22.5);
+    }
+}
