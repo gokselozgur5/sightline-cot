@@ -254,3 +254,17 @@ fn cell_center_offset(precision: usize, easting: u32, northing: u32) -> (f64, f6
         )
     }
 }
+
+fn resolve_mgrs_northing(base_n: f64, approx_n: f64) -> f64 {
+    let mut best_n = base_n;
+    let mut best_diff = (base_n - approx_n).abs();
+    for k in 1..=5 {
+        let cand = k as f64 * 2_000_000.0 + base_n;
+        let diff = (cand - approx_n).abs();
+        if diff < best_diff {
+            best_diff = diff;
+            best_n = cand;
+        }
+    }
+    best_n
+}
