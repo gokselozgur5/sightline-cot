@@ -70,5 +70,30 @@ fn validate_geohash(hash: &str) -> Result<(), GeohashError> {
     Ok(())
 }
 
+fn neighbor_cardinal(hash: &str, dir_idx: usize) -> Result<String, GeohashError> {
+    let bytes = hash.as_bytes();
+    let last = bytes[bytes.len() - 1].to_ascii_lowercase();
+    let is_odd = (bytes.len() % 2) == 1;
+    let (border, table) = if is_odd {
+        (BORDERS[dir_idx].1, NEIGHBORS[dir_idx].1)
+    } else {
+        (BORDERS[dir_idx].0, NEIGHBORS[dir_idx].0)
+    };
+    let parent = &hash[..hash.len() - 1];
+    let base_parent = if border.contains(&last) && !parent.is_empty() {
+        neighbor_cardinal(parent, dir_idx)?
+    } else {
+        parent.to_ascii_lowercase()
+    };
+    let idx = table
+        .iter()
+        .position(|&b| b == last)
+        .ok_or(GeohashError::InvalidCharacter(last as char))?;
+    let mut res = base_parent;
+    res.push(BASE32[idx] as char);
+    Ok(res)
+}
+
+
 
 
