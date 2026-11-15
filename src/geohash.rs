@@ -34,3 +34,16 @@ fn char_to_value(c: char) -> Result<u8, GeohashError> {
         None => Err(GeohashError::InvalidCharacter(c)),
     }
 }
+
+fn validate_coords(lat: f64, lon: f64, precision: usize) -> Result<(), GeohashError> {
+    if precision == 0 || precision > 12 {
+        return Err(GeohashError::InvalidPrecision);
+    }
+    if !(-90.0..=90.0).contains(&lat) || lat.is_nan() {
+        return Err(GeohashError::LatitudeOutOfRange);
+    }
+    if !(-180.0..=180.0).contains(&lon) || lon.is_nan() {
+        return Err(GeohashError::LongitudeOutOfRange);
+    }
+    Ok(())
+}
