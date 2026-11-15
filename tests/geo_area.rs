@@ -59,3 +59,15 @@ fn test_spherical_polygon_area_and_winding() {
     let a_earth = spherical_polygon_area(&octant_ccw).unwrap();
     assert!(a_earth > 0.0);
 }
+
+#[test]
+fn test_spherical_polygon_perimeter_and_degeneracy() {
+    let octant = [[0.0, 0.0], [0.0, 90.0], [90.0, 0.0]];
+    let p = spherical_polygon_perimeter_with_radius(&octant, 1.0).unwrap();
+    assert!((p - 1.5 * std::f64::consts::PI).abs() < 1e-12);
+    let p_earth = spherical_polygon_perimeter(&octant).unwrap();
+    assert!((p_earth - 1.5 * std::f64::consts::PI * 6_371_008.8).abs() < 1e-3);
+    assert!(spherical_polygon_area(&[[0.0, 0.0], [1.0, 1.0]]).is_none());
+    assert!(spherical_polygon_perimeter(&[[0.0, 0.0], [1.0, 1.0]]).is_none());
+    assert!(spherical_polygon_area_with_radius(&octant, -1.0).is_none());
+}
