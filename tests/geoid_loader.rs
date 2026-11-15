@@ -1,4 +1,4 @@
-use sightline_cot::geoid_loader::{parse_geoid_ascii, GeoidGrid};
+use sightline_cot::geoid_loader::{parse_geoid_ascii, GeoidError, GeoidGrid};
 
 #[test]
 fn test_parse_ascii_grid_basic() {
@@ -79,4 +79,21 @@ nodata_value -9999
     assert_eq!(grid.undulation_at(0.0, 0.0), Some(30.0));
     assert_eq!(grid.undulation_at(-0.1, 0.5), None);
     assert_eq!(grid.undulation_at(0.5, 2.5), None);
+}
+
+#[test]
+fn test_parse_malformed_grids() {
+    assert_eq!(parse_geoid_ascii(""), Err(GeoidError::EmptyInput));
+    assert_eq!(
+        parse_geoid_ascii("ncols 2 nrows 2 xllcorner 0 yllcorner 0 1 2 3"),
+        Err(GeoidError::MissingHeader("cellsize"))
+    );
+    assert_eq!(
+        parse_geoid_ascii("ncols 2 nrows 2 xllcorner 0 yllcorner 0 cellsize 1.0 1.0 2.0"),
+        Err(GeoidError::DataCountMismatch { expected: 4, found: 2 })
+    );
+    assert_eq!(
+        parse_geoid_ascii("ncols abc nrows 2 xllcorner 0 yllcorner 0 cellsize 1.0 1 2 3 4"),
+        Err(GeoidError::InvalidHeader("abc".into()))
+    );
 }
