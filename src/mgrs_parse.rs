@@ -171,3 +171,23 @@ fn extract_parts(s: &str) -> Result<(String, String), MgrsParseError> {
     let compact: String = s.chars().filter(|c| !c.is_whitespace()).collect();
     split_compact(&compact)
 }
+
+fn split_compact(s: &str) -> Result<(String, String), MgrsParseError> {
+    let b = s.as_bytes();
+    let zone_len = if b.len() >= 2 && b[0].is_ascii_digit() && b[1].is_ascii_digit() {
+        2
+    } else if !b.is_empty() && b[0].is_ascii_digit() {
+        1
+    } else {
+        return Err(MgrsParseError::InvalidZone);
+    };
+    if b.len() < zone_len + 3 {
+        return Err(MgrsParseError::InvalidLength);
+    }
+    let prefix = &s[..zone_len + 3];
+    let digits = &s[zone_len + 3..];
+    if !digits.chars().all(|c| c.is_ascii_digit()) || digits.len() % 2 != 0 || digits.len() > 10 {
+        return Err(MgrsParseError::InvalidDigits);
+    }
+    Ok((prefix.to_string(), digits.to_string()))
+}
