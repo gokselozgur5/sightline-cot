@@ -191,3 +191,28 @@ fn split_compact(s: &str) -> Result<(String, String), MgrsParseError> {
     }
     Ok((prefix.to_string(), digits.to_string()))
 }
+
+fn parse_prefix(prefix: &str) -> Result<(u8, char, char, char), MgrsParseError> {
+    let p = prefix.trim();
+    let num_digits = p.chars().take_while(|c| c.is_ascii_digit()).count();
+    if !(1..=2).contains(&num_digits) || p.len() != num_digits + 3 {
+        return Err(MgrsParseError::InvalidLength);
+    }
+    let zone: u8 = p[..num_digits]
+        .parse()
+        .map_err(|_| MgrsParseError::InvalidZone)?;
+    if !(1..=60).contains(&zone) {
+        return Err(MgrsParseError::InvalidZone);
+    }
+    let mut chars = p[num_digits..].chars().map(|c| c.to_ascii_uppercase());
+    let band = chars.next().ok_or(MgrsParseError::InvalidBand)?;
+    let col = chars.next().ok_or(MgrsParseError::InvalidSquare)?;
+    let row = chars.next().ok_or(MgrsParseError::InvalidSquare)?;
+    if !BANDS.contains(&(band as u8)) {
+        return Err(MgrsParseError::InvalidBand);
+    }
+    if !COLS.contains(&(col as u8)) || !ROWS.contains(&(row as u8)) {
+        return Err(MgrsParseError::InvalidSquare);
+    }
+    Ok((zone, band, col, row))
+}
