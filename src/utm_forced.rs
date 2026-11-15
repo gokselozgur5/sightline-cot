@@ -134,3 +134,23 @@ fn utm_unproject_point_forced(coord: &UtmCoord) -> (f64, f64) {
     let lon_norm = ((lon_deg + 180.0).rem_euclid(360.0)) - 180.0;
     (lat_rad.to_degrees(), lon_norm)
 }
+
+/// Unproject a UTM coordinate forced into a chosen zone back to WGS84 lat/lon.
+///
+/// Unlike standard [`crate::mgrs::utm_to_wgs84`], this supports coordinates spanning
+/// beyond standard single-zone boundaries.
+pub fn utm_forced_to_wgs84(coord: &UtmCoord) -> Result<(f64, f64), GridError> {
+    if !(1..=60).contains(&coord.zone) {
+        return Err(GridError::InvalidZone);
+    }
+    if coord.hemisphere != 'N' && coord.hemisphere != 'S' {
+        return Err(GridError::InvalidLatitude);
+    }
+    if !coord.easting.is_finite() {
+        return Err(GridError::InvalidEasting);
+    }
+    if !coord.northing.is_finite() {
+        return Err(GridError::InvalidNorthing);
+    }
+    Ok(utm_unproject_point_forced(coord))
+}
