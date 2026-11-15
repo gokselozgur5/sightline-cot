@@ -47,3 +47,17 @@ fn compute_en_terms(lat: f64, dlon: f64, nu: f64, m: f64, ep2: f64) -> (f64, f64
         + (61.0 - 58.0 * t + t * t + 600.0 * eta2) * p6 / 720.0));
     (e, n)
 }
+
+fn utm_project_point_forced(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, f64) {
+    let lat = lat_deg.to_radians();
+    let lon0 = zone_central_meridian_rad(zone);
+    let dlon = normalize_dlon_rad(lon_deg.to_radians() - lon0);
+    let sin_lat = lat.sin();
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    let ep2 = e2 / (1.0 - e2);
+    let nu = WGS84_A / (1.0 - e2 * sin_lat * sin_lat).sqrt();
+    let m = meridian_arc(lat, e2);
+    let (east, north_val) = compute_en_terms(lat, dlon, nu, m, ep2);
+    let north = if hemi == 'S' { FALSE_NORTHING_SOUTH + north_val } else { north_val };
+    (east, north)
+}
