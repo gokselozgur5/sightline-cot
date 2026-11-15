@@ -61,3 +61,30 @@ fn utm_project_point_forced(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) ->
     let north = if hemi == 'S' { FALSE_NORTHING_SOUTH + north_val } else { north_val };
     (east, north)
 }
+
+/// Project WGS84 lat/lon into a user-specified UTM zone.
+///
+/// Unlike standard UTM, this allows extending coordinates across adjacent zone boundaries.
+pub fn wgs84_to_utm_forced(
+    lat_deg: f64,
+    lon_deg: f64,
+    forced_zone: u8,
+) -> Result<UtmCoord, GridError> {
+    if !(-80.0..=84.0).contains(&lat_deg) {
+        return Err(GridError::InvalidLatitude);
+    }
+    if !(-180.0..=180.0).contains(&lon_deg) {
+        return Err(GridError::InvalidLongitude);
+    }
+    if !(1..=60).contains(&forced_zone) {
+        return Err(GridError::InvalidZone);
+    }
+    let hemisphere = if lat_deg >= 0.0 { 'N' } else { 'S' };
+    let (easting, northing) = utm_project_point_forced(lat_deg, lon_deg, forced_zone, hemisphere);
+    Ok(UtmCoord {
+        zone: forced_zone,
+        hemisphere,
+        easting,
+        northing,
+    })
+}
