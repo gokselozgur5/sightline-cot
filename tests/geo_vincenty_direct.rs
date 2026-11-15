@@ -13,3 +13,20 @@ fn test_vincenty_direct_flinders_peak() {
     assert!((res.lat_deg - expected_lat).abs() < 1e-6);
     assert!((res.lon_deg - expected_lon).abs() < 1e-6);
 }
+
+use sightline_cot::geo_vincenty_direct::VincentyError;
+
+#[test]
+fn test_vincenty_direct_validation_errors() {
+    assert_eq!(vincenty_direct(95.0, 0.0, 0.0, 100.0), Err(VincentyError::InvalidLatitude));
+    assert_eq!(vincenty_direct(0.0, 185.0, 0.0, 100.0), Err(VincentyError::InvalidLongitude));
+    assert_eq!(vincenty_direct(0.0, 0.0, 0.0, -10.0), Err(VincentyError::NegativeDistance));
+    assert_eq!(vincenty_direct(0.0, 0.0, f64::NAN, 10.0), Err(VincentyError::NonFiniteInput));
+}
+
+#[test]
+fn test_vincenty_direct_zero_distance() {
+    let res = vincenty_direct(10.0, 20.0, 45.0, 0.0).expect("zero dist");
+    assert!((res.lat_deg - 10.0).abs() < 1e-9);
+    assert!((res.lon_deg - 20.0).abs() < 1e-9);
+}
