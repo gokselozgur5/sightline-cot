@@ -103,3 +103,8 @@ pub fn meters_to_nm(meters: f64) -> f64 {
 pub fn nm_to_meters(nm: f64) -> f64 {
     nm * NAUTICAL_MILE_M
 }
+
+/// Great-circle angular distance in radians from distance and sphere radius.
+pub fn angular_distance_rad(dist_m: f64, radius_m: f64) -> f64 {
+    dist_m / radius_m
+}
