@@ -64,3 +64,14 @@ fn test_polar_coincident_points() {
     let south = vincenty_inverse(-90.0, 10.0, -90.0, -50.0).expect("south pole");
     assert_eq!(south.distance_m, 0.0);
 }
+
+#[test]
+fn test_equator_and_meridian_arcs() {
+    let eq = vincenty_inverse(0.0, 0.0, 0.0, 1.0).expect("equator 1 deg");
+    assert!((eq.distance_m - 111319.491).abs() < 0.01);
+    assert!((eq.forward_azimuth_deg - 90.0).abs() < 1e-6);
+
+    let mer = vincenty_inverse(0.0, 0.0, 90.0, 0.0).expect("quarter meridian");
+    assert!((mer.distance_m - 10001965.729).abs() < 0.01);
+    assert!((mer.forward_azimuth_deg - 0.0).abs() < 1e-6);
+}
