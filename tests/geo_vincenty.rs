@@ -31,8 +31,14 @@ use sightline_cot::geo_vincenty::VincentyError;
 
 #[test]
 fn test_antipodal_and_error_cases() {
-    let res = vincenty_inverse(0.0, 0.0, 0.5, 179.7);
-    assert!(res == Err(VincentyError::NoConvergence) || res.is_ok());
+    assert_eq!(
+        vincenty_inverse(0.0, 0.0, 0.5, 179.7),
+        Err(VincentyError::NoConvergence)
+    );
+    assert_eq!(
+        vincenty_inverse(0.0, 0.0, 0.0, 180.0),
+        Err(VincentyError::NoConvergence)
+    );
 
     assert_eq!(
         vincenty_inverse(95.0, 0.0, 0.0, 0.0),
