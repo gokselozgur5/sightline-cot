@@ -49,3 +49,17 @@ pub trait GeoidModel {
         self.undulation(lat_deg, lon_deg).map(|n| ellipsoidal_m - n)
     }
 }
+
+impl<T: GeoidModel + ?Sized> GeoidModel for &T {
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        (**self).undulation(lat_deg, lon_deg)
+    }
+}
+
+impl<T: GeoidModel + ?Sized> GeoidModel for Box<T> {
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        (**self).undulation(lat_deg, lon_deg)
+    }
+}
+
+pub use GeoidModel as Geoid;
