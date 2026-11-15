@@ -285,3 +285,21 @@ impl ParsedMgrs {
         })
     }
 }
+
+impl ParsedMgrs {
+    /// Convert parsed MGRS coordinate to WGS84 (latitude, longitude) in degrees.
+    pub fn to_wgs84(&self) -> Result<(f64, f64), MgrsParseError> {
+        let utm = self.to_utm()?;
+        utm_to_wgs84(&utm).map_err(MgrsParseError::Grid)
+    }
+}
+
+/// Convenience function to directly parse an MGRS string into a UTM coordinate.
+pub fn parse_mgrs_to_utm(s: &str) -> Result<UtmCoord, MgrsParseError> {
+    parse_mgrs(s)?.to_utm()
+}
+
+/// Convenience function to directly parse an MGRS string into WGS84 (lat, lon) degrees.
+pub fn parse_mgrs_to_wgs84(s: &str) -> Result<(f64, f64), MgrsParseError> {
+    parse_mgrs(s)?.to_wgs84()
+}
