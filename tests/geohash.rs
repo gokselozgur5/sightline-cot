@@ -44,3 +44,17 @@ fn test_geohash_error_handling() {
     assert_eq!(decode(""), Err(GeohashError::EmptyHash));
     assert_eq!(decode("s000a"), Err(GeohashError::InvalidCharacter('a')));
 }
+
+#[test]
+fn test_geohash_case_insensitive_and_roundtrip() {
+    let lower = decode("u4pruyd").expect("valid lower decode");
+    let upper = decode("U4PRUYD").expect("valid upper decode");
+    assert!((lower.0 - upper.0).abs() < 1e-9);
+    assert!((lower.1 - upper.1).abs() < 1e-9);
+
+    let original = (35.6895, 139.6917);
+    let encoded = encode(original.0, original.1, 9).expect("encoded tokyo");
+    let decoded = decode(&encoded).expect("decoded tokyo");
+    assert!((original.0 - decoded.0).abs() < 0.0001);
+    assert!((original.1 - decoded.1).abs() < 0.0001);
+}
