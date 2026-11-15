@@ -176,7 +176,9 @@ pub fn vincenty_inverse(
 ) -> Result<VincentyInverse, VincentyError> {
     validate_point(lat1, lon1)?;
     validate_point(lat2, lon2)?;
-    if (lat1 - lat2).abs() < 1e-12 && (lon1 - lon2).abs() < 1e-12 {
+    let same_pole = (lat1 >= 90.0 - 1e-12 && lat2 >= 90.0 - 1e-12)
+        || (lat1 <= -90.0 + 1e-12 && lat2 <= -90.0 + 1e-12);
+    if ((lat1 - lat2).abs() < 1e-12 && (lon1 - lon2).abs() < 1e-12) || same_pole {
         return Ok(VincentyInverse {
             distance_m: 0.0,
             forward_azimuth_deg: 0.0,
