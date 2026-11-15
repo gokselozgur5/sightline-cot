@@ -153,3 +153,8 @@ pub fn speed_mps(dist_m: f64, dt_sec: f64) -> Option<f64> {
 pub fn time_to_go_sec(dist_m: f64, speed_mps: f64) -> Option<f64> {
     if speed_mps > 0.0 { Some(dist_m / speed_mps) } else { None }
 }
+
+/// Checks whether course over ground in degrees is a valid number.
+pub fn is_valid_cog_deg(cog_deg: f64) -> bool {
+    cog_deg.is_finite() && cog_deg >= 0.0 && cog_deg < 360.0
+}
