@@ -54,3 +54,6 @@ pub const WGS84_SECOND_ECCENTRICITY_SQ: f64 = 0.00673949674228;
 
 /// GRS80 semi-major axis in meters.
 pub const GRS80_SEMI_MAJOR_RADIUS_M: f64 = 6_378_137.0;
+
+/// GRS80 flattening factor.
+pub const GRS80_FLATTENING: f64 = 1.0 / 298.257222101;
