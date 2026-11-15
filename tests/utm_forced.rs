@@ -23,3 +23,13 @@ fn test_utm_forced_matches_standard_utm_in_native_zone() {
     assert!((forced.easting - std_utm.easting).abs() < 1e-4);
     assert!((forced.northing - std_utm.northing).abs() < 1e-4);
 }
+
+#[test]
+fn test_utm_forced_error_cases() {
+    use sightline_cot::GridError;
+    assert_eq!(wgs84_to_utm_forced(85.0, 0.0, 31), Err(GridError::InvalidLatitude));
+    assert_eq!(wgs84_to_utm_forced(-81.0, 0.0, 31), Err(GridError::InvalidLatitude));
+    assert_eq!(wgs84_to_utm_forced(0.0, 185.0, 31), Err(GridError::InvalidLongitude));
+    assert_eq!(wgs84_to_utm_forced(0.0, 0.0, 0), Err(GridError::InvalidZone));
+    assert_eq!(wgs84_to_utm_forced(0.0, 0.0, 61), Err(GridError::InvalidZone));
+}
