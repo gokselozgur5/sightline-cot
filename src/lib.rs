@@ -48,6 +48,7 @@ pub use geo_crosstrack::{
     along_track_distance_m, cross_track_distance_m, cross_track_error, CrossTrackResult,
 };
 pub mod geo_ddm;
+pub mod geo_dms;
 pub mod geo_destination;
 pub mod geo_enu;
 pub mod geo_frame;
