@@ -63,3 +63,6 @@ pub const NAUTICAL_MILE_M: f64 = 1852.0;
 
 /// International foot to meters conversion factor.
 pub const FEET_TO_METERS: f64 = 0.3048;
+
+/// Meters to international feet conversion factor.
+pub const METERS_TO_FEET: f64 = 1.0 / 0.3048;
