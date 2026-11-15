@@ -69,3 +69,6 @@ pub const METERS_TO_FEET: f64 = 1.0 / 0.3048;
 
 /// Knots to meters per second conversion factor.
 pub const KNOTS_TO_MPS: f64 = 1852.0 / 3600.0;
+
+/// Meters per second to knots conversion factor.
+pub const MPS_TO_KNOTS: f64 = 3600.0 / 1852.0;
