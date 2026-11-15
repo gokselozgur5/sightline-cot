@@ -177,8 +177,17 @@ impl AsciiHeader {
 fn is_header_key(k: &str) -> bool {
     matches!(
         k.to_ascii_lowercase().as_str(),
-        "ncols" | "nrows" | "xllcorner" | "yllcorner" | "xllcenter"
-            | "yllcenter" | "cellsize" | "dx" | "dy" | "nodata_value" | "nodata"
+        "ncols"
+            | "nrows"
+            | "xllcorner"
+            | "yllcorner"
+            | "xllcenter"
+            | "yllcenter"
+            | "cellsize"
+            | "dx"
+            | "dy"
+            | "nodata_value"
+            | "nodata"
     )
 }
 
