@@ -111,13 +111,18 @@ impl GeoidGrid {
         if !self.contains(lon, lat) || !lon.is_finite() || !lat.is_finite() {
             return None;
         }
-        if self.cols == 1 && self.rows == 1 { return self.get(0, 0); }
+        if self.cols == 1 && self.rows == 1 {
+            return self.get(0, 0);
+        }
         let u = ((lon - self.xllcorner) / self.cellsize).max(0.0);
         let v_norm = ((lat - self.yllcorner) / self.cellsize).max(0.0);
         let v_top = (self.rows.saturating_sub(1) as f64 - v_norm).max(0.0);
         let c0 = (u.floor() as usize).min(self.cols.saturating_sub(2));
         let r0 = (v_top.floor() as usize).min(self.rows.saturating_sub(2));
-        let (s, t) = ((u - c0 as f64).clamp(0.0, 1.0), (v_top - r0 as f64).clamp(0.0, 1.0));
+        let (s, t) = (
+            (u - c0 as f64).clamp(0.0, 1.0),
+            (v_top - r0 as f64).clamp(0.0, 1.0),
+        );
         let (z00, z10) = (self.get(c0, r0)?, self.get(c0 + 1, r0)?);
         let (z01, z11) = (self.get(c0, r0 + 1)?, self.get(c0 + 1, r0 + 1)?);
         Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
