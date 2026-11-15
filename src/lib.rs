@@ -81,6 +81,7 @@ pub use tracker_cov_adaptive::{
 };
 pub mod utm_mgrs;
 pub mod utm_string;
+pub mod utm_forced;
 pub use cam_distorted_pinhole::DistortedPinhole;
 pub mod geoid;
 pub use geoid::{
