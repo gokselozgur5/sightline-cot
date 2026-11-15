@@ -57,4 +57,18 @@ const NEIGHBORS: [(&[u8; 32], &[u8; 32]); 4] = [
     (b"238967debc01fg45kmstqrwxuvhjyznp", b"14365h7k9dcfesgujnmqp0r2twvyx8zb"),
 ];
 
+fn validate_geohash(hash: &str) -> Result<(), GeohashError> {
+    if hash.is_empty() {
+        return Err(GeohashError::EmptyString);
+    }
+    for b in hash.bytes() {
+        let lower = b.to_ascii_lowercase();
+        if !BASE32.contains(&lower) {
+            return Err(GeohashError::InvalidCharacter(b as char));
+        }
+    }
+    Ok(())
+}
+
+
 
