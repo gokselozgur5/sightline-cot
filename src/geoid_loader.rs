@@ -131,10 +131,14 @@ impl GeoidGrid {
 
 #[derive(Default)]
 struct AsciiHeader {
-    cols: Option<usize>, rows: Option<usize>,
-    xcorner: Option<f64>, ycorner: Option<f64>,
-    xcenter: Option<f64>, ycenter: Option<f64>,
-    cellsize: Option<f64>, nodata: Option<f64>,
+    cols: Option<usize>,
+    rows: Option<usize>,
+    xcorner: Option<f64>,
+    ycorner: Option<f64>,
+    xcenter: Option<f64>,
+    ycenter: Option<f64>,
+    cellsize: Option<f64>,
+    nodata: Option<f64>,
 }
 
 impl AsciiHeader {
@@ -142,9 +146,13 @@ impl AsciiHeader {
         let cols = self.cols.ok_or(GeoidError::MissingHeader("ncols"))?;
         let rows = self.rows.ok_or(GeoidError::MissingHeader("nrows"))?;
         let step = self.cellsize.ok_or(GeoidError::MissingHeader("cellsize"))?;
-        let x0 = self.xcorner.or_else(|| self.xcenter.map(|c| c - 0.5 * step))
+        let x0 = self
+            .xcorner
+            .or_else(|| self.xcenter.map(|c| c - 0.5 * step))
             .ok_or(GeoidError::MissingHeader("xllcorner"))?;
-        let y0 = self.ycorner.or_else(|| self.ycenter.map(|c| c - 0.5 * step))
+        let y0 = self
+            .ycorner
+            .or_else(|| self.ycenter.map(|c| c - 0.5 * step))
             .ok_or(GeoidError::MissingHeader("yllcorner"))?;
         Ok((cols, rows, x0, y0, step, self.nodata))
     }
