@@ -125,3 +125,24 @@ fn decode_100k_row(zone: u8, row: u8) -> Result<f64, MgrsParseError> {
     let row_idx = (r_idx + 20 - row_offset) % 20;
     Ok(row_idx as f64 * 100_000.0)
 }
+
+const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
+
+fn band_approx_northing(band: char) -> Result<(char, f64), MgrsParseError> {
+    let b_pos = BANDS
+        .iter()
+        .position(|&b| b == band as u8)
+        .ok_or(MgrsParseError::InvalidBand)?;
+    let hemi = if band >= 'N' { 'N' } else { 'S' };
+    let lat = if b_pos == 19 {
+        78.0
+    } else {
+        -80.0 + (b_pos as f64) * 8.0 + 4.0
+    };
+    let n = if hemi == 'N' {
+        lat * 111_132.0
+    } else {
+        10_000_000.0 + lat * 111_132.0
+    };
+    Ok((hemi, n))
+}
