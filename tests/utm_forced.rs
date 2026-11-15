@@ -45,3 +45,20 @@ fn test_utm_forced_southern_and_antimeridian_zones() {
     assert!((lat - lat_out).abs() < 1e-5);
     assert!((lon - lon_out).abs() < 1e-5);
 }
+
+#[test]
+fn test_utm_forced_antimeridian_and_adjacency() {
+    use sightline_cot::utm_forced::{is_adjacent_zone, zone_distance_delta};
+    assert!(is_adjacent_zone(1, 2));
+    assert!(is_adjacent_zone(1, 60));
+    assert!(is_adjacent_zone(60, 1));
+    assert!(!is_adjacent_zone(1, 3));
+    assert_eq!(zone_distance_delta(1, 60), -1);
+    assert_eq!(zone_distance_delta(60, 1), 1);
+    let lat = 10.0;
+    let lon = 179.8;
+    let forced = wgs84_to_utm_forced(lat, lon, 1).unwrap();
+    let (lat_out, lon_out) = utm_forced_to_wgs84(&forced).unwrap();
+    assert!((lat - lat_out).abs() < 1e-5);
+    assert!((lon - lon_out).abs() < 1e-5);
+}
