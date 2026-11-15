@@ -1,5 +1,6 @@
 use sightline_cot::geo_area::{
     planar_polygon_area, planar_polygon_perimeter, polygon_area, polygon_perimeter,
+    spherical_polygon_excess,
 };
 
 #[test]
@@ -36,4 +37,11 @@ fn test_polygon_area_rectangle_and_winding() {
     assert!((a1 - 500_000.0).abs() / 500_000.0 < 1e-4);
     assert!((a1 - a2).abs() < 1e-9);
     assert!((polygon_perimeter(&ccw).unwrap() - 3000.0).abs() / 3000.0 < 1e-4);
+}
+
+#[test]
+fn test_spherical_polygon_excess_octant() {
+    let octant = [[0.0, 0.0], [0.0, 90.0], [90.0, 0.0]];
+    let excess = spherical_polygon_excess(&octant).unwrap();
+    assert!((excess - std::f64::consts::FRAC_PI_2).abs() < 1e-12);
 }
