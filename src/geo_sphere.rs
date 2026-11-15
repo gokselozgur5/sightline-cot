@@ -113,3 +113,8 @@ pub fn angular_distance_rad(dist_m: f64, radius_m: f64) -> f64 {
 pub fn is_valid_latitude_deg(lat_deg: f64) -> bool {
     (-90.0..=90.0).contains(&lat_deg)
 }
+
+/// Checks whether longitude in degrees is valid [-180, 180].
+pub fn is_valid_longitude_deg(lon_deg: f64) -> bool {
+    (-180.0..=180.0).contains(&lon_deg)
+}
