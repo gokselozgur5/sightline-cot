@@ -128,3 +128,8 @@ pub fn chord_length_m(angular_rad: f64, radius_m: f64) -> f64 {
 pub fn subtense_rad(size_m: f64, dist_m: f64) -> f64 {
     (size_m / dist_m).atan()
 }
+
+/// Absolute difference between two bearings in degrees.
+pub fn bearing_delta_deg(b1: f64, b2: f64) -> f64 {
+    normalize_bearing_pm180(b1 - b2).abs()
+}
