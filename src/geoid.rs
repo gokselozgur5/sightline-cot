@@ -213,3 +213,13 @@ impl GeoidGrid {
         lat_deg >= self.min_lat_deg && lat_deg <= self.max_lat_deg() && lon_deg >= self.min_lon_deg && lon_deg <= self.max_lon_deg()
     }
 }
+
+impl GeoidGrid {
+    pub fn get_node(&self, col: usize, row: usize) -> Option<f64> {
+        if col < self.cols && row < self.rows {
+            self.undulations[row * self.cols + col]
+        } else {
+            None
+        }
+    }
+}
