@@ -72,3 +72,8 @@ pub const KNOTS_TO_MPS: f64 = 1852.0 / 3600.0;
 
 /// Meters per second to knots conversion factor.
 pub const MPS_TO_KNOTS: f64 = 3600.0 / 1852.0;
+
+/// Degrees to radians factor.
+pub fn deg_to_rad_fast(deg: f64) -> f64 {
+    deg * (std::f64::consts::PI / 180.0)
+}
