@@ -138,3 +138,8 @@ pub fn bearing_delta_deg(b1: f64, b2: f64) -> f64 {
 pub fn horizon_distance_m(height_m: f64, radius_m: f64) -> f64 {
     (height_m * (2.0 * radius_m + height_m)).sqrt()
 }
+
+/// Mutual line of sight between two elevated observers in meters.
+pub fn line_of_sight_m(h1_m: f64, h2_m: f64, radius_m: f64) -> f64 {
+    horizon_distance_m(h1_m, radius_m) + horizon_distance_m(h2_m, radius_m)
+}
