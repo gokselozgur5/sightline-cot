@@ -94,3 +94,26 @@ fn decode_intervals(hash: &str) -> Result<([f64; 2], [f64; 2]), GeohashError> {
     }
     Ok((lat_r, lon_r))
 }
+
+/// Decodes a geohash string into its bounding box bounds.
+pub fn decode_bbox(hash: &str) -> Result<GeoBbox, GeohashError> {
+    let (lat_r, lon_r) = decode_intervals(hash)?;
+    Ok(GeoBbox::new(lat_r[0], lon_r[0], lat_r[1], lon_r[1]))
+}
+
+/// Alias for [`decode_bbox`].
+pub fn decode_geohash_bbox(hash: &str) -> Result<GeoBbox, GeohashError> {
+    decode_bbox(hash)
+}
+
+/// Decodes a geohash string into the center point `(latitude, longitude)`.
+pub fn decode(hash: &str) -> Result<(f64, f64), GeohashError> {
+    let bbox = decode_bbox(hash)?;
+    let center = bbox.center();
+    Ok((center[0], center[1]))
+}
+
+/// Alias for [`decode`].
+pub fn decode_geohash(hash: &str) -> Result<(f64, f64), GeohashError> {
+    decode(hash)
+}
