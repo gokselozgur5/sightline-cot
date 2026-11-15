@@ -51,3 +51,16 @@ fn test_parse_mgrs_precision_levels() {
         assert!((p.resolution_meters() - res).abs() < 1e-6);
     }
 }
+
+#[test]
+fn test_parse_mgrs_single_digit_zone_and_from_str() {
+    let p1: sightline_cot::mgrs_parse::ParsedMgrs = "4Q FJ 1234 5678".parse().unwrap();
+    assert_eq!(p1.zone, 4);
+    assert_eq!(p1.band, 'Q');
+    assert_eq!(p1.col, 'F');
+    assert_eq!(p1.row, 'J');
+    assert_eq!(p1.precision, 4);
+
+    let p2 = parse_mgrs("04QFJ12345678").unwrap();
+    assert_eq!(p1, p2);
+}
