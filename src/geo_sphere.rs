@@ -87,3 +87,9 @@ pub fn rad_to_deg_fast(rad: f64) -> f64 {
 pub fn normalize_bearing_360(bearing: f64) -> f64 {
     (bearing % 360.0 + 360.0) % 360.0
 }
+
+/// Normalizes relative angle in degrees to [-180, 180).
+pub fn normalize_bearing_pm180(bearing: f64) -> f64 {
+    let b = normalize_bearing_360(bearing);
+    if b >= 180.0 { b - 360.0 } else { b }
+}
