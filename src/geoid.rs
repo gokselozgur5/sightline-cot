@@ -238,3 +238,9 @@ impl GeoidGrid {
         Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
     }
 }
+
+impl GeoidModel for GeoidGrid {
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        self.sample(lat_deg, lon_deg)
+    }
+}
