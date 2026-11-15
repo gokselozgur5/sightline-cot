@@ -82,3 +82,29 @@ fn compute_destination(
     let rev_az = (s_alp.atan2(-x).to_degrees() + 360.0).rem_euclid(360.0);
     VincentyDirect { lat_deg: lat2, lon_deg: lon2, reverse_azimuth_deg: rev_az }
 }
+
+/// Computes destination coordinates on a reference ellipsoid using Vincenty direct formula.
+pub fn vincenty_direct_ellipsoid(
+    lat1: f64, lon1: f64, bearing1_deg: f64, distance_m: f64, ellipsoid: &Ellipsoid,
+) -> Result<VincentyDirect, VincentyError> {
+    validate_direct_inputs(lat1, lon1, bearing1_deg, distance_m)?;
+    let alp1 = bearing1_deg.to_radians();
+    let tan_u1 = (1.0 - ellipsoid.f) * lat1.to_radians().tan();
+    let cos_u1 = 1.0 / (1.0 + tan_u1 * tan_u1).sqrt();
+    let (sin_u1, sig1) = (tan_u1 * cos_u1, tan_u1.atan2(alp1.cos()));
+    let sin_alp = cos_u1 * alp1.sin();
+    let cos2_alp = 1.0 - sin_alp * sin_alp;
+    let u2 = cos2_alp * (ellipsoid.a.powi(2) - ellipsoid.b.powi(2)) / ellipsoid.b.powi(2);
+    let (a, b) = vincenty_ab(u2);
+    let (sig, cos_2sm) = solve_direct_sigma(ellipsoid.b, distance_m, a, sig1, b);
+    Ok(compute_destination(
+        lon1, sin_u1, cos_u1, sin_alp, cos2_alp, alp1, sig, cos_2sm, ellipsoid.f,
+    ))
+}
+
+/// Computes destination coordinates on WGS84 using Vincenty direct formula.
+pub fn vincenty_direct(
+    lat1: f64, lon1: f64, bearing1_deg: f64, distance_m: f64,
+) -> Result<VincentyDirect, VincentyError> {
+    vincenty_direct_ellipsoid(lat1, lon1, bearing1_deg, distance_m, &Ellipsoid::WGS84)
+}
