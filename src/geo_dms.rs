@@ -14,3 +14,22 @@ pub enum DmsError {
     LongitudeOutOfRange,
     ConflictingHemisphere,
 }
+
+impl core::fmt::Display for DmsError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::EmptyInput => write!(f, "empty input string"),
+            Self::InvalidFormat => write!(f, "invalid DMS format"),
+            Self::InvalidDegrees => write!(f, "invalid degrees component"),
+            Self::InvalidMinutes => write!(f, "invalid minutes component"),
+            Self::InvalidSeconds => write!(f, "invalid seconds component"),
+            Self::MinutesOutOfRange => write!(f, "minutes out of range [0, 60)"),
+            Self::SecondsOutOfRange => write!(f, "seconds out of range [0, 60)"),
+            Self::LatitudeOutOfRange => write!(f, "latitude out of range [-90, 90]"),
+            Self::LongitudeOutOfRange => write!(f, "longitude out of range [-180, 180]"),
+            Self::ConflictingHemisphere => write!(f, "conflicting hemisphere or sign"),
+        }
+    }
+}
+
+impl std::error::Error for DmsError {}
