@@ -42,3 +42,26 @@ pub struct Dms {
     pub seconds: f64,
     pub hemisphere: char,
 }
+
+impl Dms {
+    /// Create a new DMS component with validation.
+    pub fn new(degrees: u32, minutes: u32, seconds: f64, hemisphere: char) -> Result<Self, DmsError> {
+        let h = hemisphere.to_ascii_uppercase();
+        if !matches!(h, 'N' | 'S' | 'E' | 'W') {
+            return Err(DmsError::InvalidFormat);
+        }
+        if minutes >= 60 {
+            return Err(DmsError::MinutesOutOfRange);
+        }
+        if !seconds.is_finite() || seconds < 0.0 || seconds >= 60.0 {
+            return Err(DmsError::SecondsOutOfRange);
+        }
+        Ok(Self { degrees, minutes, seconds, hemisphere: h })
+    }
+
+    /// Convert DMS component to signed decimal degrees.
+    pub fn to_degrees(&self) -> f64 {
+        let mag = self.degrees as f64 + (self.minutes as f64) / 60.0 + self.seconds / 3600.0;
+        if matches!(self.hemisphere, 'S' | 'W') { -mag } else { mag }
+    }
+}
