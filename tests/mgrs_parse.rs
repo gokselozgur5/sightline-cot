@@ -79,3 +79,20 @@ fn test_parse_mgrs_errors() {
     assert_eq!(parse_mgrs("31NEA 12 345"), Err(MgrsParseError::InvalidDigits));
     assert_eq!(parse_mgrs("31NEA123456789012"), Err(MgrsParseError::InvalidDigits));
 }
+
+#[test]
+fn test_parse_mgrs_wgs84_roundtrip_known_locations() {
+    let points = [
+        (37.7749, -122.4194),
+        (40.7128, -74.0060),
+        (51.5074, -0.1278),
+        (35.6762, 139.6503),
+        (-33.8688, 151.2093),
+    ];
+    for (lat, lon) in points {
+        let mgrs = sightline_cot::format_mgrs(lat, lon, 5).unwrap();
+        let (p_lat, p_lon) = parse_mgrs_to_wgs84(mgrs.as_str()).unwrap();
+        assert!((lat - p_lat).abs() < 1e-4);
+        assert!((lon - p_lon).abs() < 1e-4);
+    }
+}
