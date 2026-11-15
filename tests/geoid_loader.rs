@@ -60,3 +60,23 @@ cellsize 1.0
     assert_eq!(grid.undulation_at(1.0, 0.0), Some(40.0));
     assert_eq!(grid.undulation_at(0.5, 0.5), Some(25.0));
 }
+
+#[test]
+fn test_nodata_and_out_of_bounds() {
+    let ascii = "\
+ncols 2
+nrows 2
+xllcorner 0.0
+yllcorner 0.0
+cellsize 1.0
+nodata_value -9999
+10.0 -9999
+30.0 40.0
+";
+    let grid = parse_geoid_ascii(ascii).unwrap();
+    assert_eq!(grid.undulation_at(1.0, 1.0), None);
+    assert_eq!(grid.undulation_at(0.5, 0.5), None);
+    assert_eq!(grid.undulation_at(0.0, 0.0), Some(30.0));
+    assert_eq!(grid.undulation_at(-0.1, 0.5), None);
+    assert_eq!(grid.undulation_at(0.5, 2.5), None);
+}
