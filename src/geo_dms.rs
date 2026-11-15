@@ -64,4 +64,22 @@ impl Dms {
         let mag = self.degrees as f64 + (self.minutes as f64) / 60.0 + self.seconds / 3600.0;
         if matches!(self.hemisphere, 'S' | 'W') { -mag } else { mag }
     }
+
+    /// Create a Dms instance from decimal latitude in [-90, 90].
+    pub fn from_degrees_lat(lat: f64) -> Result<Self, DmsError> {
+        if !(-90.0..=90.0).contains(&lat) {
+            return Err(DmsError::LatitudeOutOfRange);
+        }
+        let hemi = if lat >= 0.0 { 'N' } else { 'S' };
+        Self::decompose(lat.abs(), hemi)
+    }
+
+    /// Create a Dms instance from decimal longitude in [-180, 180].
+    pub fn from_degrees_lon(lon: f64) -> Result<Self, DmsError> {
+        if !(-180.0..=180.0).contains(&lon) {
+            return Err(DmsError::LongitudeOutOfRange);
+        }
+        let hemi = if lon >= 0.0 { 'E' } else { 'W' };
+        Self::decompose(lon.abs(), hemi)
+    }
 }
