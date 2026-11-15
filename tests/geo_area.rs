@@ -71,3 +71,11 @@ fn test_spherical_polygon_perimeter_and_degeneracy() {
     assert!(spherical_polygon_perimeter(&[[0.0, 0.0], [1.0, 1.0]]).is_none());
     assert!(spherical_polygon_area_with_radius(&octant, -1.0).is_none());
 }
+
+#[test]
+fn test_spherical_area_antimeridian_and_planar_limit() {
+    let poly = [[0.0, 179.0], [0.0, -179.0], [1.0, -179.0], [1.0, 179.0]];
+    let a_sphere = spherical_polygon_area(&poly).unwrap();
+    let p_sphere = spherical_polygon_perimeter(&poly).unwrap();
+    assert!(a_sphere > 0.0 && p_sphere > 0.0);
+}
