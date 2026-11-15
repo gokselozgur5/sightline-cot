@@ -133,3 +133,8 @@ pub fn subtense_rad(size_m: f64, dist_m: f64) -> f64 {
 pub fn bearing_delta_deg(b1: f64, b2: f64) -> f64 {
     normalize_bearing_pm180(b1 - b2).abs()
 }
+
+/// Geometric distance to horizon in meters for height above sphere.
+pub fn horizon_distance_m(height_m: f64, radius_m: f64) -> f64 {
+    (height_m * (2.0 * radius_m + height_m)).sqrt()
+}
