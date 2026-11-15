@@ -108,3 +108,8 @@ pub fn nm_to_meters(nm: f64) -> f64 {
 pub fn angular_distance_rad(dist_m: f64, radius_m: f64) -> f64 {
     dist_m / radius_m
 }
+
+/// Checks whether latitude in degrees is valid [-90, 90].
+pub fn is_valid_latitude_deg(lat_deg: f64) -> bool {
+    (-90.0..=90.0).contains(&lat_deg)
+}
