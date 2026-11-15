@@ -39,3 +39,15 @@ fn test_bilinear_planar_surface() {
     let expected = 10.0 + 20.0 * lat + 10.0 * lon;
     assert!((grid.undulation(lat, lon).unwrap() - expected).abs() < 1e-9);
 }
+
+#[test]
+fn test_nodata_corner_rejection() {
+    let mut vals = vec![Some(15.0); 9];
+    vals[4] = None;
+    let grid = GeoidGrid::new_uniform(10.0, 20.0, 1.0, 3, 3, vals).unwrap();
+    assert_eq!(grid.undulation(10.5, 20.5), None);
+    assert_eq!(grid.undulation(11.5, 20.5), None);
+    assert_eq!(grid.undulation(10.5, 21.5), None);
+    assert_eq!(grid.undulation(11.5, 21.5), None);
+    assert_eq!(grid.undulation(9.0, 20.0), None);
+}
