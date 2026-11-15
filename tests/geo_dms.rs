@@ -44,3 +44,17 @@ fn test_dms_format_variants() {
         assert!((lon - exp_lon).abs() < 1e-6);
     }
 }
+
+#[test]
+fn test_dms_south_east() {
+    let s_hemi = "S 33 51 30.5 E 151 12 45.2";
+    let s_signed = "-33 51 30.5 151 12 45.2";
+    let (lat1, lon1) = parse_dms(s_hemi).expect("se hemi parse");
+    let (lat2, lon2) = parse_dms(s_signed).expect("se signed parse");
+    assert!((lat1 - lat2).abs() < 1e-6);
+    assert!((lon1 - lon2).abs() < 1e-6);
+    let exp_lat = -(33.0 + 51.0 / 60.0 + 30.5 / 3600.0);
+    let exp_lon = 151.0 + 12.0 / 60.0 + 45.2 / 3600.0;
+    assert!((lat1 - exp_lat).abs() < 1e-6);
+    assert!((lon1 - exp_lon).abs() < 1e-6);
+}
