@@ -154,3 +154,15 @@ pub fn utm_forced_to_wgs84(coord: &UtmCoord) -> Result<(f64, f64), GridError> {
     }
     Ok(utm_unproject_point_forced(coord))
 }
+
+/// Compute the shortest zone difference between two UTM zones wrapping around the antimeridian.
+pub fn zone_distance_delta(current_zone: u8, target_zone: u8) -> i8 {
+    let diff = (target_zone as i16) - (current_zone as i16);
+    let wrapped = ((diff + 30).rem_euclid(60)) - 30;
+    wrapped as i8
+}
+
+/// Return true if two UTM zones are immediate neighbors across borders or antimeridian.
+pub fn is_adjacent_zone(zone1: u8, zone2: u8) -> bool {
+    zone_distance_delta(zone1, zone2).abs() == 1
+}
