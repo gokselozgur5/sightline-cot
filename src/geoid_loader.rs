@@ -85,14 +85,25 @@ impl GeoidGrid {
     }
 
     /// Geographic coverage bounds in degrees.
-    pub fn min_lon(&self) -> f64 { self.xllcorner }
-    pub fn max_lon(&self) -> f64 { self.xllcorner + self.cols as f64 * self.cellsize }
-    pub fn min_lat(&self) -> f64 { self.yllcorner }
-    pub fn max_lat(&self) -> f64 { self.yllcorner + self.rows as f64 * self.cellsize }
+    pub fn min_lon(&self) -> f64 {
+        self.xllcorner
+    }
+    pub fn max_lon(&self) -> f64 {
+        self.xllcorner + self.cols as f64 * self.cellsize
+    }
+    pub fn min_lat(&self) -> f64 {
+        self.yllcorner
+    }
+    pub fn max_lat(&self) -> f64 {
+        self.yllcorner + self.rows as f64 * self.cellsize
+    }
 
     /// Test if longitude and latitude fall within the grid coverage.
     pub fn contains(&self, lon: f64, lat: f64) -> bool {
-        lon >= self.min_lon() && lon <= self.max_lon() && lat >= self.min_lat() && lat <= self.max_lat()
+        lon >= self.min_lon()
+            && lon <= self.max_lon()
+            && lat >= self.min_lat()
+            && lat <= self.max_lat()
     }
 
     /// Bilinear interpolation of geoid undulation at continuous geographic coordinates.
