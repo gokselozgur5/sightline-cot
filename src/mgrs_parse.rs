@@ -242,3 +242,15 @@ pub fn parse_mgrs(s: &str) -> Result<ParsedMgrs, MgrsParseError> {
         precision,
     })
 }
+
+fn cell_center_offset(precision: usize, easting: u32, northing: u32) -> (f64, f64) {
+    if precision == 0 {
+        (50_000.0, 50_000.0)
+    } else {
+        let scale = 10_f64.powi(5 - precision as i32);
+        (
+            easting as f64 * scale + scale * 0.5,
+            northing as f64 * scale + scale * 0.5,
+        )
+    }
+}
