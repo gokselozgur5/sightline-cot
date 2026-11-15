@@ -110,7 +110,12 @@ impl Dms {
                 deg += 1;
             }
         }
-        Ok(Self { degrees: deg, minutes: min, seconds: sec, hemisphere })
+        Ok(Self {
+            degrees: deg,
+            minutes: min,
+            seconds: sec,
+            hemisphere,
+        })
     }
 }
 
@@ -136,7 +141,11 @@ pub fn format_dms_lon(lon: f64) -> Result<String, DmsError> {
 
 /// Format lat/lon into standard DMS representation.
 pub fn format_dms(lat: f64, lon: f64) -> Result<String, DmsError> {
-    Ok(format!("{}, {}", format_dms_lat(lat)?, format_dms_lon(lon)?))
+    Ok(format!(
+        "{}, {}",
+        format_dms_lat(lat)?,
+        format_dms_lon(lon)?
+    ))
 }
 
 fn tokenize(s: &str) -> Vec<String> {
