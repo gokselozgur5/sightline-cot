@@ -188,18 +188,30 @@ fn parse_hemi(tok: &str) -> Option<char> {
 fn parse_comp(toks: &[String]) -> Result<(f64, Option<char>), DmsError> {
     let (h, d_s, m_s, s_s) = match toks {
         [t0, t1, t2] => (None, t0.as_str(), t1.as_str(), t2.as_str()),
-        [t0, t1, t2, t3] if parse_hemi(t0).is_some() => (parse_hemi(t0), t1.as_str(), t2.as_str(), t3.as_str()),
-        [t0, t1, t2, t3] if parse_hemi(t3).is_some() => (parse_hemi(t3), t0.as_str(), t1.as_str(), t2.as_str()),
+        [t0, t1, t2, t3] if parse_hemi(t0).is_some() => {
+            (parse_hemi(t0), t1.as_str(), t2.as_str(), t3.as_str())
+        }
+        [t0, t1, t2, t3] if parse_hemi(t3).is_some() => {
+            (parse_hemi(t3), t0.as_str(), t1.as_str(), t2.as_str())
+        }
         _ => return Err(DmsError::InvalidFormat),
     };
     let deg: f64 = d_s.parse().map_err(|_| DmsError::InvalidDegrees)?;
     let min: f64 = m_s.parse().map_err(|_| DmsError::InvalidMinutes)?;
     let sec: f64 = s_s.parse().map_err(|_| DmsError::InvalidSeconds)?;
-    if !deg.is_finite() { return Err(DmsError::InvalidDegrees); }
-    if !min.is_finite() || min < 0.0 || min >= 60.0 { return Err(DmsError::MinutesOutOfRange); }
-    if !sec.is_finite() || sec < 0.0 || sec >= 60.0 { return Err(DmsError::SecondsOutOfRange); }
+    if !deg.is_finite() {
+        return Err(DmsError::InvalidDegrees);
+    }
+    if !min.is_finite() || min < 0.0 || min >= 60.0 {
+        return Err(DmsError::MinutesOutOfRange);
+    }
+    if !sec.is_finite() || sec < 0.0 || sec >= 60.0 {
+        return Err(DmsError::SecondsOutOfRange);
+    }
     let is_neg = d_s.starts_with('-');
-    if h.is_some() && is_neg { return Err(DmsError::ConflictingHemisphere); }
+    if h.is_some() && is_neg {
+        return Err(DmsError::ConflictingHemisphere);
+    }
     let mag = deg.abs() + min / 60.0 + sec / 3600.0;
     let signed = match h {
         Some('S' | 'W') => -mag,
