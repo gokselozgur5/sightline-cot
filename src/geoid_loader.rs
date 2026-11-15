@@ -194,18 +194,26 @@ fn is_header_key(k: &str) -> bool {
 /// Parse an ESRI ASCII grid formatted string into a GeoidGrid.
 pub fn parse_geoid_ascii(ascii: &str) -> Result<GeoidGrid, GeoidError> {
     let mut tokens = ascii.split_whitespace().peekable();
-    if tokens.peek().is_none() { return Err(GeoidError::EmptyInput); }
+    if tokens.peek().is_none() {
+        return Err(GeoidError::EmptyInput);
+    }
     let mut header = AsciiHeader::default();
     while let Some(&tok) = tokens.peek() {
-        if !is_header_key(tok) { break; }
+        if !is_header_key(tok) {
+            break;
+        }
         let key = tokens.next().unwrap();
-        let val = tokens.next().ok_or_else(|| GeoidError::InvalidHeader(key.into()))?;
+        let val = tokens
+            .next()
+            .ok_or_else(|| GeoidError::InvalidHeader(key.into()))?;
         header.set_field(key, val)?;
     }
     let (cols, rows, x0, y0, step, nodata) = header.resolve()?;
     let mut data = Vec::with_capacity(cols * rows);
     for tok in tokens {
-        let v: f64 = tok.parse().map_err(|_| GeoidError::InvalidDataValue(tok.into()))?;
+        let v: f64 = tok
+            .parse()
+            .map_err(|_| GeoidError::InvalidDataValue(tok.into()))?;
         let is_nd = !v.is_finite() || nodata.map_or(false, |nd| (v - nd).abs() < 1e-5);
         data.push((!is_nd).then_some(v));
     }
