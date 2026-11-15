@@ -118,3 +118,20 @@ impl GeoidGrid {
         Ok(())
     }
 }
+
+impl GeoidGrid {
+    fn validate(lat0: f64, lon0: f64, dlat: f64, dlon: f64, c: usize, r: usize, n: usize) -> Result<(), GeoidError> {
+        Self::validate_coords(lat0, lon0, dlat, dlon)?;
+        if c < 2 || r < 2 {
+            return Err(GeoidError::InvalidDimensions);
+        }
+        if n != c * r {
+            return Err(GeoidError::DataLengthMismatch);
+        }
+        let max_lat = lat0 + (r - 1) as f64 * dlat;
+        if lat0 < -90.0 - 1e-9 || max_lat > 90.0 + 1e-9 {
+            return Err(GeoidError::InvalidBounds);
+        }
+        Ok(())
+    }
+}
