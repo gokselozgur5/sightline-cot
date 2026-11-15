@@ -100,8 +100,9 @@ pub mod ellipsoid;
 pub use ellipsoid::{Ellipsoid, GRS80, WGS72, WGS84};
 pub mod geohash_neighbors;
 pub use geohash_neighbors::{
-    geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashError, GeohashNeighbors,
+    geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
+pub mod geohash;
 
 pub const VERSION: &str = "0.1.0";
 
