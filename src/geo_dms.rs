@@ -186,3 +186,26 @@ fn parse_comp(toks: &[String]) -> Result<(f64, Option<char>), DmsError> {
     };
     Ok((signed, h))
 }
+
+fn split_components(toks: &[String]) -> Result<(&[String], &[String]), DmsError> {
+    match toks.len() {
+        6 => Ok((&toks[0..3], &toks[3..6])),
+        8 => Ok((&toks[0..4], &toks[4..8])),
+        7 => {
+            if parse_hemi(&toks[0]).is_some() {
+                Ok((&toks[0..4], &toks[4..7]))
+            } else if parse_hemi(&toks[6]).is_some() {
+                Ok((&toks[0..3], &toks[3..7]))
+            } else if let Some(h) = parse_hemi(&toks[3]) {
+                if toks[4].starts_with('-') || toks[4].starts_with('+') || matches!(h, 'N' | 'S') {
+                    Ok((&toks[0..4], &toks[4..7]))
+                } else {
+                    Ok((&toks[0..3], &toks[3..7]))
+                }
+            } else {
+                Err(DmsError::InvalidFormat)
+            }
+        }
+        _ => Err(DmsError::InvalidFormat),
+    }
+}
