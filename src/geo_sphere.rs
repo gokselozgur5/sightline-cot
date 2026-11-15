@@ -82,3 +82,8 @@ pub fn deg_to_rad_fast(deg: f64) -> f64 {
 pub fn rad_to_deg_fast(rad: f64) -> f64 {
     rad * (180.0 / std::f64::consts::PI)
 }
+
+/// Normalizes bearing in degrees to [0, 360).
+pub fn normalize_bearing_360(bearing: f64) -> f64 {
+    (bearing % 360.0 + 360.0) % 360.0
+}
