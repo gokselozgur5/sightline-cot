@@ -326,7 +326,11 @@ pub fn vincenty_direct(
 
 /// Computes intermediate coordinates along the geodesic arc between two points.
 pub fn vincenty_intermediate_points(
-    lat1: f64, lon1: f64, lat2: f64, lon2: f64, count: usize,
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
+    count: usize,
 ) -> Result<Vec<(f64, f64)>, VincentyError> {
     if count == 0 {
         return Ok(Vec::new());
@@ -344,7 +348,11 @@ pub fn vincenty_intermediate_points(
 
 /// Generates a dense geodesic waypoint path sampled at a given step distance.
 pub fn vincenty_geodesic_path(
-    lat1: f64, lon1: f64, lat2: f64, lon2: f64, step_m: f64,
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
+    step_m: f64,
 ) -> Result<Vec<(f64, f64)>, VincentyError> {
     if !step_m.is_finite() || step_m <= 0.0 {
         return Err(VincentyError::NegativeDistance);
