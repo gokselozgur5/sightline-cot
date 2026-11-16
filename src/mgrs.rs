@@ -764,7 +764,11 @@ mod tests {
 
     #[test]
     fn test_mgrs_10figure_wgs84_roundtrip() {
-        let points = [(37.7749, -122.4194), (40.7128, -74.0060), (-33.8688, 151.2093)];
+        let points = [
+            (37.7749, -122.4194),
+            (40.7128, -74.0060),
+            (-33.8688, 151.2093),
+        ];
         for (lat, lon) in points {
             let fig = Mgrs10Figure::from_lat_lon(lat, lon).unwrap();
             let (lat_rt, lon_rt) = fig.to_lat_lon().unwrap();
