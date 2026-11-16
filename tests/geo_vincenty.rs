@@ -90,3 +90,20 @@ fn test_vincenty_inverse_ellipsoids() {
     assert!((wgs.distance_m - grs.distance_m).abs() < 0.01);
     assert!((wgs.distance_m - w72.distance_m).abs() < 5.0);
 }
+
+#[test]
+fn test_vincenty_intermediate_points() {
+    use sightline_cot::geo_vincenty::vincenty_intermediate_points;
+    let lat1 = 0.0;
+    let lon1 = 0.0;
+    let lat2 = 0.0;
+    let lon2 = 10.0;
+    let empty = vincenty_intermediate_points(lat1, lon1, lat2, lon2, 0).unwrap();
+    assert!(empty.is_empty());
+    let pts = vincenty_intermediate_points(lat1, lon1, lat2, lon2, 3).unwrap();
+    assert_eq!(pts.len(), 3);
+    for (lat, lon) in &pts {
+        assert!(lat.abs() < 1e-6);
+        assert!(*lon > 0.0 && *lon < 10.0);
+    }
+}
