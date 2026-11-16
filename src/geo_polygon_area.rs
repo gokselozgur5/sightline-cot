@@ -143,3 +143,15 @@ pub fn polygon_geodesic_perimeter(vertices: &[[f64; 2]]) -> Result<f64, Geodesic
     }
     Ok(total_rad * WGS84_AUTHALIC_RADIUS_M)
 }
+
+/// Compute full geometry metrics for a polygonal CoT zone.
+pub fn compute_cot_polygon_geometry(
+    vertices: &[[f64; 2]],
+) -> Result<GeodesicPolygonArea, GeodesicAreaError> {
+    let area_m2 = geodesic_polygon_area(vertices)?;
+    let perimeter_m = polygon_geodesic_perimeter(vertices)?;
+    Ok(GeodesicPolygonArea {
+        area_m2,
+        perimeter_m,
+    })
+}
