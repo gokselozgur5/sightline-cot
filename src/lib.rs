@@ -104,6 +104,8 @@ pub use geohash_neighbors::{
     geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
 pub mod geohash;
+pub mod geo_ups;
+pub use geo_ups::{ups_to_wgs84, wgs84_to_ups, UpsCoord, UpsError, UpsHemisphere};
 pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
 pub const VERSION: &str = "0.1.0";
