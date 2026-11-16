@@ -285,3 +285,14 @@ mod tests {
         let n2 = grid.undulation(0.0, -10.0).unwrap();
         assert!((n1 - n2).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_height_conversions() {
+        let grid = Egm96Geoid::coarse_reference_grid();
+        let (lat, lon) = (0.0, 90.0);
+        let h_ellips = 100.0;
+        let h_ortho = grid.ellipsoidal_to_orthometric(lat, lon, h_ellips).unwrap();
+        assert!((h_ortho - 206.0).abs() < 1e-6);
+        let roundtrip = grid.orthometric_to_ellipsoidal(lat, lon, h_ortho).unwrap();
+        assert!((roundtrip - h_ellips).abs() < 1e-6);
+    }
