@@ -783,4 +783,24 @@ mod tests {
         let parsed_sp = Mgrs10Figure::parse("31N EA 12345 67890").unwrap();
         assert_eq!(parsed, parsed_sp);
     }
+
+    #[test]
+    fn test_mgrs_10figure_invalid_inputs() {
+        assert_eq!(
+            wgs84_to_mgrs_10figure(85.0, 0.0),
+            Err(GridError::InvalidLatitude)
+        );
+        assert_eq!(
+            wgs84_to_mgrs_10figure(0.0, 190.0),
+            Err(GridError::InvalidLongitude)
+        );
+        assert_eq!(
+            parse_mgrs_10figure("99NEA1234567890"),
+            Err(GridError::InvalidZone)
+        );
+        assert_eq!(
+            parse_mgrs_10figure("31NEA12345"),
+            Err(GridError::InvalidZone)
+        );
+    }
 }
