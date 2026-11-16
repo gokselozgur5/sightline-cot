@@ -26,3 +26,19 @@ impl std::fmt::Display for CotTaskError {
 }
 
 impl std::error::Error for CotTaskError {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum TaskAction {
+    #[default]
+    FlyOver,
+    FlyBy,
+    Ingress,
+    Egress,
+    Orbit,
+    Drop,
+    Landing,
+    Target,
+    Checkpoint,
+    Rendezvous,
+    Custom(String),
+}
