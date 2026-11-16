@@ -19,3 +19,16 @@ fn test_millis_and_secs_conversions() {
 
     assert!(StanagTimestamp::from_millis(-10).is_err());
 }
+
+
+#[test]
+fn test_klv_tag2_roundtrip_encoding_and_decoding() {
+    let ts = StanagTimestamp::from_micros(0x0102030405060708_u64);
+    let tag2 = ts.to_klv_tag2();
+    assert_eq!(tag2[0], 0x02);
+    assert_eq!(tag2[1], 0x08);
+    assert_eq!(&tag2[2..], &[1, 2, 3, 4, 5, 6, 7, 8]);
+
+    let decoded = StanagTimestamp::from_klv_slice(&tag2).expect("valid KLV slice");
+    assert_eq!(decoded, ts);
+}
