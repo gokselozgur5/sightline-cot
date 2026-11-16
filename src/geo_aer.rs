@@ -196,3 +196,22 @@ pub fn aer_to_ecef(
     let sez = aer_to_sez(aer);
     sez_to_ecef(sez, obs_lat_deg, obs_lon_deg, obs_hae_m)
 }
+
+/// Compute AER coordinates of target geodetic point from observer geodetic point.
+pub fn geodetic_to_aer(
+    target_lat_deg: f64,
+    target_lon_deg: f64,
+    target_hae_m: f64,
+    obs_lat_deg: f64,
+    obs_lon_deg: f64,
+    obs_hae_m: f64,
+) -> Result<AerCoord, AerError> {
+    if !target_lat_deg.is_finite() || !target_lon_deg.is_finite() || !target_hae_m.is_finite() {
+        return Err(AerError::NonFinite);
+    }
+    if !(-90.0..=90.0).contains(&target_lat_deg) {
+        return Err(AerError::LatitudeOutOfRange);
+    }
+    let target_ecef = crate::geo_ecef::geodetic_to_ecef(target_lat_deg, target_lon_deg, target_hae_m);
+    ecef_to_aer(target_ecef, obs_lat_deg, obs_lon_deg, obs_hae_m)
+}
