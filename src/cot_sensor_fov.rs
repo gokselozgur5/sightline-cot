@@ -214,3 +214,10 @@ mod tests {
             Err(SensorFovError::InvalidElevation)
         );
     }
+
+    #[test]
+    fn test_sensor_cone_azimuth_normalization() {
+        let cone = SensorCone::new(370.0, -15.0, 60.0, 5000.0).unwrap();
+        assert!((cone.azimuth_deg - 10.0).abs() < 1e-9);
+        assert_eq!(cone.elevation_deg, -15.0);
+    }
