@@ -266,4 +266,18 @@ mod tests {
             GreatCircleError::InsufficientWaypoints
         );
     }
+
+    #[test]
+    fn test_invalid_waypoint_coordinates() {
+        let bad_lat = [Waypoint::new(95.0, 0.0), Waypoint::new(0.0, 0.0)];
+        assert_eq!(
+            GreatCirclePath::from_waypoints(&bad_lat).unwrap_err(),
+            GreatCircleError::InvalidLatitude
+        );
+        let bad_lon = [Waypoint::new(0.0, 0.0), Waypoint::new(0.0, 190.0)];
+        assert_eq!(
+            GreatCirclePath::from_waypoints(&bad_lon).unwrap_err(),
+            GreatCircleError::InvalidLongitude
+        );
+    }
 }
