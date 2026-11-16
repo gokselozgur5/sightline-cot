@@ -191,4 +191,16 @@ mod tests {
         let sin_beta_sp = authalic_sin_beta(-90.0).unwrap();
         assert!((sin_beta_sp - (-1.0)).abs() < 1e-12);
     }
+
+    #[test]
+    fn test_equatorial_square_area() {
+        let square = [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 1.0],
+        ];
+        let area = geodesic_polygon_area(&square).unwrap();
+        assert!((area - 1.2308e10).abs() < 5e7);
+    }
 }
