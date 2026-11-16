@@ -221,3 +221,18 @@ mod tests {
         assert!((cone.azimuth_deg - 10.0).abs() < 1e-9);
         assert_eq!(cone.elevation_deg, -15.0);
     }
+
+    #[test]
+    fn test_boresight_vector() {
+        let north_nadir = SensorCone::new(0.0, -90.0, 30.0, 1000.0).unwrap();
+        let b1 = north_nadir.boresight_vector();
+        assert!(b1[0].abs() < 1e-9);
+        assert!(b1[1].abs() < 1e-9);
+        assert!((b1[2] - (-1.0)).abs() < 1e-9);
+
+        let east_horiz = SensorCone::new(90.0, 0.0, 45.0, 2000.0).unwrap();
+        let b2 = east_horiz.boresight_vector();
+        assert!((b2[0] - 1.0).abs() < 1e-9);
+        assert!(b2[1].abs() < 1e-9);
+        assert!(b2[2].abs() < 1e-9);
+    }
