@@ -54,3 +54,15 @@ pub fn normalize_lon_180(lon_deg: f64) -> f64 {
         lon360
     }
 }
+
+/// Regular geodetic grid for EGM96 geoid undulation interpolation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Egm96Geoid {
+    pub min_lat_deg: f64,
+    pub max_lat_deg: f64,
+    pub lat_step_deg: f64,
+    pub lon_step_deg: f64,
+    pub cols: usize,
+    pub rows: usize,
+    pub undulations: Vec<f64>,
+}
