@@ -624,8 +624,12 @@ pub fn parse_mgrs_10figure(s: &str) -> Result<Mgrs10Figure, GridError> {
         n = n * 10 + (d - b'0') as u32;
     }
     Ok(Mgrs10Figure {
-        zone, band: cleaned[r] as char, col: cleaned[r + 1] as char,
-        row: cleaned[r + 2] as char, easting: e, northing: n,
+        zone,
+        band: cleaned[r] as char,
+        col: cleaned[r + 1] as char,
+        row: cleaned[r + 2] as char,
+        easting: e,
+        northing: n,
     })
 }
 
