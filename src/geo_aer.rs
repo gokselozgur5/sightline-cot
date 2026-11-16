@@ -96,3 +96,19 @@ pub fn enu_to_sez(enu: [f64; 3]) -> SezCoord {
 pub fn sez_to_enu(sez: SezCoord) -> [f64; 3] {
     [sez.east_m, -sez.south_m, sez.zenith_m]
 }
+
+/// Convert topocentric SEZ coordinates to AER (Azimuth, Elevation, Range).
+pub fn sez_to_aer(sez: SezCoord) -> Result<AerCoord, AerError> {
+    let (s, e, z) = (sez.south_m, sez.east_m, sez.zenith_m);
+    let range = (s * s + e * e + z * z).sqrt();
+    if range < 1e-12 {
+        return AerCoord::new(0.0, 0.0, 0.0);
+    }
+    let horiz = (s * s + e * e).sqrt();
+    let el_deg = z.atan2(horiz).to_degrees();
+    let mut az_deg = e.atan2(-s).to_degrees();
+    if az_deg < 0.0 {
+        az_deg += 360.0;
+    }
+    AerCoord::new(az_deg, el_deg, range)
+}
