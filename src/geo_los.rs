@@ -19,3 +19,24 @@ impl core::fmt::Display for GeoLosError {
 }
 
 impl std::error::Error for GeoLosError {}
+
+/// 3D geographic point specified by latitude, longitude, and height above ellipsoid.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct GeoPoint3D {
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+    pub hae_m: f64,
+}
+
+impl GeoPoint3D {
+    /// Create and validate a geographic 3D position.
+    pub fn new(lat_deg: f64, lon_deg: f64, hae_m: f64) -> Result<Self, GeoLosError> {
+        if !lat_deg.is_finite() || !lon_deg.is_finite() || !hae_m.is_finite() {
+            return Err(GeoLosError::NonFiniteCoordinate);
+        }
+        if !(-90.0..=90.0).contains(&lat_deg) {
+            return Err(GeoLosError::LatitudeOutOfRange);
+        }
+        Ok(Self { lat_deg, lon_deg, hae_m })
+    }
+}
