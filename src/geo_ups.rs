@@ -70,3 +70,32 @@ pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, UpsError> {
         Err(UpsError::InvalidLatitude)
     }
 }
+
+pub fn ups_to_wgs84(coord: UpsCoord) -> Result<(f64, f64), UpsError> {
+    if !coord.easting.is_finite() || !coord.northing.is_finite() {
+        return Err(UpsError::NonFinite);
+    }
+    let (dx, dy) = match coord.hemisphere {
+        UpsHemisphere::North => (coord.easting - FALSE_EASTING_NORTH, -(coord.northing - FALSE_NORTHING_NORTH)),
+        UpsHemisphere::South => (coord.easting - FALSE_EASTING_SOUTH, coord.northing - FALSE_NORTHING_SOUTH),
+    };
+    let rho = (dx * dx + dy * dy).sqrt();
+    if rho < 1e-12 {
+        let lat = if coord.hemisphere == UpsHemisphere::North { 90.0 } else { -90.0 };
+        return Ok((lat, 0.0));
+    }
+    let lon_rad = dx.atan2(dy);
+    let lon_deg = lon_rad.to_degrees();
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    let m1 = UPS_K0 * 2.0 * WGS84_A / ((1.0 - e2).sqrt());
+    let t = 2.0 * rho / m1;
+    let mut phi = std::f64::consts::FRAC_PI_2 - 2.0 * t.atan();
+    let e = e2.sqrt();
+    for _ in 0..5 {
+        let es = e * phi.sin();
+        let next_phi = std::f64::consts::FRAC_PI_2 - 2.0 * (t * ((1.0 - es) / (1.0 + es)).powf(e / 2.0)).atan();
+        phi = next_phi;
+    }
+    let lat_deg = if coord.hemisphere == UpsHemisphere::North { phi.to_degrees() } else { -phi.to_degrees() };
+    Ok((lat_deg, lon_deg))
+}
