@@ -73,3 +73,20 @@ impl StanagTimestamp {
         self.micros.to_be_bytes()
     }
 }
+
+/// MISB ST 0601 Tag for Precision Time Stamp (PTS).
+pub const MISB_TAG_PRECISION_TIME_STAMP: u8 = 0x02;
+
+/// Length of Precision Time Stamp field in bytes.
+pub const MISB_LEN_PRECISION_TIME_STAMP: u8 = 0x08;
+
+impl StanagTimestamp {
+    /// Format Tag 2 KLV TLV element (Tag 0x02, Len 0x08, 8 bytes value).
+    pub fn to_klv_tag2(&self) -> [u8; 10] {
+        let mut out = [0u8; 10];
+        out[0] = MISB_TAG_PRECISION_TIME_STAMP;
+        out[1] = MISB_LEN_PRECISION_TIME_STAMP;
+        out[2..10].copy_from_slice(&self.to_be_bytes());
+        out
+    }
+}
