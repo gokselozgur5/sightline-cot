@@ -189,32 +189,6 @@ fn compute_inverse_result_ellipsoid(
     }
 }
 
-#[allow(clippy::too_many_arguments)]
-fn compute_inverse_result(
-    sigma: f64,
-    c2_a: f64,
-    c_2sm: f64,
-    lam: f64,
-    s_u1: f64,
-    c_u1: f64,
-    s_u2: f64,
-    c_u2: f64,
-) -> VincentyInverse {
-    let (a, b) = vincenty_ab(c2_a);
-    let s = WGS84_B * a * (sigma - vincenty_delta_sigma(b, sigma.sin(), sigma.cos(), c_2sm));
-    let a1 = (c_u2 * lam.sin())
-        .atan2(c_u1 * s_u2 - s_u1 * c_u2 * lam.cos())
-        .to_degrees();
-    let a2 = (c_u1 * lam.sin())
-        .atan2(-s_u1 * c_u2 + c_u1 * s_u2 * lam.cos())
-        .to_degrees();
-    VincentyInverse {
-        distance_m: s,
-        forward_azimuth_deg: wrap_azimuth(a1),
-        reverse_azimuth_deg: wrap_azimuth(a2),
-    }
-}
-
 /// Computes geodesic distance and azimuths between two points on a given ellipsoid.
 pub fn vincenty_inverse_ellipsoid(
     lat1: f64, lon1: f64, lat2: f64, lon2: f64, ellipsoid: &Ellipsoid,
