@@ -57,6 +57,15 @@ pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, UpsError> {
         let easting = FALSE_EASTING_NORTH + rho * lon_rad.sin();
         let northing = FALSE_NORTHING_NORTH - rho * lon_rad.cos();
         Ok(UpsCoord::new(easting, northing, UpsHemisphere::North))
+    } else if lat_deg <= -79.5 {
+        let lat_rad = (-lat_deg).to_radians();
+        let lon_rad = lon_deg.to_radians();
+        let t = conformal_radius(lat_rad, e);
+        let m1 = UPS_K0 * 2.0 * WGS84_A / ((1.0 - e2).sqrt());
+        let rho = m1 * t / 2.0;
+        let easting = FALSE_EASTING_SOUTH + rho * lon_rad.sin();
+        let northing = FALSE_NORTHING_SOUTH + rho * lon_rad.cos();
+        Ok(UpsCoord::new(easting, northing, UpsHemisphere::South))
     } else {
         Err(UpsError::InvalidLatitude)
     }
