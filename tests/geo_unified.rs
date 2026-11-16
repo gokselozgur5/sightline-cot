@@ -58,7 +58,16 @@ fn test_unified_exact_poles() {
 fn test_unified_out_of_bounds() {
     use sightline_cot::GridError;
     assert_eq!(wgs84_to_unified(91.0, 0.0), Err(GridError::InvalidLatitude));
-    assert_eq!(wgs84_to_unified(-91.0, 0.0), Err(GridError::InvalidLatitude));
-    assert_eq!(wgs84_to_unified(0.0, 181.0), Err(GridError::InvalidLongitude));
-    assert_eq!(wgs84_to_unified(0.0, -181.0), Err(GridError::InvalidLongitude));
+    assert_eq!(
+        wgs84_to_unified(-91.0, 0.0),
+        Err(GridError::InvalidLatitude)
+    );
+    assert_eq!(
+        wgs84_to_unified(0.0, 181.0),
+        Err(GridError::InvalidLongitude)
+    );
+    assert_eq!(
+        wgs84_to_unified(0.0, -181.0),
+        Err(GridError::InvalidLongitude)
+    );
 }
