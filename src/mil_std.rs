@@ -128,3 +128,17 @@ impl MilStdDimension {
         }
     }
 }
+
+impl MilStdDimension {
+    pub fn from_2525c_char(c: char) -> Result<Self, MilStdError> {
+        match c {
+            'G' => Ok(Self::Land),
+            'A' => Ok(Self::Air),
+            'S' => Ok(Self::Surface),
+            'U' => Ok(Self::Subsurface),
+            'P' => Ok(Self::Space),
+            'X' => Ok(Self::Activity),
+            _ => Err(MilStdError::InvalidDimension),
+        }
+    }
+}
