@@ -218,3 +218,26 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
     let end = xml[start..].find(&close)?;
     Some(&xml[start..start + end])
 }
+
+impl CotCircle {
+    fn parse_point_and_radius(xml: &str) -> Result<(f64, f64, Option<f64>, f64), CotCircleError> {
+        let (lat, lon, hae) = if let Some(p_start) = xml.find("<point") {
+            let p_end = xml[p_start..].find("/>").ok_or_else(|| CotCircleError::XmlParseError("unclosed <point".into()))?;
+            let tag = &xml[p_start..p_start + p_end];
+            let lat = extract_attr(tag, "lat").ok_or(CotCircleError::InvalidCoordinate("missing lat"))?
+                .parse::<f64>().map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lat"))?;
+            let lon = extract_attr(tag, "lon").ok_or(CotCircleError::InvalidCoordinate("missing lon"))?
+                .parse::<f64>().map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lon"))?;
+            let hae = extract_attr(tag, "hae").and_then(|h| h.parse::<f64>().ok());
+            (lat, lon, hae)
+        } else {
+            (0.0, 0.0, None)
+        };
+        let e_start = xml.find("<ellipse").ok_or_else(|| CotCircleError::XmlParseError("missing <ellipse".into()))?;
+        let e_end = xml[e_start..].find("/>").ok_or_else(|| CotCircleError::XmlParseError("unclosed <ellipse".into()))?;
+        let el_tag = &xml[e_start..e_start + e_end];
+        let major = extract_attr(el_tag, "major").ok_or(CotCircleError::InvalidRadius("missing major radius"))?
+            .parse::<f64>().map_err(|_| CotCircleError::InvalidRadius("non-numeric major radius"))?;
+        Ok((lat, lon, hae, major))
+    }
+}
