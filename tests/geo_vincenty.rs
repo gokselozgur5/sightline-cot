@@ -75,3 +75,18 @@ fn test_equator_and_meridian_arcs() {
     assert!((mer.distance_m - 10001965.729).abs() < 0.01);
     assert!((mer.forward_azimuth_deg - 0.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_vincenty_inverse_ellipsoids() {
+    use sightline_cot::ellipsoid::Ellipsoid;
+    use sightline_cot::geo_vincenty::vincenty_inverse_ellipsoid;
+    let lat1 = 37.7749;
+    let lon1 = -122.4194;
+    let lat2 = 34.0522;
+    let lon2 = -118.2437;
+    let wgs = vincenty_inverse_ellipsoid(lat1, lon1, lat2, lon2, &Ellipsoid::WGS84).unwrap();
+    let grs = vincenty_inverse_ellipsoid(lat1, lon1, lat2, lon2, &Ellipsoid::GRS80).unwrap();
+    let w72 = vincenty_inverse_ellipsoid(lat1, lon1, lat2, lon2, &Ellipsoid::WGS72).unwrap();
+    assert!((wgs.distance_m - grs.distance_m).abs() < 0.01);
+    assert!((wgs.distance_m - w72.distance_m).abs() < 5.0);
+}
