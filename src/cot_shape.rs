@@ -169,3 +169,24 @@ impl CotShape {
         )
     }
 }
+
+fn extract_attr(tag: &str, attr: &str) -> Option<String> {
+    let needle = format!("{attr}=\"");
+    let start = tag.find(&needle)? + needle.len();
+    let end = tag[start..].find('"')?;
+    Some(tag[start..start + end].to_string())
+}
+
+impl CotVertex {
+    /// Parse `<vertex lat="..." lon="..." [hae="..."]/>` XML element.
+    pub fn parse(xml: &str) -> Result<Self, CotShapeError> {
+        let lat_str = extract_attr(xml, "lat").ok_or(CotShapeError::InvalidCoordinate("missing lat"))?;
+        let lon_str = extract_attr(xml, "lon").ok_or(CotShapeError::InvalidCoordinate("missing lon"))?;
+        let lat = lat_str.parse::<f64>().map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lat"))?;
+        let lon = lon_str.parse::<f64>().map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lon"))?;
+        let hae = extract_attr(xml, "hae").and_then(|h| h.parse::<f64>().ok());
+        let mut v = Self::new(lat, lon)?;
+        v.hae = hae;
+        Ok(v)
+    }
+}
