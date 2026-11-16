@@ -23,3 +23,21 @@ impl std::fmt::Display for StanagError {
 }
 
 impl std::error::Error for StanagError {}
+
+/// Precision timestamp in microseconds since Unix epoch (MISB ST 0601 Tag 2).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct StanagTimestamp {
+    micros: u64,
+}
+
+impl StanagTimestamp {
+    /// Create a timestamp from elapsed microseconds since Unix epoch.
+    pub const fn from_micros(micros: u64) -> Self {
+        Self { micros }
+    }
+
+    /// Return the raw microsecond value since Unix epoch.
+    pub const fn as_micros(&self) -> u64 {
+        self.micros
+    }
+}
