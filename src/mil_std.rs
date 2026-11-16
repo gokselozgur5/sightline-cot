@@ -259,3 +259,17 @@ pub struct MilStdSymbol {
     pub country_code: [char; 2],
     pub modifier: [char; 2],
 }
+
+impl Default for MilStdSymbol {
+    fn default() -> Self {
+        Self {
+            affiliation: MilStdAffiliation::Unknown,
+            dimension: MilStdDimension::Land,
+            status: MilStdStatus::Present,
+            echelon: MilStdEchelon::Unspecified,
+            function_id: ['-', '-', '-', '-', '-', '-'],
+            country_code: ['-', '-'],
+            modifier: ['-', '-'],
+        }
+    }
+}
