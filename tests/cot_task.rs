@@ -40,3 +40,13 @@ fn test_cot_task_full_workflow() {
     assert_eq!(parsed.points.len(), 3);
     assert_eq!(parsed.points[1].action, TaskAction::Orbit);
 }
+
+#[test]
+fn test_cot_task_empty_and_error_handling() {
+    let empty_task = TacticalTask::new("EMPTY");
+    assert_eq!(empty_task.centroid(), Err(CotTaskError::EmptyRoute));
+    assert_eq!(empty_task.total_distance_m(), 0.0);
+
+    let bad_pt = TaskPoint::new(1, "ERR", 91.0, 0.0);
+    assert!(matches!(bad_pt, Err(CotTaskError::InvalidCoordinate(_))));
+}
