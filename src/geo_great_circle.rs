@@ -310,4 +310,17 @@ mod tests {
         let q1 = path.interpolate_at_fraction(0.25).unwrap();
         assert!((q1.lon - 5.0).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_interpolate_fixed_step_and_n_points() {
+        let wps = [Waypoint::new(0.0, 0.0), Waypoint::new(0.0, 2.0)];
+        let path = GreatCirclePath::from_waypoints(&wps).unwrap();
+        let pts = path.interpolate_n_points(5).unwrap();
+        assert_eq!(pts.len(), 5);
+        assert!((pts[0].lon - 0.0).abs() < 1e-6);
+        assert!((pts[4].lon - 2.0).abs() < 1e-6);
+        let step = path.total_distance_m() / 4.0;
+        let sampled = path.interpolate_fixed_step(step).unwrap();
+        assert!(sampled.len() >= 5);
+    }
 }
