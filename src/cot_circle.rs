@@ -375,3 +375,13 @@ impl CotRangeRings {
         }).collect()
     }
 }
+
+impl CotRangeRings {
+    /// Generate complete CoT 2.0 XML events for all concentric rings.
+    pub fn to_cot_events(&self, base_uid: &str, time_ms: i64, stale_ms: i64) -> Vec<String> {
+        self.to_circles().into_iter().enumerate().map(|(i, circle)| {
+            let ring_uid = format!("{base_uid}-ring-{}", i + 1);
+            circle.to_cot_event_xml(&ring_uid, time_ms, stale_ms)
+        }).collect()
+    }
+}
