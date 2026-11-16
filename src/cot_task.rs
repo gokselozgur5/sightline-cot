@@ -76,3 +76,32 @@ impl TaskAction {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum TaskPriority {
+    #[default]
+    Routine,
+    Priority,
+    Immediate,
+    Flash,
+}
+
+impl TaskPriority {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Routine => "routine",
+            Self::Priority => "priority",
+            Self::Immediate => "immediate",
+            Self::Flash => "flash",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "priority" => Self::Priority,
+            "immediate" => Self::Immediate,
+            "flash" => Self::Flash,
+            _ => Self::Routine,
+        }
+    }
+}
