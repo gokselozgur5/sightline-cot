@@ -37,3 +37,11 @@ fn test_mayday_and_cancel_beacons() {
     let cancel_xml = cancel.to_cot_xml();
     assert!(cancel_xml.contains("cancel=\"true\""));
 }
+
+#[test]
+fn test_beacon_coordinate_errors() {
+    assert!(EmergencyBeacon::new_911("U", "C", 95.0, 0.0).is_err());
+    assert!(EmergencyBeacon::new_911("U", "C", -95.0, 0.0).is_err());
+    assert!(EmergencyBeacon::new_911("U", "C", 0.0, 185.0).is_err());
+    assert!(EmergencyBeacon::new_911("U", "C", f64::NAN, 0.0).is_err());
+}
