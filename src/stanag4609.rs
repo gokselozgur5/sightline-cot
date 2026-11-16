@@ -145,3 +145,20 @@ impl StanagTimestamp {
         Ok(Self::from_micros(micros))
     }
 }
+
+/// 16-byte Universal Metadata Key for MISB ST 0601 UAS Datalink Local Set.
+pub const MISB_0601_UNIVERSAL_KEY: [u8; 16] = [
+    0x06, 0x0E, 0x2B, 0x34, 0x02, 0x0B, 0x01, 0x01, 0x0E, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00,
+];
+
+impl StanagTimestamp {
+    /// Format standalone MISB ST 0601 KLV packet containing this timestamp.
+    pub fn to_klv_packet(&self) -> Vec<u8> {
+        let tag2 = self.to_klv_tag2();
+        let mut packet = Vec::with_capacity(16 + 2 + tag2.len());
+        packet.extend_from_slice(&MISB_0601_UNIVERSAL_KEY);
+        packet.push(tag2.len() as u8);
+        packet.extend_from_slice(&tag2);
+        packet
+    }
+}
