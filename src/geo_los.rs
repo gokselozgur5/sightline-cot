@@ -51,3 +51,16 @@ pub struct LosGeometry {
     pub horizon_distance_m: f64,
     pub is_direct_los: bool,
 }
+
+impl LosGeometry {
+    /// Return the elevation angle in degrees.
+    pub fn elevation_angle_deg(&self) -> f64 {
+        self.elevation_angle_rad.to_degrees()
+    }
+
+    /// Return the azimuth (true bearing) in degrees in range [0, 360).
+    pub fn azimuth_deg(&self) -> f64 {
+        let deg = self.azimuth_rad.to_degrees();
+        (deg % 360.0 + 360.0) % 360.0
+    }
+}
