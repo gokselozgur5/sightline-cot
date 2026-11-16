@@ -64,3 +64,15 @@ impl LosGeometry {
         (deg % 360.0 + 360.0) % 360.0
     }
 }
+
+pub const WGS84_MEAN_RADIUS_M: f64 = 6_371_000.0;
+
+/// Compute geometric horizon line-of-sight limit distance between two heights.
+pub fn horizon_distance_m(h1_m: f64, h2_m: f64) -> Result<f64, GeoLosError> {
+    if !h1_m.is_finite() || !h2_m.is_finite() {
+        return Err(GeoLosError::NonFiniteCoordinate);
+    }
+    let d1 = if h1_m > 0.0 { (2.0 * WGS84_MEAN_RADIUS_M * h1_m + h1_m * h1_m).sqrt() } else { 0.0 };
+    let d2 = if h2_m > 0.0 { (2.0 * WGS84_MEAN_RADIUS_M * h2_m + h2_m * h2_m).sqrt() } else { 0.0 };
+    Ok(d1 + d2)
+}
