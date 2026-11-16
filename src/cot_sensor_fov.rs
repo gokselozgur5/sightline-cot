@@ -148,3 +148,20 @@ pub fn compute_ground_footprint(
     let perimeter = rays.into_iter().filter_map(|r| intersect_ray_ground(r, dz, ground_alt_m)).collect();
     Ok(SensorFootprint { boresight_ground, perimeter_points: perimeter, slant_range_boresight_m: slant_range })
 }
+
+use crate::geo_enu::geodetic_to_enu;
+
+/// Check if geodetic target falls within sensor cone positioned at `sensor_pos`.
+pub fn is_target_in_sensor_fov(
+    sensor_lat: f64,
+    sensor_lon: f64,
+    sensor_hae: f64,
+    target_lat: f64,
+    target_lon: f64,
+    target_hae: f64,
+    cone: &SensorCone,
+) -> Result<bool, SensorFovError> {
+    let enu = geodetic_to_enu(target_lat, target_lon, target_hae, sensor_lat, sensor_lon, sensor_hae)
+        .map_err(|_| SensorFovError::NonFiniteParameter)?;
+    Ok(cone.contains_relative_point(enu))
+}
