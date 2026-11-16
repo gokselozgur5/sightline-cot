@@ -248,3 +248,14 @@ mod tests {
         assert_eq!(normalize_lon_180(270.0), -90.0);
         assert_eq!(normalize_lon_180(-180.0), -180.0);
     }
+
+    #[test]
+    fn test_grid_validation_errors() {
+        let err = Egm96Geoid::new(-1.0, 30.0, vec![0.0; 84]);
+        assert_eq!(err, Err(Egm96Error::InvalidStep));
+        let err2 = Egm96Geoid::new(30.0, 30.0, vec![0.0; 10]);
+        assert_eq!(err2, Err(Egm96Error::DataLengthMismatch { expected: 84, found: 10 }));
+        let grid = Egm96Geoid::coarse_reference_grid();
+        assert_eq!(grid.undulation(95.0, 0.0), Err(Egm96Error::LatitudeOutOfRange(95.0)));
+        assert_eq!(grid.undulation(f64::NAN, 0.0), Err(Egm96Error::NonFiniteCoordinate));
+    }
