@@ -127,8 +127,8 @@ fn test_vincenty_geodesic_path() {
 fn test_crate_root_reexports() {
     use sightline_cot::{
         vincenty_direct, vincenty_direct_ellipsoid, vincenty_geodesic_path,
-        vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid,
-        Ellipsoid, VincentyDirect, VincentyError, VincentyInverse,
+        vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid, Ellipsoid,
+        VincentyDirect, VincentyError, VincentyInverse,
     };
     let inv: Result<VincentyInverse, VincentyError> = vincenty_inverse(0.0, 0.0, 1.0, 1.0);
     assert!(inv.unwrap().distance_m > 0.0);
