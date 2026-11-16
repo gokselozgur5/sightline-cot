@@ -234,3 +234,18 @@ impl GreatCirclePath {
         Ok(result)
     }
 }
+
+impl GreatCirclePath {
+    /// Sample exactly `n` evenly spaced waypoints along the path.
+    pub fn interpolate_n_points(&self, n: usize) -> Result<Vec<Waypoint>, GreatCircleError> {
+        if n < 2 {
+            return Err(GreatCircleError::InvalidParameter);
+        }
+        let mut result = Vec::with_capacity(n);
+        for i in 0..n {
+            let frac = (i as f64) / ((n - 1) as f64);
+            result.push(self.interpolate_at_fraction(frac)?);
+        }
+        Ok(result)
+    }
+}
