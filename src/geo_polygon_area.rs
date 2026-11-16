@@ -155,3 +155,23 @@ pub fn compute_cot_polygon_geometry(
         perimeter_m,
     })
 }
+
+/// Check whether polygon vertices are ordered counter-clockwise (positive signed area).
+pub fn is_counter_clockwise(vertices: &[[f64; 2]]) -> Result<bool, GeodesicAreaError> {
+    let n = vertices.len();
+    if n < 3 {
+        return Err(GeodesicAreaError::InsufficientVertices);
+    }
+    let mut sum = 0.0;
+    for i in 0..n {
+        let (p1, p2) = (vertices[i], vertices[(i + 1) % n]);
+        let sin_beta1 = authalic_sin_beta(p1[0])?;
+        let sin_beta2 = authalic_sin_beta(p2[0])?;
+        let dlon = wrap_delta_lon((p2[1] - p1[1]).to_radians());
+        sum += dlon * (2.0 + sin_beta1 + sin_beta2);
+    }
+    if sum.abs() < 1e-15 {
+        return Err(GeodesicAreaError::DegeneratePolygon);
+    }
+    Ok(sum > 0.0)
+}
