@@ -546,6 +546,26 @@ impl Mgrs10Figure {
         append_digits(&mut s.bytes, &mut s.len, self.northing, 5);
         s
     }
+
+    /// Format as spaced MGRS string (e.g. "31N EA 12345 67890").
+    pub fn format_spaced(&self) -> MgrsString {
+        let mut s = MgrsString {
+            bytes: [0u8; 32],
+            len: 0,
+        };
+        append_digits(&mut s.bytes, &mut s.len, self.zone as u32, 2);
+        s.bytes[s.len] = self.band as u8;
+        s.bytes[s.len + 1] = b' ';
+        s.bytes[s.len + 2] = self.col as u8;
+        s.bytes[s.len + 3] = self.row as u8;
+        s.bytes[s.len + 4] = b' ';
+        s.len += 5;
+        append_digits(&mut s.bytes, &mut s.len, self.easting, 5);
+        s.bytes[s.len] = b' ';
+        s.len += 1;
+        append_digits(&mut s.bytes, &mut s.len, self.northing, 5);
+        s
+    }
 }
 
 #[cfg(test)]
