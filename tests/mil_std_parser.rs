@@ -1,4 +1,4 @@
-use sightline_cot::mil_std::{parse_mil_std, MilStdAffiliation, MilStdDimension};
+use sightline_cot::mil_std::{parse_mil_std, MilStdAffiliation, MilStdDimension, MilStdEchelon, MilStdError};
 
 #[test]
 fn test_mil_std_2525c_basic_parse() {
