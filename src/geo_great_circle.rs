@@ -280,4 +280,18 @@ mod tests {
             GreatCircleError::InvalidLongitude
         );
     }
+
+    #[test]
+    fn test_single_segment_interpolation() {
+        let wps = [Waypoint::new(0.0, 0.0), Waypoint::new(0.0, 10.0)];
+        let path = GreatCirclePath::from_waypoints(&wps).unwrap();
+        assert_eq!(path.segment_count(), 1);
+        let mid = path.interpolate_at_fraction(0.5).unwrap();
+        assert!(mid.lat.abs() < 1e-9);
+        assert!((mid.lon - 5.0).abs() < 1e-6);
+        let start = path.interpolate_at_distance(0.0).unwrap();
+        assert!((start.lon - 0.0).abs() < 1e-9);
+        let end = path.interpolate_at_distance(path.total_distance_m()).unwrap();
+        assert!((end.lon - 10.0).abs() < 1e-6);
+    }
 }
