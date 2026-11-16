@@ -258,3 +258,19 @@ impl EmergencyBeacon {
         )
     }
 }
+
+fn extract_attr<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
+    let key = format!("{name}=\"");
+    let start = tag.find(&key)? + key.len();
+    let end = tag[start..].find('\"')? + start;
+    Some(&tag[start..end])
+}
+
+fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
+    let open = format!("<{tag}");
+    let start = xml.find(&open)?;
+    let content_start = xml[start..].find('>')? + start + 1;
+    let close = format!("</{tag}>");
+    let end = xml[content_start..].find(&close)? + content_start;
+    Some(&xml[content_start..end])
+}
