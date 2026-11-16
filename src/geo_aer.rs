@@ -25,3 +25,14 @@ impl std::fmt::Display for AerError {
         }
     }
 }
+
+/// Topocentric Azimuth, Elevation, Range (AER) coordinates.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct AerCoord {
+    /// Azimuth angle measured clockwise from True North in degrees [0, 360).
+    pub azimuth_deg: f64,
+    /// Elevation angle above local horizon in degrees [-90, 90].
+    pub elevation_deg: f64,
+    /// Slant range distance in meters (>= 0).
+    pub range_m: f64,
+}
