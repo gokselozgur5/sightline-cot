@@ -18,3 +18,12 @@ pub struct UpsCoord {
     pub easting: f64,
     pub northing: f64,
 }
+
+/// Unified UTM or UPS coordinate.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum UnifiedCoord {
+    /// Standard UTM projection coordinate.
+    Utm(UtmCoord),
+    /// Universal Polar Stereographic coordinate.
+    Ups(UpsCoord),
+}
