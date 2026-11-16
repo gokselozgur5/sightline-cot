@@ -215,3 +215,14 @@ pub fn geodetic_to_aer(
     let target_ecef = crate::geo_ecef::geodetic_to_ecef(target_lat_deg, target_lon_deg, target_hae_m);
     ecef_to_aer(target_ecef, obs_lat_deg, obs_lon_deg, obs_hae_m)
 }
+
+/// Compute target geodetic point from observer geodetic point and AER vector.
+pub fn aer_to_geodetic(
+    aer: AerCoord,
+    obs_lat_deg: f64,
+    obs_lon_deg: f64,
+    obs_hae_m: f64,
+) -> Result<(f64, f64, f64), AerError> {
+    let ecef = aer_to_ecef(aer, obs_lat_deg, obs_lon_deg, obs_hae_m)?;
+    Ok(crate::geo_ecef::ecef_to_geodetic(ecef[0], ecef[1], ecef[2]))
+}
