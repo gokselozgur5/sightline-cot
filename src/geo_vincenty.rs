@@ -58,6 +58,7 @@ fn validate_point(lat_deg: f64, lon_deg: f64) -> Result<(), VincentyError> {
 }
 
 use crate::ellipsoid::Ellipsoid;
+pub use crate::geo_vincenty_direct::vincenty_direct_ellipsoid;
 
 fn vincenty_ab_ellipsoid(cos2_alpha: f64, a_semi: f64, b_semi: f64) -> (f64, f64) {
     let u2 = cos2_alpha * (a_semi * a_semi - b_semi * b_semi) / (b_semi * b_semi);
