@@ -218,3 +218,17 @@ impl CotShape {
         Ok(shape)
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_internal_sanity() {
+        let v1 = CotVertex::new(10.0, 20.0).unwrap();
+        let v2 = CotVertex::new(10.5, 20.5).unwrap();
+        let s = CotShape::new_polyline(vec![v1, v2]).unwrap();
+        assert_eq!(s.centroid(), [10.25, 20.25]);
+    }
+}
