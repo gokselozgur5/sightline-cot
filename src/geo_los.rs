@@ -134,3 +134,9 @@ mod tests {
         );
         assert!(GeoPoint3D::new(45.0, 10.0, 100.0).is_ok());
     }
+
+    #[test]
+    fn test_coincident_positions_error() {
+        let p = GeoPoint3D::new(37.5, -122.0, 50.0).unwrap();
+        assert_eq!(compute_geo_los(&p, &p), Err(GeoLosError::CoincidentPoints));
+    }
