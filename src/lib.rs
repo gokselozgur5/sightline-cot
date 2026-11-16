@@ -181,6 +181,11 @@ mod tests {
         assert!((geoid.get_node(0, 0) - (-30.0)).abs() < 1e-6);
     }
     #[test]
+    fn test_cot_task_crate_export() {
+        let task = TacticalTask::new("EXPORT-TEST");
+        assert_eq!(task.name, "EXPORT-TEST");
+    }
+    #[test]
     fn sanity() {
         assert_eq!(VERSION, "0.1.0");
     }
