@@ -20,3 +20,15 @@ impl std::fmt::Display for CotBeaconError {
 }
 
 impl std::error::Error for CotBeaconError {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum EmergencyType {
+    #[default]
+    Alert911,
+    Mayday,
+    RingTheBell,
+    TroopsInContact,
+    GeoFenceBreach,
+    Cancel,
+    Custom(String),
+}
