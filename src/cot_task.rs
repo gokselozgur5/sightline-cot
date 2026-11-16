@@ -164,3 +164,19 @@ fn extract_attr(tag: &str, attr: &str) -> Option<String> {
     let end = tag[start..].find('"')?;
     Some(tag[start..start + end].to_string())
 }
+
+impl TaskPoint {
+    pub fn new(order: u32, name: impl Into<String>, lat: f64, lon: f64) -> Result<Self, CotTaskError> {
+        validate_lat_lon(lat, lon)?;
+        Ok(Self {
+            order,
+            name: name.into(),
+            lat,
+            lon,
+            hae: None,
+            action: TaskAction::default(),
+            speed_mps: None,
+            eta_ms: None,
+            remarks: None,
+        })
+    }
