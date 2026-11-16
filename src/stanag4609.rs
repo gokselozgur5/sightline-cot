@@ -162,3 +162,17 @@ impl StanagTimestamp {
         packet
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_internal_packet_sanity() {
+        let ts = StanagTimestamp::from_micros(1_000_000);
+        let packet = ts.to_klv_packet();
+        assert_eq!(packet.len(), 16 + 1 + 10);
+        assert_eq!(&packet[..16], &MISB_0601_UNIVERSAL_KEY);
+    }
+}
