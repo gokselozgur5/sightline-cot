@@ -130,3 +130,26 @@ fn ups_project_south(phi_s: f64, lam: f64, e: f64) -> (f64, f64) {
     let y = UPS_FALSE_ORIGIN + rho * lam.cos();
     (x, y)
 }
+
+/// Project WGS84 latitude and longitude to UPS.
+pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, GridError> {
+    if !(-90.0..=90.0).contains(&lat_deg) {
+        return Err(GridError::InvalidLatitude);
+    }
+    if !(-180.0..=180.0).contains(&lon_deg) {
+        return Err(GridError::InvalidLongitude);
+    }
+    if !is_polar_latitude(lat_deg) && lat_deg != 84.0 && lat_deg != -80.0 {
+        return Err(GridError::InvalidLatitude);
+    }
+    let (_, e) = ups_eccentricity();
+    let lam = lon_deg.to_radians();
+    let (hemisphere, easting, northing) = if lat_deg >= 0.0 {
+        let (x, y) = ups_project_north(lat_deg.to_radians(), lam, e);
+        ('N', x, y)
+    } else {
+        let (x, y) = ups_project_south((-lat_deg).to_radians(), lam, e);
+        ('S', x, y)
+    };
+    Ok(UpsCoord { hemisphere, easting, northing })
+}
