@@ -66,3 +66,21 @@ impl SensorCone {
         [east, north, up]
     }
 }
+
+impl SensorCone {
+    /// Determine if a relative target point [east, north, up] in meters lies inside the cone.
+    pub fn contains_relative_point(&self, rel_enu: [f64; 3]) -> bool {
+        let [e, n, u] = rel_enu;
+        let dist = (e * e + n * n + u * u).sqrt();
+        if dist < 1e-9 {
+            return true;
+        }
+        if dist > self.range_m {
+            return false;
+        }
+        let b = self.boresight_vector();
+        let cos_angle = (e * b[0] + n * b[1] + u * b[2]) / dist;
+        let half_fov_rad = (self.fov_deg * 0.5).to_radians();
+        cos_angle >= half_fov_rad.cos() - 1e-12
+    }
+}
