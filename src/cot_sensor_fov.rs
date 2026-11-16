@@ -261,3 +261,18 @@ mod tests {
             Err(SensorFovError::RayDoesNotIntersectGround)
         );
     }
+
+    #[test]
+    fn test_geodetic_target_and_cot_conversion() {
+        let cone = SensorCone::new(0.0, -45.0, 60.0, 5000.0).unwrap();
+        let cot_sensor: CotSensor = cone.into();
+        assert_eq!(cot_sensor.azimuth_deg, 0.0);
+        assert_eq!(cot_sensor.elevation_deg, -45.0);
+
+        let roundtrip = SensorCone::try_from(&cot_sensor).unwrap();
+        assert_eq!(roundtrip, cone);
+
+        let target_in = is_target_in_sensor_fov(0.0, 0.0, 1000.0, 0.005, 0.0, 0.0, &cone).unwrap();
+        assert!(target_in);
+    }
+}
