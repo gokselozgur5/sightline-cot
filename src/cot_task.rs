@@ -180,3 +180,16 @@ impl TaskPoint {
             remarks: None,
         })
     }
+
+    pub fn with_hae(mut self, hae: f64) -> Result<Self, CotTaskError> {
+        if !hae.is_finite() {
+            return Err(CotTaskError::InvalidParameter("hae must be finite"));
+        }
+        self.hae = Some(hae);
+        Ok(self)
+    }
+
+    pub fn with_action(mut self, action: TaskAction) -> Self {
+        self.action = action;
+        self
+    }
