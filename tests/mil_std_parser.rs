@@ -28,3 +28,11 @@ fn test_mil_std_2525d_echelon_and_cot() {
     assert_eq!(sym.echelon, MilStdEchelon::Company);
     assert_eq!(sym.to_cot_type(), "a-f-G");
 }
+
+#[test]
+fn test_mil_std_errors() {
+    assert_eq!(parse_mil_std("SHORT"), Err(MilStdError::InvalidLength));
+    assert_eq!(parse_mil_std("SFGPUCI----K--\u{00FF}"), Err(MilStdError::InvalidCharacter));
+    assert_eq!(parse_mil_std("SZGPUCI----K---"), Err(MilStdError::InvalidAffiliation));
+    assert_eq!(parse_mil_std("SFZPUCI----K---"), Err(MilStdError::InvalidDimension));
+}
