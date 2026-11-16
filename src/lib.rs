@@ -98,6 +98,11 @@ pub mod utm_forced;
 pub use utm_forced::{
     is_adjacent_zone, utm_forced_to_wgs84, wgs84_to_utm_forced, zone_distance_delta,
 };
+pub mod geo_unified;
+pub use geo_unified::{
+    is_polar_latitude, is_utm_latitude, unified_to_wgs84, ups_to_wgs84, wgs84_to_unified,
+    wgs84_to_ups, GridSystem, UnifiedCoord, UpsCoord,
+};
 pub use cam_distorted_pinhole::DistortedPinhole;
 pub mod geoid;
 pub use geoid::{
