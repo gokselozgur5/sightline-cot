@@ -303,3 +303,21 @@ pub fn vincenty_direct(
         lon1, sin_u1, cos_u1, sin_alp, cos2_alp, alp1, sig, cos_2sm,
     ))
 }
+
+/// Computes intermediate coordinates along the geodesic arc between two points.
+pub fn vincenty_intermediate_points(
+    lat1: f64, lon1: f64, lat2: f64, lon2: f64, count: usize,
+) -> Result<Vec<(f64, f64)>, VincentyError> {
+    if count == 0 {
+        return Ok(Vec::new());
+    }
+    let inv = vincenty_inverse(lat1, lon1, lat2, lon2)?;
+    let mut points = Vec::with_capacity(count);
+    for i in 1..=count {
+        let frac = i as f64 / (count + 1) as f64;
+        let dist = inv.distance_m * frac;
+        let direct = vincenty_direct(lat1, lon1, inv.forward_azimuth_deg, dist)?;
+        points.push((direct.lat_deg, direct.lon_deg));
+    }
+    Ok(points)
+}
