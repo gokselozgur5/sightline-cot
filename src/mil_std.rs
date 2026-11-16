@@ -24,3 +24,17 @@ impl std::fmt::Display for MilStdError {
 }
 
 impl std::error::Error for MilStdError {}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum MilStdAffiliation {
+    #[default]
+    Unknown,
+    Pending,
+    Friend,
+    AssumedFriend,
+    Neutral,
+    Hostile,
+    Suspect,
+    Joker,
+    Faker,
+}
