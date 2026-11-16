@@ -115,3 +115,24 @@ fn validate_coords(lat: f64, lon: f64) -> Result<(), CotBeaconError> {
     }
     Ok(())
 }
+
+impl EmergencyBeacon {
+    pub fn new_911(uid: &str, callsign: &str, lat: f64, lon: f64) -> Result<Self, CotBeaconError> {
+        validate_coords(lat, lon)?;
+        Ok(Self {
+            uid: uid.to_string(),
+            callsign: callsign.to_string(),
+            emergency_type: EmergencyType::Alert911,
+            severity: EmergencySeverity::Critical,
+            cancel: false,
+            lat_deg: lat,
+            lon_deg: lon,
+            hae_m: 0.0,
+            ce_m: 10.0,
+            le_m: 10.0,
+            time_ms: 0,
+            stale_sec: 120,
+            details: None,
+        })
+    }
+}
