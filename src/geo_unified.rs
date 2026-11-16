@@ -246,4 +246,17 @@ mod tests {
         assert!(is_utm_latitude(84.0));
         assert!(is_utm_latitude(-80.0));
     }
+
+    #[test]
+    fn test_unified_coord_accessors() {
+        let ups = UpsCoord { hemisphere: 'N', easting: 2000000.0, northing: 2000000.0 };
+        let u = UnifiedCoord::Ups(ups);
+        assert_eq!(u.easting(), 2000000.0);
+        assert_eq!(u.northing(), 2000000.0);
+        assert_eq!(u.hemisphere(), 'N');
+        assert_eq!(u.grid_system(), GridSystem::Ups);
+        assert_eq!(u.zone(), None);
+        assert!(u.is_ups());
+        assert!(!u.is_utm());
+    }
 }
