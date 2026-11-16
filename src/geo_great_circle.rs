@@ -16,3 +16,18 @@ pub enum GreatCircleError {
     /// Step or count parameter is zero or non-positive.
     InvalidParameter,
 }
+
+/// Geodetic waypoint with latitude and longitude in degrees.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Waypoint {
+    pub lat: f64,
+    pub lon: f64,
+}
+
+impl Waypoint {
+    /// Create a new waypoint.
+    #[inline]
+    pub const fn new(lat: f64, lon: f64) -> Self {
+        Self { lat, lon }
+    }
+}
