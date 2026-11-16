@@ -509,6 +509,12 @@ pub fn mgrs_10figure_to_utm(mgrs: &Mgrs10Figure) -> Result<UtmCoord, GridError> 
     })
 }
 
+/// Convert a 10-figure MGRS coordinate back to WGS84 latitude and longitude.
+pub fn mgrs_10figure_to_wgs84(mgrs: &Mgrs10Figure) -> Result<(f64, f64), GridError> {
+    let utm = mgrs_10figure_to_utm(mgrs)?;
+    utm_to_wgs84(&utm)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
