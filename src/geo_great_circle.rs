@@ -169,3 +169,22 @@ impl GreatCirclePath {
         (idx, frac.clamp(0.0, 1.0))
     }
 }
+
+impl GreatCirclePath {
+    /// Interpolate waypoint at a given distance along the path in meters.
+    pub fn interpolate_at_distance(&self, distance_m: f64) -> Result<Waypoint, GreatCircleError> {
+        if !distance_m.is_finite() || distance_m < 0.0 || distance_m > self.total_length {
+            return Err(GreatCircleError::InvalidDistance);
+        }
+        let (idx, frac) = self.locate_segment(distance_m);
+        Ok(interpolate_segment(&self.waypoints[idx], &self.waypoints[idx + 1], frac))
+    }
+
+    /// Interpolate waypoint at a fraction in [0.0, 1.0] of total path length.
+    pub fn interpolate_at_fraction(&self, fraction: f64) -> Result<Waypoint, GreatCircleError> {
+        if !fraction.is_finite() || !(0.0..=1.0).contains(&fraction) {
+            return Err(GreatCircleError::InvalidParameter);
+        }
+        self.interpolate_at_distance(fraction * self.total_length)
+    }
+}
