@@ -89,3 +89,25 @@ impl Egm96Geoid {
         Ok(())
     }
 }
+
+impl Egm96Geoid {
+    /// Construct a new global EGM96 geoid grid spanning [-90, +90] latitude.
+    pub fn new(
+        lat_step_deg: f64,
+        lon_step_deg: f64,
+        undulations: Vec<f64>,
+    ) -> Result<Self, Egm96Error> {
+        let rows = ((180.0 / lat_step_deg).round() as usize) + 1;
+        let cols = (360.0 / lon_step_deg).round() as usize;
+        Self::validate_grid(lat_step_deg, lon_step_deg, cols, rows, undulations.len())?;
+        Ok(Self {
+            min_lat_deg: -90.0,
+            max_lat_deg: 90.0,
+            lat_step_deg,
+            lon_step_deg,
+            cols,
+            rows,
+            undulations,
+        })
+    }
+}
