@@ -35,3 +35,13 @@ pub const WGS84_E2: f64 = 0.006_694_379_990_141_316_5;
 
 /// WGS84 authalic sphere radius in meters (R_q = sqrt(A / 4pi)).
 pub const WGS84_AUTHALIC_RADIUS_M: f64 = 6_371_007.180_918_474;
+
+/// Compute the authalic parameter q(phi) for the WGS84 ellipsoid.
+pub fn authalic_q(lat_rad: f64) -> f64 {
+    let sin_phi = lat_rad.sin();
+    let e = WGS84_E2.sqrt();
+    let e_sin = e * sin_phi;
+    let term1 = sin_phi / (1.0 - WGS84_E2 * sin_phi * sin_phi);
+    let term2 = ((1.0 - e_sin) / (1.0 + e_sin)).ln() / (2.0 * e);
+    (1.0 - WGS84_E2) * (term1 - term2)
+}
