@@ -147,3 +147,20 @@ pub struct TaskPoint {
     pub eta_ms: Option<i64>,
     pub remarks: Option<String>,
 }
+
+fn validate_lat_lon(lat: f64, lon: f64) -> Result<(), CotTaskError> {
+    if !lat.is_finite() || !(-90.0..=90.0).contains(&lat) {
+        return Err(CotTaskError::InvalidCoordinate("latitude in [-90, 90]"));
+    }
+    if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
+        return Err(CotTaskError::InvalidCoordinate("longitude in [-180, 180]"));
+    }
+    Ok(())
+}
+
+fn extract_attr(tag: &str, attr: &str) -> Option<String> {
+    let needle = format!("{attr}=\"");
+    let start = tag.find(&needle)? + needle.len();
+    let end = tag[start..].find('"')?;
+    Some(tag[start..start + end].to_string())
+}
