@@ -111,3 +111,24 @@ impl Egm96Geoid {
         })
     }
 }
+
+impl Egm96Geoid {
+    /// Get undulation value at grid index (col, row) with periodic lon wrapping.
+    #[inline]
+    pub fn get_node(&self, col: usize, row: usize) -> f64 {
+        let wrapped_col = col % self.cols;
+        let clamped_row = row.min(self.rows - 1);
+        self.undulations[clamped_row * self.cols + wrapped_col]
+    }
+
+    /// Check if coordinates are finite and within latitude limits.
+    pub fn check_coords(&self, lat_deg: f64, lon_deg: f64) -> Result<(), Egm96Error> {
+        if !lat_deg.is_finite() || !lon_deg.is_finite() {
+            return Err(Egm96Error::NonFiniteCoordinate);
+        }
+        if !(-90.0..=90.0).contains(&lat_deg) {
+            return Err(Egm96Error::LatitudeOutOfRange(lat_deg));
+        }
+        Ok(())
+    }
+}
