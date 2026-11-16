@@ -283,3 +283,29 @@ fn parse_point_coords(xml: &str) -> Result<(f64, f64), CotBeaconError> {
     validate_coords(lat, lon)?;
     Ok((lat, lon))
 }
+
+impl EmergencyBeacon {
+    pub fn from_cot_xml(xml: &str) -> Result<Self, CotBeaconError> {
+        let uid = extract_attr(xml, "uid").ok_or(CotBeaconError::MissingField("uid"))?;
+        let (lat, lon) = parse_point_coords(xml)?;
+        let callsign = extract_attr(xml, "callsign").unwrap_or("UNKNOWN");
+        let cancel = extract_attr(xml, "cancel").map(|c| c == "true").unwrap_or(false);
+        let etype_s = extract_attr(xml, "type").unwrap_or("911 Alert");
+        let desc = extract_tag_content(xml, "emergency").map(|s| s.to_string());
+        Ok(Self {
+            uid: uid.to_string(),
+            callsign: callsign.to_string(),
+            emergency_type: EmergencyType::from_str(etype_s),
+            severity: if cancel { EmergencySeverity::Low } else { EmergencySeverity::Critical },
+            cancel,
+            lat_deg: lat,
+            lon_deg: lon,
+            hae_m: extract_attr(xml, "hae").and_then(|s| s.parse().ok()).unwrap_or(0.0),
+            ce_m: extract_attr(xml, "ce").and_then(|s| s.parse().ok()).unwrap_or(10.0),
+            le_m: extract_attr(xml, "le").and_then(|s| s.parse().ok()).unwrap_or(10.0),
+            time_ms: 0,
+            stale_sec: 120,
+            details: desc,
+        })
+    }
+}
