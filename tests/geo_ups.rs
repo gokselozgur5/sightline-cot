@@ -46,3 +46,13 @@ fn test_ups_validation_and_errors() {
     assert_eq!(wgs84_to_ups(f64::NAN, 0.0), Err(UpsError::NonFinite));
     assert_eq!(ups_to_wgs84(UpsCoord::new(f64::NAN, 0.0, UpsHemisphere::North)), Err(UpsError::NonFinite));
 }
+
+
+#[test]
+fn test_ups_root_exports() {
+    use sightline_cot::{wgs84_to_ups, ups_to_wgs84, UpsCoord, UpsHemisphere};
+    let ups = wgs84_to_ups(89.0, 10.0).unwrap();
+    let (lat, lon) = ups_to_wgs84(ups).unwrap();
+    assert!((lat - 89.0).abs() < 1e-5);
+    assert!((lon - 10.0).abs() < 1e-5);
+}
