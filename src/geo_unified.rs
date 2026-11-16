@@ -53,3 +53,31 @@ impl UnifiedCoord {
         }
     }
 }
+
+impl UnifiedCoord {
+    /// Return the active grid system.
+    pub fn grid_system(&self) -> GridSystem {
+        match self {
+            Self::Utm(_) => GridSystem::Utm,
+            Self::Ups(_) => GridSystem::Ups,
+        }
+    }
+
+    /// Return UTM zone or None for UPS.
+    pub fn zone(&self) -> Option<u8> {
+        match self {
+            Self::Utm(c) => Some(c.zone),
+            Self::Ups(_) => None,
+        }
+    }
+
+    /// Return true if coordinate is UTM.
+    pub fn is_utm(&self) -> bool {
+        matches!(self, Self::Utm(_))
+    }
+
+    /// Return true if coordinate is UPS.
+    pub fn is_ups(&self) -> bool {
+        matches!(self, Self::Ups(_))
+    }
+}
