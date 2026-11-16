@@ -22,3 +22,21 @@ fn test_cot_task_full_workflow() {
     let p3 = TaskPoint::new(3, "EXIT", 36.2, -115.0)
         .unwrap()
         .with_action(TaskAction::Egress);
+    task.add_point(p1);
+    task.add_point(p2);
+    task.add_point(p3);
+
+    assert_eq!(task.point_count(), 3);
+    assert!(task.total_distance_m() > 0.0);
+
+    let cot_event = task
+        .to_cot_event_xml("route-123", "EAGLE-LEAD", 1700000000000, 1700000600000)
+        .expect("to_cot_event_xml should succeed");
+    assert!(cot_event.contains(r#"uid="route-123""#));
+    assert!(cot_event.contains(r#"contact callsign="EAGLE-LEAD""#));
+
+    let parsed = TacticalTask::from_cot_event_xml(&cot_event).expect("parsing cot event should succeed");
+    assert_eq!(parsed.name, "PATROL-GRID");
+    assert_eq!(parsed.points.len(), 3);
+    assert_eq!(parsed.points[1].action, TaskAction::Orbit);
+}
