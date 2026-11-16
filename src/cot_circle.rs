@@ -264,3 +264,15 @@ impl CotCircle {
         Ok(circle)
     }
 }
+
+/// Concentric range rings sharing a common center coordinate.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CotRangeRings {
+    pub center_lat: f64,
+    pub center_lon: f64,
+    pub hae: Option<f64>,
+    pub radii_m: Vec<f64>,
+    pub stroke_color: Option<i32>,
+    pub stroke_weight: Option<f64>,
+    pub callsign_prefix: Option<String>,
+}
