@@ -325,3 +325,14 @@ impl TacticalTask {
         let n = self.points.len() as f64;
         Ok([sum_lat / n, sum_lon / n])
     }
+
+    pub fn total_distance_m(&self) -> f64 {
+        if self.points.len() < 2 {
+            return 0.0;
+        }
+        let mut total = 0.0;
+        for w in self.points.windows(2) {
+            total += haversine_dist_m(w[0].lat, w[0].lon, w[1].lat, w[1].lon);
+        }
+        total
+    }
