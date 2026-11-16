@@ -117,3 +117,29 @@ impl GreatCirclePath {
         })
     }
 }
+
+impl GreatCirclePath {
+    /// Return total distance in meters.
+    #[inline]
+    pub fn total_distance_m(&self) -> f64 {
+        self.total_length
+    }
+
+    /// Return slice of waypoints.
+    #[inline]
+    pub fn waypoints(&self) -> &[Waypoint] {
+        &self.waypoints
+    }
+
+    /// Return number of waypoints.
+    #[inline]
+    pub fn waypoint_count(&self) -> usize {
+        self.waypoints.len()
+    }
+
+    /// Return number of segments.
+    #[inline]
+    pub fn segment_count(&self) -> usize {
+        self.segment_lengths.len()
+    }
+}
