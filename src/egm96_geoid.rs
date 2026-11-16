@@ -155,3 +155,22 @@ impl Egm96Geoid {
         Ok((1.0 - t) * top + t * bottom)
     }
 }
+
+impl Egm96Geoid {
+    /// Alias for undulation: geoid height N in meters.
+    #[inline]
+    pub fn geoid_height(&self, lat_deg: f64, lon_deg: f64) -> Result<f64, Egm96Error> {
+        self.undulation(lat_deg, lon_deg)
+    }
+
+    /// Convert ellipsoidal height (HAE) to orthometric height (MSL): H = h - N.
+    pub fn ellipsoidal_to_orthometric(
+        &self,
+        lat_deg: f64,
+        lon_deg: f64,
+        hae_m: f64,
+    ) -> Result<f64, Egm96Error> {
+        let n = self.undulation(lat_deg, lon_deg)?;
+        Ok(hae_m - n)
+    }
+}
