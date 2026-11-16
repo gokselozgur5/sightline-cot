@@ -23,3 +23,15 @@ impl core::fmt::Display for GeodesicAreaError {
 }
 
 impl std::error::Error for GeodesicAreaError {}
+
+/// WGS84 semi-major axis in meters.
+pub const WGS84_A_M: f64 = 6_378_137.0;
+
+/// WGS84 flattening.
+pub const WGS84_F: f64 = 1.0 / 298.257_223_563;
+
+/// WGS84 first eccentricity squared (e^2 = 2f - f^2).
+pub const WGS84_E2: f64 = 0.006_694_379_990_141_316_5;
+
+/// WGS84 authalic sphere radius in meters (R_q = sqrt(A / 4pi)).
+pub const WGS84_AUTHALIC_RADIUS_M: f64 = 6_371_007.180_918_474;
