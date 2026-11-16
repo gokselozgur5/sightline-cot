@@ -92,3 +92,15 @@ fn ups_eccentricity() -> (f64, f64) {
     let e2 = WGS84_F * (2.0 - WGS84_F);
     (e2, e2.sqrt())
 }
+
+/// Return true if the latitude falls in polar UPS coverage.
+#[inline]
+pub fn is_polar_latitude(lat_deg: f64) -> bool {
+    lat_deg > 84.0 || lat_deg < -80.0
+}
+
+/// Return true if the latitude falls in standard UTM coverage.
+#[inline]
+pub fn is_utm_latitude(lat_deg: f64) -> bool {
+    (-80.0..=84.0).contains(&lat_deg)
+}
