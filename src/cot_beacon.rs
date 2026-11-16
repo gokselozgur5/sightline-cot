@@ -105,3 +105,13 @@ pub struct EmergencyBeacon {
     pub stale_sec: i64,
     pub details: Option<String>,
 }
+
+fn validate_coords(lat: f64, lon: f64) -> Result<(), CotBeaconError> {
+    if !lat.is_finite() || !(-90.0..=90.0).contains(&lat) {
+        return Err(CotBeaconError::InvalidCoordinate("latitude in [-90, 90]"));
+    }
+    if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
+        return Err(CotBeaconError::InvalidCoordinate("longitude in [-180, 180]"));
+    }
+    Ok(())
+}
