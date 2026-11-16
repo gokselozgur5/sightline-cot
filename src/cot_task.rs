@@ -266,3 +266,23 @@ impl TaskPoint {
         Ok(pt)
     }
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TacticalTask {
+    pub name: String,
+    pub task_type: String,
+    pub priority: TaskPriority,
+    pub status: TaskStatus,
+    pub points: Vec<TaskPoint>,
+}
+
+impl TacticalTask {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            task_type: "route".to_string(),
+            priority: TaskPriority::default(),
+            status: TaskStatus::default(),
+            points: Vec::new(),
+        }
+    }
