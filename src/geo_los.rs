@@ -164,3 +164,15 @@ mod tests {
         let geom_e = compute_geo_los(&obs, &east_target).unwrap();
         assert!((geom_e.azimuth_deg() - 90.0).abs() < 1e-2);
     }
+
+    #[test]
+    fn test_horizon_distance_and_visibility() {
+        let d = horizon_distance_m(100.0, 0.0).unwrap();
+        let expected = (2.0 * WGS84_MEAN_RADIUS_M * 100.0 + 10000.0).sqrt();
+        assert!((d - expected).abs() < 1.0);
+
+        let obs = GeoPoint3D::new(0.0, 0.0, 10.0).unwrap();
+        let close_target = GeoPoint3D::new(0.01, 0.0, 10.0).unwrap();
+        assert!(has_line_of_sight(&obs, &close_target).unwrap());
+    }
+}
