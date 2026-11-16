@@ -38,3 +38,19 @@ fn test_circle_to_polygon_vertices() {
         assert!((dist - 500.0).abs() < 1.0);
     }
 }
+
+#[test]
+fn test_circle_xml_roundtrip() {
+    let circle = CotCircle::new(37.7749, -122.4194, 750.0).expect("valid circle")
+        .with_callsign("PERIMETER_1")
+        .with_stroke_color(-65536)
+        .with_stroke_weight(2.5).expect("weight")
+        .with_remarks("Test Circle");
+    let xml = circle.to_cot_event_xml("UID-C1", 1700000000000, 1700000060000);
+    assert!(xml.contains("major=\"750.00\""));
+    assert!(xml.contains("minor=\"750.00\""));
+    let parsed = CotCircle::parse(&xml).expect("parse xml");
+    assert_eq!(parsed.radius_m, 750.0);
+    assert_eq!(parsed.callsign.as_deref(), Some("PERIMETER_1"));
+    assert_eq!(parsed.stroke_color, Some(-65536));
+}
