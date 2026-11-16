@@ -359,7 +359,11 @@ impl MilStdSymbol {
         s.push_str("10");
         s.push_str(self.affiliation.to_2525d_code());
         s.push_str(self.dimension.to_2525d_code());
-        s.push(if self.status == MilStdStatus::Present { '0' } else { '1' });
+        s.push(if self.status == MilStdStatus::Present {
+            '0'
+        } else {
+            '1'
+        });
         s.push('0');
         s.push_str(self.echelon.to_2525d_code());
         s.push_str("0000000000");
