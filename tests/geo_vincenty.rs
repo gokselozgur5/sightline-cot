@@ -128,8 +128,14 @@ fn test_crate_root_reexports() {
     use sightline_cot::{
         vincenty_direct, vincenty_direct_ellipsoid, vincenty_geodesic_path,
         vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid,
-        VincentyDirect, VincentyError, VincentyInverse,
+        Ellipsoid, VincentyDirect, VincentyError, VincentyInverse,
     };
     let inv: Result<VincentyInverse, VincentyError> = vincenty_inverse(0.0, 0.0, 1.0, 1.0);
     assert!(inv.unwrap().distance_m > 0.0);
+    let dir: Result<VincentyDirect, VincentyError> = vincenty_direct(0.0, 0.0, 90.0, 1000.0);
+    assert!(dir.unwrap().lon_deg > 0.0);
+    let _ = vincenty_inverse_ellipsoid(0.0, 0.0, 1.0, 1.0, &Ellipsoid::WGS84);
+    let _ = vincenty_direct_ellipsoid(0.0, 0.0, 90.0, 1000.0, &Ellipsoid::WGS84);
+    let _ = vincenty_intermediate_points(0.0, 0.0, 1.0, 1.0, 1);
+    let _ = vincenty_geodesic_path(0.0, 0.0, 1.0, 1.0, 50000.0);
 }
