@@ -26,3 +26,15 @@ fn test_circle_geometry_and_containment() {
     assert!(circle.contains_point(0.0, 0.005).unwrap());
     assert!(!circle.contains_point(0.0, 0.05).unwrap());
 }
+
+#[test]
+fn test_circle_to_polygon_vertices() {
+    let circle = CotCircle::new(45.0, 10.0, 500.0).expect("valid circle");
+    assert!(circle.to_polygon_vertices(2).is_err());
+    let vertices = circle.to_polygon_vertices(8).expect("8 vertices");
+    assert_eq!(vertices.len(), 8);
+    for pt in vertices {
+        let dist = sightline_cot::geo_haversine::haversine_distance_m([45.0, 10.0], pt);
+        assert!((dist - 500.0).abs() < 1.0);
+    }
+}
