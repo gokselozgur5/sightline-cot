@@ -274,3 +274,12 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
     let end = xml[content_start..].find(&close)? + content_start;
     Some(&xml[content_start..end])
 }
+
+fn parse_point_coords(xml: &str) -> Result<(f64, f64), CotBeaconError> {
+    let lat_s = extract_attr(xml, "lat").ok_or(CotBeaconError::MissingField("lat"))?;
+    let lon_s = extract_attr(xml, "lon").ok_or(CotBeaconError::MissingField("lon"))?;
+    let lat: f64 = lat_s.parse().map_err(|_| CotBeaconError::InvalidCoordinate("lat"))?;
+    let lon: f64 = lon_s.parse().map_err(|_| CotBeaconError::InvalidCoordinate("lon"))?;
+    validate_coords(lat, lon)?;
+    Ok((lat, lon))
+}
