@@ -497,3 +497,19 @@ mod tests {
         assert_eq!(parsed.points.len(), 2);
         assert_eq!(parsed.points[1].action, TaskAction::Target);
     }
+
+    #[test]
+    fn test_tactical_task_cot_event_xml() {
+        let mut task = TacticalTask::new("RECON-1");
+        task.add_point(TaskPoint::new(1, "WP1", 10.0, 20.0).unwrap());
+        task.add_point(TaskPoint::new(2, "WP2", 12.0, 22.0).unwrap());
+
+        let event_xml = task.to_cot_event_xml("task-uid-01", "GHOST-1", 1700000000000, 1700000300000).unwrap();
+        assert!(event_xml.contains("type=\"b-m-r\""));
+        assert!(event_xml.contains("uid=\"task-uid-01\""));
+        assert!(event_xml.contains("contact callsign=\"GHOST-1\""));
+
+        let parsed = TacticalTask::from_cot_event_xml(&event_xml).unwrap();
+        assert_eq!(parsed.name, "RECON-1");
+        assert_eq!(parsed.point_count(), 2);
+    }
