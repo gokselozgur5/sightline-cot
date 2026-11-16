@@ -14,3 +14,15 @@ fn test_circle_creation_and_error_validation() {
     assert!(matches!(circle.clone().with_stroke_weight(0.0), Err(CotCircleError::InvalidParameter(_))));
     assert!(matches!(circle.with_hae(f64::NAN), Err(CotCircleError::InvalidParameter(_))));
 }
+
+#[test]
+fn test_circle_geometry_and_containment() {
+    let circle = CotCircle::new(0.0, 0.0, 1000.0).expect("valid circle");
+    let expected_area = std::f64::consts::PI * 1_000_000.0;
+    assert!((circle.area_m2() - expected_area).abs() < 1e-6);
+    let expected_circ = 2.0 * std::f64::consts::PI * 1000.0;
+    assert!((circle.circumference_m() - expected_circ).abs() < 1e-6);
+
+    assert!(circle.contains_point(0.0, 0.005).unwrap());
+    assert!(!circle.contains_point(0.0, 0.05).unwrap());
+}
