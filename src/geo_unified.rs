@@ -281,4 +281,19 @@ mod tests {
         assert!((lat - lat_out).abs() < 1e-6);
         assert!((lon - lon_out).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_unified_coord_dispatch() {
+        let utm_pt = wgs84_to_unified(45.0, 9.0).expect("utm unified");
+        assert!(utm_pt.is_utm());
+        let (lat1, lon1) = unified_to_wgs84(&utm_pt).expect("unproject utm");
+        assert!((lat1 - 45.0).abs() < 1e-5);
+        assert!((lon1 - 9.0).abs() < 1e-5);
+
+        let ups_pt = wgs84_to_unified(87.0, 15.0).expect("ups unified");
+        assert!(ups_pt.is_ups());
+        let (lat2, lon2) = unified_to_wgs84(&ups_pt).expect("unproject ups");
+        assert!((lat2 - 87.0).abs() < 1e-6);
+        assert!((lon2 - 15.0).abs() < 1e-6);
+    }
 }
