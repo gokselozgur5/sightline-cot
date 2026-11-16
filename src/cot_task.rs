@@ -134,3 +134,16 @@ impl TaskStatus {
         }
     }
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TaskPoint {
+    pub order: u32,
+    pub name: String,
+    pub lat: f64,
+    pub lon: f64,
+    pub hae: Option<f64>,
+    pub action: TaskAction,
+    pub speed_mps: Option<f64>,
+    pub eta_ms: Option<i64>,
+    pub remarks: Option<String>,
+}
