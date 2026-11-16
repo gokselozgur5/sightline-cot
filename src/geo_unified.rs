@@ -1,6 +1,6 @@
 //! Unified UTM / UPS coordinate transformations.
 
-use crate::mgrs::{GridError, UtmCoord};
+use crate::mgrs::{utm_to_wgs84, wgs84_to_utm, GridError, UtmCoord};
 
 /// Active grid coordinate system.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -204,4 +204,19 @@ pub fn ups_to_wgs84(coord: &UpsCoord) -> Result<(f64, f64), GridError> {
         return Err(GridError::InvalidLatitude);
     }
     Ok((lat, lon))
+}
+
+/// Transform WGS84 geographic coordinate to unified UTM/UPS representation.
+pub fn wgs84_to_unified(lat_deg: f64, lon_deg: f64) -> Result<UnifiedCoord, GridError> {
+    if !(-90.0..=90.0).contains(&lat_deg) {
+        return Err(GridError::InvalidLatitude);
+    }
+    if !(-180.0..=180.0).contains(&lon_deg) {
+        return Err(GridError::InvalidLongitude);
+    }
+    if is_polar_latitude(lat_deg) {
+        wgs84_to_ups(lat_deg, lon_deg).map(UnifiedCoord::Ups)
+    } else {
+        wgs84_to_utm(lat_deg, lon_deg).map(UnifiedCoord::Utm)
+    }
 }
