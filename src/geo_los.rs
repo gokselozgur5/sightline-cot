@@ -151,3 +151,16 @@ mod tests {
         assert!((geom.elevation_angle_deg() - 90.0).abs() < 1e-3);
         assert!(geom.is_direct_los);
     }
+
+    #[test]
+    fn test_cardinal_azimuth_and_range() {
+        let obs = GeoPoint3D::new(0.0, 0.0, 0.0).unwrap();
+        let north_target = GeoPoint3D::new(0.01, 0.0, 0.0).unwrap();
+        let geom_n = compute_geo_los(&obs, &north_target).unwrap();
+        assert!(geom_n.azimuth_deg().abs() < 1e-2);
+        assert!(geom_n.elevation_angle_deg() < 0.0);
+
+        let east_target = GeoPoint3D::new(0.0, 0.01, 0.0).unwrap();
+        let geom_e = compute_geo_los(&obs, &east_target).unwrap();
+        assert!((geom_e.azimuth_deg() - 90.0).abs() < 1e-2);
+    }
