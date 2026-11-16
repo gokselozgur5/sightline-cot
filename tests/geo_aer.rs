@@ -37,3 +37,9 @@ fn test_integration_aer_errors_and_zero_range() {
     let sez = sightline_cot::enu_to_sez(enu);
     assert_eq!(sightline_cot::sez_to_enu(sez), enu);
 }
+
+#[test]
+fn test_integration_sez_coord() {
+    let sez = SezCoord::new(-10.0, 20.0, 30.0).unwrap();
+    assert_eq!(sez.to_array(), [-10.0, 20.0, 30.0]);
+}
