@@ -61,3 +61,26 @@ impl CotCircle {
         })
     }
 }
+
+impl CotCircle {
+    /// Set height above ellipsoid in meters.
+    pub fn with_hae(mut self, hae: f64) -> Result<Self, CotCircleError> {
+        if !hae.is_finite() {
+            return Err(CotCircleError::InvalidParameter("hae must be finite"));
+        }
+        self.hae = Some(hae);
+        Ok(self)
+    }
+
+    /// Set line/stroke color (signed 32-bit ARGB integer).
+    pub fn with_stroke_color(mut self, color: i32) -> Self {
+        self.stroke_color = Some(color);
+        self
+    }
+
+    /// Set interior fill color (signed 32-bit ARGB integer).
+    pub fn with_fill_color(mut self, color: i32) -> Self {
+        self.fill_color = Some(color);
+        self
+    }
+}
