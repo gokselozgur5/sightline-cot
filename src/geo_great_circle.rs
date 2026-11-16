@@ -188,3 +188,29 @@ impl GreatCirclePath {
         self.interpolate_at_distance(fraction * self.total_length)
     }
 }
+
+fn segment_bearing_deg(w1: &Waypoint, w2: &Waypoint) -> f64 {
+    let (phi1, phi2) = (w1.lat.to_radians(), w2.lat.to_radians());
+    let delta_lam = (w2.lon - w1.lon).to_radians();
+    let y = delta_lam.sin() * phi2.cos();
+    let x = phi1.cos() * phi2.sin() - phi1.sin() * phi2.cos() * delta_lam.cos();
+    (y.atan2(x).to_degrees() + 360.0).rem_euclid(360.0)
+}
+
+impl GreatCirclePath {
+    /// Return instantaneous great-circle bearing in degrees [0, 360) at distance_m.
+    pub fn bearing_at_distance(&self, distance_m: f64) -> Result<f64, GreatCircleError> {
+        if !distance_m.is_finite() || distance_m < 0.0 || distance_m > self.total_length {
+            return Err(GreatCircleError::InvalidDistance);
+        }
+        let (idx, _) = self.locate_segment(distance_m);
+        let current_pt = self.interpolate_at_distance(distance_m)?;
+        let target_pt = &self.waypoints[idx + 1];
+        if (current_pt.lat - target_pt.lat).abs() < 1e-9 && (current_pt.lon - target_pt.lon).abs() < 1e-9 {
+            if idx + 2 < self.waypoints.len() {
+                return Ok(segment_bearing_deg(&current_pt, &self.waypoints[idx + 2]));
+            }
+        }
+        Ok(segment_bearing_deg(&current_pt, target_pt))
+    }
+}
