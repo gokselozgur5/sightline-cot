@@ -17,3 +17,23 @@ fn test_integration_aer_cardinal_and_zenith() {
     assert!((aer_back.elevation_deg - 90.0).abs() < 1e-4);
     assert!((aer_back.range_m - 1000.0).abs() < 1e-2);
 }
+
+#[test]
+fn test_integration_aer_errors_and_zero_range() {
+    let obs_lat = 45.0;
+    let obs_lon = 9.0;
+    let obs_hae = 100.0;
+
+    let res = geodetic_to_aer(95.0, 9.0, 100.0, obs_lat, obs_lon, obs_hae);
+    assert!(res.is_err());
+
+    let res_obs = geodetic_to_aer(45.0, 9.0, 100.0, -95.0, obs_lon, obs_hae);
+    assert!(res_obs.is_err());
+
+    let zero_aer = geodetic_to_aer(obs_lat, obs_lon, obs_hae, obs_lat, obs_lon, obs_hae).unwrap();
+    assert!(zero_aer.range_m < 1e-6);
+
+    let enu = [5.0, -12.0, 100.0];
+    let sez = sightline_cot::enu_to_sez(enu);
+    assert_eq!(sightline_cot::sez_to_enu(sez), enu);
+}
