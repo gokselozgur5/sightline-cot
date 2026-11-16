@@ -266,4 +266,22 @@ mod tests {
             Err(GeodesicAreaError::LongitudeOutOfRange)
         );
     }
+
+    #[test]
+    fn test_insufficient_vertices() {
+        let empty: &[[f64; 2]] = &[];
+        assert_eq!(
+            geodesic_polygon_area(empty),
+            Err(GeodesicAreaError::InsufficientVertices)
+        );
+        let pair = [[0.0, 0.0], [1.0, 1.0]];
+        assert_eq!(
+            geodesic_polygon_area(&pair),
+            Err(GeodesicAreaError::InsufficientVertices)
+        );
+        assert_eq!(
+            polygon_geodesic_perimeter(&pair),
+            Err(GeodesicAreaError::InsufficientVertices)
+        );
+    }
 }
