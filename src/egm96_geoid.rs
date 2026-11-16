@@ -259,3 +259,14 @@ mod tests {
         assert_eq!(grid.undulation(95.0, 0.0), Err(Egm96Error::LatitudeOutOfRange(95.0)));
         assert_eq!(grid.undulation(f64::NAN, 0.0), Err(Egm96Error::NonFiniteCoordinate));
     }
+
+    #[test]
+    fn test_exact_node_undulation() {
+        let grid = Egm96Geoid::coarse_reference_grid();
+        let n_south_pole = grid.undulation(-90.0, 0.0).unwrap();
+        assert!((n_south_pole - (-30.0)).abs() < 1e-6);
+        let n_north_pole = grid.undulation(90.0, 180.0).unwrap();
+        assert!((n_north_pole - 14.0).abs() < 1e-6);
+        let n_ind_ocean = grid.undulation(0.0, 90.0).unwrap();
+        assert!((n_ind_ocean - (-106.0)).abs() < 1e-6);
+    }
