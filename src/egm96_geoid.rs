@@ -224,3 +224,12 @@ impl Egm96Geoid {
         }
     }
 }
+
+/// Interpolate EGM96 geoid undulation from a given geoid grid.
+pub fn sample_egm96_undulation(
+    geoid: &Egm96Geoid,
+    lat_deg: f64,
+    lon_deg: f64,
+) -> Result<f64, Egm96Error> {
+    geoid.undulation(lat_deg, lon_deg)
+}
