@@ -259,4 +259,15 @@ mod tests {
         assert!(u.is_ups());
         assert!(!u.is_utm());
     }
+
+    #[test]
+    fn test_ups_north_roundtrip() {
+        let lat = 88.5;
+        let lon = 45.0;
+        let ups = wgs84_to_ups(lat, lon).expect("ups north");
+        assert_eq!(ups.hemisphere, 'N');
+        let (lat_out, lon_out) = ups_to_wgs84(&ups).expect("unproject");
+        assert!((lat - lat_out).abs() < 1e-6);
+        assert!((lon - lon_out).abs() < 1e-6);
+    }
 }
