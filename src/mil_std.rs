@@ -248,3 +248,14 @@ impl MilStdEchelon {
         }
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MilStdSymbol {
+    pub affiliation: MilStdAffiliation,
+    pub dimension: MilStdDimension,
+    pub status: MilStdStatus,
+    pub echelon: MilStdEchelon,
+    pub function_id: [char; 6],
+    pub country_code: [char; 2],
+    pub modifier: [char; 2],
+}
