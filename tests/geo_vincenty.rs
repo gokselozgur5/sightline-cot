@@ -107,3 +107,18 @@ fn test_vincenty_intermediate_points() {
         assert!(*lon > 0.0 && *lon < 10.0);
     }
 }
+
+#[test]
+fn test_vincenty_geodesic_path() {
+    use sightline_cot::geo_vincenty::vincenty_geodesic_path;
+    let lat1 = 10.0;
+    let lon1 = 20.0;
+    let lat2 = 10.0;
+    let lon2 = 21.0;
+    let path = vincenty_geodesic_path(lat1, lon1, lat2, lon2, 25000.0).unwrap();
+    assert!(path.len() >= 4);
+    assert!((path.first().unwrap().0 - lat1).abs() < 1e-6);
+    assert!((path.first().unwrap().1 - lon1).abs() < 1e-6);
+    assert!((path.last().unwrap().0 - lat2).abs() < 1e-6);
+    assert!((path.last().unwrap().1 - lon2).abs() < 1e-6);
+}
