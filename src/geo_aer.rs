@@ -240,4 +240,14 @@ mod tests {
         assert_eq!(AerCoord::new(0.0, 95.0, 10.0), Err(AerError::ElevationOutOfRange));
         assert_eq!(AerCoord::new(0.0, 0.0, -1.0), Err(AerError::NegativeRange));
     }
+    #[test]
+    fn test_sez_enu_conversions() {
+        let enu = [10.0, 20.0, 30.0];
+        let sez = enu_to_sez(enu);
+        assert_eq!(sez.south_m, -20.0);
+        assert_eq!(sez.east_m, 10.0);
+        assert_eq!(sez.zenith_m, 30.0);
+        let back_enu = sez_to_enu(sez);
+        assert_eq!(back_enu, enu);
+    }
 }
