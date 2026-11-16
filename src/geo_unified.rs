@@ -104,3 +104,15 @@ pub fn is_polar_latitude(lat_deg: f64) -> bool {
 pub fn is_utm_latitude(lat_deg: f64) -> bool {
     (-80.0..=84.0).contains(&lat_deg)
 }
+
+fn ups_c0(e: f64) -> f64 {
+    let term1 = (1.0 + e).powf(1.0 + e);
+    let term2 = (1.0 - e).powf(1.0 - e);
+    2.0 * WGS84_A * UPS_K0 / (term1 * term2).sqrt()
+}
+
+fn ups_t(phi: f64, e: f64) -> f64 {
+    let con = e * phi.sin();
+    let ep = ((1.0 + con) / (1.0 - con)).powf(e / 2.0);
+    (std::f64::consts::FRAC_PI_4 - phi / 2.0).tan() * ep
+}
