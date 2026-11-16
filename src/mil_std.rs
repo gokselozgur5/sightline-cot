@@ -366,3 +366,22 @@ impl MilStdSymbol {
         s
     }
 }
+
+impl MilStdSymbol {
+    pub fn to_cot_type(&self) -> String {
+        let aff = match self.affiliation {
+            MilStdAffiliation::Friend | MilStdAffiliation::AssumedFriend => "f",
+            MilStdAffiliation::Hostile | MilStdAffiliation::Joker | MilStdAffiliation::Faker => "h",
+            MilStdAffiliation::Neutral => "n",
+            _ => "u",
+        };
+        let dim = match self.dimension {
+            MilStdDimension::Air => "A",
+            MilStdDimension::Surface => "S",
+            MilStdDimension::Subsurface => "U",
+            MilStdDimension::Space => "P",
+            _ => "G",
+        };
+        format!("a-{aff}-{dim}")
+    }
+}
