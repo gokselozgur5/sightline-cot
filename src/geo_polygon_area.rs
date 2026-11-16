@@ -100,3 +100,27 @@ pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaE
     let r = WGS84_AUTHALIC_RADIUS_M;
     Ok((0.5 * r * r * sum).abs())
 }
+
+/// Comprehensive geometry metrics for a polygonal CoT zone.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct GeodesicPolygonArea {
+    pub area_m2: f64,
+    pub perimeter_m: f64,
+}
+
+impl GeodesicPolygonArea {
+    /// Area in square kilometers.
+    pub fn area_km2(&self) -> f64 {
+        self.area_m2 / 1_000_000.0
+    }
+
+    /// Area in hectares (1 ha = 10,000 m^2).
+    pub fn area_hectares(&self) -> f64 {
+        self.area_m2 / 10_000.0
+    }
+
+    /// Area in acres (1 acre = 4046.8564224 m^2).
+    pub fn area_acres(&self) -> f64 {
+        self.area_m2 / 4_046.856_422_4
+    }
+}
