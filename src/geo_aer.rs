@@ -151,3 +151,26 @@ pub fn ecef_to_sez(
     let zenith = c_lat * c_lon * dx + c_lat * s_lon * dy + s_lat * dz;
     SezCoord::new(south, east, zenith)
 }
+
+/// Convert topocentric SEZ vector to target ECEF position for given observer location.
+pub fn sez_to_ecef(
+    sez: SezCoord,
+    obs_lat_deg: f64,
+    obs_lon_deg: f64,
+    obs_hae_m: f64,
+) -> Result<[f64; 3], AerError> {
+    if !obs_lat_deg.is_finite() || !obs_lon_deg.is_finite() || !obs_hae_m.is_finite() {
+        return Err(AerError::NonFinite);
+    }
+    if !(-90.0..=90.0).contains(&obs_lat_deg) {
+        return Err(AerError::LatitudeOutOfRange);
+    }
+    let obs_ecef = crate::geo_ecef::geodetic_to_ecef(obs_lat_deg, obs_lon_deg, obs_hae_m);
+    let (s_lat, c_lat) = (obs_lat_deg.to_radians().sin(), obs_lat_deg.to_radians().cos());
+    let (s_lon, c_lon) = (obs_lon_deg.to_radians().sin(), obs_lon_deg.to_radians().cos());
+    let (s, e, z) = (sez.south_m, sez.east_m, sez.zenith_m);
+    let dx = s * s_lat * c_lon - e * s_lon + z * c_lat * c_lon;
+    let dy = s * s_lat * s_lon + e * c_lon + z * c_lat * s_lon;
+    let dz = -s * c_lat + z * s_lat;
+    Ok([obs_ecef[0] + dx, obs_ecef[1] + dy, obs_ecef[2] + dz])
+}
