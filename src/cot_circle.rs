@@ -186,3 +186,20 @@ impl CotCircle {
         format!("<detail>{inner}</detail>")
     }
 }
+
+impl CotCircle {
+    /// Render complete standalone CoT 2.0 XML event for this circle.
+    pub fn to_cot_event_xml(&self, uid: &str, time_ms: i64, stale_ms: i64) -> String {
+        let time_str = crate::cot::format_iso8601_utc(time_ms);
+        let stale_str = crate::cot::format_iso8601_utc(stale_ms);
+        let uid_esc = crate::cot::escape_xml_attr(uid);
+        let hae_val = self.hae.unwrap_or(0.0);
+        let detail_xml = self.to_detail_xml();
+        format!(
+            "<event version=\"2.0\" uid=\"{uid_esc}\" type=\"u-d-c-c\" how=\"h-e\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\">\
+<point lat=\"{:.7}\" lon=\"{:.7}\" hae=\"{hae_val:.2}\" ce=\"9999999.00\" le=\"9999999.00\"/>\
+{detail_xml}</event>",
+            self.lat, self.lon
+        )
+    }
+}
