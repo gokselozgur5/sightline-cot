@@ -126,3 +126,29 @@ impl CotShape {
         self.shape_type == CotShapeType::Polygon
     }
 }
+
+impl CotShape {
+    /// Format shape as `<shape><polyline ...>...</polyline></shape>` XML snippet.
+    pub fn to_xml(&self) -> String {
+        let mut attrs = format!("closed=\"{}\"", if self.is_closed() { "true" } else { "false" });
+        if let Some(c) = self.color {
+            attrs.push_str(&format!(" color=\"{c}\""));
+        }
+        if let Some(fc) = self.fill_color {
+            attrs.push_str(&format!(" fillColor=\"{fc}\""));
+        }
+        if let Some(w) = self.stroke_weight {
+            attrs.push_str(&format!(" strokeWeight=\"{w:.2}\""));
+        }
+        let inner: String = self.vertices.iter().map(|v| v.to_xml()).collect();
+        format!("<shape><polyline {attrs}>{inner}</polyline></shape>")
+    }
+
+    /// Calculate centroid of the shape vertices as [lat, lon].
+    pub fn centroid(&self) -> [f64; 2] {
+        let n = self.vertices.len() as f64;
+        let lat = self.vertices.iter().map(|v| v.lat).sum::<f64>() / n;
+        let lon = self.vertices.iter().map(|v| v.lon).sum::<f64>() / n;
+        [lat, lon]
+    }
+}
