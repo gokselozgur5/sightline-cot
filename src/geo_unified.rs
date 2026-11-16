@@ -153,3 +153,13 @@ pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, GridError> {
     };
     Ok(UpsCoord { hemisphere, easting, northing })
 }
+
+fn ups_solve_phi(t: f64, e: f64) -> f64 {
+    let mut phi = std::f64::consts::FRAC_PI_2 - 2.0 * t.atan();
+    for _ in 0..6 {
+        let con = e * phi.sin();
+        let ep = ((1.0 - con) / (1.0 + con)).powf(e / 2.0);
+        phi = std::f64::consts::FRAC_PI_2 - 2.0 * (t * ep).atan();
+    }
+    phi
+}
