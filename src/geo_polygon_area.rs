@@ -247,4 +247,23 @@ mod tests {
         assert_eq!(is_counter_clockwise(&ccw), Ok(true));
         assert_eq!(is_counter_clockwise(&cw), Ok(false));
     }
+
+    #[test]
+    fn test_coordinate_validation_errors() {
+        let nan_poly = [[f64::NAN, 0.0], [1.0, 0.0], [1.0, 1.0]];
+        assert_eq!(
+            geodesic_polygon_area(&nan_poly),
+            Err(GeodesicAreaError::NonFiniteCoordinate)
+        );
+        let lat_oob = [[95.0, 0.0], [1.0, 0.0], [1.0, 1.0]];
+        assert_eq!(
+            geodesic_polygon_area(&lat_oob),
+            Err(GeodesicAreaError::LatitudeOutOfRange)
+        );
+        let lon_oob = [[0.0, 190.0], [1.0, 0.0], [1.0, 1.0]];
+        assert_eq!(
+            geodesic_polygon_area(&lon_oob),
+            Err(GeodesicAreaError::LongitudeOutOfRange)
+        );
+    }
 }
