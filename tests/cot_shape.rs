@@ -43,3 +43,15 @@ fn test_shape_and_vertex_error_validation() {
     let polyline = CotShape::new_polyline(vec![v, v]).unwrap();
     assert!(polyline.with_stroke_weight(-1.0).is_err());
 }
+
+
+#[test]
+fn test_shape_xml_roundtrip_parsing() {
+    let xml = r#"<shape><polyline closed="true" color="-65536" fillColor="1073741824" strokeWeight="3.50"><vertex lat="34.052200" lon="-118.243700"/><vertex lat="34.055000" lon="-118.250000"/><vertex lat="34.045000" lon="-118.250000"/></polyline></shape>"#;
+    let shape = CotShape::parse(xml).expect("parse shape XML");
+    assert!(shape.is_closed());
+    assert_eq!(shape.color, Some(-65536));
+    assert_eq!(shape.fill_color, Some(1073741824));
+    assert_eq!(shape.stroke_weight, Some(3.5));
+    assert_eq!(shape.vertices.len(), 3);
+}
