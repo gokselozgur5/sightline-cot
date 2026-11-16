@@ -25,6 +25,9 @@ pub mod cot_shape;
 pub use cot_shape::{CotShape, CotShapeError, CotShapeType, CotVertex};
 pub mod dem_bilinear;
 pub mod egm96_geoid;
+pub use egm96_geoid::{
+    normalize_lon_180, normalize_lon_360, sample_egm96_undulation, Egm96Error, Egm96Geoid,
+};
 pub mod ffi;
 pub mod geo_helmert;
 pub mod geo_molodensky;
