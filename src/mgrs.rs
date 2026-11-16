@@ -398,6 +398,17 @@ pub fn format_mgrs(
     Ok(s)
 }
 
+/// A 10-figure MGRS grid coordinate (1-meter precision).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Mgrs10Figure {
+    pub zone: u8,
+    pub band: char,
+    pub col: char,
+    pub row: char,
+    pub easting: u32,
+    pub northing: u32,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
