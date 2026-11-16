@@ -27,3 +27,29 @@ pub enum UnifiedCoord {
     /// Universal Polar Stereographic coordinate.
     Ups(UpsCoord),
 }
+
+impl UnifiedCoord {
+    /// Return easting in meters.
+    pub fn easting(&self) -> f64 {
+        match self {
+            Self::Utm(c) => c.easting,
+            Self::Ups(c) => c.easting,
+        }
+    }
+
+    /// Return northing in meters.
+    pub fn northing(&self) -> f64 {
+        match self {
+            Self::Utm(c) => c.northing,
+            Self::Ups(c) => c.northing,
+        }
+    }
+
+    /// Return hemisphere character ('N' or 'S').
+    pub fn hemisphere(&self) -> char {
+        match self {
+            Self::Utm(c) => c.hemisphere,
+            Self::Ups(c) => c.hemisphere,
+        }
+    }
+}
