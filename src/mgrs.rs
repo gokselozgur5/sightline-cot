@@ -482,6 +482,33 @@ pub fn utm_to_mgrs_10figure(utm: &UtmCoord, band: char) -> Result<Mgrs10Figure, 
     })
 }
 
+/// Convert a 10-figure MGRS coordinate back into a UTM coordinate.
+pub fn mgrs_10figure_to_utm(mgrs: &Mgrs10Figure) -> Result<UtmCoord, GridError> {
+    if !(1..=60).contains(&mgrs.zone) {
+        return Err(GridError::InvalidZone);
+    }
+    let (hemi, approx_n) = band_to_approx_northing(mgrs.band)?;
+    let col_e = decode_100k_col(mgrs.zone, mgrs.col)?;
+    let row_n = decode_100k_row(mgrs.zone, mgrs.row)?;
+    let base_n = row_n + mgrs.northing as f64;
+    let mut best_n = base_n;
+    let mut best_diff = (base_n - approx_n).abs();
+    for k in 0..=5 {
+        let cand = k as f64 * 2_000_000.0 + base_n;
+        let diff = (cand - approx_n).abs();
+        if diff < best_diff {
+            best_diff = diff;
+            best_n = cand;
+        }
+    }
+    Ok(UtmCoord {
+        zone: mgrs.zone,
+        hemisphere: hemi,
+        easting: col_e + mgrs.easting as f64,
+        northing: best_n,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
