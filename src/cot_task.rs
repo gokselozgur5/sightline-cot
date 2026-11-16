@@ -301,3 +301,16 @@ impl TacticalTask {
         self.status = status;
         self
     }
+
+    pub fn add_point(&mut self, point: TaskPoint) {
+        self.points.push(point);
+    }
+
+    pub fn with_points(mut self, points: Vec<TaskPoint>) -> Self {
+        self.points = points;
+        self
+    }
+
+    pub fn point_count(&self) -> usize {
+        self.points.len()
+    }
