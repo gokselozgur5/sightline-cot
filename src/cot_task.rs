@@ -211,3 +211,14 @@ impl TaskPoint {
         self.remarks = Some(remarks.into());
         self
     }
+
+    pub fn to_xml(&self) -> String {
+        let name_esc = crate::cot::escape_xml_attr(&self.name);
+        let mut xml = format!(
+            r#"<point order="{}" name="{}" lat="{:.7}" lon="{:.7}""#,
+            self.order, name_esc, self.lat, self.lon
+        );
+        if let Some(h) = self.hae {
+            xml.push_str(&format!(r#" hae="{:.2}""#, h));
+        }
+        xml.push_str(&format!(r#" action="{}""#, self.action.as_str()));
