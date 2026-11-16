@@ -744,4 +744,15 @@ mod tests {
         assert_eq!(utm.easting as u32, 512345);
         assert_eq!(utm.northing as u32, 67890);
     }
+
+    #[test]
+    fn test_mgrs_10figure_wgs84_roundtrip() {
+        let points = [(37.7749, -122.4194), (40.7128, -74.0060), (-33.8688, 151.2093)];
+        for (lat, lon) in points {
+            let fig = Mgrs10Figure::from_lat_lon(lat, lon).unwrap();
+            let (lat_rt, lon_rt) = fig.to_lat_lon().unwrap();
+            assert!((lat - lat_rt).abs() < 1e-4, "lat error at ({lat}, {lon})");
+            assert!((lon - lon_rt).abs() < 1e-4, "lon error at ({lat}, {lon})");
+        }
+    }
 }
