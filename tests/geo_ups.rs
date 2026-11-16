@@ -17,3 +17,12 @@ fn test_north_pole_forward() {
     assert!((ups.easting - 2000000.0).abs() < 1e-4);
     assert!((ups.northing - 2000000.0).abs() < 1e-4);
 }
+
+
+#[test]
+fn test_south_pole_forward() {
+    let ups = wgs84_to_ups(-90.0, 0.0).unwrap();
+    assert_eq!(ups.hemisphere, UpsHemisphere::South);
+    assert!((ups.easting - 2000000.0).abs() < 1e-4);
+    assert!((ups.northing - 2000000.0).abs() < 1e-4);
+}
