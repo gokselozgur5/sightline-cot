@@ -530,6 +530,22 @@ impl Mgrs10Figure {
     pub fn to_utm(&self) -> Result<UtmCoord, GridError> {
         mgrs_10figure_to_utm(self)
     }
+
+    /// Format as compact 15-character MGRS string (e.g. "31NEA1234567890").
+    pub fn format_compact(&self) -> MgrsString {
+        let mut s = MgrsString {
+            bytes: [0u8; 32],
+            len: 0,
+        };
+        append_digits(&mut s.bytes, &mut s.len, self.zone as u32, 2);
+        s.bytes[s.len] = self.band as u8;
+        s.bytes[s.len + 1] = self.col as u8;
+        s.bytes[s.len + 2] = self.row as u8;
+        s.len += 3;
+        append_digits(&mut s.bytes, &mut s.len, self.easting, 5);
+        append_digits(&mut s.bytes, &mut s.len, self.northing, 5);
+        s
+    }
 }
 
 #[cfg(test)]
