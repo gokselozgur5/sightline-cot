@@ -296,3 +296,12 @@ mod tests {
         let roundtrip = grid.orthometric_to_ellipsoidal(lat, lon, h_ortho).unwrap();
         assert!((roundtrip - h_ellips).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_geoid_model_trait_integration() {
+        use crate::geoid::GeoidModel;
+        let grid = Egm96Geoid::coarse_reference_grid();
+        let undulation = grid.undulation(0.0, 90.0);
+        assert_eq!(undulation, Some(-106.0));
+    }
+}
