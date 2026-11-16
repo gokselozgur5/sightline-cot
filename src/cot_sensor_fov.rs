@@ -23,3 +23,12 @@ impl core::fmt::Display for SensorFovError {
 }
 
 impl std::error::Error for SensorFovError {}
+
+/// Spherical cone parameters representing CoT sensor field of view.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SensorCone {
+    pub azimuth_deg: f64,
+    pub elevation_deg: f64,
+    pub fov_deg: f64,
+    pub range_m: f64,
+}
