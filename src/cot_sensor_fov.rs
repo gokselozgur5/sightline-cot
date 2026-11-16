@@ -186,3 +186,31 @@ impl TryFrom<&CotSensor> for SensorCone {
         SensorCone::new(sensor.azimuth_deg, sensor.elevation_deg, sensor.fov_deg, sensor.range_m)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sensor_cone_invalid_parameters() {
+        assert_eq!(
+            SensorCone::new(f64::NAN, 0.0, 30.0, 1000.0),
+            Err(SensorFovError::NonFiniteParameter)
+        );
+        assert_eq!(
+            SensorCone::new(0.0, 0.0, 0.0, 1000.0),
+            Err(SensorFovError::InvalidFovAngle)
+        );
+        assert_eq!(
+            SensorCone::new(0.0, 0.0, 185.0, 1000.0),
+            Err(SensorFovError::InvalidFovAngle)
+        );
+        assert_eq!(
+            SensorCone::new(0.0, 0.0, 45.0, -10.0),
+            Err(SensorFovError::InvalidRange)
+        );
+        assert_eq!(
+            SensorCone::new(0.0, 95.0, 45.0, 1000.0),
+            Err(SensorFovError::InvalidElevation)
+        );
+    }
