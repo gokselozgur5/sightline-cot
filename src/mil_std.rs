@@ -142,3 +142,17 @@ impl MilStdDimension {
         }
     }
 }
+
+impl MilStdDimension {
+    pub fn from_2525d_code(code: &str) -> Result<Self, MilStdError> {
+        match code {
+            "01" => Ok(Self::Air),
+            "05" => Ok(Self::Space),
+            "10" => Ok(Self::Land),
+            "30" => Ok(Self::Surface),
+            "35" => Ok(Self::Subsurface),
+            "40" => Ok(Self::Activity),
+            _ => Err(MilStdError::InvalidDimension),
+        }
+    }
+}
