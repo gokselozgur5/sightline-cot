@@ -111,7 +111,9 @@ fn validate_coords(lat: f64, lon: f64) -> Result<(), CotBeaconError> {
         return Err(CotBeaconError::InvalidCoordinate("latitude in [-90, 90]"));
     }
     if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
-        return Err(CotBeaconError::InvalidCoordinate("longitude in [-180, 180]"));
+        return Err(CotBeaconError::InvalidCoordinate(
+            "longitude in [-180, 180]",
+        ));
     }
     Ok(())
 }
@@ -249,7 +251,10 @@ impl EmergencyBeacon {
         let time_str = format_iso8601(self.time_ms);
         let stale_str = format_iso8601(self.time_ms + self.stale_sec * 1000);
         let cot_type = self.emergency_type.default_cot_type();
-        let desc = self.details.as_deref().unwrap_or(self.emergency_type.as_str());
+        let desc = self
+            .details
+            .as_deref()
+            .unwrap_or(self.emergency_type.as_str());
         format!(
             "<event version=\"2.0\" uid=\"{uid}\" type=\"{cot_type}\" how=\"m-g\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\"><point lat=\"{lat:.7}\" lon=\"{lon:.7}\" hae=\"{hae:.2}\" ce=\"{ce:.2}\" le=\"{le:.2}\"/><detail><contact callsign=\"{callsign}\"/><emergency cancel=\"{cancel}\" type=\"{etype}\">{desc}</emergency></detail></event>",
             uid = escape_xml(&self.uid),
