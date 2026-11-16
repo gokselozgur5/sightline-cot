@@ -58,3 +58,13 @@ impl EmergencyType {
         }
     }
 }
+
+impl EmergencyType {
+    pub fn default_cot_type(&self) -> &'static str {
+        match self {
+            Self::Mayday => "b-a-o-pan",
+            Self::Cancel => "b-a-o-can",
+            _ => "b-a-o-tbl",
+        }
+    }
+}
