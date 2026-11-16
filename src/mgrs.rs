@@ -409,6 +409,22 @@ pub struct Mgrs10Figure {
     pub northing: u32,
 }
 
+fn decode_100k_col(zone: u8, col: char) -> Result<f64, GridError> {
+    const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
+    let c_idx = COLS.iter().position(|&c| c == col as u8).ok_or(GridError::InvalidLongitude)?;
+    let base_idx = [0, 8, 16][((zone.saturating_sub(1)) % 3) as usize];
+    let col_idx = (c_idx + 24 - base_idx) % 24;
+    Ok((col_idx + 1) as f64 * 100_000.0)
+}
+
+fn decode_100k_row(zone: u8, row: char) -> Result<f64, GridError> {
+    const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
+    let r_idx = ROWS.iter().position(|&r| r == row as u8).ok_or(GridError::InvalidLatitude)?;
+    let row_offset = if (zone % 2) == 1 { 0 } else { 5 };
+    let row_idx = (r_idx + 20 - row_offset) % 20;
+    Ok(row_idx as f64 * 100_000.0)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
