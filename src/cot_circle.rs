@@ -84,3 +84,26 @@ impl CotCircle {
         self
     }
 }
+
+impl CotCircle {
+    /// Set stroke line thickness in pixels.
+    pub fn with_stroke_weight(mut self, weight: f64) -> Result<Self, CotCircleError> {
+        if !weight.is_finite() || weight <= 0.0 {
+            return Err(CotCircleError::InvalidParameter("stroke weight must be positive"));
+        }
+        self.stroke_weight = Some(weight);
+        Ok(self)
+    }
+
+    /// Set contact callsign for map label rendering.
+    pub fn with_callsign(mut self, callsign: impl Into<String>) -> Self {
+        self.callsign = Some(callsign.into());
+        self
+    }
+
+    /// Set optional remarks description.
+    pub fn with_remarks(mut self, remarks: impl Into<String>) -> Self {
+        self.remarks = Some(remarks.into());
+        self
+    }
+}
