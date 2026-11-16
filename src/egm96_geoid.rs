@@ -206,3 +206,21 @@ const COARSE_EGM96_NORTH: [f64; 48] = [
     45.0, 30.0, -10.0, -25.0, -15.0, 10.0, 15.0, 5.0, -15.0, -30.0, -10.0, 25.0,
     14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0,
 ];
+
+impl Egm96Geoid {
+    /// Create a coarse 30-degree EGM96 reference model for testing and fallback.
+    pub fn coarse_reference_grid() -> Self {
+        let mut data = Vec::with_capacity(84);
+        data.extend_from_slice(&COARSE_EGM96_SOUTH);
+        data.extend_from_slice(&COARSE_EGM96_NORTH);
+        Self {
+            min_lat_deg: -90.0,
+            max_lat_deg: 90.0,
+            lat_step_deg: 30.0,
+            lon_step_deg: 30.0,
+            cols: 12,
+            rows: 7,
+            undulations: data,
+        }
+    }
+}
