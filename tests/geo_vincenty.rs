@@ -122,3 +122,14 @@ fn test_vincenty_geodesic_path() {
     assert!((path.last().unwrap().0 - lat2).abs() < 1e-6);
     assert!((path.last().unwrap().1 - lon2).abs() < 1e-6);
 }
+
+#[test]
+fn test_crate_root_reexports() {
+    use sightline_cot::{
+        vincenty_direct, vincenty_direct_ellipsoid, vincenty_geodesic_path,
+        vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid,
+        VincentyDirect, VincentyError, VincentyInverse,
+    };
+    let inv: Result<VincentyInverse, VincentyError> = vincenty_inverse(0.0, 0.0, 1.0, 1.0);
+    assert!(inv.unwrap().distance_m > 0.0);
+}
