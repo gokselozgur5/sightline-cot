@@ -463,6 +463,25 @@ pub fn wgs84_to_mgrs_10figure(lat_deg: f64, lon_deg: f64) -> Result<Mgrs10Figure
     })
 }
 
+/// Project a UTM coordinate and latitude band directly to a 10-figure MGRS coordinate.
+pub fn utm_to_mgrs_10figure(utm: &UtmCoord, band: char) -> Result<Mgrs10Figure, GridError> {
+    if !(1..=60).contains(&utm.zone) {
+        return Err(GridError::InvalidZone);
+    }
+    let col = mgrs_100k_col_letter(utm.zone, utm.easting);
+    let row = mgrs_100k_row_letter(utm.zone, utm.northing);
+    let easting = ((utm.easting.rem_euclid(100_000.0)).floor() as u32).min(99_999);
+    let northing = ((utm.northing.rem_euclid(100_000.0)).floor() as u32).min(99_999);
+    Ok(Mgrs10Figure {
+        zone: utm.zone,
+        band,
+        col,
+        row,
+        easting,
+        northing,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
