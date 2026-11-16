@@ -233,3 +233,18 @@ pub fn sample_egm96_undulation(
 ) -> Result<f64, Egm96Error> {
     geoid.undulation(lat_deg, lon_deg)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_lon_360() {
+        assert_eq!(normalize_lon_360(0.0), 0.0);
+        assert_eq!(normalize_lon_360(360.0), 0.0);
+        assert_eq!(normalize_lon_360(-90.0), 270.0);
+        assert_eq!(normalize_lon_360(450.0), 90.0);
+        assert_eq!(normalize_lon_180(0.0), 0.0);
+        assert_eq!(normalize_lon_180(270.0), -90.0);
+        assert_eq!(normalize_lon_180(-180.0), -180.0);
+    }
