@@ -140,3 +140,14 @@ mod tests {
         let p = GeoPoint3D::new(37.5, -122.0, 50.0).unwrap();
         assert_eq!(compute_geo_los(&p, &p), Err(GeoLosError::CoincidentPoints));
     }
+
+    #[test]
+    fn test_vertical_los_elevation() {
+        let obs = GeoPoint3D::new(0.0, 0.0, 100.0).unwrap();
+        let target = GeoPoint3D::new(0.0, 0.0, 1100.0).unwrap();
+        let geom = compute_geo_los(&obs, &target).unwrap();
+        assert!((geom.slant_range_m - 1000.0).abs() < 1e-2);
+        assert!(geom.ground_range_m.abs() < 1e-2);
+        assert!((geom.elevation_angle_deg() - 90.0).abs() < 1e-3);
+        assert!(geom.is_direct_los);
+    }
