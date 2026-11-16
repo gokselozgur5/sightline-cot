@@ -65,3 +65,18 @@ fn from_cartesian(v: [f64; 3]) -> Waypoint {
     let lon = (v[1].atan2(v[0]).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
     Waypoint::new(lat, lon)
 }
+
+fn interpolate_segment(w1: &Waypoint, w2: &Waypoint, f: f64) -> Waypoint {
+    let (v1, v2) = (to_cartesian(w1), to_cartesian(w2));
+    let dot = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]).clamp(-1.0, 1.0);
+    let d = dot.acos();
+    if d < 1e-15 {
+        return *w1;
+    }
+    let (a, b) = (((1.0 - f) * d).sin() / d.sin(), (f * d).sin() / d.sin());
+    from_cartesian([
+        a * v1[0] + b * v2[0],
+        a * v1[1] + b * v2[1],
+        a * v1[2] + b * v2[2],
+    ])
+}
