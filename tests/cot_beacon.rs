@@ -23,3 +23,17 @@ fn test_911_beacon_xml_roundtrip() {
     assert_eq!(parsed.callsign, "MEDEVAC-1");
     assert_eq!(parsed.emergency_type, EmergencyType::Alert911);
 }
+
+#[test]
+fn test_mayday_and_cancel_beacons() {
+    let mayday = EmergencyBeacon::new_mayday("AIR-1", "VIPER-01", 36.1, -115.2)
+        .expect("mayday");
+    let xml = mayday.to_cot_xml();
+    assert!(xml.contains("type=\"b-a-o-pan\""));
+    assert!(xml.contains("Mayday"));
+
+    let cancel = EmergencyBeacon::new_cancel("AIR-1", "VIPER-01", 36.1, -115.2)
+        .expect("cancel");
+    let cancel_xml = cancel.to_cot_xml();
+    assert!(cancel_xml.contains("cancel=\"true\""));
+}
