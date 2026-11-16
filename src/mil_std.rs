@@ -319,3 +319,17 @@ impl MilStdSymbol {
         Ok(sym)
     }
 }
+
+pub fn parse_mil_std(sidc: &str) -> Result<MilStdSymbol, MilStdError> {
+    let trimmed = sidc.trim();
+    if !trimmed.is_ascii() {
+        return Err(MilStdError::InvalidCharacter);
+    }
+    if trimmed.len() == 15 {
+        MilStdSymbol::parse_2525c(trimmed)
+    } else if trimmed.len() >= 20 && trimmed.len() <= 30 {
+        MilStdSymbol::parse_2525d(trimmed)
+    } else {
+        Err(MilStdError::InvalidLength)
+    }
+}
