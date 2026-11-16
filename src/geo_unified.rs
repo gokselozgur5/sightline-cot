@@ -116,3 +116,17 @@ fn ups_t(phi: f64, e: f64) -> f64 {
     let ep = ((1.0 + con) / (1.0 - con)).powf(e / 2.0);
     (std::f64::consts::FRAC_PI_4 - phi / 2.0).tan() * ep
 }
+
+fn ups_project_north(phi: f64, lam: f64, e: f64) -> (f64, f64) {
+    let rho = ups_c0(e) * ups_t(phi, e);
+    let x = UPS_FALSE_ORIGIN + rho * lam.sin();
+    let y = UPS_FALSE_ORIGIN - rho * lam.cos();
+    (x, y)
+}
+
+fn ups_project_south(phi_s: f64, lam: f64, e: f64) -> (f64, f64) {
+    let rho = ups_c0(e) * ups_t(phi_s, e);
+    let x = UPS_FALSE_ORIGIN + rho * lam.sin();
+    let y = UPS_FALSE_ORIGIN + rho * lam.cos();
+    (x, y)
+}
