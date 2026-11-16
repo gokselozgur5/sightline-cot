@@ -42,3 +42,20 @@ pub enum TaskAction {
     Rendezvous,
     Custom(String),
 }
+
+impl TaskAction {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::FlyOver => "flyover",
+            Self::FlyBy => "flyby",
+            Self::Ingress => "ingress",
+            Self::Egress => "egress",
+            Self::Orbit => "orbit",
+            Self::Drop => "drop",
+            Self::Landing => "landing",
+            Self::Target => "target",
+            Self::Checkpoint => "checkpoint",
+            Self::Rendezvous => "rendezvous",
+            Self::Custom(s) => s.as_str(),
+        }
+    }
