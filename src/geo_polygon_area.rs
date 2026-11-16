@@ -229,4 +229,22 @@ mod tests {
         let area = geodesic_polygon_area(&poly).unwrap();
         assert!(area > 2.0e10 && area < 3.0e10);
     }
+
+    #[test]
+    fn test_polygon_winding_order() {
+        let ccw = [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 1.0],
+        ];
+        let cw = [
+            [0.0, 0.0],
+            [0.0, 1.0],
+            [1.0, 1.0],
+            [1.0, 0.0],
+        ];
+        assert_eq!(is_counter_clockwise(&ccw), Ok(true));
+        assert_eq!(is_counter_clockwise(&cw), Ok(false));
+    }
 }
