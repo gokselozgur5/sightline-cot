@@ -92,3 +92,20 @@ pub struct SensorFootprint {
     pub perimeter_points: Vec<[f64; 3]>,
     pub slant_range_boresight_m: f64,
 }
+
+fn compute_basis_axes(b: [f64; 3]) -> ([f64; 3], [f64; 3]) {
+    let arb = if b[0].abs() < 0.9 && b[1].abs() < 0.9 { [1.0, 0.0, 0.0] } else { [0.0, 0.0, 1.0] };
+    let cross1 = [
+        b[1] * arb[2] - b[2] * arb[1],
+        b[2] * arb[0] - b[0] * arb[2],
+        b[0] * arb[1] - b[1] * arb[0],
+    ];
+    let mag1 = (cross1[0] * cross1[0] + cross1[1] * cross1[1] + cross1[2] * cross1[2]).sqrt();
+    let u1 = [cross1[0] / mag1, cross1[1] / mag1, cross1[2] / mag1];
+    let u2 = [
+        b[1] * u1[2] - b[2] * u1[1],
+        b[2] * u1[0] - b[0] * u1[2],
+        b[0] * u1[1] - b[1] * u1[0],
+    ];
+    (u1, u2)
+}
