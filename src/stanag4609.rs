@@ -61,3 +61,15 @@ impl StanagTimestamp {
         (self.micros as f64) / 1_000_000.0
     }
 }
+
+impl StanagTimestamp {
+    /// Create a timestamp from 8 big-endian bytes (MISB ST 0601 wire format).
+    pub const fn from_be_bytes(bytes: [u8; 8]) -> Self {
+        Self::from_micros(u64::from_be_bytes(bytes))
+    }
+
+    /// Serialize timestamp to 8 big-endian bytes.
+    pub const fn to_be_bytes(&self) -> [u8; 8] {
+        self.micros.to_be_bytes()
+    }
+}
