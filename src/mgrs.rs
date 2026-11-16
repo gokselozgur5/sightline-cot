@@ -769,4 +769,18 @@ mod tests {
         assert_eq!(fig.format_compact().as_str(), "31NEA0123405678");
         assert_eq!(fig.format_spaced().as_str(), "31N EA 01234 05678");
     }
+
+    #[test]
+    fn test_mgrs_10figure_parsing() {
+        let parsed = parse_mgrs_10figure("31NEA1234567890").unwrap();
+        assert_eq!(parsed.zone, 31);
+        assert_eq!(parsed.band, 'N');
+        assert_eq!(parsed.col, 'E');
+        assert_eq!(parsed.row, 'A');
+        assert_eq!(parsed.easting, 12345);
+        assert_eq!(parsed.northing, 67890);
+
+        let parsed_sp = Mgrs10Figure::parse("31N EA 12345 67890").unwrap();
+        assert_eq!(parsed, parsed_sp);
+    }
 }
