@@ -53,3 +53,15 @@ fn validate_coord(wp: &Waypoint) -> Result<(), GreatCircleError> {
     }
     Ok(())
 }
+
+fn to_cartesian(wp: &Waypoint) -> [f64; 3] {
+    let (phi, lam) = (wp.lat.to_radians(), wp.lon.to_radians());
+    let c = phi.cos();
+    [c * lam.cos(), c * lam.sin(), phi.sin()]
+}
+
+fn from_cartesian(v: [f64; 3]) -> Waypoint {
+    let lat = v[2].atan2((v[0] * v[0] + v[1] * v[1]).sqrt()).to_degrees();
+    let lon = (v[1].atan2(v[0]).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    Waypoint::new(lat, lon)
+}
