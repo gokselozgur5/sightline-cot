@@ -143,3 +143,29 @@ impl GreatCirclePath {
         self.segment_lengths.len()
     }
 }
+
+impl GreatCirclePath {
+    fn locate_segment(&self, distance_m: f64) -> (usize, f64) {
+        if distance_m <= 0.0 {
+            return (0, 0.0);
+        }
+        if distance_m >= self.total_length {
+            let last_idx = self.segment_lengths.len() - 1;
+            return (last_idx, 1.0);
+        }
+        let mut idx = 0;
+        for i in 0..self.segment_lengths.len() {
+            if distance_m <= self.cumulative_lengths[i + 1] {
+                idx = i;
+                break;
+            }
+        }
+        let seg_len = self.segment_lengths[idx];
+        let frac = if seg_len < 1e-12 {
+            0.0
+        } else {
+            (distance_m - self.cumulative_lengths[idx]) / seg_len
+        };
+        (idx, frac.clamp(0.0, 1.0))
+    }
+}
