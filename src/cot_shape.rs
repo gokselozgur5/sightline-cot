@@ -43,3 +43,23 @@ impl CotVertex {
         Ok(Self { lat, lon, hae: None })
     }
 }
+
+impl CotVertex {
+    /// Create a 3D vertex with height above ellipsoid in meters.
+    pub fn with_hae(lat: f64, lon: f64, hae: f64) -> Result<Self, CotShapeError> {
+        let mut v = Self::new(lat, lon)?;
+        if !hae.is_finite() {
+            return Err(CotShapeError::InvalidParameter("hae must be finite"));
+        }
+        v.hae = Some(hae);
+        Ok(v)
+    }
+
+    /// Format vertex as XML `<vertex .../>` tag.
+    pub fn to_xml(&self) -> String {
+        match self.hae {
+            Some(h) => format!("<vertex lat=\"{:.6}\" lon=\"{:.6}\" hae=\"{:.2}\"/>", self.lat, self.lon, h),
+            None => format!("<vertex lat=\"{:.6}\" lon=\"{:.6}\"/>", self.lat, self.lon),
+        }
+    }
+}
