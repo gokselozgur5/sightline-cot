@@ -296,4 +296,15 @@ mod tests {
         assert!((lat2 - 87.0).abs() < 1e-6);
         assert!((lon2 - 15.0).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_ups_error_cases() {
+        assert_eq!(wgs84_to_ups(95.0, 0.0), Err(GridError::InvalidLatitude));
+        assert_eq!(wgs84_to_ups(50.0, 0.0), Err(GridError::InvalidLatitude));
+        assert_eq!(wgs84_to_ups(88.0, 200.0), Err(GridError::InvalidLongitude));
+        let bad_hemi = UpsCoord { hemisphere: 'X', easting: 2000000.0, northing: 2000000.0 };
+        assert_eq!(ups_to_wgs84(&bad_hemi), Err(GridError::InvalidLatitude));
+        let bad_easting = UpsCoord { hemisphere: 'N', easting: -1.0, northing: 2000000.0 };
+        assert_eq!(ups_to_wgs84(&bad_easting), Err(GridError::InvalidEasting));
+    }
 }
