@@ -130,3 +130,21 @@ fn sample_cone_perimeter_rays(b: [f64; 3], u1: [f64; 3], u2: [f64; 3], half_fov:
         ]
     }).collect()
 }
+
+/// Compute ground plane intersection footprint for sensor cone with `num_points` perimeter samples.
+pub fn compute_ground_footprint(
+    cone: &SensorCone, sensor_alt_m: f64, ground_alt_m: f64, num_points: usize,
+) -> Result<SensorFootprint, SensorFovError> {
+    if !sensor_alt_m.is_finite() || !ground_alt_m.is_finite() || sensor_alt_m <= ground_alt_m {
+        return Err(SensorFovError::NonFiniteParameter);
+    }
+    let dz = ground_alt_m - sensor_alt_m;
+    let b = cone.boresight_vector();
+    let boresight_ground = intersect_ray_ground(b, dz, ground_alt_m)
+        .ok_or(SensorFovError::RayDoesNotIntersectGround)?;
+    let slant_range = (boresight_ground[0].powi(2) + boresight_ground[1].powi(2) + dz.powi(2)).sqrt();
+    let (u1, u2) = compute_basis_axes(b);
+    let rays = sample_cone_perimeter_rays(b, u1, u2, (cone.fov_deg * 0.5).to_radians(), num_points);
+    let perimeter = rays.into_iter().filter_map(|r| intersect_ray_ground(r, dz, ground_alt_m)).collect();
+    Ok(SensorFootprint { boresight_ground, perimeter_points: perimeter, slant_range_boresight_m: slant_range })
+}
