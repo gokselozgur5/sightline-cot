@@ -108,3 +108,8 @@ pub fn slant_range_geodetic(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<f64
 pub fn elevation_angle_rad(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<f64, GeoLosError> {
     compute_geo_los(obs, target).map(|geom| geom.elevation_angle_rad)
 }
+
+/// Determine whether target is within unobstructed geometric line of sight.
+pub fn has_line_of_sight(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<bool, GeoLosError> {
+    compute_geo_los(obs, target).map(|geom| geom.is_direct_los)
+}
