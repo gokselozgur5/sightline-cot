@@ -28,3 +28,18 @@ fn test_polygon_xml_generation_and_closed_flag() {
     assert!(xml.contains("color=\"-16776961\""));
     assert!(xml.contains("fillColor=\"1073741824\""));
 }
+
+
+#[test]
+fn test_shape_and_vertex_error_validation() {
+    assert!(CotVertex::new(95.0, 0.0).is_err());
+    assert!(CotVertex::new(0.0, -190.0).is_err());
+    assert!(CotVertex::new(f64::NAN, 0.0).is_err());
+
+    let v = CotVertex::new(10.0, 20.0).unwrap();
+    assert!(CotShape::new_polyline(vec![v]).is_err());
+    assert!(CotShape::new_polygon(vec![v, v]).is_err());
+
+    let polyline = CotShape::new_polyline(vec![v, v]).unwrap();
+    assert!(polyline.with_stroke_weight(-1.0).is_err());
+}
