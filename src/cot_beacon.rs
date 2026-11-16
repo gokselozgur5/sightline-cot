@@ -88,3 +88,20 @@ impl EmergencySeverity {
         }
     }
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct EmergencyBeacon {
+    pub uid: String,
+    pub callsign: String,
+    pub emergency_type: EmergencyType,
+    pub severity: EmergencySeverity,
+    pub cancel: bool,
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+    pub hae_m: f64,
+    pub ce_m: f64,
+    pub le_m: f64,
+    pub time_ms: i64,
+    pub stale_sec: i64,
+    pub details: Option<String>,
+}
