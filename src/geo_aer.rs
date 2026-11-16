@@ -174,3 +174,25 @@ pub fn sez_to_ecef(
     let dz = -s * c_lat + z * s_lat;
     Ok([obs_ecef[0] + dx, obs_ecef[1] + dy, obs_ecef[2] + dz])
 }
+
+/// Convert target ECEF position directly to topocentric AER coordinates.
+pub fn ecef_to_aer(
+    target_ecef: [f64; 3],
+    obs_lat_deg: f64,
+    obs_lon_deg: f64,
+    obs_hae_m: f64,
+) -> Result<AerCoord, AerError> {
+    let sez = ecef_to_sez(target_ecef, obs_lat_deg, obs_lon_deg, obs_hae_m)?;
+    sez_to_aer(sez)
+}
+
+/// Convert topocentric AER coordinates to target ECEF position.
+pub fn aer_to_ecef(
+    aer: AerCoord,
+    obs_lat_deg: f64,
+    obs_lon_deg: f64,
+    obs_hae_m: f64,
+) -> Result<[f64; 3], AerError> {
+    let sez = aer_to_sez(aer);
+    sez_to_ecef(sez, obs_lat_deg, obs_lon_deg, obs_hae_m)
+}
