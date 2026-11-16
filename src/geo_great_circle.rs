@@ -214,3 +214,23 @@ impl GreatCirclePath {
         Ok(segment_bearing_deg(&current_pt, target_pt))
     }
 }
+
+impl GreatCirclePath {
+    /// Sample waypoints at fixed distance intervals along the path.
+    pub fn interpolate_fixed_step(&self, step_m: f64) -> Result<Vec<Waypoint>, GreatCircleError> {
+        if !step_m.is_finite() || step_m <= 0.0 {
+            return Err(GreatCircleError::InvalidParameter);
+        }
+        let mut result = Vec::new();
+        let mut d = 0.0;
+        while d < self.total_length {
+            result.push(self.interpolate_at_distance(d)?);
+            d += step_m;
+        }
+        let last_wp = *self.waypoints.last().unwrap();
+        if result.is_empty() || result.last() != Some(&last_wp) {
+            result.push(last_wp);
+        }
+        Ok(result)
+    }
+}
