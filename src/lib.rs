@@ -100,8 +100,8 @@ pub use utm_forced::{
 };
 pub mod geo_unified;
 pub use geo_unified::{
-    is_polar_latitude, is_utm_latitude, unified_to_wgs84, ups_to_wgs84, wgs84_to_unified,
-    wgs84_to_ups, GridSystem, UnifiedCoord, UpsCoord,
+    is_polar_latitude, is_utm_latitude, unified_to_wgs84, wgs84_to_unified, GridSystem,
+    UnifiedCoord,
 };
 pub use cam_distorted_pinhole::DistortedPinhole;
 pub mod geoid;
