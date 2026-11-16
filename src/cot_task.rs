@@ -433,3 +433,19 @@ fn haversine_dist_m(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
     r * c
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_task_point_creation_and_bounds() {
+        let pt = TaskPoint::new(1, "WP-ALPHA", 37.7749, -122.4194).unwrap();
+        assert_eq!(pt.order, 1);
+        assert_eq!(pt.name, "WP-ALPHA");
+        assert_eq!(pt.action, TaskAction::FlyOver);
+
+        assert!(TaskPoint::new(1, "ERR", 95.0, 0.0).is_err());
+        assert!(TaskPoint::new(1, "ERR", 0.0, 190.0).is_err());
+        assert!(TaskPoint::new(1, "ERR", f64::NAN, 0.0).is_err());
+    }
