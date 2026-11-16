@@ -174,3 +174,22 @@ impl Egm96Geoid {
         Ok(hae_m - n)
     }
 }
+
+impl Egm96Geoid {
+    /// Convert orthometric height (MSL) to ellipsoidal height (HAE): h = H + N.
+    pub fn orthometric_to_ellipsoidal(
+        &self,
+        lat_deg: f64,
+        lon_deg: f64,
+        msl_m: f64,
+    ) -> Result<f64, Egm96Error> {
+        let n = self.undulation(lat_deg, lon_deg)?;
+        Ok(msl_m + n)
+    }
+}
+
+impl crate::geoid::GeoidModel for Egm96Geoid {
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        self.undulation(lat_deg, lon_deg).ok()
+    }
+}
