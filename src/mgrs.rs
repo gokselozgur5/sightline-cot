@@ -601,7 +601,10 @@ pub fn parse_mgrs_10figure(s: &str) -> Result<Mgrs10Figure, GridError> {
         return Err(GridError::InvalidZone);
     }
     let (zone, r) = if len == 15 {
-        ((cleaned[0].wrapping_sub(b'0')) * 10 + (cleaned[1].wrapping_sub(b'0')), 2)
+        (
+            (cleaned[0].wrapping_sub(b'0')) * 10 + (cleaned[1].wrapping_sub(b'0')),
+            2,
+        )
     } else {
         (cleaned[0].wrapping_sub(b'0'), 1)
     };
@@ -613,9 +616,13 @@ pub fn parse_mgrs_10figure(s: &str) -> Result<Mgrs10Figure, GridError> {
         return Err(GridError::InvalidEasting);
     }
     let mut e = 0u32;
-    for &d in &digits[..5] { e = e * 10 + (d - b'0') as u32; }
+    for &d in &digits[..5] {
+        e = e * 10 + (d - b'0') as u32;
+    }
     let mut n = 0u32;
-    for &d in &digits[5..] { n = n * 10 + (d - b'0') as u32; }
+    for &d in &digits[5..] {
+        n = n * 10 + (d - b'0') as u32;
+    }
     Ok(Mgrs10Figure {
         zone, band: cleaned[r] as char, col: cleaned[r + 1] as char,
         row: cleaned[r + 2] as char, easting: e, northing: n,
