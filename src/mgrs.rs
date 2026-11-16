@@ -713,4 +713,18 @@ mod tests {
             assert!((lon - lon_rt).abs() < 1e-4, "lon {lon} roundtrip {lon_rt}");
         }
     }
+
+    #[test]
+    fn test_mgrs_10figure_from_lat_lon() {
+        let fig = wgs84_to_mgrs_10figure(0.0, 3.0).unwrap();
+        assert_eq!(fig.zone, 31);
+        assert_eq!(fig.band, 'N');
+        assert_eq!(fig.col, 'E');
+        assert_eq!(fig.row, 'A');
+        assert_eq!(fig.easting, 0);
+        assert_eq!(fig.northing, 0);
+        let sf = Mgrs10Figure::from_lat_lon(37.7749, -122.4194).unwrap();
+        assert_eq!(sf.zone, 10);
+        assert_eq!(sf.band, 'S');
+    }
 }
