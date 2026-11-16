@@ -328,3 +328,26 @@ impl CotRangeRings {
         Ok(self)
     }
 }
+
+impl CotRangeRings {
+    /// Set stroke line color (signed 32-bit ARGB integer).
+    pub fn with_stroke_color(mut self, color: i32) -> Self {
+        self.stroke_color = Some(color);
+        self
+    }
+
+    /// Set stroke line thickness in pixels.
+    pub fn with_stroke_weight(mut self, weight: f64) -> Result<Self, CotCircleError> {
+        if !weight.is_finite() || weight <= 0.0 {
+            return Err(CotCircleError::InvalidParameter("stroke weight must be positive"));
+        }
+        self.stroke_weight = Some(weight);
+        Ok(self)
+    }
+
+    /// Set callsign prefix for individual rings.
+    pub fn with_callsign_prefix(mut self, prefix: impl Into<String>) -> Self {
+        self.callsign_prefix = Some(prefix.into());
+        self
+    }
+}
