@@ -54,3 +54,19 @@ fn test_circle_xml_roundtrip() {
     assert_eq!(parsed.callsign.as_deref(), Some("PERIMETER_1"));
     assert_eq!(parsed.stroke_color, Some(-65536));
 }
+
+#[test]
+fn test_range_rings_generation_and_lookup() {
+    let rings = CotRangeRings::from_interval(34.0, -118.0, 500.0, 3).expect("rings")
+        .with_callsign_prefix("AIRPORT");
+    assert_eq!(rings.radii_m, vec![500.0, 1000.0, 1500.0]);
+    assert_eq!(rings.ring_index_for_distance(250.0), Some(0));
+    assert_eq!(rings.ring_index_for_distance(750.0), Some(1));
+    assert_eq!(rings.ring_index_for_distance(1250.0), Some(2));
+    assert_eq!(rings.ring_index_for_distance(2000.0), None);
+
+    let events = rings.to_cot_events("BASE", 1700000000000, 1700000060000);
+    assert_eq!(events.len(), 3);
+    assert!(events[0].contains("BASE-ring-1"));
+    assert!(events[1].contains("AIRPORT Ring 2"));
+}
