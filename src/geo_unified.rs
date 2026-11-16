@@ -228,3 +228,22 @@ pub fn unified_to_wgs84(coord: &UnifiedCoord) -> Result<(f64, f64), GridError> {
         UnifiedCoord::Ups(ups) => ups_to_wgs84(ups),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_polar_latitude_classification() {
+        assert!(is_polar_latitude(84.0001));
+        assert!(is_polar_latitude(90.0));
+        assert!(is_polar_latitude(-80.0001));
+        assert!(is_polar_latitude(-90.0));
+        assert!(!is_polar_latitude(84.0));
+        assert!(!is_polar_latitude(0.0));
+        assert!(!is_polar_latitude(-80.0));
+        assert!(is_utm_latitude(0.0));
+        assert!(is_utm_latitude(84.0));
+        assert!(is_utm_latitude(-80.0));
+    }
+}
