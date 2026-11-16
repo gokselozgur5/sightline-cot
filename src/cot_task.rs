@@ -389,3 +389,30 @@ impl TacticalTask {
             "<event version=\"2.0\" uid=\"{uid_esc}\" type=\"b-m-r\" how=\"h-e\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\"><point lat=\"{c_lat:.7}\" lon=\"{c_lon:.7}\" hae=\"0.00\" ce=\"10.00\" le=\"10.00\"/><detail><contact callsign=\"{cs_esc}\"/>{task_xml}</detail></event>"
         ))
     }
+
+    pub fn parse_task_xml(xml: &str) -> Result<Self, CotTaskError> {
+        let t_start = xml.find("<task").ok_or_else(|| CotTaskError::XmlParseError("missing <task tag".into()))?;
+        let header_end = xml[t_start..].find('>').ok_or_else(|| CotTaskError::XmlParseError("unclosed <task tag".into()))?;
+        let header = &xml[t_start..t_start + header_end];
+        let name = extract_attr(header, "name").unwrap_or_else(|| "task".into());
+        let task_type = extract_attr(header, "type").unwrap_or_else(|| "route".into());
+        let priority = extract_attr(header, "priority").map(|p| TaskPriority::from_str(&p)).unwrap_or_default();
+        let status = extract_attr(header, "status").map(|s| TaskStatus::from_str(&s)).unwrap_or_default();
+
+        let mut points = Vec::new();
+        let mut rest = &xml[t_start + header_end..];
+        while let Some(p_start) = rest.find("<point") {
+            let p_end = rest[p_start..].find("/>").ok_or_else(|| CotTaskError::XmlParseError("unclosed <point tag".into()))?;
+            let p_xml = &rest[p_start..p_start + p_end + 2];
+            points.push(TaskPoint::parse(p_xml)?);
+            rest = &rest[p_start + p_end + 2..];
+        }
+
+        Ok(Self {
+            name,
+            task_type,
+            priority,
+            status,
+            points,
+        })
+    }
