@@ -449,3 +449,30 @@ mod tests {
         assert!(TaskPoint::new(1, "ERR", 0.0, 190.0).is_err());
         assert!(TaskPoint::new(1, "ERR", f64::NAN, 0.0).is_err());
     }
+
+    #[test]
+    fn test_task_point_builders_and_xml() {
+        let pt = TaskPoint::new(2, "IP", 36.12, -115.15)
+            .unwrap()
+            .with_hae(1500.0)
+            .unwrap()
+            .with_action(TaskAction::Ingress)
+            .with_speed(120.5)
+            .unwrap()
+            .with_eta(1700000000)
+            .with_remarks("Initial Point for strike");
+        let xml = pt.to_xml();
+        assert!(xml.contains("order=\"2\""));
+        assert!(xml.contains("name=\"IP\""));
+        assert!(xml.contains("hae=\"1500.00\""));
+        assert!(xml.contains("action=\"ingress\""));
+        assert!(xml.contains("speed=\"120.50\""));
+        assert!(xml.contains("remarks=\"Initial Point for strike\""));
+
+        let parsed = TaskPoint::parse(&xml).unwrap();
+        assert_eq!(parsed.order, 2);
+        assert_eq!(parsed.name, "IP");
+        assert_eq!(parsed.action, TaskAction::Ingress);
+        assert_eq!(parsed.hae, Some(1500.0));
+        assert_eq!(parsed.speed_mps, Some(120.5));
+    }
