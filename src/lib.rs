@@ -13,6 +13,10 @@ pub mod cot;
 pub mod cot_detail;
 pub mod cot_sensor;
 pub mod cot_sensor_fov;
+pub use cot_sensor_fov::{
+    compute_ground_footprint, is_target_in_sensor_fov, SensorCone, SensorFootprint,
+    SensorFovError,
+};
 pub mod cot_shape;
 pub use cot_shape::{CotShape, CotShapeError, CotShapeType, CotVertex};
 pub mod dem_bilinear;
