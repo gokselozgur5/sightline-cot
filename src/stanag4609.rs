@@ -90,3 +90,23 @@ impl StanagTimestamp {
         out
     }
 }
+
+impl StanagTimestamp {
+    /// Parse Tag 2 timestamp from a KLV byte slice (tag, length, 8-byte value).
+    pub fn from_klv_slice(bytes: &[u8]) -> Result<Self, StanagError> {
+        if bytes.len() < 10 {
+            return Err(StanagError::BufferTooShort);
+        }
+        let tag = bytes[0];
+        if tag != MISB_TAG_PRECISION_TIME_STAMP {
+            return Err(StanagError::InvalidKlvTag(tag));
+        }
+        let len = bytes[1] as usize;
+        if len != (MISB_LEN_PRECISION_TIME_STAMP as usize) {
+            return Err(StanagError::InvalidKlvLength(len));
+        }
+        let mut val = [0u8; 8];
+        val.copy_from_slice(&bytes[2..10]);
+        Ok(Self::from_be_bytes(val))
+    }
+}
