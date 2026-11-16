@@ -21,3 +21,17 @@ impl std::fmt::Display for CotCircleError {
 }
 
 impl std::error::Error for CotCircleError {}
+
+/// Cursor-on-Target circle or range ring shape representation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CotCircle {
+    pub lat: f64,
+    pub lon: f64,
+    pub hae: Option<f64>,
+    pub radius_m: f64,
+    pub stroke_color: Option<i32>,
+    pub fill_color: Option<i32>,
+    pub stroke_weight: Option<f64>,
+    pub callsign: Option<String>,
+    pub remarks: Option<String>,
+}
