@@ -286,3 +286,18 @@ impl TacticalTask {
             points: Vec::new(),
         }
     }
+
+    pub fn with_type(mut self, task_type: impl Into<String>) -> Self {
+        self.task_type = task_type.into();
+        self
+    }
+
+    pub fn with_priority(mut self, priority: TaskPriority) -> Self {
+        self.priority = priority;
+        self
+    }
+
+    pub fn with_status(mut self, status: TaskStatus) -> Self {
+        self.status = status;
+        self
+    }
