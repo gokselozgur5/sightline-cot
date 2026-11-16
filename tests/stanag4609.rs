@@ -42,3 +42,16 @@ fn test_iso8601_formatting_and_bidirectional_parsing() {
     assert_eq!(formatted, iso_str);
     assert_eq!(ts.to_iso8601_utc(), "2026-11-16T08:41:00.123Z");
 }
+
+
+#[test]
+fn test_klv_error_handling() {
+    let short_buf = [0x02, 0x08, 0x01];
+    assert_eq!(StanagTimestamp::from_klv_slice(&short_buf), Err(sightline_cot::stanag4609::StanagError::BufferTooShort));
+
+    let wrong_tag = [0x03, 0x08, 1, 2, 3, 4, 5, 6, 7, 8];
+    assert!(matches!(StanagTimestamp::from_klv_slice(&wrong_tag), Err(sightline_cot::stanag4609::StanagError::InvalidKlvTag(0x03))));
+
+    let wrong_len = [0x02, 0x04, 1, 2, 3, 4, 5, 6, 7, 8];
+    assert!(matches!(StanagTimestamp::from_klv_slice(&wrong_len), Err(sightline_cot::stanag4609::StanagError::InvalidKlvLength(4))));
+}
