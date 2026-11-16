@@ -27,6 +27,8 @@ pub mod cot_task;
 pub use cot_task::{
     CotTaskError, TacticalTask, TaskAction, TaskPoint, TaskPriority, TaskStatus,
 };
+pub mod cot_circle;
+pub use cot_circle::{CotCircle, CotCircleError, CotRangeRings};
 pub mod dem_bilinear;
 pub mod egm96_geoid;
 pub use egm96_geoid::{
