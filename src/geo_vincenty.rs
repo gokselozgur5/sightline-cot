@@ -199,7 +199,11 @@ fn compute_inverse_result_ellipsoid(
 
 /// Computes geodesic distance and azimuths between two points on a given ellipsoid.
 pub fn vincenty_inverse_ellipsoid(
-    lat1: f64, lon1: f64, lat2: f64, lon2: f64, ellipsoid: &Ellipsoid,
+    lat1: f64,
+    lon1: f64,
+    lat2: f64,
+    lon2: f64,
+    ellipsoid: &Ellipsoid,
 ) -> Result<VincentyInverse, VincentyError> {
     validate_point(lat1, lon1)?;
     validate_point(lat2, lon2)?;
@@ -219,7 +223,16 @@ pub fn vincenty_inverse_ellipsoid(
     let (sig, _, c2_a, c_2sm, lam) =
         solve_inverse_loop_ellipsoid(s_u1, c_u1, s_u2, c_u2, l, ellipsoid.f)?;
     Ok(compute_inverse_result_ellipsoid(
-        sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2, ellipsoid.a, ellipsoid.b,
+        sig,
+        c2_a,
+        c_2sm,
+        lam,
+        s_u1,
+        c_u1,
+        s_u2,
+        c_u2,
+        ellipsoid.a,
+        ellipsoid.b,
     ))
 }
 
