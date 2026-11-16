@@ -105,6 +105,7 @@ pub use geohash_neighbors::{
 };
 pub mod geohash;
 pub mod geo_ups;
+pub mod geo_los;
 pub use geo_ups::{ups_to_wgs84, wgs84_to_ups, UpsCoord, UpsError, UpsHemisphere};
 pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
