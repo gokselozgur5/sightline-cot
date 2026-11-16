@@ -476,3 +476,24 @@ mod tests {
         assert_eq!(parsed.hae, Some(1500.0));
         assert_eq!(parsed.speed_mps, Some(120.5));
     }
+
+    #[test]
+    fn test_tactical_task_xml_roundtrip() {
+        let mut task = TacticalTask::new("ALPHA-ROUTE")
+            .with_type("strike")
+            .with_priority(TaskPriority::Immediate)
+            .with_status(TaskStatus::InProgress);
+        let p1 = TaskPoint::new(1, "START", 35.0, -115.0).unwrap();
+        let p2 = TaskPoint::new(2, "END", 35.5, -114.5).unwrap().with_action(TaskAction::Target);
+        task.add_point(p1);
+        task.add_point(p2);
+
+        let xml = task.to_task_xml();
+        let parsed = TacticalTask::parse_task_xml(&xml).unwrap();
+        assert_eq!(parsed.name, "ALPHA-ROUTE");
+        assert_eq!(parsed.task_type, "strike");
+        assert_eq!(parsed.priority, TaskPriority::Immediate);
+        assert_eq!(parsed.status, TaskStatus::InProgress);
+        assert_eq!(parsed.points.len(), 2);
+        assert_eq!(parsed.points[1].action, TaskAction::Target);
+    }
