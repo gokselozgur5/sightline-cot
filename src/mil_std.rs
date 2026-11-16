@@ -176,3 +176,20 @@ pub enum MilStdStatus {
     Present,
     Planned,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum MilStdEchelon {
+    #[default]
+    Unspecified,
+    Team,
+    Squad,
+    Section,
+    Platoon,
+    Company,
+    Battalion,
+    Regiment,
+    Brigade,
+    Division,
+    Corps,
+    Army,
+}
