@@ -36,3 +36,14 @@ pub struct AerCoord {
     /// Slant range distance in meters (>= 0).
     pub range_m: f64,
 }
+
+/// Topocentric South, East, Zenith (SEZ) coordinates in meters.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SezCoord {
+    /// Southward displacement in meters along local meridian.
+    pub south_m: f64,
+    /// Eastward displacement in meters along local parallel.
+    pub east_m: f64,
+    /// Zenith displacement in meters normal to reference ellipsoid.
+    pub zenith_m: f64,
+}
