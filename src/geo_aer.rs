@@ -65,3 +65,18 @@ impl AerCoord {
         Ok(Self { azimuth_deg: final_az, elevation_deg, range_m })
     }
 }
+
+impl SezCoord {
+    /// Create and validate a new SEZ coordinate.
+    pub fn new(south_m: f64, east_m: f64, zenith_m: f64) -> Result<Self, AerError> {
+        if !south_m.is_finite() || !east_m.is_finite() || !zenith_m.is_finite() {
+            return Err(AerError::NonFinite);
+        }
+        Ok(Self { south_m, east_m, zenith_m })
+    }
+
+    /// Return SEZ components as an array [south_m, east_m, zenith_m].
+    pub fn to_array(&self) -> [f64; 3] {
+        [self.south_m, self.east_m, self.zenith_m]
+    }
+}
