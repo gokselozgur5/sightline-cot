@@ -30,6 +30,11 @@ pub mod geo_molodensky;
 pub mod geo_velocity;
 pub mod geo_vincenty;
 pub mod geo_vincenty_direct;
+pub use geo_vincenty::{
+    vincenty_direct, vincenty_direct_ellipsoid, vincenty_geodesic_path,
+    vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid,
+    VincentyDirect, VincentyError, VincentyInverse,
+};
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
 pub mod imm;
