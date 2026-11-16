@@ -270,4 +270,15 @@ mod tests {
         assert!((lat - lat_out).abs() < 1e-6);
         assert!((lon - lon_out).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_ups_south_roundtrip() {
+        let lat = -85.0;
+        let lon = -60.0;
+        let ups = wgs84_to_ups(lat, lon).expect("ups south");
+        assert_eq!(ups.hemisphere, 'S');
+        let (lat_out, lon_out) = ups_to_wgs84(&ups).expect("unproject");
+        assert!((lat - lat_out).abs() < 1e-6);
+        assert!((lon - lon_out).abs() < 1e-6);
+    }
 }
