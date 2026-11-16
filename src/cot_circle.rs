@@ -276,3 +276,32 @@ pub struct CotRangeRings {
     pub stroke_weight: Option<f64>,
     pub callsign_prefix: Option<String>,
 }
+
+impl CotRangeRings {
+    /// Create concentric range rings from explicit list of radii in meters.
+    pub fn new(center_lat: f64, center_lon: f64, radii_m: Vec<f64>) -> Result<Self, CotCircleError> {
+        if !center_lat.is_finite() || !(-90.0..=90.0).contains(&center_lat) {
+            return Err(CotCircleError::InvalidCoordinate("latitude in [-90, 90]"));
+        }
+        if !center_lon.is_finite() || !(-180.0..=180.0).contains(&center_lon) {
+            return Err(CotCircleError::InvalidCoordinate("longitude in [-180, 180]"));
+        }
+        if radii_m.is_empty() {
+            return Err(CotCircleError::InvalidParameter("radii_m must not be empty"));
+        }
+        for &r in &radii_m {
+            if !r.is_finite() || r <= 0.0 {
+                return Err(CotCircleError::InvalidRadius("each radius must be positive"));
+            }
+        }
+        Ok(Self {
+            center_lat,
+            center_lon,
+            hae: None,
+            radii_m,
+            stroke_color: None,
+            stroke_weight: None,
+            callsign_prefix: None,
+        })
+    }
+}
