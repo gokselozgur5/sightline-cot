@@ -175,3 +175,20 @@ pub fn is_counter_clockwise(vertices: &[[f64; 2]]) -> Result<bool, GeodesicAreaE
     }
     Ok(sum > 0.0)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_authalic_latitude_poles_and_equator() {
+        let q_eq = authalic_q(0.0);
+        assert!(q_eq.abs() < 1e-12);
+        let sin_beta_eq = authalic_sin_beta(0.0).unwrap();
+        assert!(sin_beta_eq.abs() < 1e-12);
+        let sin_beta_np = authalic_sin_beta(90.0).unwrap();
+        assert!((sin_beta_np - 1.0).abs() < 1e-12);
+        let sin_beta_sp = authalic_sin_beta(-90.0).unwrap();
+        assert!((sin_beta_sp - (-1.0)).abs() < 1e-12);
+    }
+}
