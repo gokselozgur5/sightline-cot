@@ -246,3 +246,18 @@ mod tests {
         assert!(cone.contains_relative_point([0.0, 0.0, 0.0]));
         assert!(cone.contains_relative_point([100.0, 500.0, 0.0]));
     }
+
+    #[test]
+    fn test_compute_ground_footprint() {
+        let cone = SensorCone::new(0.0, -45.0, 30.0, 5000.0).unwrap();
+        let fp = compute_ground_footprint(&cone, 1000.0, 0.0, 8).unwrap();
+        assert!(fp.boresight_ground[1] > 0.0);
+        assert_eq!(fp.boresight_ground[2], 0.0);
+        assert!(!fp.perimeter_points.is_empty());
+
+        let up_cone = SensorCone::new(0.0, 10.0, 30.0, 5000.0).unwrap();
+        assert_eq!(
+            compute_ground_footprint(&up_cone, 1000.0, 0.0, 8),
+            Err(SensorFovError::RayDoesNotIntersectGround)
+        );
+    }
