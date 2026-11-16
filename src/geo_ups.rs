@@ -25,3 +25,11 @@ pub enum UpsError {
     InvalidLongitude,
     NonFinite,
 }
+
+const WGS84_A: f64 = 6378137.0;
+const WGS84_F: f64 = 1.0 / 298.257223563;
+const UPS_K0: f64 = 0.994;
+const FALSE_EASTING_NORTH: f64 = 2000000.0;
+const FALSE_NORTHING_NORTH: f64 = 2000000.0;
+const FALSE_EASTING_SOUTH: f64 = 2000000.0;
+const FALSE_NORTHING_SOUTH: f64 = 2000000.0;
