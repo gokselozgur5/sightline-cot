@@ -138,7 +138,12 @@ impl EmergencyBeacon {
 }
 
 impl EmergencyBeacon {
-    pub fn new_mayday(uid: &str, callsign: &str, lat: f64, lon: f64) -> Result<Self, CotBeaconError> {
+    pub fn new_mayday(
+        uid: &str,
+        callsign: &str,
+        lat: f64,
+        lon: f64,
+    ) -> Result<Self, CotBeaconError> {
         validate_coords(lat, lon)?;
         Ok(Self {
             uid: uid.to_string(),
@@ -159,7 +164,12 @@ impl EmergencyBeacon {
 }
 
 impl EmergencyBeacon {
-    pub fn new_cancel(uid: &str, callsign: &str, lat: f64, lon: f64) -> Result<Self, CotBeaconError> {
+    pub fn new_cancel(
+        uid: &str,
+        callsign: &str,
+        lat: f64,
+        lon: f64,
+    ) -> Result<Self, CotBeaconError> {
         validate_coords(lat, lon)?;
         Ok(Self {
             uid: uid.to_string(),
