@@ -178,3 +178,22 @@ impl EmergencyBeacon {
         })
     }
 }
+
+impl EmergencyBeacon {
+    pub fn with_hae(mut self, hae_m: f64) -> Self {
+        self.hae_m = hae_m;
+        self
+    }
+    pub fn with_details(mut self, details: &str) -> Self {
+        self.details = Some(details.to_string());
+        self
+    }
+    pub fn with_stale_duration(mut self, sec: i64) -> Self {
+        self.stale_sec = sec;
+        self
+    }
+    pub fn with_time(mut self, time_ms: i64) -> Self {
+        self.time_ms = time_ms;
+        self
+    }
+}
