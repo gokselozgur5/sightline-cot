@@ -98,3 +98,8 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
     let is_direct_los = ground_range_m <= horiz_m;
     Ok(LosGeometry { slant_range_m, ground_range_m, elevation_angle_rad, azimuth_rad, horizon_distance_m: horiz_m, is_direct_los })
 }
+
+/// Compute 3D slant range distance between observer and target in meters.
+pub fn slant_range_geodetic(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<f64, GeoLosError> {
+    compute_geo_los(obs, target).map(|geom| geom.slant_range_m)
+}
