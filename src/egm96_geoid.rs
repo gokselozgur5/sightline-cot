@@ -34,3 +34,23 @@ impl std::fmt::Display for Egm96Error {
 }
 
 impl std::error::Error for Egm96Error {}
+
+/// Normalize longitude into standard [0.0, 360.0) range.
+pub fn normalize_lon_360(lon_deg: f64) -> f64 {
+    let rem = lon_deg % 360.0;
+    if rem < 0.0 {
+        rem + 360.0
+    } else {
+        rem
+    }
+}
+
+/// Normalize longitude into standard [-180.0, 180.0) range.
+pub fn normalize_lon_180(lon_deg: f64) -> f64 {
+    let lon360 = normalize_lon_360(lon_deg);
+    if lon360 >= 180.0 {
+        lon360 - 360.0
+    } else {
+        lon360
+    }
+}
