@@ -193,3 +193,19 @@ pub enum MilStdEchelon {
     Corps,
     Army,
 }
+
+impl MilStdStatus {
+    pub fn from_char(c: char) -> Result<Self, MilStdError> {
+        match c {
+            'P' | '0' => Ok(Self::Present),
+            'A' | '1' => Ok(Self::Planned),
+            _ => Err(MilStdError::InvalidStatus),
+        }
+    }
+    pub fn to_char(&self) -> char {
+        match self {
+            Self::Present => 'P',
+            Self::Planned => 'A',
+        }
+    }
+}
