@@ -10,6 +10,7 @@ pub mod cam_frustum;
 pub mod camera;
 pub mod classifier;
 pub mod cot;
+pub mod cot_beacon;
 pub mod cot_detail;
 pub mod cot_sensor;
 pub mod cot_shape;
