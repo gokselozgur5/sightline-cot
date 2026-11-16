@@ -37,8 +37,9 @@ pub use mgrs_parse::{
     parse_mgrs, parse_mgrs_to_utm, parse_mgrs_to_wgs84, MgrsParseError, ParsedMgrs,
 };
 pub use mgrs::{
-    format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, utm_to_wgs84, wgs84_to_utm, GridError,
-    MgrsString, UtmCoord,
+    format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, mgrs_10figure_to_utm, mgrs_10figure_to_wgs84,
+    parse_mgrs_10figure, utm_to_mgrs_10figure, utm_to_wgs84, wgs84_to_mgrs_10figure,
+    wgs84_to_utm, GridError, Mgrs10Figure, MgrsString, UtmCoord,
 };
 pub mod proto;
 pub mod mil_std;
