@@ -32,3 +32,13 @@ fn test_klv_tag2_roundtrip_encoding_and_decoding() {
     let decoded = StanagTimestamp::from_klv_slice(&tag2).expect("valid KLV slice");
     assert_eq!(decoded, ts);
 }
+
+
+#[test]
+fn test_iso8601_formatting_and_bidirectional_parsing() {
+    let iso_str = "2026-11-16T08:41:00.123456Z";
+    let ts = StanagTimestamp::from_iso8601(iso_str).expect("valid ISO string");
+    let formatted = ts.to_iso8601_micros();
+    assert_eq!(formatted, iso_str);
+    assert_eq!(ts.to_iso8601_utc(), "2026-11-16T08:41:00.123Z");
+}
