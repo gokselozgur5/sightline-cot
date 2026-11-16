@@ -80,3 +80,21 @@ pub struct CotShape {
     pub stroke_weight: Option<f64>,
     pub vertices: Vec<CotVertex>,
 }
+
+impl CotShape {
+    /// Create a new open polyline shape (minimum 2 vertices).
+    pub fn new_polyline(vertices: Vec<CotVertex>) -> Result<Self, CotShapeError> {
+        if vertices.len() < 2 {
+            return Err(CotShapeError::InsufficientVertices { expected: 2, found: vertices.len() });
+        }
+        Ok(Self { shape_type: CotShapeType::Polyline, color: None, fill_color: None, stroke_weight: None, vertices })
+    }
+
+    /// Create a new closed polygon shape (minimum 3 vertices).
+    pub fn new_polygon(vertices: Vec<CotVertex>) -> Result<Self, CotShapeError> {
+        if vertices.len() < 3 {
+            return Err(CotShapeError::InsufficientVertices { expected: 3, found: vertices.len() });
+        }
+        Ok(Self { shape_type: CotShapeType::Polygon, color: None, fill_color: None, stroke_weight: None, vertices })
+    }
+}
