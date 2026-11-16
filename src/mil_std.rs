@@ -297,3 +297,25 @@ impl MilStdSymbol {
         Ok(sym)
     }
 }
+
+impl MilStdSymbol {
+    pub fn parse_2525d(s: &str) -> Result<Self, MilStdError> {
+        if s.len() < 20 || s.len() > 30 {
+            return Err(MilStdError::InvalidLength);
+        }
+        if !s.chars().all(|c| c.is_ascii_digit()) {
+            return Err(MilStdError::InvalidCharacter);
+        }
+        let aff = MilStdAffiliation::from_2525d_code(&s[2..4])?;
+        let dim = MilStdDimension::from_2525d_code(&s[4..6])?;
+        let status_ch = s.chars().nth(6).unwrap_or('0');
+        let status = MilStdStatus::from_char(status_ch)?;
+        let echelon = MilStdEchelon::from_2525d_code(&s[8..10])?;
+        let mut sym = Self::default();
+        sym.affiliation = aff;
+        sym.dimension = dim;
+        sym.status = status;
+        sym.echelon = echelon;
+        Ok(sym)
+    }
+}
