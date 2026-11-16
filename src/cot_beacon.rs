@@ -68,3 +68,23 @@ impl EmergencyType {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum EmergencySeverity {
+    #[default]
+    Critical,
+    High,
+    Medium,
+    Low,
+}
+
+impl EmergencySeverity {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Critical => "critical",
+            Self::High => "high",
+            Self::Medium => "medium",
+            Self::Low => "low",
+        }
+    }
+}
