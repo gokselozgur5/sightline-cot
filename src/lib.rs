@@ -12,6 +12,7 @@ pub mod classifier;
 pub mod cot;
 pub mod cot_detail;
 pub mod cot_sensor;
+pub mod cot_sensor_fov;
 pub mod cot_shape;
 pub use cot_shape::{CotShape, CotShapeError, CotShapeType, CotVertex};
 pub mod dem_bilinear;
