@@ -354,3 +354,20 @@ impl TacticalTask {
         }
         Ok(total_duration)
     }
+
+    pub fn to_task_xml(&self) -> String {
+        let name_esc = crate::cot::escape_xml_attr(&self.name);
+        let type_esc = crate::cot::escape_xml_attr(&self.task_type);
+        let mut xml = format!(
+            r#"<task name="{}" type="{}" priority="{}" status="{}">"#,
+            name_esc,
+            type_esc,
+            self.priority.as_str(),
+            self.status.as_str()
+        );
+        for pt in &self.points {
+            xml.push_str(&pt.to_xml());
+        }
+        xml.push_str("</task>");
+        xml
+    }
