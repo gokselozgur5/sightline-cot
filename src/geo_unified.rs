@@ -10,3 +10,11 @@ pub enum GridSystem {
     /// Universal Polar Stereographic (polar caps).
     Ups,
 }
+
+/// UPS coordinate representation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct UpsCoord {
+    pub hemisphere: char,
+    pub easting: f64,
+    pub northing: f64,
+}
