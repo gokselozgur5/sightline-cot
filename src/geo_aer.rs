@@ -250,4 +250,23 @@ mod tests {
         let back_enu = sez_to_enu(sez);
         assert_eq!(back_enu, enu);
     }
+    #[test]
+    fn test_cardinal_directions_sez_aer() {
+        let north = SezCoord::new(-100.0, 0.0, 0.0).unwrap();
+        let aer_n = sez_to_aer(north).unwrap();
+        assert!((aer_n.azimuth_deg - 0.0).abs() < 1e-6);
+        assert!((aer_n.range_m - 100.0).abs() < 1e-6);
+
+        let east = SezCoord::new(0.0, 100.0, 0.0).unwrap();
+        let aer_e = sez_to_aer(east).unwrap();
+        assert!((aer_e.azimuth_deg - 90.0).abs() < 1e-6);
+
+        let south = SezCoord::new(100.0, 0.0, 0.0).unwrap();
+        let aer_s = sez_to_aer(south).unwrap();
+        assert!((aer_s.azimuth_deg - 180.0).abs() < 1e-6);
+
+        let west = SezCoord::new(0.0, -100.0, 0.0).unwrap();
+        let aer_w = sez_to_aer(west).unwrap();
+        assert!((aer_w.azimuth_deg - 270.0).abs() < 1e-6);
+    }
 }
