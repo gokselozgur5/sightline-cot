@@ -566,6 +566,11 @@ impl Mgrs10Figure {
         append_digits(&mut s.bytes, &mut s.len, self.northing, 5);
         s
     }
+
+    /// Parse a 10-figure MGRS string into an [`Mgrs10Figure`].
+    pub fn parse(s: &str) -> Result<Self, GridError> {
+        parse_mgrs_10figure(s)
+    }
 }
 
 fn clean_mgrs_bytes(s: &str, out: &mut [u8; 32]) -> Result<usize, GridError> {
