@@ -294,4 +294,20 @@ mod tests {
         let end = path.interpolate_at_distance(path.total_distance_m()).unwrap();
         assert!((end.lon - 10.0).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_multi_segment_distance_and_fractions() {
+        let wps = [
+            Waypoint::new(0.0, 0.0),
+            Waypoint::new(0.0, 10.0),
+            Waypoint::new(0.0, 20.0),
+        ];
+        let path = GreatCirclePath::from_waypoints(&wps).unwrap();
+        assert_eq!(path.segment_count(), 2);
+        assert_eq!(path.waypoint_count(), 3);
+        let mid = path.interpolate_at_fraction(0.5).unwrap();
+        assert!((mid.lon - 10.0).abs() < 1e-6);
+        let q1 = path.interpolate_at_fraction(0.25).unwrap();
+        assert!((q1.lon - 5.0).abs() < 1e-6);
+    }
 }
