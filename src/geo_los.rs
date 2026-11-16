@@ -40,3 +40,14 @@ impl GeoPoint3D {
         Ok(Self { lat_deg, lon_deg, hae_m })
     }
 }
+
+/// Result of a 3D line-of-sight calculation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LosGeometry {
+    pub slant_range_m: f64,
+    pub ground_range_m: f64,
+    pub elevation_angle_rad: f64,
+    pub azimuth_rad: f64,
+    pub horizon_distance_m: f64,
+    pub is_direct_los: bool,
+}
