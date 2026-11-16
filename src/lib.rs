@@ -11,6 +11,9 @@ pub mod camera;
 pub mod classifier;
 pub mod cot;
 pub mod cot_beacon;
+pub use cot_beacon::{
+    CotBeaconError, EmergencyBeacon, EmergencySeverity, EmergencyType,
+};
 pub mod cot_detail;
 pub mod cot_sensor;
 pub mod cot_sensor_fov;
