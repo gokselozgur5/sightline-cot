@@ -84,3 +84,11 @@ impl SensorCone {
         cos_angle >= half_fov_rad.cos() - 1e-12
     }
 }
+
+/// 3D ground footprint produced by intersecting sensor FOV cone with ground plane.
+#[derive(Debug, Clone, PartialEq)]
+pub struct SensorFootprint {
+    pub boresight_ground: [f64; 3],
+    pub perimeter_points: Vec<[f64; 3]>,
+    pub slant_range_boresight_m: f64,
+}
