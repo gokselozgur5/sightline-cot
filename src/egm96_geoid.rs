@@ -301,7 +301,7 @@ mod tests {
     fn test_geoid_model_trait_integration() {
         use crate::geoid::GeoidModel;
         let grid = Egm96Geoid::coarse_reference_grid();
-        let undulation = grid.undulation(0.0, 90.0);
+        let undulation = GeoidModel::undulation(&grid, 0.0, 90.0);
         assert_eq!(undulation, Some(-106.0));
     }
 }
