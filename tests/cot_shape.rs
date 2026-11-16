@@ -55,3 +55,16 @@ fn test_shape_xml_roundtrip_parsing() {
     assert_eq!(shape.stroke_weight, Some(3.5));
     assert_eq!(shape.vertices.len(), 3);
 }
+
+
+#[test]
+fn test_to_cot_event_xml_generation() {
+    let v1 = CotVertex::with_hae(37.7749, -122.4194, 15.0).unwrap();
+    let v2 = CotVertex::with_hae(37.7752, -122.4178, 20.0).unwrap();
+    let shape = CotShape::new_polyline(vec![v1, v2]).unwrap();
+    let xml = shape.to_cot_event_xml("UID-01", "TEST_CALLSIGN", 1700000000000, 1700000060000);
+    assert!(xml.contains("uid=\"UID-01\""));
+    assert!(xml.contains("type=\"u-d-f\""));
+    assert!(xml.contains("<contact callsign=\"TEST_CALLSIGN\"/>"));
+    assert!(xml.contains("hae=\"15.00\""));
+}
