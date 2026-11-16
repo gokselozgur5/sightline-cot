@@ -336,3 +336,21 @@ impl TacticalTask {
         }
         total
     }
+
+    pub fn estimated_duration_secs(&self, default_speed_mps: f64) -> Result<f64, CotTaskError> {
+        if !default_speed_mps.is_finite() || default_speed_mps <= 0.0 {
+            return Err(CotTaskError::InvalidParameter("default_speed_mps must be positive"));
+        }
+        if self.points.len() < 2 {
+            return Ok(0.0);
+        }
+        let mut total_duration = 0.0;
+        for w in self.points.windows(2) {
+            let dist = haversine_dist_m(w[0].lat, w[0].lon, w[1].lat, w[1].lon);
+            let spd = w[1].speed_mps.unwrap_or(default_speed_mps);
+            if spd > 0.0 {
+                total_duration += dist / spd;
+            }
+        }
+        Ok(total_duration)
+    }
