@@ -109,3 +109,12 @@ fn compute_basis_axes(b: [f64; 3]) -> ([f64; 3], [f64; 3]) {
     ];
     (u1, u2)
 }
+
+fn intersect_ray_ground(ray: [f64; 3], dz_total: f64, ground_alt: f64) -> Option<[f64; 3]> {
+    if ray[2] >= -1e-6 {
+        None
+    } else {
+        let t = dz_total / ray[2];
+        Some([t * ray[0], t * ray[1], ground_alt])
+    }
+}
