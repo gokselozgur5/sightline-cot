@@ -203,4 +203,18 @@ mod tests {
         let area = geodesic_polygon_area(&square).unwrap();
         assert!((area - 1.2308e10).abs() < 5e7);
     }
+
+    #[test]
+    fn test_triangular_cot_geofence() {
+        let tri = [
+            [37.7749, -122.4194],
+            [37.7749, -122.4094],
+            [37.7849, -122.4194],
+        ];
+        let geom = compute_cot_polygon_geometry(&tri).unwrap();
+        assert!(geom.area_m2 > 400_000.0 && geom.area_m2 < 600_000.0);
+        assert!(geom.perimeter_m > 2500.0 && geom.perimeter_m < 3500.0);
+        assert!(geom.area_km2() > 0.4 && geom.area_km2() < 0.6);
+        assert!(geom.area_hectares() > 40.0 && geom.area_hectares() < 60.0);
+    }
 }
