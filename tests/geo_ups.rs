@@ -37,3 +37,12 @@ fn test_ups_roundtrip_north() {
     assert!((lat - orig_lat).abs() < 1e-6);
     assert!((lon - orig_lon).abs() < 1e-6);
 }
+
+use sightline_cot::geo_ups::UpsError;
+
+#[test]
+fn test_ups_validation_and_errors() {
+    assert_eq!(wgs84_to_ups(45.0, 0.0), Err(UpsError::InvalidLatitude));
+    assert_eq!(wgs84_to_ups(f64::NAN, 0.0), Err(UpsError::NonFinite));
+    assert_eq!(ups_to_wgs84(UpsCoord::new(f64::NAN, 0.0, UpsHemisphere::North)), Err(UpsError::NonFinite));
+}
