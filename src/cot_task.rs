@@ -193,3 +193,21 @@ impl TaskPoint {
         self.action = action;
         self
     }
+
+    pub fn with_speed(mut self, speed_mps: f64) -> Result<Self, CotTaskError> {
+        if !speed_mps.is_finite() || speed_mps < 0.0 {
+            return Err(CotTaskError::InvalidParameter("speed_mps must be non-negative"));
+        }
+        self.speed_mps = Some(speed_mps);
+        Ok(self)
+    }
+
+    pub fn with_eta(mut self, eta_ms: i64) -> Self {
+        self.eta_ms = Some(eta_ms);
+        self
+    }
+
+    pub fn with_remarks(mut self, remarks: impl Into<String>) -> Self {
+        self.remarks = Some(remarks.into());
+        self
+    }
