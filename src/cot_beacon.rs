@@ -293,8 +293,12 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
 fn parse_point_coords(xml: &str) -> Result<(f64, f64), CotBeaconError> {
     let lat_s = extract_attr(xml, "lat").ok_or(CotBeaconError::MissingField("lat"))?;
     let lon_s = extract_attr(xml, "lon").ok_or(CotBeaconError::MissingField("lon"))?;
-    let lat: f64 = lat_s.parse().map_err(|_| CotBeaconError::InvalidCoordinate("lat"))?;
-    let lon: f64 = lon_s.parse().map_err(|_| CotBeaconError::InvalidCoordinate("lon"))?;
+    let lat: f64 = lat_s
+        .parse()
+        .map_err(|_| CotBeaconError::InvalidCoordinate("lat"))?;
+    let lon: f64 = lon_s
+        .parse()
+        .map_err(|_| CotBeaconError::InvalidCoordinate("lon"))?;
     validate_coords(lat, lon)?;
     Ok((lat, lon))
 }
@@ -312,7 +316,11 @@ impl EmergencyBeacon {
             uid: uid.to_string(),
             callsign: callsign.to_string(),
             emergency_type: EmergencyType::from_str(etype_s),
-            severity: if cancel { EmergencySeverity::Low } else { EmergencySeverity::Critical },
+            severity: if cancel {
+                EmergencySeverity::Low
+            } else {
+                EmergencySeverity::Critical
+            },
             cancel,
             lat_deg: lat,
             lon_deg: lon,
