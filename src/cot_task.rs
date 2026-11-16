@@ -244,3 +244,25 @@ impl TaskPoint {
         let lat = lat_s.parse::<f64>().map_err(|_| CotTaskError::InvalidCoordinate("lat"))?;
         let lon = lon_s.parse::<f64>().map_err(|_| CotTaskError::InvalidCoordinate("lon"))?;
         let mut pt = Self::new(order, name, lat, lon)?;
+        if let Some(h_s) = extract_attr(xml, "hae") {
+            let h = h_s.parse::<f64>().map_err(|_| CotTaskError::InvalidParameter("hae"))?;
+            pt = pt.with_hae(h)?;
+        }
+        if let Some(act_s) = extract_attr(xml, "action") {
+            pt = pt.with_action(TaskAction::from_str(&act_s));
+        }
+        if let Some(s_s) = extract_attr(xml, "speed") {
+            let s = s_s.parse::<f64>().map_err(|_| CotTaskError::InvalidParameter("speed"))?;
+            pt = pt.with_speed(s)?;
+        }
+        if let Some(e_s) = extract_attr(xml, "eta") {
+            if let Ok(eta) = e_s.parse::<i64>() {
+                pt = pt.with_eta(eta);
+            }
+        }
+        if let Some(rem) = extract_attr(xml, "remarks") {
+            pt = pt.with_remarks(rem);
+        }
+        Ok(pt)
+    }
+}
