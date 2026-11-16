@@ -103,3 +103,8 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
 pub fn slant_range_geodetic(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<f64, GeoLosError> {
     compute_geo_los(obs, target).map(|geom| geom.slant_range_m)
 }
+
+/// Compute elevation angle in radians from observer to target.
+pub fn elevation_angle_rad(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<f64, GeoLosError> {
+    compute_geo_los(obs, target).map(|geom| geom.elevation_angle_rad)
+}
