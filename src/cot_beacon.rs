@@ -290,7 +290,8 @@ impl EmergencyBeacon {
         let (lat, lon) = parse_point_coords(xml)?;
         let callsign = extract_attr(xml, "callsign").unwrap_or("UNKNOWN");
         let cancel = extract_attr(xml, "cancel").map(|c| c == "true").unwrap_or(false);
-        let etype_s = extract_attr(xml, "type").unwrap_or("911 Alert");
+        let em_tag = xml.find("<emergency").and_then(|i| xml[i..].split('>').next()).unwrap_or("");
+        let etype_s = extract_attr(em_tag, "type").unwrap_or("911 Alert");
         let desc = extract_tag_content(xml, "emergency").map(|s| s.to_string());
         Ok(Self {
             uid: uid.to_string(),
