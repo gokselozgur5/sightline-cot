@@ -351,3 +351,27 @@ impl CotRangeRings {
         self
     }
 }
+
+impl CotRangeRings {
+    /// Determine which concentric ring index (0-based) a distance falls within.
+    pub fn ring_index_for_distance(&self, distance_m: f64) -> Option<usize> {
+        if !distance_m.is_finite() || distance_m < 0.0 {
+            return None;
+        }
+        self.radii_m.iter().position(|&r| distance_m <= r)
+    }
+
+    /// Convert into a list of individual CotCircle instances.
+    pub fn to_circles(&self) -> Vec<CotCircle> {
+        self.radii_m.iter().enumerate().map(|(i, &r)| {
+            let mut c = CotCircle::new(self.center_lat, self.center_lon, r).expect("valid");
+            c.hae = self.hae;
+            c.stroke_color = self.stroke_color;
+            c.stroke_weight = self.stroke_weight;
+            if let Some(ref pfx) = self.callsign_prefix {
+                c.callsign = Some(format!("{pfx} Ring {}", i + 1));
+            }
+            c
+        }).collect()
+    }
+}
