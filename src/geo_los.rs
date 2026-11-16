@@ -113,3 +113,24 @@ pub fn elevation_angle_rad(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<f64,
 pub fn has_line_of_sight(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<bool, GeoLosError> {
     compute_geo_los(obs, target).map(|geom| geom.is_direct_los)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_coordinate_validation() {
+        assert_eq!(
+            GeoPoint3D::new(f64::NAN, 10.0, 100.0),
+            Err(GeoLosError::NonFiniteCoordinate)
+        );
+        assert_eq!(
+            GeoPoint3D::new(91.0, 10.0, 100.0),
+            Err(GeoLosError::LatitudeOutOfRange)
+        );
+        assert_eq!(
+            GeoPoint3D::new(-90.1, 10.0, 100.0),
+            Err(GeoLosError::LatitudeOutOfRange)
+        );
+        assert!(GeoPoint3D::new(45.0, 10.0, 100.0).is_ok());
+    }
