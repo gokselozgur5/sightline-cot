@@ -333,3 +333,22 @@ pub fn parse_mil_std(sidc: &str) -> Result<MilStdSymbol, MilStdError> {
         Err(MilStdError::InvalidLength)
     }
 }
+
+impl MilStdSymbol {
+    pub fn to_2525c_string(&self) -> String {
+        let mut s = String::with_capacity(15);
+        s.push('S');
+        s.push(self.affiliation.to_2525c_char());
+        s.push(self.dimension.to_2525c_char());
+        s.push(self.status.to_char());
+        for &c in &self.function_id {
+            s.push(c);
+        }
+        s.push(self.modifier[0]);
+        s.push(self.modifier[1]);
+        s.push(self.country_code[0]);
+        s.push(self.country_code[1]);
+        s.push('-');
+        s
+    }
+}
