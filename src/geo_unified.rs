@@ -151,7 +151,11 @@ pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, GridError> {
         let (x, y) = ups_project_south((-lat_deg).to_radians(), lam, e);
         ('S', x, y)
     };
-    Ok(UpsCoord { hemisphere, easting, northing })
+    Ok(UpsCoord {
+        hemisphere,
+        easting,
+        northing,
+    })
 }
 
 fn ups_solve_phi(t: f64, e: f64) -> f64 {
@@ -249,7 +253,11 @@ mod tests {
 
     #[test]
     fn test_unified_coord_accessors() {
-        let ups = UpsCoord { hemisphere: 'N', easting: 2000000.0, northing: 2000000.0 };
+        let ups = UpsCoord {
+            hemisphere: 'N',
+            easting: 2000000.0,
+            northing: 2000000.0,
+        };
         let u = UnifiedCoord::Ups(ups);
         assert_eq!(u.easting(), 2000000.0);
         assert_eq!(u.northing(), 2000000.0);
@@ -302,9 +310,17 @@ mod tests {
         assert_eq!(wgs84_to_ups(95.0, 0.0), Err(GridError::InvalidLatitude));
         assert_eq!(wgs84_to_ups(50.0, 0.0), Err(GridError::InvalidLatitude));
         assert_eq!(wgs84_to_ups(88.0, 200.0), Err(GridError::InvalidLongitude));
-        let bad_hemi = UpsCoord { hemisphere: 'X', easting: 2000000.0, northing: 2000000.0 };
+        let bad_hemi = UpsCoord {
+            hemisphere: 'X',
+            easting: 2000000.0,
+            northing: 2000000.0,
+        };
         assert_eq!(ups_to_wgs84(&bad_hemi), Err(GridError::InvalidLatitude));
-        let bad_easting = UpsCoord { hemisphere: 'N', easting: -1.0, northing: 2000000.0 };
+        let bad_easting = UpsCoord {
+            hemisphere: 'N',
+            easting: -1.0,
+            northing: 2000000.0,
+        };
         assert_eq!(ups_to_wgs84(&bad_easting), Err(GridError::InvalidEasting));
     }
 }
