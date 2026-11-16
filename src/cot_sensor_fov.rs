@@ -32,3 +32,23 @@ pub struct SensorCone {
     pub fov_deg: f64,
     pub range_m: f64,
 }
+
+impl SensorCone {
+    /// Create and validate a new SensorCone.
+    pub fn new(az_deg: f64, el_deg: f64, fov_deg: f64, range_m: f64) -> Result<Self, SensorFovError> {
+        if !az_deg.is_finite() || !el_deg.is_finite() || !fov_deg.is_finite() || !range_m.is_finite() {
+            return Err(SensorFovError::NonFiniteParameter);
+        }
+        if fov_deg <= 0.0 || fov_deg >= 180.0 {
+            return Err(SensorFovError::InvalidFovAngle);
+        }
+        if range_m <= 0.0 {
+            return Err(SensorFovError::InvalidRange);
+        }
+        if !(-90.0..=90.0).contains(&el_deg) {
+            return Err(SensorFovError::InvalidElevation);
+        }
+        let norm_az = (az_deg % 360.0 + 360.0) % 360.0;
+        Ok(Self { azimuth_deg: norm_az, elevation_deg: el_deg, fov_deg, range_m })
+    }
+}
