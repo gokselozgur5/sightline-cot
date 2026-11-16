@@ -305,3 +305,26 @@ impl CotRangeRings {
         })
     }
 }
+
+impl CotRangeRings {
+    /// Create uniform concentric range rings spaced by step_m.
+    pub fn from_interval(center_lat: f64, center_lon: f64, step_m: f64, count: usize) -> Result<Self, CotCircleError> {
+        if count == 0 {
+            return Err(CotCircleError::InvalidParameter("ring count must be at least 1"));
+        }
+        if !step_m.is_finite() || step_m <= 0.0 {
+            return Err(CotCircleError::InvalidRadius("interval step must be positive"));
+        }
+        let radii: Vec<f64> = (1..=count).map(|i| i as f64 * step_m).collect();
+        Self::new(center_lat, center_lon, radii)
+    }
+
+    /// Set height above ellipsoid in meters.
+    pub fn with_hae(mut self, hae: f64) -> Result<Self, CotCircleError> {
+        if !hae.is_finite() {
+            return Err(CotCircleError::InvalidParameter("hae must be finite"));
+        }
+        self.hae = Some(hae);
+        Ok(self)
+    }
+}
