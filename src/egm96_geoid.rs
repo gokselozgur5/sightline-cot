@@ -66,3 +66,26 @@ pub struct Egm96Geoid {
     pub rows: usize,
     pub undulations: Vec<f64>,
 }
+
+impl Egm96Geoid {
+    /// Validate input dimensions and grid step sizes.
+    fn validate_grid(
+        lat_step: f64,
+        lon_step: f64,
+        cols: usize,
+        rows: usize,
+        data_len: usize,
+    ) -> Result<(), Egm96Error> {
+        if !lat_step.is_finite() || lat_step <= 0.0 || !lon_step.is_finite() || lon_step <= 0.0 {
+            return Err(Egm96Error::InvalidStep);
+        }
+        if cols < 2 || rows < 2 {
+            return Err(Egm96Error::InvalidDimensions { cols, rows });
+        }
+        let expected = cols * rows;
+        if data_len != expected {
+            return Err(Egm96Error::DataLengthMismatch { expected, found: data_len });
+        }
+        Ok(())
+    }
+}
