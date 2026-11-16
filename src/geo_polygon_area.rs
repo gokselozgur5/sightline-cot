@@ -124,3 +124,22 @@ impl GeodesicPolygonArea {
         self.area_m2 / 4_046.856_422_4
     }
 }
+
+/// Compute polygon perimeter along great-circle arcs in meters.
+pub fn polygon_geodesic_perimeter(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaError> {
+    let n = vertices.len();
+    if n < 3 {
+        return Err(GeodesicAreaError::InsufficientVertices);
+    }
+    let mut total_rad = 0.0;
+    for i in 0..n {
+        let (p1, p2) = (vertices[i], vertices[(i + 1) % n]);
+        let (phi1, phi2) = (p1[0].to_radians(), p2[0].to_radians());
+        let dphi = phi2 - phi1;
+        let dlam = wrap_delta_lon((p2[1] - p1[1]).to_radians());
+        let h = (dphi * 0.5).sin().powi(2) + phi1.cos() * phi2.cos() * (dlam * 0.5).sin().powi(2);
+        let c = 2.0 * h.clamp(0.0, 1.0).sqrt().asin();
+        total_rad += c;
+    }
+    Ok(total_rad * WGS84_AUTHALIC_RADIUS_M)
+}
