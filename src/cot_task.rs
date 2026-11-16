@@ -59,3 +59,20 @@ impl TaskAction {
             Self::Custom(s) => s.as_str(),
         }
     }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "flyover" => Self::FlyOver,
+            "flyby" => Self::FlyBy,
+            "ingress" => Self::Ingress,
+            "egress" => Self::Egress,
+            "orbit" => Self::Orbit,
+            "drop" => Self::Drop,
+            "landing" => Self::Landing,
+            "target" => Self::Target,
+            "checkpoint" => Self::Checkpoint,
+            "rendezvous" => Self::Rendezvous,
+            other => Self::Custom(other.to_string()),
+        }
+    }
+}
