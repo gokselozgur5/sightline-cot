@@ -38,3 +38,19 @@ pub enum MilStdAffiliation {
     Joker,
     Faker,
 }
+
+impl MilStdAffiliation {
+    pub fn to_2525c_char(&self) -> char {
+        match self {
+            Self::Pending => 'P',
+            Self::Unknown => 'U',
+            Self::Friend => 'F',
+            Self::AssumedFriend => 'A',
+            Self::Neutral => 'N',
+            Self::Hostile => 'H',
+            Self::Suspect => 'S',
+            Self::Joker => 'J',
+            Self::Faker => 'K',
+        }
+    }
+}
