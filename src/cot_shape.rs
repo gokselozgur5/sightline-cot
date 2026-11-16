@@ -63,3 +63,20 @@ impl CotVertex {
         }
     }
 }
+
+/// Geometric shape category in CoT detail.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CotShapeType {
+    Polyline,
+    Polygon,
+}
+
+/// CoT shape representation for polylines and polygons.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CotShape {
+    pub shape_type: CotShapeType,
+    pub color: Option<i32>,
+    pub fill_color: Option<i32>,
+    pub stroke_weight: Option<f64>,
+    pub vertices: Vec<CotVertex>,
+}
