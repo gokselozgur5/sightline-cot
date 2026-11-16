@@ -515,6 +515,23 @@ pub fn mgrs_10figure_to_wgs84(mgrs: &Mgrs10Figure) -> Result<(f64, f64), GridErr
     utm_to_wgs84(&utm)
 }
 
+impl Mgrs10Figure {
+    /// Construct a 10-figure MGRS coordinate from WGS84 coordinates.
+    pub fn from_lat_lon(lat_deg: f64, lon_deg: f64) -> Result<Self, GridError> {
+        wgs84_to_mgrs_10figure(lat_deg, lon_deg)
+    }
+
+    /// Convert this 10-figure coordinate to WGS84 latitude and longitude.
+    pub fn to_lat_lon(&self) -> Result<(f64, f64), GridError> {
+        mgrs_10figure_to_wgs84(self)
+    }
+
+    /// Convert this 10-figure coordinate to a UTM coordinate.
+    pub fn to_utm(&self) -> Result<UtmCoord, GridError> {
+        mgrs_10figure_to_utm(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
