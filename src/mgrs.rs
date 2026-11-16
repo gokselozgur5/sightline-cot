@@ -755,4 +755,18 @@ mod tests {
             assert!((lon - lon_rt).abs() < 1e-4, "lon error at ({lat}, {lon})");
         }
     }
+
+    #[test]
+    fn test_mgrs_10figure_formatting() {
+        let fig = Mgrs10Figure {
+            zone: 31,
+            band: 'N',
+            col: 'E',
+            row: 'A',
+            easting: 1234,
+            northing: 5678,
+        };
+        assert_eq!(fig.format_compact().as_str(), "31NEA0123405678");
+        assert_eq!(fig.format_spaced().as_str(), "31N EA 01234 05678");
+    }
 }
