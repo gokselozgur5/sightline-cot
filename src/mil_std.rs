@@ -229,3 +229,22 @@ impl MilStdEchelon {
         }
     }
 }
+
+impl MilStdEchelon {
+    pub fn to_2525d_code(&self) -> &'static str {
+        match self {
+            Self::Unspecified => "00",
+            Self::Team => "11",
+            Self::Squad => "12",
+            Self::Section => "13",
+            Self::Platoon => "14",
+            Self::Company => "15",
+            Self::Battalion => "16",
+            Self::Regiment => "17",
+            Self::Brigade => "18",
+            Self::Division => "21",
+            Self::Corps => "22",
+            Self::Army => "23",
+        }
+    }
+}
