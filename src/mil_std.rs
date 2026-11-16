@@ -115,3 +115,16 @@ pub enum MilStdDimension {
     Space,
     Activity,
 }
+
+impl MilStdDimension {
+    pub fn to_2525c_char(&self) -> char {
+        match self {
+            Self::Land => 'G',
+            Self::Air => 'A',
+            Self::Surface => 'S',
+            Self::Subsurface => 'U',
+            Self::Space => 'P',
+            Self::Activity => 'X',
+        }
+    }
+}
