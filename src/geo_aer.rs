@@ -226,3 +226,18 @@ pub fn aer_to_geodetic(
     let ecef = aer_to_ecef(aer, obs_lat_deg, obs_lon_deg, obs_hae_m)?;
     Ok(crate::geo_ecef::ecef_to_geodetic(ecef[0], ecef[1], ecef[2]))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_aer_coord_validation() {
+        assert!(AerCoord::new(0.0, 0.0, 100.0).is_ok());
+        assert_eq!(AerCoord::new(-90.0, 0.0, 10.0).unwrap().azimuth_deg, 270.0);
+        assert_eq!(AerCoord::new(450.0, 0.0, 10.0).unwrap().azimuth_deg, 90.0);
+        assert_eq!(AerCoord::new(f64::NAN, 0.0, 10.0), Err(AerError::NonFinite));
+        assert_eq!(AerCoord::new(0.0, 95.0, 10.0), Err(AerError::ElevationOutOfRange));
+        assert_eq!(AerCoord::new(0.0, 0.0, -1.0), Err(AerError::NegativeRange));
+    }
+}
