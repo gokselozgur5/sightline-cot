@@ -133,3 +133,22 @@ impl CotCircle {
         Ok(dist <= self.radius_m)
     }
 }
+
+impl CotCircle {
+    /// Generate an approximation polygon of `num_points` geodetic boundary vertices.
+    pub fn to_polygon_vertices(&self, num_points: usize) -> Result<Vec<[f64; 2]>, CotCircleError> {
+        if num_points < 3 {
+            return Err(CotCircleError::InvalidParameter("num_points must be at least 3"));
+        }
+        let mut vertices = Vec::with_capacity(num_points);
+        let step_deg = 360.0 / num_points as f64;
+        for i in 0..num_points {
+            let bearing = i as f64 * step_deg;
+            let (p_lat, p_lon) = crate::geo_destination::destination_point(
+                self.lat, self.lon, bearing, self.radius_m,
+            );
+            vertices.push([p_lat, p_lon]);
+        }
+        Ok(vertices)
+    }
+}
