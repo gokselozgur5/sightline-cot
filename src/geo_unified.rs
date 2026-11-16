@@ -185,3 +185,23 @@ fn ups_unproject_south(easting: f64, northing: f64, e: f64) -> (f64, f64) {
     let phi_s = ups_solve_phi(rho / ups_c0(e), e).to_degrees();
     (-phi_s, lam)
 }
+
+/// Unproject UPS coordinate back to WGS84 (lat_deg, lon_deg).
+pub fn ups_to_wgs84(coord: &UpsCoord) -> Result<(f64, f64), GridError> {
+    if coord.hemisphere != 'N' && coord.hemisphere != 'S' {
+        return Err(GridError::InvalidLatitude);
+    }
+    if coord.easting <= 0.0 || coord.northing <= 0.0 {
+        return Err(GridError::InvalidEasting);
+    }
+    let (_, e) = ups_eccentricity();
+    let (lat, lon) = if coord.hemisphere == 'N' {
+        ups_unproject_north(coord.easting, coord.northing, e)
+    } else {
+        ups_unproject_south(coord.easting, coord.northing, e)
+    };
+    if !(-90.0..=90.0).contains(&lat) {
+        return Err(GridError::InvalidLatitude);
+    }
+    Ok((lat, lon))
+}
