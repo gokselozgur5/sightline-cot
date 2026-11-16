@@ -31,3 +31,12 @@ impl Waypoint {
         Self { lat, lon }
     }
 }
+
+/// Multi-segment great circle path interpolator.
+#[derive(Debug, Clone)]
+pub struct GreatCirclePath {
+    waypoints: Vec<Waypoint>,
+    segment_lengths: Vec<f64>,
+    cumulative_lengths: Vec<f64>,
+    total_length: f64,
+}
