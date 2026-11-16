@@ -513,3 +513,24 @@ mod tests {
         assert_eq!(parsed.name, "RECON-1");
         assert_eq!(parsed.point_count(), 2);
     }
+
+    #[test]
+    fn test_tactical_task_geometry() {
+        let mut task = TacticalTask::new("GEO-TASK");
+        assert!(task.centroid().is_err());
+        assert_eq!(task.total_distance_m(), 0.0);
+
+        task.add_point(TaskPoint::new(1, "P1", 0.0, 0.0).unwrap());
+        task.add_point(TaskPoint::new(2, "P2", 1.0, 0.0).unwrap());
+
+        let c = task.centroid().unwrap();
+        assert!((c[0] - 0.5).abs() < 1e-6);
+        assert!((c[1] - 0.0).abs() < 1e-6);
+
+        let dist = task.total_distance_m();
+        assert!((dist - 111195.0).abs() < 500.0);
+
+        let dur = task.estimated_duration_secs(50.0).unwrap();
+        assert!((dur - (dist / 50.0)).abs() < 1.0);
+    }
+}
