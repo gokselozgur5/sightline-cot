@@ -81,3 +81,14 @@ impl UnifiedCoord {
         matches!(self, Self::Ups(_))
     }
 }
+
+const WGS84_A: f64 = 6378137.0;
+const WGS84_F: f64 = 1.0 / 298.257223563;
+const UPS_K0: f64 = 0.994;
+const UPS_FALSE_ORIGIN: f64 = 2000000.0;
+
+#[inline]
+fn ups_eccentricity() -> (f64, f64) {
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    (e2, e2.sqrt())
+}
