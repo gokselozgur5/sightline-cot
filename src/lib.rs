@@ -39,6 +39,7 @@ pub use mgrs::{
     MgrsString, UtmCoord,
 };
 pub mod proto;
+pub mod mil_std;
 pub mod sidc;
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub mod geo_angle;
