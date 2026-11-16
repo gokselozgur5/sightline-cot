@@ -120,6 +120,13 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_geo_los_crate_export() {
+        let obs = GeoPoint3D::new(0.0, 0.0, 0.0).unwrap();
+        let tgt = GeoPoint3D::new(0.0, 0.0, 100.0).unwrap();
+        let geom = compute_geo_los(&obs, &tgt).unwrap();
+        assert!((geom.slant_range_m - 100.0).abs() < 1e-3);
+    }
+    #[test]
     fn sanity() {
         assert_eq!(VERSION, "0.1.0");
     }
