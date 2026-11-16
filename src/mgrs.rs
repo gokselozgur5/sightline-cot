@@ -727,4 +727,21 @@ mod tests {
         assert_eq!(sf.zone, 10);
         assert_eq!(sf.band, 'S');
     }
+
+    #[test]
+    fn test_mgrs_10figure_to_utm() {
+        let fig = Mgrs10Figure {
+            zone: 31,
+            band: 'N',
+            col: 'E',
+            row: 'A',
+            easting: 12345,
+            northing: 67890,
+        };
+        let utm = fig.to_utm().unwrap();
+        assert_eq!(utm.zone, 31);
+        assert_eq!(utm.hemisphere, 'N');
+        assert_eq!(utm.easting as u32, 512345);
+        assert_eq!(utm.northing as u32, 67890);
+    }
 }
