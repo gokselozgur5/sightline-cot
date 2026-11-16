@@ -112,3 +112,18 @@ pub fn sez_to_aer(sez: SezCoord) -> Result<AerCoord, AerError> {
     }
     AerCoord::new(az_deg, el_deg, range)
 }
+
+/// Convert topocentric AER coordinates to SEZ (South, East, Zenith).
+pub fn aer_to_sez(aer: AerCoord) -> SezCoord {
+    let az_rad = aer.azimuth_deg.to_radians();
+    let el_rad = aer.elevation_deg.to_radians();
+    let horiz = aer.range_m * el_rad.cos();
+    let zenith = aer.range_m * el_rad.sin();
+    let north = horiz * az_rad.cos();
+    let east = horiz * az_rad.sin();
+    SezCoord {
+        south_m: -north,
+        east_m: east,
+        zenith_m: zenith,
+    }
+}
