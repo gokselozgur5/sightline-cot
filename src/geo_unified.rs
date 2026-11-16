@@ -163,3 +163,25 @@ fn ups_solve_phi(t: f64, e: f64) -> f64 {
     }
     phi
 }
+
+fn ups_unproject_north(easting: f64, northing: f64, e: f64) -> (f64, f64) {
+    let (dx, dy) = (easting - UPS_FALSE_ORIGIN, northing - UPS_FALSE_ORIGIN);
+    let rho = dx.hypot(dy);
+    if rho < 1e-10 {
+        return (90.0, 0.0);
+    }
+    let lam = dx.atan2(-dy).to_degrees();
+    let phi = ups_solve_phi(rho / ups_c0(e), e).to_degrees();
+    (phi, lam)
+}
+
+fn ups_unproject_south(easting: f64, northing: f64, e: f64) -> (f64, f64) {
+    let (dx, dy) = (easting - UPS_FALSE_ORIGIN, northing - UPS_FALSE_ORIGIN);
+    let rho = dx.hypot(dy);
+    if rho < 1e-10 {
+        return (-90.0, 0.0);
+    }
+    let lam = dx.atan2(dy).to_degrees();
+    let phi_s = ups_solve_phi(rho / ups_c0(e), e).to_degrees();
+    (-phi_s, lam)
+}
