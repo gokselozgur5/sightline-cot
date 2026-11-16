@@ -110,3 +110,17 @@ impl StanagTimestamp {
         Ok(Self::from_be_bytes(val))
     }
 }
+
+impl StanagTimestamp {
+    /// Format timestamp as ISO 8601 UTC string (millisecond precision).
+    pub fn to_iso8601_utc(&self) -> String {
+        crate::cot::format_iso8601_utc(self.to_cot_millis())
+    }
+
+    /// Format timestamp as ISO 8601 UTC string with full microsecond precision.
+    pub fn to_iso8601_micros(&self) -> String {
+        let base = self.to_iso8601_utc();
+        let rem_micros = (self.micros % 1_000_000) as u32;
+        format!("{}.{:06}Z", &base[..19], rem_micros)
+    }
+}
