@@ -80,3 +80,19 @@ impl SezCoord {
         [self.south_m, self.east_m, self.zenith_m]
     }
 }
+
+/// Convert local ENU (East, North, Up) vector to SEZ (South, East, Zenith).
+#[inline]
+pub fn enu_to_sez(enu: [f64; 3]) -> SezCoord {
+    SezCoord {
+        south_m: -enu[1],
+        east_m: enu[0],
+        zenith_m: enu[2],
+    }
+}
+
+/// Convert local SEZ (South, East, Zenith) vector to ENU (East, North, Up).
+#[inline]
+pub fn sez_to_enu(sez: SezCoord) -> [f64; 3] {
+    [sez.east_m, -sez.south_m, sez.zenith_m]
+}
