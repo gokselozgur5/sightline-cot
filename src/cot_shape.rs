@@ -98,3 +98,31 @@ impl CotShape {
         Ok(Self { shape_type: CotShapeType::Polygon, color: None, fill_color: None, stroke_weight: None, vertices })
     }
 }
+
+impl CotShape {
+    /// Set line/stroke color (ARGB signed 32-bit integer).
+    pub fn with_color(mut self, color: i32) -> Self {
+        self.color = Some(color);
+        self
+    }
+
+    /// Set interior fill color (ARGB signed 32-bit integer).
+    pub fn with_fill_color(mut self, color: i32) -> Self {
+        self.fill_color = Some(color);
+        self
+    }
+
+    /// Set stroke line thickness in pixels.
+    pub fn with_stroke_weight(mut self, weight: f64) -> Result<Self, CotShapeError> {
+        if !weight.is_finite() || weight <= 0.0 {
+            return Err(CotShapeError::InvalidParameter("stroke weight must be positive"));
+        }
+        self.stroke_weight = Some(weight);
+        Ok(self)
+    }
+
+    /// Check if shape is a closed polygon.
+    pub fn is_closed(&self) -> bool {
+        self.shape_type == CotShapeType::Polygon
+    }
+}
