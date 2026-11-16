@@ -323,4 +323,14 @@ mod tests {
         let sampled = path.interpolate_fixed_step(step).unwrap();
         assert!(sampled.len() >= 5);
     }
+
+    #[test]
+    fn test_bearing_at_distance() {
+        let wps = [Waypoint::new(0.0, 0.0), Waypoint::new(10.0, 0.0)];
+        let path = GreatCirclePath::from_waypoints(&wps).unwrap();
+        let b0 = path.bearing_at_distance(0.0).unwrap();
+        assert!(b0.abs() < 1e-4);
+        let b_mid = path.bearing_at_distance(path.total_distance_m() * 0.5).unwrap();
+        assert!(b_mid.abs() < 1e-4);
+    }
 }
