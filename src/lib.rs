@@ -60,6 +60,7 @@ pub use mil_std::{
 };
 pub mod geo_angle;
 pub mod geo_area;
+pub mod geo_polygon_area;
 pub mod geo_bbox;
 pub mod geo_centroid;
 pub mod geo_compass;
