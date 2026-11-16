@@ -165,3 +165,24 @@ pub fn is_target_in_sensor_fov(
         .map_err(|_| SensorFovError::NonFiniteParameter)?;
     Ok(cone.contains_relative_point(enu))
 }
+
+use crate::cot_sensor::CotSensor;
+
+impl From<SensorCone> for CotSensor {
+    fn from(cone: SensorCone) -> Self {
+        CotSensor {
+            azimuth_deg: cone.azimuth_deg,
+            fov_deg: cone.fov_deg,
+            range_m: cone.range_m,
+            elevation_deg: cone.elevation_deg,
+        }
+    }
+}
+
+impl TryFrom<&CotSensor> for SensorCone {
+    type Error = SensorFovError;
+
+    fn try_from(sensor: &CotSensor) -> Result<Self, Self::Error> {
+        SensorCone::new(sensor.azimuth_deg, sensor.elevation_deg, sensor.fov_deg, sensor.range_m)
+    }
+}
