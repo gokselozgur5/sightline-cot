@@ -24,6 +24,9 @@ pub use cot_sensor_fov::{
 pub mod cot_shape;
 pub use cot_shape::{CotShape, CotShapeError, CotShapeType, CotVertex};
 pub mod cot_task;
+pub use cot_task::{
+    CotTaskError, TacticalTask, TaskAction, TaskPoint, TaskPriority, TaskStatus,
+};
 pub mod dem_bilinear;
 pub mod egm96_geoid;
 pub use egm96_geoid::{
