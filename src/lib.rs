@@ -63,6 +63,10 @@ pub use mil_std::{
 pub mod geo_angle;
 pub mod geo_area;
 pub mod geo_polygon_area;
+pub use geo_polygon_area::{
+    compute_cot_polygon_geometry, geodesic_polygon_area, is_counter_clockwise,
+    polygon_geodesic_perimeter, GeodesicAreaError, GeodesicPolygonArea,
+};
 pub mod geo_bbox;
 pub mod geo_centroid;
 pub mod geo_compass;
