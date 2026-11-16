@@ -582,6 +582,35 @@ fn clean_mgrs_bytes(s: &str, out: &mut [u8; 32]) -> Result<usize, GridError> {
     Ok(len)
 }
 
+/// Parse a 10-figure MGRS string into an [`Mgrs10Figure`] coordinate.
+pub fn parse_mgrs_10figure(s: &str) -> Result<Mgrs10Figure, GridError> {
+    let mut cleaned = [0u8; 32];
+    let len = clean_mgrs_bytes(s, &mut cleaned)?;
+    if !(14..=15).contains(&len) {
+        return Err(GridError::InvalidZone);
+    }
+    let (zone, r) = if len == 15 {
+        ((cleaned[0].wrapping_sub(b'0')) * 10 + (cleaned[1].wrapping_sub(b'0')), 2)
+    } else {
+        (cleaned[0].wrapping_sub(b'0'), 1)
+    };
+    if !(1..=60).contains(&zone) {
+        return Err(GridError::InvalidZone);
+    }
+    let digits = &cleaned[r + 3..len];
+    if digits.len() != 10 || !digits.iter().all(|c| c.is_ascii_digit()) {
+        return Err(GridError::InvalidEasting);
+    }
+    let mut e = 0u32;
+    for &d in &digits[..5] { e = e * 10 + (d - b'0') as u32; }
+    let mut n = 0u32;
+    for &d in &digits[5..] { n = n * 10 + (d - b'0') as u32; }
+    Ok(Mgrs10Figure {
+        zone, band: cleaned[r] as char, col: cleaned[r + 1] as char,
+        row: cleaned[r + 2] as char, easting: e, northing: n,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
