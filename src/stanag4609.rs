@@ -41,3 +41,23 @@ impl StanagTimestamp {
         self.micros
     }
 }
+
+impl StanagTimestamp {
+    /// Create a timestamp from elapsed milliseconds since Unix epoch (CoT format).
+    pub fn from_millis(millis: i64) -> Result<Self, StanagError> {
+        if millis < 0 {
+            return Err(StanagError::NegativeTimestamp);
+        }
+        Ok(Self::from_micros((millis as u64) * 1_000))
+    }
+
+    /// Convert timestamp to Unix epoch milliseconds used in CoT event attributes.
+    pub const fn to_cot_millis(&self) -> i64 {
+        (self.micros / 1_000) as i64
+    }
+
+    /// Convert timestamp to fractional seconds since Unix epoch.
+    pub fn to_secs_f64(&self) -> f64 {
+        (self.micros as f64) / 1_000_000.0
+    }
+}
