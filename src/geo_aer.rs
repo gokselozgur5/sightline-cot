@@ -269,4 +269,19 @@ mod tests {
         let aer_w = sez_to_aer(west).unwrap();
         assert!((aer_w.azimuth_deg - 270.0).abs() < 1e-6);
     }
+    #[test]
+    fn test_zenith_and_geodetic_roundtrip() {
+        let zenith = SezCoord::new(0.0, 0.0, 500.0).unwrap();
+        let aer_z = sez_to_aer(zenith).unwrap();
+        assert!((aer_z.elevation_deg - 90.0).abs() < 1e-6);
+        assert!((aer_z.range_m - 500.0).abs() < 1e-6);
+
+        let obs = (37.7749, -122.4194, 50.0);
+        let aer = AerCoord::new(45.0, 30.0, 1500.0).unwrap();
+        let (t_lat, t_lon, t_hae) = aer_to_geodetic(aer, obs.0, obs.1, obs.2).unwrap();
+        let aer_back = geodetic_to_aer(t_lat, t_lon, t_hae, obs.0, obs.1, obs.2).unwrap();
+        assert!((aer_back.azimuth_deg - aer.azimuth_deg).abs() < 1e-4);
+        assert!((aer_back.elevation_deg - aer.elevation_deg).abs() < 1e-4);
+        assert!((aer_back.range_m - aer.range_m).abs() < 1e-3);
+    }
 }
