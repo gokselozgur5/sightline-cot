@@ -47,3 +47,21 @@ pub struct SezCoord {
     /// Zenith displacement in meters normal to reference ellipsoid.
     pub zenith_m: f64,
 }
+
+impl AerCoord {
+    /// Create and validate a new AER coordinate.
+    pub fn new(azimuth_deg: f64, elevation_deg: f64, range_m: f64) -> Result<Self, AerError> {
+        if !azimuth_deg.is_finite() || !elevation_deg.is_finite() || !range_m.is_finite() {
+            return Err(AerError::NonFinite);
+        }
+        if !(-90.0..=90.0).contains(&elevation_deg) {
+            return Err(AerError::ElevationOutOfRange);
+        }
+        if range_m < 0.0 {
+            return Err(AerError::NegativeRange);
+        }
+        let norm_az = (azimuth_deg % 360.0 + 360.0) % 360.0;
+        let final_az = if (norm_az - 360.0).abs() < 1e-12 { 0.0 } else { norm_az };
+        Ok(Self { azimuth_deg: final_az, elevation_deg, range_m })
+    }
+}
