@@ -233,3 +233,28 @@ fn days_to_ymd(days: i64) -> (i64, i64, i64) {
     }
     (y, 1, (d % 28) + 1)
 }
+
+impl EmergencyBeacon {
+    pub fn to_cot_xml(&self) -> String {
+        let time_str = format_iso8601(self.time_ms);
+        let stale_str = format_iso8601(self.time_ms + self.stale_sec * 1000);
+        let cot_type = self.emergency_type.default_cot_type();
+        let desc = self.details.as_deref().unwrap_or(self.emergency_type.as_str());
+        format!(
+            "<event version=\"2.0\" uid=\"{uid}\" type=\"{cot_type}\" how=\"m-g\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\"><point lat=\"{lat:.7}\" lon=\"{lon:.7}\" hae=\"{hae:.2}\" ce=\"{ce:.2}\" le=\"{le:.2}\"/><detail><contact callsign=\"{callsign}\"/><emergency cancel=\"{cancel}\" type=\"{etype}\">{desc}</emergency></detail></event>",
+            uid = escape_xml(&self.uid),
+            cot_type = cot_type,
+            time_str = time_str,
+            stale_str = stale_str,
+            lat = self.lat_deg,
+            lon = self.lon_deg,
+            hae = self.hae_m,
+            ce = self.ce_m,
+            le = self.le_m,
+            callsign = escape_xml(&self.callsign),
+            cancel = self.cancel,
+            etype = escape_xml(self.emergency_type.as_str()),
+            desc = escape_xml(desc),
+        )
+    }
+}
