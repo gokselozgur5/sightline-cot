@@ -53,3 +53,12 @@ fn test_unified_exact_poles() {
     let (lat_s, _) = unified_to_wgs84(&south).expect("unproject south pole");
     assert!((lat_s - (-90.0)).abs() < 1e-6);
 }
+
+#[test]
+fn test_unified_out_of_bounds() {
+    use sightline_cot::GridError;
+    assert_eq!(wgs84_to_unified(91.0, 0.0), Err(GridError::InvalidLatitude));
+    assert_eq!(wgs84_to_unified(-91.0, 0.0), Err(GridError::InvalidLatitude));
+    assert_eq!(wgs84_to_unified(0.0, 181.0), Err(GridError::InvalidLongitude));
+    assert_eq!(wgs84_to_unified(0.0, -181.0), Err(GridError::InvalidLongitude));
+}
