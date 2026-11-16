@@ -220,3 +220,11 @@ pub fn wgs84_to_unified(lat_deg: f64, lon_deg: f64) -> Result<UnifiedCoord, Grid
         wgs84_to_utm(lat_deg, lon_deg).map(UnifiedCoord::Utm)
     }
 }
+
+/// Transform unified coordinate back to WGS84 geographic coordinate (lat_deg, lon_deg).
+pub fn unified_to_wgs84(coord: &UnifiedCoord) -> Result<(f64, f64), GridError> {
+    match coord {
+        UnifiedCoord::Utm(utm) => utm_to_wgs84(utm),
+        UnifiedCoord::Ups(ups) => ups_to_wgs84(ups),
+    }
+}
