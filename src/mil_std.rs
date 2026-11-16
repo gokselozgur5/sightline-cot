@@ -169,3 +169,10 @@ impl MilStdDimension {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum MilStdStatus {
+    #[default]
+    Present,
+    Planned,
+}
