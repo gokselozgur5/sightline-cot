@@ -118,3 +118,15 @@ fn intersect_ray_ground(ray: [f64; 3], dz_total: f64, ground_alt: f64) -> Option
         Some([t * ray[0], t * ray[1], ground_alt])
     }
 }
+
+fn sample_cone_perimeter_rays(b: [f64; 3], u1: [f64; 3], u2: [f64; 3], half_fov: f64, n: usize) -> Vec<[f64; 3]> {
+    let (cos_half, sin_half) = (half_fov.cos(), half_fov.sin());
+    (0..n).map(|i| {
+        let phi = 2.0 * std::f64::consts::PI * (i as f64) / (n as f64);
+        [
+            cos_half * b[0] + sin_half * (phi.cos() * u1[0] + phi.sin() * u2[0]),
+            cos_half * b[1] + sin_half * (phi.cos() * u1[1] + phi.sin() * u2[1]),
+            cos_half * b[2] + sin_half * (phi.cos() * u1[2] + phi.sin() * u2[2]),
+        ]
+    }).collect()
+}
