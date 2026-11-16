@@ -236,3 +236,13 @@ mod tests {
         assert!(b2[1].abs() < 1e-9);
         assert!(b2[2].abs() < 1e-9);
     }
+
+    #[test]
+    fn test_contains_relative_point() {
+        let cone = SensorCone::new(0.0, 0.0, 60.0, 1000.0).unwrap();
+        assert!(cone.contains_relative_point([0.0, 500.0, 0.0]));
+        assert!(!cone.contains_relative_point([0.0, 1500.0, 0.0]));
+        assert!(!cone.contains_relative_point([0.0, -500.0, 0.0]));
+        assert!(cone.contains_relative_point([0.0, 0.0, 0.0]));
+        assert!(cone.contains_relative_point([100.0, 500.0, 0.0]));
+    }
