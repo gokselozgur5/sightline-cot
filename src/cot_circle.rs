@@ -241,3 +241,26 @@ impl CotCircle {
         Ok((lat, lon, hae, major))
     }
 }
+
+impl CotCircle {
+    /// Parse a CoT circle from an XML event or detail snippet.
+    pub fn parse(xml: &str) -> Result<Self, CotCircleError> {
+        let (lat, lon, hae, radius) = Self::parse_point_and_radius(xml)?;
+        let mut circle = Self::new(lat, lon, radius)?;
+        circle.hae = hae;
+        if let Some(c) = xml.find("<contact").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+            circle.callsign = extract_attr(c, "callsign");
+        }
+        if let Some(s) = xml.find("<strokeColor").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+            circle.stroke_color = extract_attr(s, "value").and_then(|v| v.parse().ok());
+        }
+        if let Some(w) = xml.find("<strokeWeight").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+            circle.stroke_weight = extract_attr(w, "value").and_then(|v| v.parse().ok());
+        }
+        if let Some(f) = xml.find("<fillColor").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+            circle.fill_color = extract_attr(f, "value").and_then(|v| v.parse().ok());
+        }
+        circle.remarks = extract_tag_content(xml, "remarks").map(|s| s.to_string());
+        Ok(circle)
+    }
+}
