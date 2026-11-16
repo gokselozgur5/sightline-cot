@@ -107,3 +107,15 @@ impl CotCircle {
         self
     }
 }
+
+impl CotCircle {
+    /// Compute planar circle area in square meters.
+    pub fn area_m2(&self) -> f64 {
+        std::f64::consts::PI * self.radius_m * self.radius_m
+    }
+
+    /// Compute circle circumference in meters.
+    pub fn circumference_m(&self) -> f64 {
+        2.0 * std::f64::consts::PI * self.radius_m
+    }
+}
