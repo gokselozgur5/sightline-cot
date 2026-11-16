@@ -167,6 +167,11 @@ mod tests {
         assert!(cone.contains_relative_point([0.0, 100.0, -100.0]));
     }
     #[test]
+    fn test_egm96_geoid_crate_export() {
+        let geoid = Egm96Geoid::coarse_reference_grid();
+        assert!((geoid.get_node(0, 0) - (-30.0)).abs() < 1e-6);
+    }
+    #[test]
     fn sanity() {
         assert_eq!(VERSION, "0.1.0");
     }
