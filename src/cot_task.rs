@@ -314,3 +314,14 @@ impl TacticalTask {
     pub fn point_count(&self) -> usize {
         self.points.len()
     }
+
+    pub fn centroid(&self) -> Result<[f64; 2], CotTaskError> {
+        if self.points.is_empty() {
+            return Err(CotTaskError::EmptyRoute);
+        }
+        let (sum_lat, sum_lon) = self.points.iter().fold((0.0, 0.0), |(a_lat, a_lon), p| {
+            (a_lat + p.lat, a_lon + p.lon)
+        });
+        let n = self.points.len() as f64;
+        Ok([sum_lat / n, sum_lon / n])
+    }
