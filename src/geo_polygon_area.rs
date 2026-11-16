@@ -217,4 +217,16 @@ mod tests {
         assert!(geom.area_km2() > 0.4 && geom.area_km2() < 0.6);
         assert!(geom.area_hectares() > 40.0 && geom.area_hectares() < 60.0);
     }
+
+    #[test]
+    fn test_antimeridian_crossing_area() {
+        let poly = [
+            [10.0, 179.0],
+            [10.0, -179.0],
+            [11.0, -179.0],
+            [11.0, 179.0],
+        ];
+        let area = geodesic_polygon_area(&poly).unwrap();
+        assert!(area > 2.0e10 && area < 3.0e10);
+    }
 }
