@@ -152,3 +152,13 @@ impl CotCircle {
         Ok(vertices)
     }
 }
+
+impl CotCircle {
+    /// Render inner ATAK `<shape><ellipse .../></shape>` XML snippet.
+    pub fn to_shape_xml(&self) -> String {
+        format!(
+            "<shape><ellipse major=\"{:.2}\" minor=\"{:.2}\" angle=\"0.0\"/></shape>",
+            self.radius_m, self.radius_m
+        )
+    }
+}
