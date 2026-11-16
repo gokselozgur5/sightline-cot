@@ -145,6 +145,11 @@ mod tests {
         assert!((geom.slant_range_m - 100.0).abs() < 1e-3);
     }
     #[test]
+    fn test_cot_sensor_fov_crate_export() {
+        let cone = SensorCone::new(0.0, -45.0, 30.0, 1000.0).unwrap();
+        assert!(cone.contains_relative_point([0.0, 100.0, -100.0]));
+    }
+    #[test]
     fn sanity() {
         assert_eq!(VERSION, "0.1.0");
     }
