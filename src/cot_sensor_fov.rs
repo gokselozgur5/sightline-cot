@@ -52,3 +52,17 @@ impl SensorCone {
         Ok(Self { azimuth_deg: norm_az, elevation_deg: el_deg, fov_deg, range_m })
     }
 }
+
+impl SensorCone {
+    /// Compute unit boresight vector in local ENU frame [East, North, Up].
+    pub fn boresight_vector(&self) -> [f64; 3] {
+        let az_rad = self.azimuth_deg.to_radians();
+        let el_rad = self.elevation_deg.to_radians();
+        let cos_el = el_rad.cos();
+        let sin_el = el_rad.sin();
+        let east = az_rad.sin() * cos_el;
+        let north = az_rad.cos() * cos_el;
+        let up = sin_el;
+        [east, north, up]
+    }
+}
