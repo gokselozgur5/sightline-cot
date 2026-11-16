@@ -190,3 +190,31 @@ impl CotVertex {
         Ok(v)
     }
 }
+
+impl CotShape {
+    /// Parse a `<shape>...</shape>` or `<polyline ...>...</polyline>` XML snippet.
+    pub fn parse(xml: &str) -> Result<Self, CotShapeError> {
+        let p_start = xml.find("<polyline").ok_or_else(|| CotShapeError::XmlParseError("missing <polyline".into()))?;
+        let header_end = xml[p_start..].find('>').ok_or_else(|| CotShapeError::XmlParseError("unclosed <polyline".into()))?;
+        let header = &xml[p_start..p_start + header_end];
+        let closed = extract_attr(header, "closed").map(|s| s == "true").unwrap_or(false);
+        let color = extract_attr(header, "color").and_then(|s| s.parse::<i32>().ok());
+        let fill_color = extract_attr(header, "fillColor").and_then(|s| s.parse::<i32>().ok());
+        let stroke_weight = extract_attr(header, "strokeWeight").and_then(|s| s.parse::<f64>().ok());
+
+        let mut vertices = Vec::new();
+        let mut rest = &xml[p_start + header_end..];
+        while let Some(v_start) = rest.find("<vertex") {
+            let v_end = rest[v_start..].find("/>").ok_or_else(|| CotShapeError::XmlParseError("unclosed <vertex".into()))?;
+            let v_xml = &rest[v_start..v_start + v_end + 2];
+            vertices.push(CotVertex::parse(v_xml)?);
+            rest = &rest[v_start + v_end + 2..];
+        }
+
+        let mut shape = if closed { Self::new_polygon(vertices)? } else { Self::new_polyline(vertices)? };
+        shape.color = color;
+        shape.fill_color = fill_color;
+        shape.stroke_weight = stroke_weight;
+        Ok(shape)
+    }
+}
