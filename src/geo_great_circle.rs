@@ -40,3 +40,16 @@ pub struct GreatCirclePath {
     cumulative_lengths: Vec<f64>,
     total_length: f64,
 }
+
+/// Standard mean Earth radius in meters (IUGG).
+pub const EARTH_RADIUS_M: f64 = 6_371_008.8;
+
+fn validate_coord(wp: &Waypoint) -> Result<(), GreatCircleError> {
+    if !wp.lat.is_finite() || !(-90.0..=90.0).contains(&wp.lat) {
+        return Err(GreatCircleError::InvalidLatitude);
+    }
+    if !wp.lon.is_finite() || !(-180.0..=180.0).contains(&wp.lon) {
+        return Err(GreatCircleError::InvalidLongitude);
+    }
+    Ok(())
+}
