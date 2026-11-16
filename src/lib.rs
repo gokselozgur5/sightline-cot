@@ -79,6 +79,11 @@ pub mod geo_ddm;
 pub mod geo_dms;
 pub mod geo_destination;
 pub mod geo_enu;
+pub mod geo_aer;
+pub use geo_aer::{
+    aer_to_ecef, aer_to_geodetic, aer_to_sez, ecef_to_aer, ecef_to_sez, enu_to_sez,
+    geodetic_to_aer, sez_to_aer, sez_to_ecef, sez_to_enu, AerCoord, AerError, SezCoord,
+};
 pub mod geo_frame;
 pub mod geo_ecef;
 pub mod geo_greatcircle;
