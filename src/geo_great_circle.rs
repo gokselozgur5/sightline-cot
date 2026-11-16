@@ -89,3 +89,31 @@ fn segment_distance_m(w1: &Waypoint, w2: &Waypoint) -> Result<f64, GreatCircleEr
     }
     Ok(dot.acos() * EARTH_RADIUS_M)
 }
+
+impl GreatCirclePath {
+    /// Create a new GreatCirclePath from a list of waypoints.
+    pub fn from_waypoints(waypoints: &[Waypoint]) -> Result<Self, GreatCircleError> {
+        if waypoints.len() < 2 {
+            return Err(GreatCircleError::InsufficientWaypoints);
+        }
+        for wp in waypoints {
+            validate_coord(wp)?;
+        }
+        let mut segment_lengths = Vec::with_capacity(waypoints.len() - 1);
+        let mut cumulative_lengths = Vec::with_capacity(waypoints.len());
+        let mut running = 0.0;
+        cumulative_lengths.push(0.0);
+        for i in 0..waypoints.len() - 1 {
+            let d = segment_distance_m(&waypoints[i], &waypoints[i + 1])?;
+            segment_lengths.push(d);
+            running += d;
+            cumulative_lengths.push(running);
+        }
+        Ok(Self {
+            waypoints: waypoints.to_vec(),
+            segment_lengths,
+            cumulative_lengths,
+            total_length: running,
+        })
+    }
+}
