@@ -42,6 +42,7 @@ fn conformal_radius(lat_rad: f64, e: f64) -> f64 {
     t
 }
 
+/// Convert WGS-84 latitude and longitude into UPS coordinates.
 pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, UpsError> {
     if !lat_deg.is_finite() || !lon_deg.is_finite() {
         return Err(UpsError::NonFinite);
@@ -71,6 +72,7 @@ pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, UpsError> {
     }
 }
 
+/// Convert UPS coordinates into WGS-84 latitude and longitude.
 pub fn ups_to_wgs84(coord: UpsCoord) -> Result<(f64, f64), UpsError> {
     if !coord.easting.is_finite() || !coord.northing.is_finite() {
         return Err(UpsError::NonFinite);
