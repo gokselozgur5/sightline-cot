@@ -104,3 +104,14 @@ impl MilStdAffiliation {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum MilStdDimension {
+    #[default]
+    Land,
+    Air,
+    Surface,
+    Subsurface,
+    Space,
+    Activity,
+}
