@@ -119,3 +119,17 @@ impl CotCircle {
         2.0 * std::f64::consts::PI * self.radius_m
     }
 }
+
+impl CotCircle {
+    /// Test whether a geodetic point (lat, lon) falls within this circle.
+    pub fn contains_point(&self, lat: f64, lon: f64) -> Result<bool, CotCircleError> {
+        if !lat.is_finite() || !(-90.0..=90.0).contains(&lat) {
+            return Err(CotCircleError::InvalidCoordinate("latitude in [-90, 90]"));
+        }
+        if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
+            return Err(CotCircleError::InvalidCoordinate("longitude in [-180, 180]"));
+        }
+        let dist = crate::geo_haversine::haversine_distance_m([self.lat, self.lon], [lat, lon]);
+        Ok(dist <= self.radius_m)
+    }
+}
