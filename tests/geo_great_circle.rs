@@ -22,3 +22,17 @@ fn test_integration_transcontinental_flight_path() {
     let end = path.interpolate_at_fraction(1.0).unwrap();
     assert!((end.lat - hnd.lat).abs() < 1e-6);
 }
+
+#[test]
+fn test_integration_equatorial_sampling() {
+    let p1 = Waypoint::new(0.0, 0.0);
+    let p2 = Waypoint::new(0.0, 10.0);
+    let path = GreatCirclePath::from_waypoints(&[p1, p2]).unwrap();
+
+    let samples = path.interpolate_n_points(11).unwrap();
+    assert_eq!(samples.len(), 11);
+    for (i, wp) in samples.iter().enumerate() {
+        assert!(wp.lat.abs() < 1e-6);
+        assert!((wp.lon - (i as f64)).abs() < 1e-6);
+    }
+}
