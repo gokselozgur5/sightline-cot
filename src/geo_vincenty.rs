@@ -243,6 +243,32 @@ fn compute_inverse_result(
     }
 }
 
+/// Computes geodesic distance and azimuths between two points on a given ellipsoid.
+pub fn vincenty_inverse_ellipsoid(
+    lat1: f64, lon1: f64, lat2: f64, lon2: f64, ellipsoid: &Ellipsoid,
+) -> Result<VincentyInverse, VincentyError> {
+    validate_point(lat1, lon1)?;
+    validate_point(lat2, lon2)?;
+    let same_pole = (lat1 >= 90.0 - 1e-12 && lat2 >= 90.0 - 1e-12)
+        || (lat1 <= -90.0 + 1e-12 && lat2 <= -90.0 + 1e-12);
+    if ((lat1 - lat2).abs() < 1e-12 && (lon1 - lon2).abs() < 1e-12) || same_pole {
+        return Ok(VincentyInverse {
+            distance_m: 0.0,
+            forward_azimuth_deg: 0.0,
+            reverse_azimuth_deg: 0.0,
+        });
+    }
+    let u1 = ((1.0 - ellipsoid.f) * lat1.to_radians().tan()).atan();
+    let u2 = ((1.0 - ellipsoid.f) * lat2.to_radians().tan()).atan();
+    let (s_u1, c_u1, s_u2, c_u2) = (u1.sin(), u1.cos(), u2.sin(), u2.cos());
+    let l = wrap_to_pi((lon2 - lon1).to_radians());
+    let (sig, _, c2_a, c_2sm, lam) =
+        solve_inverse_loop_ellipsoid(s_u1, c_u1, s_u2, c_u2, l, ellipsoid.f)?;
+    Ok(compute_inverse_result_ellipsoid(
+        sig, c2_a, c_2sm, lam, s_u1, c_u1, s_u2, c_u2, ellipsoid.a, ellipsoid.b,
+    ))
+}
+
 /// Computes geodesic distance and azimuths between two points on WGS84.
 pub fn vincenty_inverse(
     lat1: f64,
