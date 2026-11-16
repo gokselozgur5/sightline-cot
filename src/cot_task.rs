@@ -371,3 +371,21 @@ impl TacticalTask {
         xml.push_str("</task>");
         xml
     }
+
+    pub fn to_cot_event_xml(
+        &self,
+        uid: &str,
+        callsign: &str,
+        time_ms: i64,
+        stale_ms: i64,
+    ) -> Result<String, CotTaskError> {
+        let [c_lat, c_lon] = self.centroid()?;
+        let time_str = crate::cot::format_iso8601_utc(time_ms);
+        let stale_str = crate::cot::format_iso8601_utc(stale_ms);
+        let uid_esc = crate::cot::escape_xml_attr(uid);
+        let cs_esc = crate::cot::escape_xml_attr(callsign);
+        let task_xml = self.to_task_xml();
+        Ok(format!(
+            "<event version=\"2.0\" uid=\"{uid_esc}\" type=\"b-m-r\" how=\"h-e\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\"><point lat=\"{c_lat:.7}\" lon=\"{c_lon:.7}\" hae=\"0.00\" ce=\"10.00\" le=\"10.00\"/><detail><contact callsign=\"{cs_esc}\"/>{task_xml}</detail></event>"
+        ))
+    }
