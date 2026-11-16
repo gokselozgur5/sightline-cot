@@ -321,3 +321,24 @@ pub fn vincenty_intermediate_points(
     }
     Ok(points)
 }
+
+/// Generates a dense geodesic waypoint path sampled at a given step distance.
+pub fn vincenty_geodesic_path(
+    lat1: f64, lon1: f64, lat2: f64, lon2: f64, step_m: f64,
+) -> Result<Vec<(f64, f64)>, VincentyError> {
+    if !step_m.is_finite() || step_m <= 0.0 {
+        return Err(VincentyError::NegativeDistance);
+    }
+    let inv = vincenty_inverse(lat1, lon1, lat2, lon2)?;
+    let mut path = vec![(lat1, lon1)];
+    if inv.distance_m > 1e-6 {
+        let mut d = step_m;
+        while d < inv.distance_m {
+            let wp = vincenty_direct(lat1, lon1, inv.forward_azimuth_deg, d)?;
+            path.push((wp.lat_deg, wp.lon_deg));
+            d += step_m;
+        }
+        path.push((lat2, lon2));
+    }
+    Ok(path)
+}
