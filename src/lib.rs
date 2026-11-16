@@ -66,6 +66,8 @@ pub mod geo_enu;
 pub mod geo_frame;
 pub mod geo_ecef;
 pub mod geo_greatcircle;
+pub mod geo_great_circle;
+pub use geo_great_circle::{GreatCircleError, GreatCirclePath, Waypoint};
 pub mod geo_haversine;
 pub use geo_haversine::{
     archav, hav, haversine_bearing_deg, haversine_bearing_rad, haversine_distance_m,
