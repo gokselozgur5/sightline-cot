@@ -277,3 +277,11 @@ mod tests {
         let n_interp = grid.undulation(75.0, 15.0).unwrap();
         assert!((n_interp - 25.75).abs() < 1e-4);
     }
+
+    #[test]
+    fn test_antimeridian_and_wrap() {
+        let grid = Egm96Geoid::coarse_reference_grid();
+        let n1 = grid.undulation(0.0, 350.0).unwrap();
+        let n2 = grid.undulation(0.0, -10.0).unwrap();
+        assert!((n1 - n2).abs() < 1e-6);
+    }
