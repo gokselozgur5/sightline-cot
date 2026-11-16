@@ -234,3 +234,13 @@ impl TaskPoint {
         xml.push_str("/>");
         xml
     }
+
+    pub fn parse(xml: &str) -> Result<Self, CotTaskError> {
+        let order_s = extract_attr(xml, "order").ok_or(CotTaskError::MissingField("order"))?;
+        let order = order_s.parse::<u32>().map_err(|_| CotTaskError::InvalidParameter("order"))?;
+        let name = extract_attr(xml, "name").unwrap_or_else(|| "WP".to_string());
+        let lat_s = extract_attr(xml, "lat").ok_or(CotTaskError::MissingField("lat"))?;
+        let lon_s = extract_attr(xml, "lon").ok_or(CotTaskError::MissingField("lon"))?;
+        let lat = lat_s.parse::<f64>().map_err(|_| CotTaskError::InvalidCoordinate("lat"))?;
+        let lon = lon_s.parse::<f64>().map_err(|_| CotTaskError::InvalidCoordinate("lon"))?;
+        let mut pt = Self::new(order, name, lat, lon)?;
