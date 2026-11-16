@@ -80,3 +80,12 @@ fn interpolate_segment(w1: &Waypoint, w2: &Waypoint, f: f64) -> Waypoint {
         a * v1[2] + b * v2[2],
     ])
 }
+
+fn segment_distance_m(w1: &Waypoint, w2: &Waypoint) -> Result<f64, GreatCircleError> {
+    let (v1, v2) = (to_cartesian(w1), to_cartesian(w2));
+    let dot = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]).clamp(-1.0, 1.0);
+    if dot <= -1.0 + 1e-12 {
+        return Err(GreatCircleError::AntipodalWaypoints);
+    }
+    Ok(dot.acos() * EARTH_RADIUS_M)
+}
