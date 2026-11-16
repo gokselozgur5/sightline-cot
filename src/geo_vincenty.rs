@@ -127,7 +127,12 @@ fn solve_step(
 }
 
 fn solve_inverse_loop_ellipsoid(
-    sin_u1: f64, cos_u1: f64, sin_u2: f64, cos_u2: f64, l: f64, f: f64,
+    sin_u1: f64,
+    cos_u1: f64,
+    sin_u2: f64,
+    cos_u2: f64,
+    l: f64,
+    f: f64,
 ) -> Result<(f64, f64, f64, f64, f64), VincentyError> {
     let mut lambda = l;
     for _ in 0..200 {
@@ -135,7 +140,9 @@ fn solve_inverse_loop_ellipsoid(
             solve_step(sin_u1, cos_u1, sin_u2, cos_u2, lambda)?;
         let c = vincenty_c_ellipsoid(c2_alp, f);
         let lam_next = l
-            + (1.0 - c) * f * s_alp
+            + (1.0 - c)
+                * f
+                * s_alp
                 * (sigma + c * s_sig * (c_2sm + c * c_sig * (-1.0 + 2.0 * c_2sm * c_2sm)));
         if (lam_next - lambda).abs() < 1e-12 {
             return Ok((sigma, s_alp, c2_alp, c_2sm, lam_next));
