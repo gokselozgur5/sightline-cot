@@ -270,3 +270,10 @@ mod tests {
         let n_ind_ocean = grid.undulation(0.0, 90.0).unwrap();
         assert!((n_ind_ocean - (-106.0)).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_bilinear_interpolation_midpoint() {
+        let grid = Egm96Geoid::coarse_reference_grid();
+        let n_interp = grid.undulation(75.0, 15.0).unwrap();
+        assert!((n_interp - 25.75).abs() < 1e-4);
+    }
