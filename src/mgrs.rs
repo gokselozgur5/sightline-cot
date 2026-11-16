@@ -568,6 +568,20 @@ impl Mgrs10Figure {
     }
 }
 
+fn clean_mgrs_bytes(s: &str, out: &mut [u8; 32]) -> Result<usize, GridError> {
+    let mut len = 0;
+    for &b in s.as_bytes() {
+        if !b.is_ascii_whitespace() {
+            if len >= 32 {
+                return Err(GridError::BufferTooSmall);
+            }
+            out[len] = b.to_ascii_uppercase();
+            len += 1;
+        }
+    }
+    Ok(len)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
