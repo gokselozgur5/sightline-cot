@@ -249,3 +249,21 @@ impl GreatCirclePath {
         Ok(result)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_insufficient_waypoints() {
+        assert_eq!(
+            GreatCirclePath::from_waypoints(&[]).unwrap_err(),
+            GreatCircleError::InsufficientWaypoints
+        );
+        let single = [Waypoint::new(0.0, 0.0)];
+        assert_eq!(
+            GreatCirclePath::from_waypoints(&single).unwrap_err(),
+            GreatCircleError::InsufficientWaypoints
+        );
+    }
+}
