@@ -42,6 +42,10 @@ pub mod proto;
 pub mod mil_std;
 pub mod sidc;
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
+pub use mil_std::{
+    parse_mil_std, MilStdAffiliation, MilStdDimension, MilStdEchelon, MilStdError, MilStdStatus,
+    MilStdSymbol,
+};
 pub mod geo_angle;
 pub mod geo_area;
 pub mod geo_bbox;
