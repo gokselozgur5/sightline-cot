@@ -73,6 +73,10 @@ fn vincenty_ab(cos2_alpha: f64) -> (f64, f64) {
     (a, b)
 }
 
+fn vincenty_c_ellipsoid(cos2_alpha: f64, f: f64) -> f64 {
+    f / 16.0 * cos2_alpha * (4.0 + f * (4.0 - 3.0 * cos2_alpha))
+}
+
 fn vincenty_c(cos2_alpha: f64) -> f64 {
     WGS84_F / 16.0 * cos2_alpha * (4.0 + WGS84_F * (4.0 - 3.0 * cos2_alpha))
 }
