@@ -45,3 +45,16 @@ pub fn authalic_q(lat_rad: f64) -> f64 {
     let term2 = ((1.0 - e_sin) / (1.0 + e_sin)).ln() / (2.0 * e);
     (1.0 - WGS84_E2) * (term1 - term2)
 }
+
+/// Compute sin(beta) where beta is the authalic latitude on WGS84.
+pub fn authalic_sin_beta(lat_deg: f64) -> Result<f64, GeodesicAreaError> {
+    if !lat_deg.is_finite() {
+        return Err(GeodesicAreaError::NonFiniteCoordinate);
+    }
+    if !(-90.0..=90.0).contains(&lat_deg) {
+        return Err(GeodesicAreaError::LatitudeOutOfRange);
+    }
+    let q = authalic_q(lat_deg.to_radians());
+    let q_polar = authalic_q(core::f64::consts::FRAC_PI_2);
+    Ok((q / q_polar).clamp(-1.0, 1.0))
+}
