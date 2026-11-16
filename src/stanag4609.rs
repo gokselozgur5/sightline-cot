@@ -124,3 +124,24 @@ impl StanagTimestamp {
         format!("{}.{:06}Z", &base[..19], rem_micros)
     }
 }
+
+impl StanagTimestamp {
+    /// Parse an ISO 8601 UTC timestamp string into a StanagTimestamp.
+    pub fn from_iso8601(s: &str) -> Result<Self, StanagError> {
+        let ms = crate::cot::parse_iso8601_utc(s)
+            .map_err(|e| StanagError::InvalidIso8601(e.to_string()))?;
+        if ms < 0 {
+            return Err(StanagError::NegativeTimestamp);
+        }
+        let mut micros = (ms as u64) * 1_000;
+        if let Some(dot_idx) = s.find('.') {
+            let frac = s[dot_idx + 1..].trim_end_matches('Z');
+            if frac.len() >= 6 {
+                if let Ok(extra_us) = frac[3..6].parse::<u64>() {
+                    micros += extra_us;
+                }
+            }
+        }
+        Ok(Self::from_micros(micros))
+    }
+}
