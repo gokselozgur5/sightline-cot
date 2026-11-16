@@ -58,3 +58,16 @@ pub fn authalic_sin_beta(lat_deg: f64) -> Result<f64, GeodesicAreaError> {
     let q_polar = authalic_q(core::f64::consts::FRAC_PI_2);
     Ok((q / q_polar).clamp(-1.0, 1.0))
 }
+
+/// Wrap longitude difference into [-PI, PI] radians.
+pub fn wrap_delta_lon(dlon_rad: f64) -> f64 {
+    let pi = core::f64::consts::PI;
+    let two_pi = 2.0 * pi;
+    let mut rem = dlon_rad % two_pi;
+    if rem > pi {
+        rem -= two_pi;
+    } else if rem < -pi {
+        rem += two_pi;
+    }
+    rem
+}
