@@ -445,6 +445,24 @@ fn band_to_approx_northing(band: char) -> Result<(char, f64), GridError> {
     Ok((hemi, n))
 }
 
+/// Convert WGS84 latitude and longitude to a 10-figure MGRS coordinate.
+pub fn wgs84_to_mgrs_10figure(lat_deg: f64, lon_deg: f64) -> Result<Mgrs10Figure, GridError> {
+    let utm = wgs84_to_utm(lat_deg, lon_deg)?;
+    let band = lat_to_mgrs_band(lat_deg)?;
+    let col = mgrs_100k_col_letter(utm.zone, utm.easting);
+    let row = mgrs_100k_row_letter(utm.zone, utm.northing);
+    let easting = ((utm.easting.rem_euclid(100_000.0)).floor() as u32).min(99_999);
+    let northing = ((utm.northing.rem_euclid(100_000.0)).floor() as u32).min(99_999);
+    Ok(Mgrs10Figure {
+        zone: utm.zone,
+        band,
+        col,
+        row,
+        easting,
+        northing,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
