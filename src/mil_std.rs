@@ -273,3 +273,27 @@ impl Default for MilStdSymbol {
         }
     }
 }
+
+impl MilStdSymbol {
+    pub fn parse_2525c(s: &str) -> Result<Self, MilStdError> {
+        let chars: Vec<char> = s.chars().collect();
+        if chars.len() != 15 {
+            return Err(MilStdError::InvalidLength);
+        }
+        let aff = MilStdAffiliation::from_2525c_char(chars[1])?;
+        let dim = MilStdDimension::from_2525c_char(chars[2])?;
+        let status = MilStdStatus::from_char(chars[3])?;
+        let mut fid = ['-'; 6];
+        for (i, c) in chars[4..10].iter().enumerate() {
+            fid[i] = *c;
+        }
+        let mut sym = Self::default();
+        sym.affiliation = aff;
+        sym.dimension = dim;
+        sym.status = status;
+        sym.function_id = fid;
+        sym.modifier = [chars[10], chars[11]];
+        sym.country_code = [chars[12], chars[13]];
+        Ok(sym)
+    }
+}
