@@ -33,3 +33,31 @@ const FALSE_EASTING_NORTH: f64 = 2000000.0;
 const FALSE_NORTHING_NORTH: f64 = 2000000.0;
 const FALSE_EASTING_SOUTH: f64 = 2000000.0;
 const FALSE_NORTHING_SOUTH: f64 = 2000000.0;
+
+fn conformal_radius(lat_rad: f64, e: f64) -> f64 {
+    let half_pi = std::f64::consts::FRAC_PI_2;
+    let s = lat_rad.sin();
+    let es = e * s;
+    let t = ((half_pi - lat_rad) / 2.0).tan() * ((1.0 + es) / (1.0 - es)).powf(e / 2.0);
+    t
+}
+
+pub fn wgs84_to_ups(lat_deg: f64, lon_deg: f64) -> Result<UpsCoord, UpsError> {
+    if !lat_deg.is_finite() || !lon_deg.is_finite() {
+        return Err(UpsError::NonFinite);
+    }
+    let e2 = WGS84_F * (2.0 - WGS84_F);
+    let e = e2.sqrt();
+    if lat_deg >= 83.5 {
+        let lat_rad = lat_deg.to_radians();
+        let lon_rad = lon_deg.to_radians();
+        let t = conformal_radius(lat_rad, e);
+        let m1 = UPS_K0 * 2.0 * WGS84_A / ((1.0 - e2).sqrt());
+        let rho = m1 * t / 2.0;
+        let easting = FALSE_EASTING_NORTH + rho * lon_rad.sin();
+        let northing = FALSE_NORTHING_NORTH - rho * lon_rad.cos();
+        Ok(UpsCoord::new(easting, northing, UpsHemisphere::North))
+    } else {
+        Err(UpsError::InvalidLatitude)
+    }
+}
