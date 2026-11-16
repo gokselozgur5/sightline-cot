@@ -162,3 +162,27 @@ impl CotCircle {
         )
     }
 }
+
+impl CotCircle {
+    /// Render the complete `<detail>` block including contact, styles, and shape.
+    pub fn to_detail_xml(&self) -> String {
+        let mut inner = String::new();
+        if let Some(ref cs) = self.callsign {
+            inner.push_str(&format!("<contact callsign=\"{}\"/>", crate::cot::escape_xml_attr(cs)));
+        }
+        if let Some(sc) = self.stroke_color {
+            inner.push_str(&format!("<strokeColor value=\"{sc}\"/>"));
+        }
+        if let Some(sw) = self.stroke_weight {
+            inner.push_str(&format!("<strokeWeight value=\"{sw:.2}\"/>"));
+        }
+        if let Some(fc) = self.fill_color {
+            inner.push_str(&format!("<fillColor value=\"{fc}\"/>"));
+        }
+        inner.push_str(&self.to_shape_xml());
+        if let Some(ref rem) = self.remarks {
+            inner.push_str(&format!("<remarks>{}</remarks>", crate::cot::escape_xml_attr(rem)));
+        }
+        format!("<detail>{inner}</detail>")
+    }
+}
