@@ -53,6 +53,7 @@ pub use mgrs::{
 pub mod proto;
 pub mod mil_std;
 pub mod sidc;
+pub mod stanag4609;
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub use mil_std::{
     parse_mil_std, MilStdAffiliation, MilStdDimension, MilStdEchelon, MilStdError, MilStdStatus,
