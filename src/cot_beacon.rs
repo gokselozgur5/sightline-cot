@@ -32,3 +32,29 @@ pub enum EmergencyType {
     Cancel,
     Custom(String),
 }
+
+impl EmergencyType {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Alert911 => "911 Alert",
+            Self::Mayday => "Mayday",
+            Self::RingTheBell => "Ring The Bell",
+            Self::TroopsInContact => "Troops In Contact",
+            Self::GeoFenceBreach => "Geo-fence Breach",
+            Self::Cancel => "Cancel",
+            Self::Custom(s) => s.as_str(),
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "911 Alert" => Self::Alert911,
+            "Mayday" => Self::Mayday,
+            "Ring The Bell" => Self::RingTheBell,
+            "Troops In Contact" => Self::TroopsInContact,
+            "Geo-fence Breach" => Self::GeoFenceBreach,
+            "Cancel" => Self::Cancel,
+            other => Self::Custom(other.to_string()),
+        }
+    }
+}
