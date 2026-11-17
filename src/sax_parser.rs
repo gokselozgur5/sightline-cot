@@ -574,3 +574,27 @@ impl CotChunkStreamer {
                     }
                     if keep > 0 {
                         let drop = self.buffer.len() - keep;
+                        self.buffer.drain(..drop);
+                    } else {
+                        self.buffer.clear();
+                    }
+                    break;
+                }
+            };
+
+            let end_pattern = "</event>";
+            let end_idx = match self.buffer[start_idx..].find(end_pattern) {
+                Some(rel) => start_idx + rel + end_pattern.len(),
+                None => {
+                    if start_idx > 0 {
+                        self.buffer.drain(..start_idx);
+                    }
+                    break;
+                }
+            };
+
+            let event_xml = self.buffer[start_idx..end_idx].to_string();
+            completed.push(event_xml);
+            self.buffer.drain(..end_idx);
+        }
+
