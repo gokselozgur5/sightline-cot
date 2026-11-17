@@ -280,4 +280,25 @@ impl ElevationMaskValidator {
             status,
         })
     }
+
+    /// Compute target elevation angle from observer to target with curvature option.
+    pub fn compute_target_elevation_deg(
+        &self,
+        dist_m: f64,
+        height_m: f64,
+        curvature: bool,
+    ) -> Result<f64, ElevationMaskError> {
+        if !dist_m.is_finite() || !height_m.is_finite() {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        if dist_m <= 0.0 {
+            return Err(ElevationMaskError::InvalidDistance);
+        }
+        let drop_m = if curvature {
+            (dist_m * dist_m) / (2.0 * ((4.0 / 3.0) * 6_371_000.0))
+        } else {
+            0.0
+        };
+        Ok(((height_m - drop_m - self.observer_height_m).atan2(dist_m)).to_degrees())
+    }
 }
