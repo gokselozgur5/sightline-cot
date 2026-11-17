@@ -362,3 +362,18 @@ mod tests {
         assert_eq!(mat.set(3, 0, 1.0), Err(AssocError::IndexOutOfBounds));
         assert_eq!(mat.set(0, 0, f64::NAN), Err(AssocError::NonFiniteInput));
     }
+
+    #[test]
+    fn test_from_nested_and_spatial() {
+        let nested = vec![vec![1.0, 2.0], vec![3.0, 4.0]];
+        let mat = DistanceMatrix::from_nested(&nested).unwrap();
+        assert_eq!(mat.get(1, 0), Some(3.0));
+        let bad = vec![vec![1.0, 2.0], vec![3.0]];
+        assert_eq!(DistanceMatrix::from_nested(&bad), Err(AssocError::DimensionMismatch));
+
+        let t2 = [[0.0, 0.0], [10.0, 10.0]];
+        let d2 = [[0.0, 3.0], [10.0, 14.0]];
+        let smat = compute_spatial_matrix_2d(&t2, &d2).unwrap();
+        assert!((smat.get(0, 0).unwrap() - 3.0).abs() < 1e-9);
+        assert!((smat.get(1, 1).unwrap() - 4.0).abs() < 1e-9);
+    }
