@@ -264,3 +264,32 @@ pub fn compute_frustum_ground_enu(
     }
     Ok((b_pt, slant_range, corners_enu))
 }
+
+
+/// Generate complete sensor ground footprint polygon from platform, gimbal, and sensor configuration.
+pub fn generate_sensor_footprint(
+    platform: &PlatformPose,
+    gimbal: &SensorGimbal,
+    config: &SensorFrustumConfig,
+    ground_alt_hae_m: f64,
+) -> Result<FrustumFootprint, FrustumError> {
+    let (b_enu, slant, corners_enu) = compute_frustum_ground_enu(platform, gimbal, config, ground_alt_hae_m)?;
+    let (b_lat, b_lon, b_alt) = crate::camera::enu_to_geodetic(
+        b_enu, platform.lat_deg, platform.lon_deg, ground_alt_hae_m,
+    );
+    let mut vertices_geo = Vec::with_capacity(corners_enu.len());
+    for c in &corners_enu {
+        let (lat, lon, alt) = crate::camera::enu_to_geodetic(*c, platform.lat_deg, platform.lon_deg, ground_alt_hae_m);
+        vertices_geo.push([lat, lon, alt]);
+    }
+    let area = polygon_area_enu(&corners_enu);
+    let perim = polygon_perimeter_enu(&corners_enu);
+    Ok(FrustumFootprint {
+        vertices_enu: corners_enu,
+        vertices_geo,
+        boresight_geo: [b_lat, b_lon, b_alt],
+        area_sq_m: area,
+        perimeter_m: perim,
+        slant_range_m: slant,
+    })
+}
