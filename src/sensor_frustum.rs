@@ -241,6 +241,27 @@ impl FrustumFootprint {
     }
 }
 
+/// Compute boresight and 4 corner ray unit vectors in ENU coordinates.
+pub fn compute_frustum_rays_enu(
+    az_deg: f64, el_deg: f64, roll_deg: f64, h_fov_deg: f64, v_fov_deg: f64,
+) -> ([f64; 3], [[f64; 3]; 4]) {
+    let (az_rad, el_rad, roll_rad) = (az_deg.to_radians(), el_deg.to_radians(), roll_deg.to_radians());
+    let (cos_el, sin_el) = (el_rad.cos(), el_rad.sin());
+    let b = [az_rad.sin() * cos_el, az_rad.cos() * cos_el, sin_el];
+    let (r0, u0) = ([az_rad.cos(), -az_rad.sin(), 0.0], [az_rad.sin() * sin_el, az_rad.cos() * sin_el, -cos_el]);
+    let (cr, sr) = (roll_rad.cos(), roll_rad.sin());
+    let r = [r0[0] * cr + u0[0] * sr, r0[1] * cr + u0[1] * sr, u0[2] * sr];
+    let u = [-r0[0] * sr + u0[0] * cr, -r0[1] * sr + u0[1] * cr, u0[2] * cr];
+    let (th, tv) = ((h_fov_deg * 0.5).to_radians().tan(), (v_fov_deg * 0.5).to_radians().tan());
+    let deltas = [(-th, tv), (th, tv), (th, -tv), (-th, -tv)];
+    let mut corners = [[0.0; 3]; 4];
+    for (i, (dx, dy)) in deltas.iter().enumerate() {
+        let v = [b[0] + r[0] * dx + u[0] * dy, b[1] + r[1] * dx + u[1] * dy, b[2] + r[2] * dx + u[2] * dy];
+        let m = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt();
+        corners[i] = [v[0] / m, v[1] / m, v[2] / m];
+    }
+    (b, corners)
+}
 
 /// Compute ENU boresight and 4 corner ground intersection points.
 pub fn compute_frustum_ground_enu(
