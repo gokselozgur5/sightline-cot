@@ -46,3 +46,27 @@ pub struct SaxAttributes<'a> {
     raw: &'a str,
 }
 
+impl<'a> SaxAttributes<'a> {
+    /// Construct a new attribute parser from the raw attribute string slice.
+    pub fn new(raw: &'a str) -> Self {
+        Self { raw }
+    }
+
+    /// Retrieve the raw attribute slice.
+    pub fn as_raw(&self) -> &'a str {
+        self.raw
+    }
+
+    /// Lookup an attribute value by name.
+    pub fn get(&self, target_name: &str) -> Option<&'a str> {
+        let mut iter = self.iter();
+        while let Some(attr) = iter.next() {
+            if let Ok(a) = attr {
+                if a.name == target_name {
+                    return Some(a.value);
+                }
+            }
+        }
+        None
+    }
+
