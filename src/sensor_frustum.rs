@@ -317,3 +317,21 @@ impl SensorGimbal {
         )
     }
 }
+
+
+impl FrustumFootprint {
+    /// Render complete standalone CoT 2.0 XML event containing the sensor footprint.
+    pub fn to_cot_event_xml(&self, uid: &str, callsign: &str, time_ms: i64, stale_ms: i64) -> String {
+        let [c_lat, c_lon, c_alt] = self.centroid_geo();
+        let time_str = crate::cot::format_iso8601_utc(time_ms);
+        let stale_str = crate::cot::format_iso8601_utc(stale_ms);
+        let shape_xml = self.to_cot_shape_xml(-16711936, 536936192);
+        let cs_esc = crate::cot::escape_xml_attr(callsign);
+        let uid_esc = crate::cot::escape_xml_attr(uid);
+        format!(
+            "<event version=\"2.0\" uid=\"{uid_esc}\" type=\"u-d-f\" how=\"m-g\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\">\
+<point lat=\"{c_lat:.7}\" lon=\"{c_lon:.7}\" hae=\"{c_alt:.2}\" ce=\"10.0\" le=\"10.0\"/>\
+<detail><contact callsign=\"{cs_esc}\"/>{shape_xml}</detail></event>"
+        )
+    }
+}
