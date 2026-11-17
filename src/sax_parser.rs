@@ -718,3 +718,27 @@ mod tests {
                 assert_eq!(expected, "b");
                 assert_eq!(found, "c");
             }
+            other => panic!("expected MismatchedTag, got {other:?}"),
+        }
+
+        let unclosed = "<start><nested>";
+        let mut reader2 = SaxReader::new(unclosed);
+        assert_eq!(reader2.next_event().unwrap(), Some(SaxEvent::StartDocument));
+        let _ = reader2.next_event().unwrap(); // <start>
+        let _ = reader2.next_event().unwrap(); // <nested>
+        match reader2.next_event() {
+            Err(SaxError::UnclosedElement(el)) => assert_eq!(el, "nested"),
+            other => panic!("expected UnclosedElement, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_cot_chunk_streamer() {
+        let mut streamer = CotChunkStreamer::new();
+        let chunk1 = "<event uid=\"1\"><point lat=\"10.0\" lon=\"20.0\"/>";
+        let chunk2 = "</event><event uid=\"2\"><point lat=\"30.0\" ";
+        let chunk3 = "lon=\"40.0\"/></event>";
+
+        let res1 = streamer.feed(chunk1);
+        assert_eq!(res1.len(), 0);
+
