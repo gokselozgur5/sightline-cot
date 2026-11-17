@@ -1,0 +1,24 @@
+use sightline_cot::terrain_sampler::{
+    cot_target_from_intercept, GeoTiffElevationGrid, InterpolationMethod, TerrainInterceptSolver,
+    TerrainRay, TerrainSamplerError,
+};
+
+#[test]
+fn test_geotiff_grid_validation_errors() {
+    assert!(GeoTiffElevationGrid::new(f64::NAN, 0.0, 1.0, 1.0, 2, 2, vec![Some(0.0); 4]).is_err());
+    assert!(GeoTiffElevationGrid::new(0.0, 0.0, -1.0, 1.0, 2, 2, vec![Some(0.0); 4]).is_err());
+    assert!(GeoTiffElevationGrid::new(0.0, 0.0, 1.0, 1.0, 1, 2, vec![Some(0.0); 2]).is_err());
+    assert!(GeoTiffElevationGrid::new(0.0, 0.0, 1.0, 1.0, 2, 2, vec![Some(0.0); 5]).is_err());
+}
+
+#[test]
+fn test_geotiff_from_raw_with_nodata() {
+    let raw = vec![-9999.0, 100.0, 200.0, -9999.0];
+    let grid =
+        GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 2, 2, &raw, Some(-9999.0)).unwrap();
+    assert_eq!(grid.get_node(0, 0), None);
+    assert_eq!(grid.get_node(1, 0), Some(100.0));
+    assert_eq!(grid.get_node(0, 1), Some(200.0));
+    assert_eq!(grid.get_node(1, 1), None);
+    assert_eq!(grid.min_max_elevation(), Some((100.0, 200.0)));
+}
