@@ -119,3 +119,30 @@ impl MaskSector {
         }
     }
 }
+
+/// Discrete terrain or obstacle point sampled along radial line-of-sight.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ObstaclePoint {
+    /// Radial ground distance from observer in meters.
+    pub distance_m: f64,
+    /// Terrain surface elevation in meters above observer datum.
+    pub elevation_m: f64,
+    /// Structural or canopy height above ground level in meters.
+    pub height_agl_m: f64,
+}
+
+impl ObstaclePoint {
+    /// Create and validate a radial obstacle sample point.
+    pub fn new(distance_m: f64, elevation_m: f64, height_agl_m: f64) -> Result<Self, ElevationMaskError> {
+        if !distance_m.is_finite() || !elevation_m.is_finite() || !height_agl_m.is_finite() {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        if distance_m <= 0.0 {
+            return Err(ElevationMaskError::InvalidDistance);
+        }
+        if height_agl_m < 0.0 {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        Ok(Self { distance_m, elevation_m, height_agl_m })
+    }
+}
