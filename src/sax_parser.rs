@@ -406,3 +406,27 @@ impl<'a> SaxReader<'a> {
             self.cursor += 1; // Consume '>'
             self.tag_stack.push(name);
             Ok(Some(SaxEvent::StartElement { name, attributes }))
+        }
+    }
+}
+
+/// Zero-copy point data extracted from a `<point>` element.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CotPointView {
+    pub lat: f64,
+    pub lon: f64,
+    pub hae: f64,
+    pub ce: f64,
+    pub le: f64,
+}
+
+impl CotPointView {
+    /// Parse from SaxAttributes of a point element.
+    pub fn from_attributes(attrs: &SaxAttributes<'_>) -> Result<Self, SaxError> {
+        let lat_str = attrs
+            .get("lat")
+            .ok_or(SaxError::InvalidNumericValue("lat"))?;
+        let lon_str = attrs
+            .get("lon")
+            .ok_or(SaxError::InvalidNumericValue("lon"))?;
+        let hae_str = attrs.get("hae").unwrap_or("0.0");
