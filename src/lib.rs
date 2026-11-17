@@ -32,6 +32,10 @@ pub use cot_circle::{CotCircle, CotCircleError, CotRangeRings};
 pub mod dem_bilinear;
 pub mod egm96_geoid;
 pub mod elevation_mask;
+pub use elevation_mask::{
+    ElevationMaskError, ElevationMaskValidator, MaskSector, MaskingEvaluation, MaskingStatus,
+    ObstaclePoint, ObstacleProfile,
+};
 pub use egm96_geoid::{
     normalize_lon_180, normalize_lon_360, sample_egm96_undulation, Egm96Error, Egm96Geoid,
 };
