@@ -41,3 +41,20 @@ impl Default for AssocConfig {
         }
     }
 }
+
+impl AssocConfig {
+    pub fn validate(&self) -> Result<(), AssocError> {
+        if !self.gate_threshold.is_finite()
+            || !self.spatial_weight.is_finite()
+            || !self.iou_weight.is_finite()
+            || !self.cosine_weight.is_finite()
+            || self.gate_threshold <= 0.0
+            || self.spatial_weight < 0.0
+            || self.iou_weight < 0.0
+            || self.cosine_weight < 0.0
+        {
+            return Err(AssocError::InvalidConfig);
+        }
+        Ok(())
+    }
+}
