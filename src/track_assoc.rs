@@ -307,3 +307,22 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
             }
         }
     }
+
+    let mut matches = Vec::new();
+    let mut matched_tracks = vec![false; n];
+    let mut matched_dets = vec![false; m];
+    for j in 1..=m {
+        let i = p[j];
+        if i >= 1 && i <= n {
+            let r = i - 1;
+            let c = j - 1;
+            if let Some(cost) = mat.get(r, c) {
+                if cost <= gate {
+                    matched_tracks[r] = true;
+                    matched_dets[c] = true;
+                    matches.push(AssocMatch { track_idx: r, det_idx: c, cost });
+                }
+            }
+        }
+    }
+    matches.sort_by_key(|m| m.track_idx);
