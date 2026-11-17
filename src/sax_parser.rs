@@ -622,3 +622,27 @@ mod tests {
             other => panic!("expected root StartElement, got {other:?}"),
         }
         match reader.next_event().unwrap().unwrap() {
+            SaxEvent::EmptyElement { name, attributes } => {
+                assert_eq!(name, "child");
+                assert_eq!(attributes.get("key"), Some("val"));
+            }
+            other => panic!("expected child EmptyElement, got {other:?}"),
+        }
+        match reader.next_event().unwrap().unwrap() {
+            SaxEvent::Characters(text) => assert_eq!(text, "text"),
+            other => panic!("expected Characters, got {other:?}"),
+        }
+        match reader.next_event().unwrap().unwrap() {
+            SaxEvent::EndElement { name } => assert_eq!(name, "root"),
+            other => panic!("expected root EndElement, got {other:?}"),
+        }
+        assert_eq!(reader.next_event().unwrap(), Some(SaxEvent::EndDocument));
+        assert_eq!(reader.next_event().unwrap(), None);
+    }
+
+    #[test]
+    fn test_attributes_iteration_and_get() {
+        let raw = "foo=\"123\" bar='abc'   baz=\"xyz\"";
+        let attrs = SaxAttributes::new(raw);
+        assert_eq!(attrs.get("foo"), Some("123"));
+        assert_eq!(attrs.get("bar"), Some("abc"));
