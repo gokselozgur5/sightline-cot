@@ -271,16 +271,17 @@ pub fn compute_frustum_ground_enu(
     ground_alt_hae_m: f64,
 ) -> Result<([f64; 3], f64, Vec<[f64; 3]>), FrustumError> {
     let sensor_h = platform.alt_hae_m - ground_alt_hae_m;
-    let rot = euler_to_rot_matrix(
+    let (b_enu, corner_rays) = compute_frustum_rays_enu(
         platform.heading_deg + gimbal.azimuth_deg,
         platform.pitch_deg + gimbal.elevation_deg,
         platform.roll_deg + gimbal.roll_deg,
+        config.h_fov_deg,
+        config.v_fov_deg,
     );
-    let b_enu = rotate_vec(&rot, [0.0, 1.0, 0.0]);
     let (b_pt, slant_range) = intersect_ray_ground(b_enu, sensor_h, config.max_range_m)?;
     let mut corners_enu = Vec::with_capacity(4);
-    for c_body in compute_frustum_corner_rays(config.h_fov_deg, config.v_fov_deg) {
-        let (c_pt, _) = intersect_ray_ground(rotate_vec(&rot, c_body), sensor_h, config.max_range_m)?;
+    for c_ray in corner_rays {
+        let (c_pt, _) = intersect_ray_ground(c_ray, sensor_h, config.max_range_m)?;
         corners_enu.push(c_pt);
     }
     Ok((b_pt, slant_range, corners_enu))
