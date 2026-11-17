@@ -21,3 +21,23 @@ impl std::fmt::Display for AssocError {
 }
 
 impl std::error::Error for AssocError {}
+
+/// Configuration parameters for track-to-detection association.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct AssocConfig {
+    pub gate_threshold: f64,
+    pub spatial_weight: f64,
+    pub iou_weight: f64,
+    pub cosine_weight: f64,
+}
+
+impl Default for AssocConfig {
+    fn default() -> Self {
+        Self {
+            gate_threshold: 50.0,
+            spatial_weight: 1.0,
+            iou_weight: 10.0,
+            cosine_weight: 5.0,
+        }
+    }
+}
