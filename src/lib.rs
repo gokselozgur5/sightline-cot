@@ -234,3 +234,8 @@ pub use xml_canonicalizer::{
     canonicalize_cot_xml, validate_cot_xml, CanonicalizeOptions, CotSchemaValidator,
     CotValidationError, CotXmlCanonicalizer,
 };
+
+pub mod spatial_rtree;
+pub use spatial_rtree::{
+    haversine_distance_m, normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree,
+};
