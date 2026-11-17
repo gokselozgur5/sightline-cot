@@ -562,3 +562,26 @@ impl TacticalTargetFilter {
         Ok((pos_d2, vel_d2))
     }
 
+    /// Forecast target kinematic trajectory waypoints over a forward time horizon.
+    pub fn predict_horizon(
+        &self,
+        horizon_sec: f64,
+        step_sec: f64,
+    ) -> Result<Vec<KinematicState>, KalmanTargetError> {
+        if !horizon_sec.is_finite()
+            || horizon_sec <= 0.0
+            || !step_sec.is_finite()
+            || step_sec <= 0.0
+        {
+            return Err(KalmanTargetError::InvalidDeltaTime);
+        }
+        let steps = (horizon_sec / step_sec).round() as usize;
+        let mut traj = Vec::with_capacity(steps);
+        let mut state = self.current_state.clone();
+        for _ in 0..steps {
+            state = state.extrapolate(step_sec, self.config.process_noise_q)?;
+            traj.push(state.clone());
+        }
+        Ok(traj)
+    }
+
