@@ -278,3 +278,18 @@ impl MilStd2525DSymbol {
             modifier2,
         })
     }
+    pub fn to_sidc20(&self) -> String {
+        format!(
+            "{:02}{:01}{:01}{:02}{:01}{:01}{:02}{:06}{:02}{:02}",
+            self.version,
+            self.context % 10,
+            self.identity.code() % 10,
+            self.symbol_set.code(),
+            self.status.code() % 10,
+            self.hq_tf_dummy % 10,
+            self.echelon.code(),
+            self.entity_code % 1_000_000,
+            self.modifier1 % 100,
+            self.modifier2 % 100
+        )
+    }
