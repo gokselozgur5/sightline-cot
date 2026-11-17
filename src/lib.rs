@@ -67,6 +67,12 @@ pub use mgrs::{
 };
 pub mod proto;
 pub mod mil_std;
+pub mod rhumb_line;
+pub use rhumb_line::{
+    great_circle_distance, interpolate_by_count, interpolate_by_step,
+    rhumb_distance_and_bearing, rhumb_intermediate_fraction, RhumbLineError,
+    RhumbPath, RhumbSegmentComparison, RhumbWaypoint,
+};
 pub mod sidc;
 pub mod stanag4609;
 pub use stanag4609::{StanagError, StanagTimestamp};
