@@ -742,3 +742,27 @@ fn serialize_node(
             out.push_str(&escape_xml_text(txt));
         }
         XmlNode::Element { name, attributes, children } => {
+            out.push('<');
+            out.push_str(name);
+
+            let mut scope_ns: HashMap<String, String> = HashMap::new();
+            let mut ns_attrs: Vec<&XmlAttribute> = Vec::new();
+            let mut standard_attrs: Vec<&XmlAttribute> = Vec::new();
+
+            for attr in attributes {
+                if attr.name == "xmlns" {
+                    let prefix = "";
+                    let is_redundant = opts.strip_redundant_namespaces && is_ns_declared(active_ns, prefix, &attr.value);
+                    if !is_redundant {
+                        scope_ns.insert(prefix.to_string(), attr.value.clone());
+                        ns_attrs.push(attr);
+                    }
+                } else if let Some(pfx) = attr.name.strip_prefix("xmlns:") {
+                    let is_redundant = opts.strip_redundant_namespaces && is_ns_declared(active_ns, pfx, &attr.value);
+                    if !is_redundant {
+                        scope_ns.insert(pfx.to_string(), attr.value.clone());
+                        ns_attrs.push(attr);
+                    }
+                } else {
+                    standard_attrs.push(attr);
+                }
