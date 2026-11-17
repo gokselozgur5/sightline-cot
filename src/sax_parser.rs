@@ -526,3 +526,27 @@ impl CotSaxParser {
                         }
                     }
                 }
+                SaxEvent::EndElement { name } if name == "event" => {
+                    if let Some(evt) = current_event.take() {
+                        events.push(evt);
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        Ok(events)
+    }
+}
+
+/// Buffer-based chunk streaming receiver for fragmented CoT data streams.
+#[derive(Debug, Default)]
+pub struct CotChunkStreamer {
+    buffer: String,
+}
+
+impl CotChunkStreamer {
+    /// Create a new empty chunk streamer.
+    pub fn new() -> Self {
+        Self {
+            buffer: String::new(),
