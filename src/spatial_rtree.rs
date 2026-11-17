@@ -482,3 +482,25 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_normalize_lon() {
+        assert_eq!(normalize_lon(0.0), 0.0);
+        assert_eq!(normalize_lon(190.0), -170.0);
+        assert_eq!(normalize_lon(-200.0), 160.0);
+    }
+
+    #[test]
+    fn test_haversine_distance() {
+        let d = haversine_distance_m(0.0, 0.0, 1.0, 0.0);
+        assert!((d - 111195.0).abs() < 1000.0);
+    }
+
+    #[test]
+    fn test_spatial_envelope_basic() {
+        let env = SpatialEnvelope::new(10.0, 20.0, 30.0, 40.0);
+        assert!(env.contains_point(15.0, 25.0));
+        assert!(!env.contains_point(5.0, 25.0));
+        assert_eq!(env.center(), [20.0, 30.0]);
+        assert_eq!(env.area(), 400.0);
+        assert_eq!(env.margin(), 40.0);
+    }
+
