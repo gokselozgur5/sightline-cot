@@ -142,3 +142,27 @@ impl KinematicState {
     pub fn velocity(&self) -> [f64; 3] {
         [self.x[3], self.x[4], self.x[5]]
     }
+
+    /// Compute 3D speed magnitude in meters per second.
+    #[inline]
+    pub fn speed_mps(&self) -> f64 {
+        let (vx, vy, vz) = (self.x[3], self.x[4], self.x[5]);
+        (vx * vx + vy * vy + vz * vz).sqrt()
+    }
+
+    /// Compute horizontal ground speed in meters per second.
+    #[inline]
+    pub fn ground_speed_mps(&self) -> f64 {
+        self.x[3].hypot(self.x[4])
+    }
+
+    /// Compute horizontal course heading in degrees clockwise from North [0, 360).
+    pub fn course_deg(&self) -> f64 {
+        let (vx, vy) = (self.x[3], self.x[4]);
+        if vx == 0.0 && vy == 0.0 {
+            0.0
+        } else {
+            vx.atan2(vy).to_degrees().rem_euclid(360.0)
+        }
+    }
+
