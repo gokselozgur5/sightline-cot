@@ -805,3 +805,28 @@ mod tests {
             cfg,
         )
         .unwrap();
+
+        let res = filter.predict_to(15_000);
+        assert!(matches!(
+            res,
+            Err(KalmanTargetError::CoastLimitExceeded { .. })
+        ));
+    }
+
+    #[test]
+    fn test_trajectory_horizon_prediction() {
+        let cfg = TargetFilterConfig::default();
+        let filter = TacticalTargetFilter::new(
+            "TGT-06",
+            [0.0, 0.0, 0.0],
+            [10.0, 20.0, 0.0],
+            10.0,
+            10.0,
+            0,
+            cfg,
+        )
+        .unwrap();
+
+        let traj = filter.predict_horizon(5.0, 1.0).unwrap();
+        assert_eq!(traj.len(), 5);
+        assert_eq!(traj[0].timestamp_ms, 1000);
