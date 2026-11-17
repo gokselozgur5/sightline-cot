@@ -385,4 +385,15 @@ mod tests {
         assert!(fp.area_sq_m > 0.0);
         assert!(fp.perimeter_m > 0.0);
     }
+
+    #[test]
+    fn test_oblique_footprint_and_containment() {
+        let platform = PlatformPose::new(0.0, 0.0, 500.0, 0.0, 0.0, 0.0).unwrap();
+        let gimbal = SensorGimbal::new(0.0, -45.0, 0.0).unwrap();
+        let cfg = SensorFrustumConfig::new(30.0, 30.0, 2000.0, 5.0).unwrap();
+        let fp = generate_sensor_footprint(&platform, &gimbal, &cfg, 0.0).unwrap();
+        assert_eq!(fp.vertices_enu.len(), 4);
+        assert!(fp.contains_enu_point(0.0, 500.0));
+        assert!(!fp.contains_enu_point(0.0, -500.0));
+    }
 }
