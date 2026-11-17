@@ -18,3 +18,19 @@ pub enum ElevationMaskError {
     /// Profile distance sequence is non-monotonic.
     NonMonotonicProfile,
 }
+
+impl core::fmt::Display for ElevationMaskError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NonFiniteValue => write!(f, "coordinate or angle value is non-finite"),
+            Self::InvalidAzimuth => write!(f, "azimuth must be in range [0.0, 360.0) degrees"),
+            Self::InvalidElevation => write!(f, "elevation must be in range [-90.0, 90.0] degrees"),
+            Self::InvalidDistance => write!(f, "distance must be positive and finite"),
+            Self::EmptyProfile => write!(f, "obstacle profile cannot be empty"),
+            Self::InvalidSectorSpan => write!(f, "azimuth sector span is invalid"),
+            Self::NonMonotonicProfile => write!(f, "obstacle profile distances must strictly increase"),
+        }
+    }
+}
+
+impl std::error::Error for ElevationMaskError {}
