@@ -285,4 +285,14 @@ mod tests {
         let expected_dist = EARTH_RADIUS_M * (10.0_f64.to_radians());
         assert!((dist - expected_dist).abs() < 1.0);
     }
+
+    #[test]
+    fn test_rhumb_vs_great_circle_comparison() {
+        let ny = RhumbWaypoint::new(40.7128, -74.0060);
+        let london = RhumbWaypoint::new(51.5074, -0.1278);
+        let comp = RhumbSegmentComparison::compute(&ny, &london).unwrap();
+        assert!(comp.rhumb_distance_m > comp.great_circle_distance_m);
+        assert!(comp.distance_difference_m > 0.0);
+        assert!(comp.rhumb_bearing_deg > 0.0 && comp.rhumb_bearing_deg < 90.0);
+    }
 }
