@@ -238,3 +238,27 @@ impl CotSchemaValidator {
         })?;
         Self::validate_cot_type(cot_type)?;
 
+        let how = map.get("how").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "event",
+            attribute: "how",
+        })?;
+        if how.trim().is_empty() {
+            return Err(CotValidationError::MalformedXml("event how cannot be empty".into()));
+        }
+
+        let time_str = map.get("time").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "event",
+            attribute: "time",
+        })?;
+        let time_ms = parse_iso8601_utc(time_str).map_err(|_| CotValidationError::InvalidTimestamp {
+            attribute: "time",
+            value: (*time_str).to_string(),
+        })?;
+
+        let start_str = map.get("start").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "event",
+            attribute: "start",
+        })?;
+        let start_ms = parse_iso8601_utc(start_str).map_err(|_| CotValidationError::InvalidTimestamp {
+            attribute: "start",
+            value: (*start_str).to_string(),
