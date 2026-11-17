@@ -165,3 +165,20 @@ impl SymbolStatus {
         *self as u8
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Echelon {
+    #[default]
+    Unspecified = 0,
+    Team = 11,
+    Squad = 12,
+    Section = 13,
+    Platoon = 14,
+    Company = 15,
+    Battalion = 16,
+    Regiment = 17,
+    Brigade = 18,
+    Division = 21,
+    Corps = 22,
+    Army = 23,
+}
