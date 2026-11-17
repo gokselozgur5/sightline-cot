@@ -382,3 +382,27 @@ impl CotSchemaValidator {
             if !c.is_ascii_alphanumeric() && c != '-' && c != '.' && c != '_' {
                 return Err(CotValidationError::InvalidCotType(format!(
                     "invalid character '{c}' in CoT type '{trimmed}'"
+                )));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// CoT XML canonicalizer for standard C14N attribute sorting and namespace management.
+pub struct CotXmlCanonicalizer;
+
+impl CotXmlCanonicalizer {
+    /// Canonicalize an XML string using default canonicalization options.
+    pub fn canonicalize(xml: &str) -> Result<String, CotValidationError> {
+        Self::canonicalize_with_options(xml, &CanonicalizeOptions::default())
+    }
+
+    /// Canonicalize an XML string with explicit options.
+    pub fn canonicalize_with_options(
+        xml: &str,
+        opts: &CanonicalizeOptions,
+    ) -> Result<String, CotValidationError> {
+        CotSchemaValidator::validate(xml)?;
+        let tree = parse_xml_to_tree(xml, opts)?;
+        let mut out = String::new();
