@@ -215,3 +215,23 @@ pub fn solve_nearest_neighbor(mat: &DistanceMatrix, gate: f64) -> AssocResult {
     let mut matches = Vec::new();
     let mut matched_tracks = vec![false; mat.rows()];
     let mut matched_dets = vec![false; mat.cols()];
+
+    for (cost, r, c) in candidates {
+        if !matched_tracks[r] && !matched_dets[c] {
+            matched_tracks[r] = true;
+            matched_dets[c] = true;
+            matches.push(AssocMatch {
+                track_idx: r,
+                det_idx: c,
+                cost,
+            });
+        }
+    }
+    let unmatched_tracks = (0..mat.rows()).filter(|&i| !matched_tracks[i]).collect();
+    let unmatched_dets = (0..mat.cols()).filter(|&j| !matched_dets[j]).collect();
+    AssocResult {
+        matches,
+        unmatched_tracks,
+        unmatched_dets,
+    }
+}
