@@ -297,3 +297,13 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
             j0 = j1;
             if p[j0] == 0 { break; }
         }
+
+        loop {
+            let j1 = way[j0];
+            p[j0] = p[j1];
+            j0 = j1;
+            if j0 == 0 {
+                break;
+            }
+        }
+    }
