@@ -303,3 +303,14 @@ impl MilStd2525DSymbol {
             _ => format!("a-{aff}-{dim}"),
         }
     }
+    pub fn from_cot_type(cot: &str) -> Result<Self, SidcParseError> {
+        let trimmed = cot.trim();
+        let parts: Vec<&str> = trimmed.split('-').collect();
+        if parts.is_empty() || parts[0] != "a" {
+            return Err(SidcParseError::InvalidCotType);
+        }
+        let identity = if parts.len() > 1 && !parts[1].is_empty() {
+            StandardIdentity::from_cot_char(parts[1].chars().next().unwrap())
+        } else {
+            StandardIdentity::Unknown
+        };
