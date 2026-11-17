@@ -57,3 +57,22 @@ fn test_error_handling_on_invalid_sidc() {
         Err(SidcParseError::InvalidSymbolSet)
     );
 }
+
+#[test]
+fn test_cot_bidirectional_mapping() {
+    assert_eq!(sidc20_to_cot_type("10031000000000000000").unwrap(), "a-f-G");
+    assert_eq!(sidc20_to_cot_type("10060100000000000000").unwrap(), "a-h-A");
+    assert_eq!(sidc20_to_cot_type("10042000000000000000").unwrap(), "a-n-S");
+    assert_eq!(sidc20_to_cot_type("10012500000000000000").unwrap(), "a-u-U");
+
+    let sidc_air = cot_type_to_sidc20("a-h-A").unwrap();
+    assert_eq!(&sidc_air[3..6], "601");
+
+    let sidc_ground = cot_type_to_sidc20("a-f-G-E").unwrap();
+    assert_eq!(&sidc_ground[3..6], "312");
+
+    assert_eq!(
+        cot_type_to_sidc20("invalid"),
+        Err(SidcParseError::InvalidCotType)
+    );
+}
