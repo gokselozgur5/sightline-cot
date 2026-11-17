@@ -453,3 +453,28 @@ impl TacticalTargetFilter {
             initial_vel[2],
         ];
 
+        let mut cov = [[0.0; 6]; 6];
+        for i in 0..3 {
+            cov[i][i] = pos_var;
+            cov[i + 3][i + 3] = vel_var;
+        }
+
+        let state = KinematicState::new(x, cov, timestamp_ms)?;
+        Ok(Self {
+            target_id: target_id.into(),
+            current_state: state,
+            config,
+            last_update_ms: timestamp_ms,
+            update_count: 0,
+            coast_count: 0,
+        })
+    }
+
+    /// Advance target filter forward in time to the target timestamp.
+    pub fn predict_to(&mut self, timestamp_ms: i64) -> Result<(), KalmanTargetError> {
+        if timestamp_ms < self.current_state.timestamp_ms {
+            return Err(KalmanTargetError::InvalidDeltaTime);
+        }
+        let dt_ms = timestamp_ms - self.current_state.timestamp_ms;
+        if dt_ms == 0 {
+            return Ok(());
