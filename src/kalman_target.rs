@@ -411,3 +411,20 @@ fn update_3d(
     Ok(mahalanobis_sq)
 }
 
+/// Tactical target velocity vector Kalman prediction filter.
+#[derive(Debug, Clone, PartialEq)]
+pub struct TacticalTargetFilter {
+    /// Unique tactical target or track identifier.
+    pub target_id: String,
+    /// Current estimated kinematic state.
+    pub current_state: KinematicState,
+    /// Operational filter configuration.
+    pub config: TargetFilterConfig,
+    /// Timestamp of most recent measurement update in milliseconds.
+    pub last_update_ms: i64,
+    /// Total count of successful measurement updates.
+    pub update_count: usize,
+    /// Consecutive extrapolation coast cycles since last update.
+    pub coast_count: usize,
+}
+
