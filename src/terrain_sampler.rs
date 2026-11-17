@@ -46,3 +46,27 @@ impl fmt::Display for TerrainSamplerError {
                     "ray points away from terrain or is parallel above surface"
                 )
             }
+            Self::NoIntersection => {
+                write!(f, "ray does not intersect terrain surface within range")
+            }
+            Self::MaxIterationsReached => {
+                write!(f, "terrain intercept solver exceeded maximum iterations")
+            }
+        }
+    }
+}
+
+impl std::error::Error for TerrainSamplerError {}
+
+/// Elevation interpolation method across grid cells.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum InterpolationMethod {
+    /// Standard bilinear interpolation across 4 surrounding nodes.
+    #[default]
+    Bilinear,
+    /// Nearest neighbor node sampling.
+    NearestNeighbor,
+}
+
+/// Regular 2D GeoTIFF-style elevation grid.
+#[derive(Debug, Clone, PartialEq)]
