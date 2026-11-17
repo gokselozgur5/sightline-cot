@@ -548,3 +548,13 @@ mod tests {
     }
 
     #[test]
+    fn test_rtree_nearest_neighbor() {
+        let mut tree = SpatialRTree::new();
+        tree.insert(SpatialEnvelope::from_point(0.0, 0.0), "Origin");
+        tree.insert(SpatialEnvelope::from_point(10.0, 10.0), "Far");
+
+        let (item, dist) = tree.nearest_neighbor(0.1, 0.1).unwrap();
+        assert_eq!(*item, "Origin");
+        assert!(dist < 20000.0);
+    }
+}
