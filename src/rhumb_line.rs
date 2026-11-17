@@ -295,4 +295,16 @@ mod tests {
         assert!(comp.distance_difference_m > 0.0);
         assert!(comp.rhumb_bearing_deg > 0.0 && comp.rhumb_bearing_deg < 90.0);
     }
+
+    #[test]
+    fn test_interpolate_by_count_and_step() {
+        let p1 = RhumbWaypoint::new(10.0, 10.0);
+        let p2 = RhumbWaypoint::new(10.0, 20.0);
+        let count_pts = interpolate_by_count(&p1, &p2, 3).unwrap();
+        assert_eq!(count_pts.len(), 5);
+        assert!((count_pts[2].lon - 15.0).abs() < 1e-4);
+
+        let step_pts = interpolate_by_step(&p1, &p2, 200_000.0).unwrap();
+        assert!(step_pts.len() > 2);
+    }
 }
