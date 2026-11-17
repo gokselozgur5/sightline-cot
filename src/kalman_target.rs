@@ -266,3 +266,28 @@ fn predict_step(x: &[f64; 6], cov: &[[f64; 6]; 6], dt: f64, q: f64) -> ([f64; 6]
     (x_pred, cov_pred)
 }
 
+/// Invert a 3x3 real symmetric matrix.
+fn invert_3x3(m: &[[f64; 3]; 3]) -> Result<[[f64; 3]; 3], KalmanTargetError> {
+    let det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+        - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+        + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    if !det.is_finite() || det.abs() < 1e-15 {
+        return Err(KalmanTargetError::SingularMatrix);
+    }
+    let inv_det = 1.0 / det;
+    Ok([
+        [
+            (m[1][1] * m[2][2] - m[1][2] * m[2][1]) * inv_det,
+            (m[0][2] * m[2][1] - m[0][1] * m[2][2]) * inv_det,
+            (m[0][1] * m[1][2] - m[0][2] * m[1][1]) * inv_det,
+        ],
+        [
+            (m[1][2] * m[2][0] - m[1][0] * m[2][2]) * inv_det,
+            (m[0][0] * m[2][2] - m[0][2] * m[2][0]) * inv_det,
+            (m[0][2] * m[1][0] - m[0][0] * m[1][2]) * inv_det,
+        ],
+        [
+            (m[1][0] * m[2][1] - m[1][1] * m[2][0]) * inv_det,
+            (m[0][1] * m[2][0] - m[0][0] * m[2][1]) * inv_det,
+            (m[0][0] * m[1][1] - m[0][1] * m[1][0]) * inv_det,
+        ],
