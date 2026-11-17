@@ -780,3 +780,28 @@ mod tests {
     fn test_gating_threshold_rejection() {
         let mut cfg = TargetFilterConfig::default();
         cfg.gate_threshold = 4.0;
+        let mut filter =
+            TacticalTargetFilter::new("TGT-04", [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], 1.0, 1.0, 0, cfg)
+                .unwrap();
+
+        let res = filter.update_position([500.0, 500.0, 500.0], None, 1000);
+        assert!(matches!(
+            res,
+            Err(KalmanTargetError::GatedMeasurement { .. })
+        ));
+    }
+
+    #[test]
+    fn test_max_coast_limit_exceeded() {
+        let mut cfg = TargetFilterConfig::default();
+        cfg.max_coast_sec = 10.0;
+        let mut filter = TacticalTargetFilter::new(
+            "TGT-05",
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            10.0,
+            10.0,
+            0,
+            cfg,
+        )
+        .unwrap();
