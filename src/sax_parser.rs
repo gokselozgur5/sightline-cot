@@ -238,3 +238,27 @@ impl<'a> SaxReader<'a> {
         }
 
         if bytes[self.cursor] == b'<' {
+            self.parse_tag_or_markup()
+        } else {
+            self.parse_characters()
+        }
+    }
+
+    fn parse_characters(&mut self) -> Result<Option<SaxEvent<'a>>, SaxError> {
+        let start = self.cursor;
+        let bytes = self.input.as_bytes();
+        let len = bytes.len();
+
+        while self.cursor < len && bytes[self.cursor] != b'<' {
+            self.cursor += 1;
+        }
+
+        let text = &self.input[start..self.cursor];
+        Ok(Some(SaxEvent::Characters(text)))
+    }
+
+    fn parse_tag_or_markup(&mut self) -> Result<Option<SaxEvent<'a>>, SaxError> {
+        let bytes = self.input.as_bytes();
+        let len = bytes.len();
+
+        // Must start with '<'
