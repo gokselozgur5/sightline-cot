@@ -79,3 +79,30 @@ impl MaskingEvaluation {
         self.status.is_visible()
     }
 }
+
+/// Azimuth sector defining terrain masking elevation angle boundary.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MaskSector {
+    /// Start azimuth of sector in degrees [0.0, 360.0).
+    pub start_azimuth_deg: f64,
+    /// End azimuth of sector in degrees [0.0, 360.0).
+    pub end_azimuth_deg: f64,
+    /// Minimum line-of-sight elevation angle in degrees [-90.0, 90.0].
+    pub mask_elevation_deg: f64,
+}
+
+impl MaskSector {
+    /// Create and validate an azimuth masking sector.
+    pub fn new(start_az: f64, end_az: f64, mask_el: f64) -> Result<Self, ElevationMaskError> {
+        if !start_az.is_finite() || !end_az.is_finite() || !mask_el.is_finite() {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        if !(0.0..360.0).contains(&start_az) || !(0.0..360.0).contains(&end_az) {
+            return Err(ElevationMaskError::InvalidAzimuth);
+        }
+        if !(-90.0..=90.0).contains(&mask_el) {
+            return Err(ElevationMaskError::InvalidElevation);
+        }
+        Ok(Self { start_azimuth_deg: start_az, end_azimuth_deg: end_az, mask_elevation_deg: mask_el })
+    }
+}
