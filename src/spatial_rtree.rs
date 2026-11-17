@@ -196,3 +196,25 @@ impl<T: Clone> SpatialRTree<T> {
     pub fn with_max_entries(max_entries: usize) -> Self {
         let max_entries = max_entries.max(2);
         Self {
+            root: None,
+            len: 0,
+            max_entries,
+        }
+    }
+
+    /// Returns the number of indexed entries in the tree.
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    /// Returns true if the R-Tree contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    /// Returns the global bounding envelope of all indexed elements, if any.
+    pub fn root_envelope(&self) -> Option<SpatialEnvelope> {
+        self.root.as_ref().map(|r| r.envelope())
+    }
+
+    /// Inserts an item with its corresponding spatial envelope into the tree.
