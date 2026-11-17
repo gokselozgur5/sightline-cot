@@ -224,4 +224,18 @@ impl ElevationMaskValidator {
             sectors: Vec::new(),
         })
     }
+
+    /// Configure grazing margin threshold in degrees.
+    pub fn with_margin_threshold(mut self, margin_deg: f64) -> Result<Self, ElevationMaskError> {
+        if !margin_deg.is_finite() || margin_deg < 0.0 {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        self.margin_threshold_deg = margin_deg;
+        Ok(self)
+    }
+
+    /// Add an azimuth masking sector to validator.
+    pub fn add_sector(&mut self, sector: MaskSector) {
+        self.sectors.push(sector);
+    }
 }
