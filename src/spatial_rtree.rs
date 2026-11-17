@@ -42,3 +42,25 @@ impl SpatialEnvelope {
         Self {
             min_lat,
             min_lon,
+            max_lat,
+            max_lon,
+        }
+    }
+
+    /// Creates an envelope enclosing a single geodetic point.
+    pub fn from_point(lat: f64, lon: f64) -> Self {
+        let norm_lon = normalize_lon(lon);
+        Self::new(lat, norm_lon, lat, norm_lon)
+    }
+
+    /// Computes the bounding envelope from a slice of polygon vertices [lat, lon].
+    pub fn from_geodesic_polygon(coords: &[[f64; 2]]) -> Option<Self> {
+        let first = coords.first()?;
+        let mut min_lat = first[0];
+        let mut max_lat = first[0];
+        let mut min_lon = normalize_lon(first[1]);
+        let mut max_lon = min_lon;
+
+        for pt in &coords[1..] {
+            min_lat = min_lat.min(pt[0]);
+            max_lat = max_lat.max(pt[0]);
