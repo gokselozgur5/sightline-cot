@@ -862,3 +862,15 @@ mod tests {
         let xml = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
         let mut opts = CanonicalizeOptions::default();
         opts.self_closing_tags = false;
+        let canon = CotXmlCanonicalizer::canonicalize_with_options(xml, &opts).unwrap();
+        assert!(canon.contains("<point ce=\"0.0\" hae=\"0.0\" lat=\"0.0\" le=\"0.0\" lon=\"0.0\"></point>"));
+    }
+
+    #[test]
+    fn test_invalid_type_characters() {
+        assert!(CotSchemaValidator::validate_cot_type("a-f-G-U-C").is_ok());
+        assert!(CotSchemaValidator::validate_cot_type("a-f-G.1_2").is_ok());
+        assert!(CotSchemaValidator::validate_cot_type("bad type with spaces").is_err());
+        assert!(CotSchemaValidator::validate_cot_type("bad$type").is_err());
+    }
+}
