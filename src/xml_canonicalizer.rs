@@ -430,3 +430,27 @@ fn strip_prefix(name: &str) -> &str {
     }
 }
 
+fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
+    let mut tokens = Vec::new();
+    let mut rest = xml;
+
+    while !rest.is_empty() {
+        if rest.starts_with("<!--") {
+            let end_idx = rest.find("-->").ok_or_else(|| {
+                CotValidationError::MalformedXml("unclosed comment <!--".into())
+            })?;
+            tokens.push(RawXmlToken::Comment);
+            rest = &rest[end_idx + 3..];
+        } else if rest.starts_with("<?") {
+            let end_idx = rest.find("?>").ok_or_else(|| {
+                CotValidationError::MalformedXml("unclosed processing instruction <?".into())
+            })?;
+            tokens.push(RawXmlToken::ProcessingInstruction);
+            rest = &rest[end_idx + 2..];
+        } else if rest.starts_with("<![CDATA[") {
+            let end_idx = rest.find("]]>").ok_or_else(|| {
+                CotValidationError::MalformedXml("unclosed CDATA block".into())
+            })?;
+            let cdata_content = &rest[9..end_idx];
+            tokens.push(RawXmlToken::Text(cdata_content.to_string()));
+            rest = &rest[end_idx + 3..];
