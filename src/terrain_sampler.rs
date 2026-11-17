@@ -622,3 +622,14 @@ mod tests {
             distance: 1250.0,
             surface_normal: [0.0, 0.0, 1.0],
             slope_deg: 0.0,
+            incident_angle_deg: 30.0,
+            iterations: 8,
+        };
+        let cot = cot_target_from_intercept(&intercept, "TGT-01", "a-h-G", 1000, 60000);
+        assert_eq!(cot.uid, "TGT-01");
+        assert_eq!(cot.cot_type, "a-h-G");
+        assert_eq!(cot.lat_deg, 39.9);
+        assert_eq!(cot.lon_deg, 32.5);
+        assert_eq!(cot.hae_m, 850.0);
+    }
+}
