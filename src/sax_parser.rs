@@ -94,3 +94,27 @@ impl<'a> Iterator for SaxAttributesIter<'a> {
         let len = bytes.len();
 
         // Skip whitespace
+        while self.cursor < len && bytes[self.cursor].is_ascii_whitespace() {
+            self.cursor += 1;
+        }
+
+        if self.cursor >= len {
+            return None;
+        }
+
+        // Attribute name
+        let name_start = self.cursor;
+        while self.cursor < len
+            && !bytes[self.cursor].is_ascii_whitespace()
+            && bytes[self.cursor] != b'='
+            && bytes[self.cursor] != b'>'
+            && bytes[self.cursor] != b'/'
+        {
+            self.cursor += 1;
+        }
+
+        let name = &self.input[name_start..self.cursor];
+        if name.is_empty() {
+            return None;
+        }
+
