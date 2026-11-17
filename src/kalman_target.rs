@@ -366,3 +366,26 @@ fn update_3d(
             a[i][offset + j] -= k_gain[i][j];
         }
     }
+
+    let mut a_p = [[0.0; 6]; 6];
+    for i in 0..6 {
+        for j in 0..6 {
+            let mut sum = 0.0;
+            for m in 0..6 {
+                sum += a[i][m] * cov[m][j];
+            }
+            a_p[i][j] = sum;
+        }
+    }
+
+    let mut new_cov = [[0.0; 6]; 6];
+    for i in 0..6 {
+        for j in 0..6 {
+            let mut sum = 0.0;
+            for m in 0..6 {
+                sum += a_p[i][m] * a[j][m];
+            }
+            new_cov[i][j] = sum;
+        }
+    }
+
