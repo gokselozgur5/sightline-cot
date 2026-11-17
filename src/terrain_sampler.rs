@@ -214,3 +214,27 @@ impl GeoTiffElevationGrid {
         if !self.contains(x, y) {
             return None;
         }
+        let u = ((x - self.origin_x) / self.step_x).round() as usize;
+        let v = ((y - self.origin_y) / self.step_y).round() as usize;
+        let col = u.min(self.cols - 1);
+        let row = v.min(self.rows - 1);
+        self.get_node(col, row)
+    }
+
+    /// Sample elevation using bilinear interpolation across 4 cell corners.
+    pub fn sample_bilinear(&self, x: f64, y: f64) -> Option<f64> {
+        if !self.contains(x, y) {
+            return None;
+        }
+        let u = ((x - self.origin_x) / self.step_x).max(0.0);
+        let v = ((y - self.origin_y) / self.step_y).max(0.0);
+        let col0 = (u.floor() as usize).min(self.cols - 2);
+        let row0 = (v.floor() as usize).min(self.rows - 2);
+        let s = (u - col0 as f64).clamp(0.0, 1.0);
+        let t = (v - row0 as f64).clamp(0.0, 1.0);
+
+        let z00 = self.get_node(col0, row0)?;
+        let z10 = self.get_node(col0 + 1, row0)?;
+        let z01 = self.get_node(col0, row0 + 1)?;
+        let z11 = self.get_node(col0 + 1, row0 + 1)?;
+
