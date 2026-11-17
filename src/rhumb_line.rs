@@ -143,3 +143,24 @@ pub fn rhumb_intermediate_fraction(
     let lon_f = (p1.lon + dlon_f.to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
     Ok(RhumbWaypoint::new(lat_f.to_degrees(), lon_f))
 }
+
+/// Interpolates intermediate waypoints along a rhumb line by count.
+pub fn interpolate_by_count(
+    p1: &RhumbWaypoint,
+    p2: &RhumbWaypoint,
+    count: usize,
+) -> Result<Vec<RhumbWaypoint>, RhumbLineError> {
+    p1.validate()?;
+    p2.validate()?;
+    if count == 0 {
+        return Err(RhumbLineError::InvalidParameter);
+    }
+    let mut waypoints = Vec::with_capacity(count + 2);
+    waypoints.push(*p1);
+    for i in 1..=count {
+        let f = (i as f64) / ((count + 1) as f64);
+        waypoints.push(rhumb_intermediate_fraction(p1, p2, f)?);
+    }
+    waypoints.push(*p2);
+    Ok(waypoints)
+}
