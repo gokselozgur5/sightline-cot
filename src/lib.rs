@@ -218,6 +218,12 @@ mod tests {
         assert_eq!(fp.vertices_enu.len(), 4);
     }
     #[test]
+    fn test_spatial_rtree_crate_export() {
+        let mut tree = crate::SpatialRTree::new();
+        tree.insert(crate::SpatialEnvelope::from_point(0.0, 0.0), 42);
+        assert_eq!(tree.len(), 1);
+    }
+    #[test]
     fn sanity() {
         assert_eq!(VERSION, "0.1.0");
     }
