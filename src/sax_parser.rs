@@ -358,3 +358,27 @@ impl<'a> SaxReader<'a> {
         while self.cursor < len
             && !bytes[self.cursor].is_ascii_whitespace()
             && bytes[self.cursor] != b'>'
+            && bytes[self.cursor] != b'/'
+        {
+            self.cursor += 1;
+        }
+
+        let name = &self.input[name_start..self.cursor];
+        if name.is_empty() {
+            return Err(SaxError::InvalidSyntax("empty tag name".to_string()));
+        }
+
+        let attr_start = self.cursor;
+        let mut self_closing = false;
+
+        while self.cursor < len {
+            if bytes[self.cursor] == b'/' && self.cursor + 1 < len && bytes[self.cursor + 1] == b'>'
+            {
+                self_closing = true;
+                break;
+            } else if bytes[self.cursor] == b'>' {
+                break;
+            } else if bytes[self.cursor] == b'"' || bytes[self.cursor] == b'\'' {
+                let q = bytes[self.cursor];
+                self.cursor += 1;
+                while self.cursor < len && bytes[self.cursor] != q {
