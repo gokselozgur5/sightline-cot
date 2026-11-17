@@ -70,3 +70,27 @@ pub enum InterpolationMethod {
 
 /// Regular 2D GeoTIFF-style elevation grid.
 #[derive(Debug, Clone, PartialEq)]
+pub struct GeoTiffElevationGrid {
+    /// Minimum X coordinate (e.g. westernmost longitude or easting).
+    pub origin_x: f64,
+    /// Minimum Y coordinate (e.g. southernmost latitude or northing).
+    pub origin_y: f64,
+    /// Cell step size along X dimension (positive).
+    pub step_x: f64,
+    /// Cell step size along Y dimension (positive).
+    pub step_y: f64,
+    /// Number of columns (cells along X).
+    pub cols: usize,
+    /// Number of rows (cells along Y).
+    pub rows: usize,
+    /// Elevation values in row-major order (row * cols + col).
+    pub elevations: Vec<Option<f64>>,
+    /// Sentinel nodata value.
+    pub nodata_value: Option<f64>,
+}
+
+impl GeoTiffElevationGrid {
+    /// Construct a validated GeoTIFF elevation grid.
+    pub fn new(
+        origin_x: f64,
+        origin_y: f64,
