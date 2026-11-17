@@ -97,3 +97,26 @@ pub enum SymbolSet {
     Activity = 30,
     Cyberspace = 40,
 }
+
+impl SymbolSet {
+    pub fn from_code(val: u8) -> Result<Self, SidcParseError> {
+        match val {
+            0 => Ok(Self::Unknown),
+            1 => Ok(Self::Air),
+            2 => Ok(Self::AirMissile),
+            5 => Ok(Self::Space),
+            10 => Ok(Self::LandUnit),
+            11 => Ok(Self::LandCivilian),
+            12 => Ok(Self::LandEquipment),
+            15 => Ok(Self::LandInstallation),
+            20 => Ok(Self::SeaSurface),
+            25 => Ok(Self::Subsurface),
+            30 => Ok(Self::Activity),
+            40 => Ok(Self::Cyberspace),
+            _ => Err(SidcParseError::InvalidSymbolSet),
+        }
+    }
+
+    pub fn code(&self) -> u8 {
+        *self as u8
+    }
