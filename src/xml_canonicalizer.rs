@@ -718,3 +718,27 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
                         attributes: attrs,
                         children,
                     };
+                    if let Some((_, _, ref mut parent_children)) = stack.last_mut() {
+                        parent_children.push(node);
+                    } else if root.is_none() {
+                        root = Some(node);
+                    }
+                }
+            }
+        }
+    }
+
+    root.ok_or_else(|| CotValidationError::MissingRequiredElement("event"))
+}
+
+fn serialize_node(
+    node: &XmlNode,
+    opts: &CanonicalizeOptions,
+    active_ns: &mut Vec<HashMap<String, String>>,
+    out: &mut String,
+) {
+    match node {
+        XmlNode::Text(txt) => {
+            out.push_str(&escape_xml_text(txt));
+        }
+        XmlNode::Element { name, attributes, children } => {
