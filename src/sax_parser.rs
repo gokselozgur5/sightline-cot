@@ -70,3 +70,27 @@ impl<'a> SaxAttributes<'a> {
         None
     }
 
+    /// Create an iterator over all attributes.
+    pub fn iter(&self) -> SaxAttributesIter<'a> {
+        SaxAttributesIter {
+            input: self.raw,
+            cursor: 0,
+        }
+    }
+}
+
+/// Iterator over raw XML attributes.
+#[derive(Debug, Clone)]
+pub struct SaxAttributesIter<'a> {
+    input: &'a str,
+    cursor: usize,
+}
+
+impl<'a> Iterator for SaxAttributesIter<'a> {
+    type Item = Result<SaxAttribute<'a>, SaxError>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let bytes = self.input.as_bytes();
+        let len = bytes.len();
+
+        // Skip whitespace
