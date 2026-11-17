@@ -215,3 +215,28 @@ pub fn polygon_perimeter_enu(pts: &[[f64; 3]]) -> f64 {
     }
     p
 }
+
+
+/// Test whether an ENU point [x, y, _] lies inside the 2D polygon footprint.
+pub fn point_in_polygon_enu(pt: [f64; 2], poly: &[[f64; 3]]) -> bool {
+    if poly.len() < 3 { return false; }
+    let (x, y) = (pt[0], pt[1]);
+    let mut inside = false;
+    let mut j = poly.len() - 1;
+    for i in 0..poly.len() {
+        let (xi, yi) = (poly[i][0], poly[i][1]);
+        let (xj, yj) = (poly[j][0], poly[j][1]);
+        let intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi + 1e-15) + xi);
+        if intersect { inside = !inside; }
+        j = i;
+    }
+    inside
+}
+
+impl FrustumFootprint {
+    /// Test whether a local ENU point lies inside the ground footprint polygon.
+    pub fn contains_enu_point(&self, east_m: f64, north_m: f64) -> bool {
+        point_in_polygon_enu([east_m, north_m], &self.vertices_enu)
+    }
+}
