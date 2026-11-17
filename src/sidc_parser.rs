@@ -144,3 +144,24 @@ impl SymbolSet {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SymbolStatus {
+    #[default]
+    Present = 0,
+    Planned = 1,
+}
+
+impl SymbolStatus {
+    pub fn from_code(val: u8) -> Result<Self, SidcParseError> {
+        match val {
+            0 => Ok(Self::Present),
+            1 => Ok(Self::Planned),
+            _ => Err(SidcParseError::InvalidStatus),
+        }
+    }
+
+    pub fn code(&self) -> u8 {
+        *self as u8
+    }
+}
