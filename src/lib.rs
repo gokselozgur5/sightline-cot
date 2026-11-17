@@ -29,6 +29,12 @@ pub use cot_task::{
 };
 pub mod cot_circle;
 pub use cot_circle::{CotCircle, CotCircleError, CotRangeRings};
+pub mod sensor_frustum;
+pub use sensor_frustum::{
+    compute_frustum_ground_enu, compute_frustum_rays_enu, generate_sensor_footprint,
+    point_in_polygon_enu, polygon_area_enu, polygon_perimeter_enu, FrustumError,
+    FrustumFootprint, PlatformPose, SensorFrustumConfig, SensorGimbal,
+};
 pub mod dem_bilinear;
 pub mod egm96_geoid;
 pub use egm96_geoid::{
