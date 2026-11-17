@@ -454,3 +454,27 @@ impl CotPointView {
             lon,
             hae,
             ce,
+            le,
+        })
+    }
+}
+
+/// Zero-copy view into a Cursor-on-Target event parsed from an XML stream.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CotEventView<'a> {
+    pub version: &'a str,
+    pub uid: &'a str,
+    pub cot_type: &'a str,
+    pub how: &'a str,
+    pub time: &'a str,
+    pub start: &'a str,
+    pub stale: &'a str,
+    pub point: Option<CotPointView>,
+    pub callsign: Option<&'a str>,
+}
+
+/// Zero-copy CoT XML extractor using SAX stream processing.
+pub struct CotSaxParser;
+
+impl CotSaxParser {
+    /// Parse all `<event>` elements from a zero-copy XML string slice.
