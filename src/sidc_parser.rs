@@ -206,3 +206,17 @@ impl Echelon {
         *self as u8
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MilStd2525DSymbol {
+    pub version: u8,
+    pub context: u8,
+    pub identity: StandardIdentity,
+    pub symbol_set: SymbolSet,
+    pub status: SymbolStatus,
+    pub hq_tf_dummy: u8,
+    pub echelon: Echelon,
+    pub entity_code: u32,
+    pub modifier1: u8,
+    pub modifier2: u8,
+}
