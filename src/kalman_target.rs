@@ -94,3 +94,26 @@ impl TargetFilterConfig {
     }
 }
 
+/// 3D Kinematic state representing tactical target position and velocity.
+#[derive(Debug, Clone, PartialEq)]
+pub struct KinematicState {
+    /// State vector: [x, y, z, vx, vy, vz] in ENU coordinates.
+    pub x: [f64; 6],
+    /// 6x6 State error covariance matrix.
+    pub cov: [[f64; 6]; 6],
+    /// Epoch timestamp in milliseconds.
+    pub timestamp_ms: i64,
+}
+
+impl KinematicState {
+    /// Create a new validated kinematic state.
+    pub fn new(
+        x: [f64; 6],
+        cov: [[f64; 6]; 6],
+        timestamp_ms: i64,
+    ) -> Result<Self, KalmanTargetError> {
+        for v in x.iter() {
+            if !v.is_finite() {
+                return Err(KalmanTargetError::NonFiniteInput);
+            }
+        }
