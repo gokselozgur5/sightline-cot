@@ -166,3 +166,28 @@ impl KinematicState {
         }
     }
 
+    /// Compute vertical elevation climb/dive angle in degrees [-90, +90].
+    pub fn elevation_deg(&self) -> f64 {
+        let gs = self.ground_speed_mps();
+        if gs == 0.0 && self.x[5] == 0.0 {
+            0.0
+        } else {
+            self.x[5].atan2(gs).to_degrees()
+        }
+    }
+
+    /// Compute estimated Circular Error Probable (CEP-50) in meters.
+    pub fn position_uncertainty_cep(&self) -> f64 {
+        let var_x = self.cov[0][0].max(0.0);
+        let var_y = self.cov[1][1].max(0.0);
+        1.1774 * (0.5 * (var_x + var_y)).sqrt()
+    }
+
+    /// Compute 1-sigma velocity root-mean-square uncertainty in m/s.
+    pub fn velocity_uncertainty_1sigma(&self) -> f64 {
+        let var_vx = self.cov[3][3].max(0.0);
+        let var_vy = self.cov[4][4].max(0.0);
+        let var_vz = self.cov[5][5].max(0.0);
+        ((var_vx + var_vy + var_vz) / 3.0).sqrt()
+    }
+
