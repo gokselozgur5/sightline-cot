@@ -84,3 +84,25 @@ impl DistanceMatrix {
         self.cols
     }
 }
+
+impl DistanceMatrix {
+    pub fn get(&self, r: usize, c: usize) -> Option<f64> {
+        if r < self.rows && c < self.cols {
+            Some(self.data[r * self.cols + c])
+        } else {
+            None
+        }
+    }
+
+    pub fn set(&mut self, r: usize, c: usize, val: f64) -> Result<(), AssocError> {
+        if !val.is_finite() {
+            return Err(AssocError::NonFiniteInput);
+        }
+        if r < self.rows && c < self.cols {
+            self.data[r * self.cols + c] = val;
+            Ok(())
+        } else {
+            Err(AssocError::IndexOutOfBounds)
+        }
+    }
+}
