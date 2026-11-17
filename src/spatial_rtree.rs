@@ -152,3 +152,25 @@ impl<T> RTreeEntry<T> {
 }
 
 #[derive(Debug, Clone)]
+enum RTreeNode<T> {
+    Leaf {
+        entries: Vec<RTreeEntry<T>>,
+        envelope: SpatialEnvelope,
+    },
+    Branch {
+        children: Vec<RTreeNode<T>>,
+        envelope: SpatialEnvelope,
+    },
+}
+
+impl<T: Clone> RTreeNode<T> {
+    fn envelope(&self) -> SpatialEnvelope {
+        match self {
+            Self::Leaf { envelope, .. } => *envelope,
+            Self::Branch { envelope, .. } => *envelope,
+        }
+    }
+}
+
+/// 2D spatial indexing R-Tree for fast tactical Cursor-on-Target queries.
+#[derive(Debug, Clone)]
