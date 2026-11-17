@@ -142,3 +142,27 @@ impl<'a> Iterator for SaxAttributesIter<'a> {
         let quote = bytes[self.cursor];
         if quote != b'"' && quote != b'\'' {
             return Some(Err(SaxError::InvalidSyntax(format!(
+                "attribute '{name}' value not quoted"
+            ))));
+        }
+        self.cursor += 1; // Consume opening quote
+
+        let val_start = self.cursor;
+        while self.cursor < len && bytes[self.cursor] != quote {
+            self.cursor += 1;
+        }
+
+        if self.cursor >= len {
+            return Some(Err(SaxError::UnexpectedEof));
+        }
+
+        let val = &self.input[val_start..self.cursor];
+        self.cursor += 1; // Consume closing quote
+
+        Some(Ok(SaxAttribute { name, value: val }))
+    }
+}
+
+/// Token events emitted by `SaxReader`.
+#[derive(Debug, Clone, PartialEq)]
+pub enum SaxEvent<'a> {
