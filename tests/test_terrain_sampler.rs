@@ -94,3 +94,20 @@ fn test_ray_pointing_away_error() {
     let solver = TerrainInterceptSolver::default();
     let res = solver.solve(&grid, &ray);
     assert_eq!(res, Err(TerrainSamplerError::RayPointsAway));
+}
+
+#[test]
+fn test_cot_target_generation_integration() {
+    let grid = GeoTiffElevationGrid::flat(32.0, 39.0, 0.1, 0.1, 10, 10, 800.0).unwrap();
+    let ray = TerrainRay::new([32.5, 39.5, 1500.0], [0.0, 0.0, -1.0]).unwrap();
+    let solver = TerrainInterceptSolver::default();
+    let intercept = solver.solve(&grid, &ray).unwrap();
+    let event =
+        cot_target_from_intercept(&intercept, "RADAR-TRK-9", "a-f-G-U-C", 1600000000, 30000);
+
+    assert_eq!(event.uid, "RADAR-TRK-9");
+    assert_eq!(event.cot_type, "a-f-G-U-C");
+    assert!((event.lon_deg - 32.5).abs() < 1e-4);
+    assert!((event.lat_deg - 39.5).abs() < 1e-4);
+    assert!((event.hae_m - 800.0).abs() < 0.1);
+}
