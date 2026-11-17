@@ -406,3 +406,27 @@ impl CotXmlCanonicalizer {
         CotSchemaValidator::validate(xml)?;
         let tree = parse_xml_to_tree(xml, opts)?;
         let mut out = String::new();
+        let mut active_ns: Vec<HashMap<String, String>> = Vec::new();
+        serialize_node(&tree, opts, &mut active_ns, &mut out);
+        Ok(out)
+    }
+}
+
+/// Validate CoT XML string against CoT 2.0 schema rules.
+pub fn validate_cot_xml(xml: &str) -> Result<(), CotValidationError> {
+    CotSchemaValidator::validate(xml)
+}
+
+/// Canonicalize CoT XML into deterministic C14N attribute order and namespace normalization.
+pub fn canonicalize_cot_xml(xml: &str) -> Result<String, CotValidationError> {
+    CotXmlCanonicalizer::canonicalize(xml)
+}
+
+fn strip_prefix(name: &str) -> &str {
+    if let Some(idx) = name.find(':') {
+        &name[idx + 1..]
+    } else {
+        name
+    }
+}
+
