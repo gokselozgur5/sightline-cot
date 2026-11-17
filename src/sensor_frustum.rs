@@ -335,3 +335,26 @@ impl FrustumFootprint {
         )
     }
 }
+
+
+fn extract_xml_attr(tag: &str, attr: &str) -> Option<String> {
+    let needle = format!("{attr}=\"");
+    let start = tag.find(&needle)? + needle.len();
+    let end = tag[start..].find('"')?;
+    Some(tag[start..start + end].to_string())
+}
+
+impl SensorGimbal {
+    /// Parse `<sensor .../>` XML string into SensorGimbal and (fov, range).
+    pub fn parse_cot_sensor(xml: &str) -> Result<(Self, f64, f64), FrustumError> {
+        let tag_start = xml.find("<sensor").ok_or_else(|| FrustumError::XmlParseError("missing <sensor".into()))?;
+        let tag_end = xml[tag_start..].find('>').ok_or_else(|| FrustumError::XmlParseError("unclosed <sensor".into()))?;
+        let tag = &xml[tag_start..tag_start + tag_end + 1];
+        let az = extract_xml_attr(tag, "azimuth").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("azimuth".into()))?;
+        let el = extract_xml_attr(tag, "elevation").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("elevation".into()))?;
+        let fov = extract_xml_attr(tag, "fov").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("fov".into()))?;
+        let rng = extract_xml_attr(tag, "range").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("range".into()))?;
+        let gimbal = Self::new(az, el, 0.0)?;
+        Ok((gimbal, fov, rng))
+    }
+}
