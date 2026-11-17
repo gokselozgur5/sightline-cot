@@ -341,3 +341,28 @@ fn update_3d(
     }
 
     let mut k_gain = [[0.0; 3]; 6];
+    for i in 0..6 {
+        for j in 0..3 {
+            let mut sum = 0.0;
+            for m in 0..3 {
+                sum += cov[i][offset + m] * s_inv[m][j];
+            }
+            k_gain[i][j] = sum;
+        }
+    }
+
+    for i in 0..6 {
+        let mut corr = 0.0;
+        for j in 0..3 {
+            corr += k_gain[i][j] * y[j];
+        }
+        x[i] += corr;
+    }
+
+    let mut a = [[0.0; 6]; 6];
+    for i in 0..6 {
+        a[i][i] = 1.0;
+        for j in 0..3 {
+            a[i][offset + j] -= k_gain[i][j];
+        }
+    }
