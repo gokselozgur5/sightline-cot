@@ -438,3 +438,25 @@ impl<T: Clone> SpatialRTree<T> {
         lon: f64,
         best: &mut Option<(&'a T, f64)>,
     ) {
+        let d_node = node.envelope().distance_to_point(lat, lon);
+        if let Some((_, best_d)) = best {
+            if d_node > *best_d {
+                return;
+            }
+        }
+
+        match node {
+            RTreeNode::Leaf { entries, .. } => {
+                for entry in entries {
+                    let d = entry.envelope.distance_to_point(lat, lon);
+                    match best {
+                        Some((_, ref mut best_d)) => {
+                            if d < *best_d {
+                                *best = Some((&entry.data, d));
+                            }
+                        }
+                        None => {
+                            *best = Some((&entry.data, d));
+                        }
+                    }
+                }
