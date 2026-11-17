@@ -622,3 +622,27 @@ fn unescape_xml_entities(s: &str) -> String {
             return out;
         }
     }
+    out.push_str(rest);
+    out
+}
+
+fn decode_numeric_char_ref(ent: &str) -> Option<char> {
+    let body = ent.strip_prefix("&#")?.strip_suffix(';')?;
+    let (digits, radix) = match body.strip_prefix(['x', 'X']) {
+        Some(hex) => (hex, 16),
+        None => (body, 10),
+    };
+    if digits.is_empty() {
+        return None;
+    }
+    let code = u32::from_str_radix(digits, radix).ok()?;
+    char::from_u32(code)
+}
+
+fn escape_xml_attr_val(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 10);
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
