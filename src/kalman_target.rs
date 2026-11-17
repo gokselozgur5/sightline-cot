@@ -830,3 +830,27 @@ mod tests {
         let traj = filter.predict_horizon(5.0, 1.0).unwrap();
         assert_eq!(traj.len(), 5);
         assert_eq!(traj[0].timestamp_ms, 1000);
+        assert_eq!(traj[4].timestamp_ms, 5000);
+        assert!((traj[4].x[0] - 50.0).abs() < 1e-6);
+        assert!((traj[4].x[1] - 100.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_intercept_time_calculations() {
+        let cfg = TargetFilterConfig::default();
+        let filter = TacticalTargetFilter::new(
+            "TGT-07",
+            [100.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            10.0,
+            10.0,
+            0,
+            cfg,
+        )
+        .unwrap();
+
+        let t = filter
+            .estimate_intercept_time([0.0, 0.0, 0.0], 20.0)
+            .unwrap();
+        assert!((t - 5.0).abs() < 1e-6);
+
