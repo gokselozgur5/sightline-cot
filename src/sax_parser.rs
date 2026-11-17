@@ -286,3 +286,27 @@ impl<'a> SaxReader<'a> {
                 && &self.input[self.cursor..self.cursor + 7] == "[CDATA["
             {
                 // CDATA
+                self.cursor += 7;
+                let start = self.cursor;
+                if let Some(end_offset) = self.input[self.cursor..].find("]]>") {
+                    let cdata_text = &self.input[start..self.cursor + end_offset];
+                    self.cursor += end_offset + 3;
+                    return Ok(Some(SaxEvent::CData(cdata_text)));
+                } else {
+                    return Err(SaxError::UnexpectedEof);
+                }
+            } else {
+                return Err(SaxError::InvalidSyntax(
+                    "malformed markup declaration".to_string(),
+                ));
+            }
+        }
+
+        // Check for Processing Instruction <? ... ?>
+        if bytes[self.cursor] == b'?' {
+            self.cursor += 1;
+            let start = self.cursor;
+            if let Some(end_offset) = self.input[self.cursor..].find("?>") {
+                let pi_content = &self.input[start..self.cursor + end_offset];
+                self.cursor += end_offset + 2;
+                let mut parts = pi_content.splitn(2, |c: char| c.is_ascii_whitespace());
