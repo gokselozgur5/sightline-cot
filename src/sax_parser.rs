@@ -430,3 +430,27 @@ impl CotPointView {
             .get("lon")
             .ok_or(SaxError::InvalidNumericValue("lon"))?;
         let hae_str = attrs.get("hae").unwrap_or("0.0");
+        let ce_str = attrs.get("ce").unwrap_or("9999999.0");
+        let le_str = attrs.get("le").unwrap_or("9999999.0");
+
+        let lat: f64 = lat_str
+            .parse()
+            .map_err(|_| SaxError::InvalidNumericValue("lat"))?;
+        let lon: f64 = lon_str
+            .parse()
+            .map_err(|_| SaxError::InvalidNumericValue("lon"))?;
+        let hae: f64 = hae_str
+            .parse()
+            .map_err(|_| SaxError::InvalidNumericValue("hae"))?;
+        let ce: f64 = ce_str
+            .parse()
+            .map_err(|_| SaxError::InvalidNumericValue("ce"))?;
+        let le: f64 = le_str
+            .parse()
+            .map_err(|_| SaxError::InvalidNumericValue("le"))?;
+
+        Ok(Self {
+            lat,
+            lon,
+            hae,
+            ce,
