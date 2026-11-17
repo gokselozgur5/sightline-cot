@@ -734,3 +734,26 @@ mod tests {
         assert_eq!(filter.update_count, 1);
         assert_eq!(filter.coast_count, 0);
     }
+
+    #[test]
+    fn test_filter_velocity_update() {
+        let cfg = TargetFilterConfig::default();
+        let mut filter = TacticalTargetFilter::new(
+            "TGT-02",
+            [0.0, 0.0, 0.0],
+            [5.0, 5.0, 0.0],
+            25.0,
+            16.0,
+            0,
+            cfg,
+        )
+        .unwrap();
+
+        let d2 = filter.update_velocity([6.0, 4.0, 0.5], None, 1000).unwrap();
+        assert!(d2 >= 0.0);
+        assert!((filter.current_state.x[3] - 5.0).abs() > 0.0);
+    }
+
+    #[test]
+    fn test_filter_full_state_update() {
+        let cfg = TargetFilterConfig::default();
