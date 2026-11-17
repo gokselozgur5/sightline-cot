@@ -46,3 +46,27 @@ fn test_aspect_and_slope() {
     let grid = GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 2, 2, &raw, None).unwrap();
     let slope = grid.slope_deg(5.0, 5.0).unwrap();
     assert!((slope - 45.0).abs() < 0.5);
+
+    let aspect = grid.aspect_deg(5.0, 5.0).unwrap();
+    // West facing downhill: aspect is 270 degrees
+    assert!((aspect - 270.0).abs() < 1.0);
+}
+
+#[test]
+fn test_ray_validation_and_point_at() {
+    assert!(TerrainRay::new([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]).is_err());
+    assert!(TerrainRay::new([f64::NAN, 0.0, 0.0], [1.0, 0.0, 0.0]).is_err());
+
+    let ray = TerrainRay::new([10.0, 20.0, 30.0], [0.0, 0.0, -2.0]).unwrap();
+    assert_eq!(ray.direction, [0.0, 0.0, -1.0]);
+    let pt = ray.point_at(10.0);
+    assert_eq!(pt, [10.0, 20.0, 20.0]);
+}
+
+#[test]
+fn test_terrain_intercept_sloped_surface() {
+    // Plane: z = 0.5 * x
+    let mut raw = Vec::new();
+    for _r in 0..11 {
+        for c in 0..11 {
+            raw.push(c as f64 * 5.0);
