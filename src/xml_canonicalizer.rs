@@ -838,3 +838,27 @@ mod tests {
         let xml = "<not_event><point lat=\"0.0\" lon=\"0.0\" hae=\"0.0\" ce=\"0.0\" le=\"0.0\"/></not_event>";
         assert!(matches!(validate_cot_xml(xml), Err(CotValidationError::MalformedXml(_))));
     }
+
+    #[test]
+    fn test_entity_unescaping_and_escaping() {
+        assert_eq!(unescape_xml_entities("&quot;&apos;&lt;&gt;&amp;&#65;&#x42;"), "\"'<>&AB");
+        assert_eq!(escape_xml_attr_val("\"hello & world\""), "&quot;hello &amp; world&quot;");
+    }
+
+    #[test]
+    fn test_cdata_and_processing_instruction() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+        <event version="2.0" uid="U1" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z">
+            <point lat="12.34" lon="-56.78" hae="100.0" ce="10.0" le="5.0"/>
+            <detail><remarks><![CDATA[Tactical Note: Alpha & Bravo]]></remarks></detail>
+        </event>"#;
+        assert!(validate_cot_xml(xml).is_ok());
+        let canon = canonicalize_cot_xml(xml).unwrap();
+        assert!(canon.contains("Tactical Note: Alpha &amp; Bravo"));
+    }
+
+    #[test]
+    fn test_canonicalize_non_self_closing() {
+        let xml = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
+        let mut opts = CanonicalizeOptions::default();
+        opts.self_closing_tags = false;
