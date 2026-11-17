@@ -237,3 +237,20 @@ impl Default for MilStd2525DSymbol {
         }
     }
 }
+
+impl MilStd2525DSymbol {
+    pub fn parse(s: &str) -> Result<Self, SidcParseError> {
+        let clean = s.trim();
+        if clean.len() != 20 && clean.len() != 30 {
+            return Err(SidcParseError::InvalidLength);
+        }
+        if !clean.chars().all(|c| c.is_ascii_digit()) {
+            return Err(SidcParseError::NonNumeric);
+        }
+        let ver: u8 = clean[0..2].parse().map_err(|_| SidcParseError::InvalidStandard)?;
+        if ver != 10 && ver != 11 && ver != 30 {
+            return Err(SidcParseError::InvalidStandard);
+        }
+        let context: u8 = clean[2..3].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let id_val: u8 = clean[3..4].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let identity = StandardIdentity::from_code(id_val)?;
