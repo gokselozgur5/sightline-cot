@@ -504,3 +504,25 @@ mod tests {
         assert_eq!(env.margin(), 40.0);
     }
 
+    #[test]
+    fn test_spatial_envelope_polygon() {
+        let pts = [[10.0, 20.0], [15.0, 25.0], [5.0, 15.0]];
+        let env = SpatialEnvelope::from_geodesic_polygon(&pts).unwrap();
+        assert_eq!(env.min_lat, 5.0);
+        assert_eq!(env.max_lat, 15.0);
+        assert_eq!(env.min_lon, 15.0);
+        assert_eq!(env.max_lon, 25.0);
+    }
+
+    #[test]
+    fn test_spatial_envelope_intersects() {
+        let env1 = SpatialEnvelope::new(0.0, 0.0, 10.0, 10.0);
+        let env2 = SpatialEnvelope::new(5.0, 5.0, 15.0, 15.0);
+        let env3 = SpatialEnvelope::new(20.0, 20.0, 30.0, 30.0);
+        assert!(env1.intersects(&env2));
+        assert!(!env1.intersects(&env3));
+    }
+
+    #[test]
+    fn test_rtree_insert_and_queries() {
+        let mut tree = SpatialRTree::with_max_entries(2);
