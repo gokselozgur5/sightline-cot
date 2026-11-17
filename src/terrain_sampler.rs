@@ -22,3 +22,27 @@ pub enum TerrainSamplerError {
     /// Ray does not intersect the elevation surface within max range.
     NoIntersection,
     /// Intercept solver reached max iterations without meeting convergence tolerance.
+    MaxIterationsReached,
+}
+
+impl fmt::Display for TerrainSamplerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NonFiniteInput => write!(f, "non-finite input value encountered"),
+            Self::InvalidDimensions => write!(f, "grid dimensions must be at least 2x2"),
+            Self::InvalidResolution => {
+                write!(f, "grid resolution step must be positive and finite")
+            }
+            Self::DataLengthMismatch => {
+                write!(f, "elevation data length must equal cols * rows")
+            }
+            Self::OutOfBounds => write!(f, "coordinate falls outside elevation grid bounds"),
+            Self::DegenerateRayDirection => {
+                write!(f, "ray direction vector magnitude is zero")
+            }
+            Self::RayPointsAway => {
+                write!(
+                    f,
+                    "ray points away from terrain or is parallel above surface"
+                )
+            }
