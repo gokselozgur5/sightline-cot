@@ -877,3 +877,15 @@ mod tests {
     #[test]
     fn test_non_finite_inputs_rejected() {
         let cfg = TargetFilterConfig::default();
+        let res = TacticalTargetFilter::new(
+            "TGT-09",
+            [f64::NAN, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            10.0,
+            10.0,
+            0,
+            cfg,
+        );
+        assert_eq!(res.unwrap_err(), KalmanTargetError::NonFiniteInput);
+    }
+}
