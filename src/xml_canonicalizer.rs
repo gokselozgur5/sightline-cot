@@ -70,3 +70,27 @@ pub struct XmlAttribute {
 /// Options controlling CoT XML canonicalization behavior.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CanonicalizeOptions {
+    /// Sort attributes lexicographically (namespaces first, then names).
+    pub sort_attributes: bool,
+    /// Normalize surrounding whitespace.
+    pub normalize_whitespace: bool,
+    /// Strip XML comments.
+    pub remove_comments: bool,
+    /// Format empty elements as self-closing tags (<tag />).
+    pub self_closing_tags: bool,
+    /// Strip redundant namespace declarations already declared in ancestor scopes.
+    pub strip_redundant_namespaces: bool,
+}
+
+impl Default for CanonicalizeOptions {
+    fn default() -> Self {
+        Self {
+            sort_attributes: true,
+            normalize_whitespace: true,
+            remove_comments: true,
+            self_closing_tags: true,
+            strip_redundant_namespaces: true,
+        }
+    }
+}
+
