@@ -238,4 +238,20 @@ impl ElevationMaskValidator {
     pub fn add_sector(&mut self, sector: MaskSector) {
         self.sectors.push(sector);
     }
+
+    /// Return the minimum required masking elevation angle at specified azimuth.
+    pub fn get_mask_angle_at_azimuth(&self, azimuth_deg: f64) -> Result<f64, ElevationMaskError> {
+        if !azimuth_deg.is_finite() {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        if !(0.0..360.0).contains(&azimuth_deg) {
+            return Err(ElevationMaskError::InvalidAzimuth);
+        }
+        for sector in &self.sectors {
+            if sector.contains_azimuth(azimuth_deg) {
+                return Ok(sector.mask_elevation_deg);
+            }
+        }
+        Ok(self.default_mask_deg)
+    }
 }
