@@ -261,3 +261,9 @@ pub mod kalman_target;
 pub use kalman_target::{
     KalmanTargetError, KinematicState, TacticalTargetFilter, TargetFilterConfig,
 };
+
+pub mod sax_parser;
+pub use sax_parser::{
+    CotChunkStreamer, CotEventView, CotPointView, CotSaxParser, SaxAttribute, SaxAttributes,
+    SaxAttributesIter, SaxError, SaxEvent, SaxReader,
+};
