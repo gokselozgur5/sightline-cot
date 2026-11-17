@@ -454,3 +454,27 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
             let cdata_content = &rest[9..end_idx];
             tokens.push(RawXmlToken::Text(cdata_content.to_string()));
             rest = &rest[end_idx + 3..];
+        } else if rest.starts_with("<!") {
+            let end_idx = rest.find('>').ok_or_else(|| {
+                CotValidationError::MalformedXml("unclosed DOCTYPE or declaration".into())
+            })?;
+            rest = &rest[end_idx + 1..];
+        } else if rest.starts_with("</") {
+            let end_idx = rest.find('>').ok_or_else(|| {
+                CotValidationError::MalformedXml("unclosed end tag </".into())
+            })?;
+            let tag_content = rest[2..end_idx].trim();
+            if tag_content.is_empty() {
+                return Err(CotValidationError::MalformedXml("empty end tag </>".into()));
+            }
+            tokens.push(RawXmlToken::EndTag {
+                name: tag_content.to_string(),
+            });
+            rest = &rest[end_idx + 1..];
+        } else if rest.starts_with('<') {
+            let end_idx = find_tag_closing(rest)?;
+            let tag_content = &rest[1..end_idx];
+            let is_self_closing = tag_content.ends_with('/');
+            let inner = if is_self_closing {
+                tag_content[..tag_content.len() - 1].trim()
+            } else {
