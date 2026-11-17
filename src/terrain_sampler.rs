@@ -598,3 +598,27 @@ mod tests {
         assert!(normal[2] > 0.0);
         assert!(
             (normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2] - 1.0).abs()
+                < 1e-6
+        );
+    }
+
+    #[test]
+    fn test_terrain_ray_intercept_flat() {
+        let grid = GeoTiffElevationGrid::flat(0.0, 0.0, 10.0, 10.0, 11, 11, 50.0).unwrap();
+        let ray = TerrainRay::new([50.0, 50.0, 150.0], [0.0, 0.0, -1.0]).unwrap();
+        let solver = TerrainInterceptSolver::default();
+        let intercept = solver.solve(&grid, &ray).unwrap();
+
+        assert!((intercept.point[0] - 50.0).abs() < 0.1);
+        assert!((intercept.point[1] - 50.0).abs() < 0.1);
+        assert!((intercept.point[2] - 50.0).abs() < 0.1);
+        assert!((intercept.distance - 100.0).abs() < 0.1);
+    }
+
+    #[test]
+    fn test_cot_event_conversion() {
+        let intercept = TerrainIntercept {
+            point: [32.5, 39.9, 850.0],
+            distance: 1250.0,
+            surface_normal: [0.0, 0.0, 1.0],
+            slope_deg: 0.0,
