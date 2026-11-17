@@ -190,3 +190,27 @@ impl GeoTiffElevationGrid {
             if let Some(h) = opt {
                 if h < min_h {
                     min_h = h;
+                }
+                if h > max_h {
+                    max_h = h;
+                }
+                found = true;
+            }
+        }
+        found.then_some((min_h, max_h))
+    }
+
+    /// Retrieve node elevation at discrete (col, row).
+    pub fn get_node(&self, col: usize, row: usize) -> Option<f64> {
+        if col < self.cols && row < self.rows {
+            self.elevations[row * self.cols + col]
+        } else {
+            None
+        }
+    }
+
+    /// Sample elevation using nearest neighbor node.
+    pub fn sample_nearest(&self, x: f64, y: f64) -> Option<f64> {
+        if !self.contains(x, y) {
+            return None;
+        }
