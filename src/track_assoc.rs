@@ -387,3 +387,17 @@ mod tests {
         let m3 = compute_spatial_matrix_3d(&t3, &d3).unwrap();
         assert_eq!(m3.get(0, 0), Some(3.0));
     }
+
+    #[test]
+    fn test_solve_nearest_neighbor_greedy() {
+        let nested = vec![vec![10.0, 20.0], vec![20.0, 5.0]];
+        let mat = DistanceMatrix::from_nested(&nested).unwrap();
+        let res = solve_nearest_neighbor(&mat, 15.0);
+        assert_eq!(res.matches.len(), 2);
+        assert_eq!(res.unmatched_tracks.len(), 0);
+        assert_eq!(res.unmatched_dets.len(), 0);
+        let res_gated = solve_nearest_neighbor(&mat, 8.0);
+        assert_eq!(res_gated.matches.len(), 1);
+        assert_eq!(res_gated.matches[0].track_idx, 1);
+        assert_eq!(res_gated.matches[0].det_idx, 1);
+    }
