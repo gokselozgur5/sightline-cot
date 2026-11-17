@@ -389,3 +389,25 @@ fn update_3d(
         }
     }
 
+    for i in 0..6 {
+        for j in 0..6 {
+            let mut k_r_kt = 0.0;
+            for m in 0..3 {
+                k_r_kt += k_gain[i][m] * r_diag[m] * k_gain[j][m];
+            }
+            new_cov[i][j] += k_r_kt;
+        }
+    }
+
+    for i in 0..6 {
+        for j in (i + 1)..6 {
+            let sym = 0.5 * (new_cov[i][j] + new_cov[j][i]);
+            new_cov[i][j] = sym;
+            new_cov[j][i] = sym;
+        }
+    }
+
+    *cov = new_cov;
+    Ok(mahalanobis_sq)
+}
+
