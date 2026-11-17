@@ -854,3 +854,26 @@ mod tests {
             .unwrap();
         assert!((t - 5.0).abs() < 1e-6);
 
+        let filter_moving = TacticalTargetFilter::new(
+            "TGT-08",
+            [100.0, 0.0, 0.0],
+            [10.0, 0.0, 0.0],
+            10.0,
+            10.0,
+            0,
+            cfg,
+        )
+        .unwrap();
+
+        let t_moving = filter_moving
+            .estimate_intercept_time([0.0, 0.0, 0.0], 20.0)
+            .unwrap();
+        assert!((t_moving - 10.0).abs() < 1e-6);
+
+        let impossible = filter_moving.estimate_intercept_time([0.0, 0.0, 0.0], 5.0);
+        assert!(impossible.is_none());
+    }
+
+    #[test]
+    fn test_non_finite_inputs_rejected() {
+        let cfg = TargetFilterConfig::default();
