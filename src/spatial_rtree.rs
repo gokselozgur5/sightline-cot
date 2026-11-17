@@ -130,3 +130,25 @@ impl SpatialEnvelope {
     pub fn distance_to_point(&self, lat: f64, lon: f64) -> f64 {
         if self.contains_point(lat, lon) {
             return 0.0;
+        }
+        let clamped_lat = lat.clamp(self.min_lat, self.max_lat);
+        let clamped_lon = normalize_lon(lon).clamp(self.min_lon, self.max_lon);
+        haversine_distance_m(lat, lon, clamped_lat, clamped_lon)
+    }
+}
+
+/// An entry held in an R-Tree node.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RTreeEntry<T> {
+    pub envelope: SpatialEnvelope,
+    pub data: T,
+}
+
+impl<T> RTreeEntry<T> {
+    /// Creates a new entry with the given envelope and associated data.
+    pub fn new(envelope: SpatialEnvelope, data: T) -> Self {
+        Self { envelope, data }
+    }
+}
+
+#[derive(Debug, Clone)]
