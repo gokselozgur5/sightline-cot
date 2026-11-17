@@ -261,3 +261,28 @@ impl RhumbPath {
         Ok(full_path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_equator_rhumb_distance_and_bearing() {
+        let p1 = RhumbWaypoint::new(0.0, 10.0);
+        let p2 = RhumbWaypoint::new(0.0, 20.0);
+        let (dist, bearing) = rhumb_distance_and_bearing(&p1, &p2, EARTH_RADIUS_M).unwrap();
+        assert!((bearing - 90.0).abs() < 1e-6);
+        let expected_dist = EARTH_RADIUS_M * (10.0_f64.to_radians());
+        assert!((dist - expected_dist).abs() < 1.0);
+    }
+
+    #[test]
+    fn test_meridian_rhumb_distance_and_bearing() {
+        let p1 = RhumbWaypoint::new(10.0, 50.0);
+        let p2 = RhumbWaypoint::new(20.0, 50.0);
+        let (dist, bearing) = rhumb_distance_and_bearing(&p1, &p2, EARTH_RADIUS_M).unwrap();
+        assert!((bearing - 0.0).abs() < 1e-6);
+        let expected_dist = EARTH_RADIUS_M * (10.0_f64.to_radians());
+        assert!((dist - expected_dist).abs() < 1.0);
+    }
+}
