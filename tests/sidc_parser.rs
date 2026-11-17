@@ -36,3 +36,24 @@ fn test_custom_fields_and_30_digit_support() {
     let parsed30 = parse_sidc2525d(&sidc30).unwrap();
     assert_eq!(parsed30, sym);
 }
+
+#[test]
+fn test_error_handling_on_invalid_sidc() {
+    assert_eq!(parse_sidc2525d("123"), Err(SidcParseError::InvalidLength));
+    assert_eq!(
+        parse_sidc2525d("1003100000000000000A"),
+        Err(SidcParseError::NonNumeric)
+    );
+    assert_eq!(
+        parse_sidc2525d("99031000000000000000"),
+        Err(SidcParseError::InvalidStandard)
+    );
+    assert_eq!(
+        parse_sidc2525d("10091000000000000000"),
+        Err(SidcParseError::InvalidAffiliation)
+    );
+    assert_eq!(
+        parse_sidc2525d("10039900000000000000"),
+        Err(SidcParseError::InvalidSymbolSet)
+    );
+}
