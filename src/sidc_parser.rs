@@ -182,3 +182,27 @@ pub enum Echelon {
     Corps = 22,
     Army = 23,
 }
+
+impl Echelon {
+    pub fn from_code(val: u8) -> Result<Self, SidcParseError> {
+        match val {
+            0 => Ok(Self::Unspecified),
+            11 => Ok(Self::Team),
+            12 => Ok(Self::Squad),
+            13 => Ok(Self::Section),
+            14 => Ok(Self::Platoon),
+            15 => Ok(Self::Company),
+            16 => Ok(Self::Battalion),
+            17 => Ok(Self::Regiment),
+            18 => Ok(Self::Brigade),
+            21 => Ok(Self::Division),
+            22 => Ok(Self::Corps),
+            23 => Ok(Self::Army),
+            _ => Err(SidcParseError::InvalidEchelon),
+        }
+    }
+
+    pub fn code(&self) -> u8 {
+        *self as u8
+    }
+}
