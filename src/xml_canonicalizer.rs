@@ -94,3 +94,27 @@ impl Default for CanonicalizeOptions {
     }
 }
 
+/// Internal XML Node representation for canonical tree formatting.
+#[derive(Debug, Clone, PartialEq)]
+enum XmlNode {
+    Element {
+        name: String,
+        attributes: Vec<XmlAttribute>,
+        children: Vec<XmlNode>,
+    },
+    Text(String),
+}
+
+/// Tokenizer token produced when scanning XML stream.
+#[derive(Debug, Clone, PartialEq)]
+enum RawXmlToken {
+    StartTag {
+        name: String,
+        attributes: Vec<XmlAttribute>,
+        self_closing: bool,
+    },
+    EndTag {
+        name: String,
+    },
+    Text(String),
+    Comment,
