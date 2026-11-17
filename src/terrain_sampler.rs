@@ -118,3 +118,27 @@ impl GeoTiffElevationGrid {
             step_x,
             step_y,
             cols,
+            rows,
+            elevations,
+            nodata_value: None,
+        })
+    }
+
+    /// Construct grid from raw floats, treating NaN and nodata sentinel as None.
+    pub fn from_raw(
+        origin_x: f64,
+        origin_y: f64,
+        step_x: f64,
+        step_y: f64,
+        cols: usize,
+        rows: usize,
+        raw: &[f64],
+        nodata: Option<f64>,
+    ) -> Result<Self, TerrainSamplerError> {
+        let is_nd = |v: f64| !v.is_finite() || nodata.is_some_and(|nd| (v - nd).abs() < 1e-5);
+        let elevations: Vec<Option<f64>> = raw.iter().map(|&v| (!is_nd(v)).then_some(v)).collect();
+        let mut grid = Self::new(origin_x, origin_y, step_x, step_y, cols, rows, elevations)?;
+        grid.nodata_value = nodata;
+        Ok(grid)
+    }
+
