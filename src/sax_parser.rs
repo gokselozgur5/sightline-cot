@@ -598,3 +598,27 @@ impl CotChunkStreamer {
             self.buffer.drain(..end_idx);
         }
 
+        completed
+    }
+
+    /// Retrieve the current pending buffer length.
+    pub fn pending_len(&self) -> usize {
+        self.buffer.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sax_tokens_basic() {
+        let xml = "<root><child key=\"val\"/>text</root>";
+        let mut reader = SaxReader::new(xml);
+
+        assert_eq!(reader.next_event().unwrap(), Some(SaxEvent::StartDocument));
+        match reader.next_event().unwrap().unwrap() {
+            SaxEvent::StartElement { name, .. } => assert_eq!(name, "root"),
+            other => panic!("expected root StartElement, got {other:?}"),
+        }
+        match reader.next_event().unwrap().unwrap() {
