@@ -28,3 +28,29 @@ impl core::fmt::Display for SidcParseError {
 }
 
 impl std::error::Error for SidcParseError {}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum StandardIdentity {
+    Pending = 0,
+    #[default]
+    Unknown = 1,
+    AssumedFriend = 2,
+    Friend = 3,
+    Neutral = 4,
+    Suspect = 5,
+    Hostile = 6,
+}
+
+impl StandardIdentity {
+    pub fn from_code(val: u8) -> Result<Self, SidcParseError> {
+        match val {
+            0 => Ok(Self::Pending),
+            1 => Ok(Self::Unknown),
+            2 => Ok(Self::AssumedFriend),
+            3 => Ok(Self::Friend),
+            4 => Ok(Self::Neutral),
+            5 => Ok(Self::Suspect),
+            6 => Ok(Self::Hostile),
+            _ => Err(SidcParseError::InvalidAffiliation),
+        }
+    }
