@@ -526,3 +526,27 @@ fn parse_tag_open_and_attrs(inner: &str) -> Result<(String, Vec<XmlAttribute>), 
     })?.to_string();
 
     let after_name = inner[name.len()..].trim_start();
+    let attributes = parse_attributes_list(after_name, &name)?;
+    Ok((name, attributes))
+}
+
+fn parse_attributes_list(mut s: &str, el_name: &str) -> Result<Vec<XmlAttribute>, CotValidationError> {
+    let mut attrs = Vec::new();
+    let mut seen_names = HashSet::new();
+
+    while !s.is_empty() {
+        s = s.trim_start();
+        if s.is_empty() {
+            break;
+        }
+
+        let eq_idx = match s.find('=') {
+            Some(idx) => idx,
+            None => {
+                return Err(CotValidationError::MalformedXml(format!(
+                    "attribute without '=' found on <{el_name}>: '{s}'"
+                )));
+            }
+        };
+
+        let attr_name = s[..eq_idx].trim();
