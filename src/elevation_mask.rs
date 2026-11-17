@@ -97,13 +97,15 @@ impl MaskSector {
         if !start_az.is_finite() || !end_az.is_finite() || !mask_el.is_finite() {
             return Err(ElevationMaskError::NonFiniteValue);
         }
-        if !(0.0..360.0).contains(&start_az) || !(0.0..360.0).contains(&end_az) {
+        if !(0.0..=360.0).contains(&start_az) || !(0.0..=360.0).contains(&end_az) {
             return Err(ElevationMaskError::InvalidAzimuth);
         }
         if !(-90.0..=90.0).contains(&mask_el) {
             return Err(ElevationMaskError::InvalidElevation);
         }
-        Ok(Self { start_azimuth_deg: start_az, end_azimuth_deg: end_az, mask_elevation_deg: mask_el })
+        let start = (start_az % 360.0 + 360.0) % 360.0;
+        let end = (end_az % 360.0 + 360.0) % 360.0;
+        Ok(Self { start_azimuth_deg: start, end_azimuth_deg: end, mask_elevation_deg: mask_el })
     }
 
     /// Check if an azimuth angle falls within this sector.
