@@ -550,3 +550,27 @@ fn parse_attributes_list(mut s: &str, el_name: &str) -> Result<Vec<XmlAttribute>
         };
 
         let attr_name = s[..eq_idx].trim();
+        if attr_name.is_empty() {
+            return Err(CotValidationError::MalformedXml(format!(
+                "empty attribute name on <{el_name}>"
+            )));
+        }
+
+        if !seen_names.insert(attr_name.to_string()) {
+            return Err(CotValidationError::DuplicateAttribute {
+                element: el_name.to_string(),
+                attribute: attr_name.to_string(),
+            });
+        }
+
+        let after_eq = s[eq_idx + 1..].trim_start();
+        let quote_char = after_eq.chars().next().ok_or_else(|| {
+            CotValidationError::MalformedXml(format!(
+                "missing attribute value quote for '{attr_name}' on <{el_name}>"
+            ))
+        })?;
+
+        if quote_char != '"' && quote_char != '\'' {
+            return Err(CotValidationError::MalformedXml(format!(
+                "unquoted attribute value for '{attr_name}' on <{el_name}>"
+            )));
