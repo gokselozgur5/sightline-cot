@@ -46,3 +46,27 @@ impl fmt::Display for CotValidationError {
             Self::NegativeValueError { field, value } => {
                 write!(f, "value must be non-negative for '{field}': {value}")
             }
+            Self::NonFiniteNumber(field) => write!(f, "non-finite number for '{field}'"),
+            Self::DuplicateAttribute { element, attribute } => {
+                write!(f, "duplicate attribute '{attribute}' on element <{element}>")
+            }
+            Self::UnclosedTag(tag) => write!(f, "unclosed tag: <{tag}>"),
+            Self::MismatchedClosingTag { expected, found } => {
+                write!(f, "mismatched closing tag: expected </{expected}>, found </{found}>")
+            }
+        }
+    }
+}
+
+impl std::error::Error for CotValidationError {}
+
+/// Parsed XML attribute representation.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XmlAttribute {
+    pub name: String,
+    pub value: String,
+}
+
+/// Options controlling CoT XML canonicalization behavior.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CanonicalizeOptions {
