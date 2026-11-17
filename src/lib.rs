@@ -240,7 +240,6 @@ pub use xml_canonicalizer::{
     canonicalize_cot_xml, validate_cot_xml, CanonicalizeOptions, CotSchemaValidator,
     CotValidationError, CotXmlCanonicalizer,
 };
-
 pub mod spatial_rtree;
 pub use spatial_rtree::{
     normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree,
@@ -250,4 +249,10 @@ pub mod sidc_parser;
 pub use sidc_parser::{
     cot_type_to_sidc20, generate_sidc2525d, parse_sidc2525d, sidc20_to_cot_type, Echelon,
     MilStd2525DSymbol, SidcParseError, StandardIdentity, SymbolSet, SymbolStatus,
+};
+
+pub mod terrain_sampler;
+pub use terrain_sampler::{
+    cot_target_from_intercept, GeoTiffElevationGrid, InterpolationMethod, TerrainIntercept,
+    TerrainInterceptSolver, TerrainRay, TerrainSamplerError,
 };
