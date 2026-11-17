@@ -182,3 +182,19 @@ pub fn compute_spatial_matrix_3d(
     }
     Ok(mat)
 }
+
+/// Single track-to-detection assignment match.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct AssocMatch {
+    pub track_idx: usize,
+    pub det_idx: usize,
+    pub cost: f64,
+}
+
+/// Association output containing matched pairs and unmatched indices.
+#[derive(Debug, Clone, PartialEq)]
+pub struct AssocResult {
+    pub matches: Vec<AssocMatch>,
+    pub unmatched_tracks: Vec<usize>,
+    pub unmatched_dets: Vec<usize>,
+}
