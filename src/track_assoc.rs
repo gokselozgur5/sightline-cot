@@ -349,3 +349,16 @@ mod tests {
         let bad = AssocConfig { gate_threshold: -1.0, ..cfg };
         assert_eq!(bad.validate(), Err(AssocError::InvalidConfig));
     }
+
+    #[test]
+    fn test_distance_matrix_ops() {
+        let mut mat = DistanceMatrix::new(2, 2, 1.0);
+        assert_eq!(mat.rows(), 2);
+        assert_eq!(mat.cols(), 2);
+        assert_eq!(mat.get(0, 0), Some(1.0));
+        assert!(mat.set(0, 1, 5.0).is_ok());
+        assert_eq!(mat.get(0, 1), Some(5.0));
+        assert_eq!(mat.get(2, 2), None);
+        assert_eq!(mat.set(3, 0, 1.0), Err(AssocError::IndexOutOfBounds));
+        assert_eq!(mat.set(0, 0, f64::NAN), Err(AssocError::NonFiniteInput));
+    }
