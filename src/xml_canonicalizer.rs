@@ -478,3 +478,27 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
             let inner = if is_self_closing {
                 tag_content[..tag_content.len() - 1].trim()
             } else {
+                tag_content.trim()
+            };
+
+            let (name, attributes) = parse_tag_open_and_attrs(inner)?;
+            tokens.push(RawXmlToken::StartTag {
+                name,
+                attributes,
+                self_closing: is_self_closing,
+            });
+            rest = &rest[end_idx + 1..];
+        } else {
+            let next_tag = rest.find('<').unwrap_or(rest.len());
+            let text = &rest[..next_tag];
+            if !text.is_empty() {
+                tokens.push(RawXmlToken::Text(text.to_string()));
+            }
+            rest = &rest[next_tag..];
+        }
+    }
+
+    Ok(tokens)
+}
+
+fn find_tag_closing(slice: &str) -> Result<usize, CotValidationError> {
