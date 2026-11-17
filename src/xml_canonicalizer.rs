@@ -190,3 +190,27 @@ impl CotSchemaValidator {
                             )));
                         }
                     }
+                }
+            }
+        }
+
+        if let Some(unclosed) = tag_stack.pop() {
+            return Err(CotValidationError::UnclosedTag(unclosed));
+        }
+
+        if !root_seen {
+            return Err(CotValidationError::MissingRequiredElement("event"));
+        }
+        if !point_seen {
+            return Err(CotValidationError::MissingRequiredElement("point"));
+        }
+
+        let _ = event_attrs;
+        Ok(())
+    }
+
+    /// Validate required and optional attributes of <event> element.
+    pub fn validate_event_attributes(attrs: &[XmlAttribute]) -> Result<(), CotValidationError> {
+        let mut map: HashMap<&str, &str> = HashMap::new();
+        for a in attrs {
+            map.insert(a.name.as_str(), a.value.as_str());
