@@ -328,3 +328,25 @@ impl<T: Clone> SpatialRTree<T> {
             },
         )
     }
+
+    fn split_branch(mut children: Vec<RTreeNode<T>>) -> (RTreeNode<T>, RTreeNode<T>) {
+        let split_at = children.len() / 2;
+        let right_children = children.split_off(split_at);
+
+        let mut left_env = children[0].envelope();
+        for c in &children[1..] {
+            left_env = left_env.merge(&c.envelope());
+        }
+
+        let mut right_env = right_children[0].envelope();
+        for c in &right_children[1..] {
+            right_env = right_env.merge(&c.envelope());
+        }
+
+        (
+            RTreeNode::Branch {
+                children,
+                envelope: left_env,
+            },
+            RTreeNode::Branch {
+                children: right_children,
