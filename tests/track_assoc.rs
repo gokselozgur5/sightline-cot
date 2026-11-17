@@ -21,3 +21,17 @@ fn test_integration_track_assoc_full_pipeline() {
     assert_eq!(res.unmatched_tracks, vec![2]);
     assert_eq!(res.unmatched_dets, vec![2]);
 }
+
+#[test]
+fn test_integration_gating_and_edge_rejection() {
+    let mat = DistanceMatrix::new(2, 2, 100.0);
+    let res = solve_nearest_neighbor(&mat, 50.0);
+    assert!(res.matches.is_empty());
+    assert_eq!(res.unmatched_tracks, vec![0, 1]);
+    assert_eq!(res.unmatched_dets, vec![0, 1]);
+
+    let nan_tracks = [[f64::NAN, 0.0]];
+    let valid_dets = [[0.0, 0.0]];
+    let err = compute_spatial_matrix_2d(&nan_tracks, &valid_dets);
+    assert_eq!(err, Err(AssocError::NonFiniteInput));
+}
