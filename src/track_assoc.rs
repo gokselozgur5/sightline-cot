@@ -198,3 +198,20 @@ pub struct AssocResult {
     pub unmatched_tracks: Vec<usize>,
     pub unmatched_dets: Vec<usize>,
 }
+
+/// Solve track association using greedy nearest-neighbor selection with gating.
+pub fn solve_nearest_neighbor(mat: &DistanceMatrix, gate: f64) -> AssocResult {
+    let mut candidates = Vec::new();
+    for r in 0..mat.rows() {
+        for c in 0..mat.cols() {
+            if let Some(cost) = mat.get(r, c) {
+                if cost <= gate {
+                    candidates.push((cost, r, c));
+                }
+            }
+        }
+    }
+    candidates.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+    let mut matches = Vec::new();
+    let mut matched_tracks = vec![false; mat.rows()];
+    let mut matched_dets = vec![false; mat.cols()];
