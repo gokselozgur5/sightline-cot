@@ -22,3 +22,27 @@ fn test_integration_full_cot_sax_stream() {
     let events = CotSaxParser::parse_events(raw_stream).expect("failed parsing events");
     assert_eq!(events.len(), 2);
 
+    assert_eq!(events[0].uid, "DRONE-99");
+    assert_eq!(events[0].callsign, Some("REAPER-01"));
+    let pt0 = events[0].point.unwrap();
+    assert!((pt0.lat - 32.7767).abs() < 1e-4);
+
+    assert_eq!(events[1].uid, "DRONE-100");
+    assert_eq!(events[1].callsign, Some("REAPER-02"));
+    let pt1 = events[1].point.unwrap();
+    assert!((pt1.lat - 32.7770).abs() < 1e-4);
+}
+
+#[test]
+fn test_integration_chunk_streamer_reassembly() {
+    let mut streamer = CotChunkStreamer::new();
+    let parts = [
+        "<ev",
+        "ent version=\"2.0\" uid=\"T1\" type=\"a-u-G\" how=\"h-e\" time=\"2026-02-16T12:00:00.000Z\" start=\"2026-02-16T12:00:00.000Z\" stale=\"2026-02-16T12:01:00.000Z\">",
+        "<point lat=\"1.0\" lon=\"2.0\" hae=\"3.0\" ce=\"4.0\" le=\"5.0\"/>",
+        "</event>",
+    ];
+
+    let mut all_events = Vec::new();
+    for part in parts {
+        let batch = streamer.feed(part);
