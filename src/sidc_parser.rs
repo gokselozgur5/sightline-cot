@@ -120,3 +120,27 @@ impl SymbolSet {
     pub fn code(&self) -> u8 {
         *self as u8
     }
+    pub fn cot_dimension_str(&self) -> &'static str {
+        match self {
+            Self::Air | Self::AirMissile => "A",
+            Self::Space => "P",
+            Self::SeaSurface => "S",
+            Self::Subsurface => "U",
+            Self::Activity => "t",
+            Self::Cyberspace => "X",
+            _ => "G",
+        }
+    }
+
+    pub fn from_cot_dimension(dim: &str) -> Self {
+        match dim {
+            "A" => Self::Air,
+            "P" => Self::Space,
+            "S" => Self::SeaSurface,
+            "U" => Self::Subsurface,
+            "t" | "T" => Self::Activity,
+            "X" | "x" => Self::Cyberspace,
+            _ => Self::LandUnit,
+        }
+    }
+}
