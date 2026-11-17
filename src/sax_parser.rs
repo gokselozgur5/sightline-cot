@@ -22,3 +22,27 @@ impl fmt::Display for SaxError {
             Self::MismatchedTag { expected, found } => {
                 write!(
                     f,
+                    "mismatched closing tag: expected </{expected}>, found </{found}>"
+                )
+            }
+            Self::InvalidEntity(e) => write!(f, "invalid XML entity: {e}"),
+            Self::InvalidNumericValue(v) => write!(f, "invalid numeric value for field: {v}"),
+        }
+    }
+}
+
+impl std::error::Error for SaxError {}
+
+/// Single XML attribute borrowed directly from the input stream.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SaxAttribute<'a> {
+    pub name: &'a str,
+    pub value: &'a str,
+}
+
+/// Zero-copy iterator and lookup over an element's attribute string.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SaxAttributes<'a> {
+    raw: &'a str,
+}
+
