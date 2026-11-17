@@ -106,3 +106,26 @@ impl DistanceMatrix {
         }
     }
 }
+
+impl DistanceMatrix {
+    pub fn from_nested(nested: &[Vec<f64>]) -> Result<Self, AssocError> {
+        let rows = nested.len();
+        if rows == 0 {
+            return Ok(Self::new(0, 0, 0.0));
+        }
+        let cols = nested[0].len();
+        let mut data = Vec::with_capacity(rows * cols);
+        for row in nested {
+            if row.len() != cols {
+                return Err(AssocError::DimensionMismatch);
+            }
+            for &val in row {
+                if !val.is_finite() {
+                    return Err(AssocError::NonFiniteInput);
+                }
+                data.push(val);
+            }
+        }
+        Ok(Self { rows, cols, data })
+    }
+}
