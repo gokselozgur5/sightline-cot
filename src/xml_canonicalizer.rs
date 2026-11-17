@@ -694,3 +694,27 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
                     let node = XmlNode::Element {
                         name,
                         attributes,
+                        children: Vec::new(),
+                    };
+                    if let Some((_, _, ref mut children)) = stack.last_mut() {
+                        children.push(node);
+                    } else if root.is_none() {
+                        root = Some(node);
+                    }
+                } else {
+                    stack.push((name, attributes, Vec::new()));
+                }
+            }
+            RawXmlToken::EndTag { name } => {
+                if let Some((open_name, attrs, children)) = stack.pop() {
+                    if open_name != name {
+                        return Err(CotValidationError::MismatchedClosingTag {
+                            expected: open_name,
+                            found: name,
+                        });
+                    }
+                    let node = XmlNode::Element {
+                        name: open_name,
+                        attributes: attrs,
+                        children,
+                    };
