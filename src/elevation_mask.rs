@@ -254,4 +254,30 @@ impl ElevationMaskValidator {
         }
         Ok(self.default_mask_deg)
     }
+
+    /// Validate line-of-sight elevation clearance against sector mask.
+    pub fn validate_target_angles(&self, az_deg: f64, el_deg: f64) -> Result<MaskingEvaluation, ElevationMaskError> {
+        if !el_deg.is_finite() {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        if !(-90.0..=90.0).contains(&el_deg) {
+            return Err(ElevationMaskError::InvalidElevation);
+        }
+        let mask_el = self.get_mask_angle_at_azimuth(az_deg)?;
+        let margin = el_deg - mask_el;
+        let status = if margin > self.margin_threshold_deg {
+            MaskingStatus::Clear
+        } else if margin >= -self.margin_threshold_deg {
+            MaskingStatus::Grazing
+        } else {
+            MaskingStatus::Masked
+        };
+        Ok(MaskingEvaluation {
+            target_azimuth_deg: az_deg,
+            target_elevation_deg: el_deg,
+            mask_elevation_deg: mask_el,
+            clearance_margin_deg: margin,
+            status,
+        })
+    }
 }
