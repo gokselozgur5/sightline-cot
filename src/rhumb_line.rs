@@ -215,3 +215,28 @@ impl RhumbPath {
         self.total_gc_distance
     }
 }
+
+impl RhumbPath {
+    /// Constructs a multi-segment rhumb path from a sequence of waypoints.
+    pub fn from_waypoints(waypoints: Vec<RhumbWaypoint>) -> Result<Self, RhumbLineError> {
+        if waypoints.len() < 2 {
+            return Err(RhumbLineError::InsufficientWaypoints);
+        }
+        for wp in &waypoints { wp.validate()?; }
+        let (mut seg_rhumb, mut seg_gc) = (Vec::new(), Vec::new());
+        let (mut total_rhumb, mut total_gc) = (0.0, 0.0);
+        for w in waypoints.windows(2) {
+            let (rd, _) = rhumb_distance_and_bearing(&w[0], &w[1], EARTH_RADIUS_M)?;
+            let gd = great_circle_distance(&w[0], &w[1], EARTH_RADIUS_M)?;
+            seg_rhumb.push(rd);
+            seg_gc.push(gd);
+            total_rhumb += rd;
+            total_gc += gd;
+        }
+        Ok(Self {
+            waypoints, segment_rhumb_distances: seg_rhumb,
+            segment_gc_distances: seg_gc, total_rhumb_distance: total_rhumb,
+            total_gc_distance: total_gc,
+        })
+    }
+}
