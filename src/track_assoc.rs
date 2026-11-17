@@ -129,3 +129,18 @@ impl DistanceMatrix {
         Ok(Self { rows, cols, data })
     }
 }
+
+/// Compute Euclidean 2D distance between two points [x, y].
+pub fn euclidean_dist_2d(p1: [f64; 2], p2: [f64; 2]) -> f64 {
+    let dx = p1[0] - p2[0];
+    let dy = p1[1] - p2[1];
+    dx.hypot(dy)
+}
+
+/// Compute Euclidean 3D distance between two points [x, y, z].
+pub fn euclidean_dist_3d(p1: [f64; 3], p2: [f64; 3]) -> f64 {
+    let dx = p1[0] - p2[0];
+    let dy = p1[1] - p2[1];
+    let dz = p1[2] - p2[2];
+    (dx * dx + dy * dy + dz * dz).sqrt()
+}
