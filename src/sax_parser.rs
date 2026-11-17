@@ -166,3 +166,27 @@ impl<'a> Iterator for SaxAttributesIter<'a> {
 /// Token events emitted by `SaxReader`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum SaxEvent<'a> {
+    StartDocument,
+    EndDocument,
+    StartElement {
+        name: &'a str,
+        attributes: SaxAttributes<'a>,
+    },
+    EndElement {
+        name: &'a str,
+    },
+    EmptyElement {
+        name: &'a str,
+        attributes: SaxAttributes<'a>,
+    },
+    Characters(&'a str),
+    Comment(&'a str),
+    ProcessingInstruction {
+        target: &'a str,
+        data: &'a str,
+    },
+    CData(&'a str),
+}
+
+/// Zero-copy streaming SAX parser over a borrowed XML string slice.
+#[derive(Debug, Clone)]
