@@ -382,3 +382,27 @@ impl Default for TerrainInterceptSolver {
 
 impl TerrainInterceptSolver {
     /// Create a configured terrain intercept solver.
+    pub fn new(
+        step_size: f64,
+        max_range: f64,
+        tolerance: f64,
+        max_iterations: usize,
+    ) -> Result<Self, TerrainSamplerError> {
+        if !step_size.is_finite()
+            || step_size <= 0.0
+            || !max_range.is_finite()
+            || max_range <= 0.0
+            || !tolerance.is_finite()
+            || tolerance <= 0.0
+        {
+            return Err(TerrainSamplerError::NonFiniteInput);
+        }
+        if max_iterations == 0 {
+            return Err(TerrainSamplerError::InvalidDimensions);
+        }
+        Ok(Self {
+            step_size,
+            max_range,
+            tolerance,
+            max_iterations,
+        })
