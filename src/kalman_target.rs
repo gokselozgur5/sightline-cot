@@ -709,3 +709,28 @@ mod tests {
         assert!(pred.cov[2][2] > 1.0);
         assert!(pred.position_uncertainty_cep() > state.position_uncertainty_cep());
     }
+
+    #[test]
+    fn test_filter_position_update_convergence() {
+        let cfg = TargetFilterConfig::default();
+        let mut filter = TacticalTargetFilter::new(
+            "TGT-01",
+            [0.0, 0.0, 100.0],
+            [10.0, 0.0, 0.0],
+            100.0,
+            25.0,
+            1000,
+            cfg,
+        )
+        .unwrap();
+
+        let initial_cep = filter.current_state.position_uncertainty_cep();
+        let d2 = filter
+            .update_position([10.5, 0.2, 100.1], None, 2000)
+            .unwrap();
+        assert!(d2 >= 0.0);
+        let updated_cep = filter.current_state.position_uncertainty_cep();
+        assert!(updated_cep < initial_cep);
+        assert_eq!(filter.update_count, 1);
+        assert_eq!(filter.coast_count, 0);
+    }
