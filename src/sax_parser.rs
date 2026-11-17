@@ -190,3 +190,27 @@ pub enum SaxEvent<'a> {
 
 /// Zero-copy streaming SAX parser over a borrowed XML string slice.
 #[derive(Debug, Clone)]
+pub struct SaxReader<'a> {
+    input: &'a str,
+    cursor: usize,
+    tag_stack: Vec<&'a str>,
+    started: bool,
+    ended: bool,
+}
+
+impl<'a> SaxReader<'a> {
+    /// Create a new SAX reader over an input string slice.
+    pub fn new(input: &'a str) -> Self {
+        Self {
+            input,
+            cursor: 0,
+            tag_stack: Vec::new(),
+            started: false,
+            ended: false,
+        }
+    }
+
+    /// Current cursor byte position in the stream.
+    pub fn position(&self) -> usize {
+        self.cursor
+    }
