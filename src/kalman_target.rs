@@ -502,3 +502,22 @@ impl TacticalTargetFilter {
         timestamp_ms: i64,
     ) -> Result<f64, KalmanTargetError> {
         self.predict_to(timestamp_ms)?;
+        let r_diag = pos_var.unwrap_or([
+            self.config.default_pos_var,
+            self.config.default_pos_var,
+            self.config.default_pos_var,
+        ]);
+        let d_sq = update_3d(
+            &mut self.current_state.x,
+            &mut self.current_state.cov,
+            pos,
+            r_diag,
+            0,
+            self.config.gate_threshold,
+        )?;
+        self.last_update_ms = timestamp_ms;
+        self.update_count += 1;
+        self.coast_count = 0;
+        Ok(d_sq)
+    }
+
