@@ -142,3 +142,27 @@ impl GeoTiffElevationGrid {
         Ok(grid)
     }
 
+    /// Construct a flat terrain grid with uniform elevation.
+    pub fn flat(
+        origin_x: f64,
+        origin_y: f64,
+        step_x: f64,
+        step_y: f64,
+        cols: usize,
+        rows: usize,
+        elevation: f64,
+    ) -> Result<Self, TerrainSamplerError> {
+        if !elevation.is_finite() {
+            return Err(TerrainSamplerError::NonFiniteInput);
+        }
+        let elevations = vec![Some(elevation); cols * rows];
+        Self::new(origin_x, origin_y, step_x, step_y, cols, rows, elevations)
+    }
+
+    /// Maximum X coordinate in grid coverage.
+    #[inline]
+    pub fn max_x(&self) -> f64 {
+        self.origin_x + (self.cols - 1) as f64 * self.step_x
+    }
+
+    /// Maximum Y coordinate in grid coverage.
