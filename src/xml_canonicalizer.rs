@@ -670,3 +670,27 @@ fn escape_xml_text(s: &str) -> String {
 }
 
 fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, CotValidationError> {
+    let tokens = tokenize_xml(xml)?;
+    let mut stack: Vec<(String, Vec<XmlAttribute>, Vec<XmlNode>)> = Vec::new();
+    let mut root: Option<XmlNode> = None;
+
+    for tok in tokens {
+        match tok {
+            RawXmlToken::Comment | RawXmlToken::ProcessingInstruction => {}
+            RawXmlToken::Text(txt) => {
+                let text_val = if opts.normalize_whitespace {
+                    txt.trim().to_string()
+                } else {
+                    txt
+                };
+                if !text_val.is_empty() {
+                    if let Some((_, _, ref mut children)) = stack.last_mut() {
+                        children.push(XmlNode::Text(text_val));
+                    }
+                }
+            }
+            RawXmlToken::StartTag { name, attributes, self_closing } => {
+                if self_closing {
+                    let node = XmlNode::Element {
+                        name,
+                        attributes,
