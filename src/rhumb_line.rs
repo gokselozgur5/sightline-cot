@@ -117,3 +117,29 @@ impl RhumbSegmentComparison {
         })
     }
 }
+
+/// Computes an intermediate waypoint along a rhumb line at fraction f in [0, 1].
+pub fn rhumb_intermediate_fraction(
+    p1: &RhumbWaypoint,
+    p2: &RhumbWaypoint,
+    f: f64,
+) -> Result<RhumbWaypoint, RhumbLineError> {
+    p1.validate()?;
+    p2.validate()?;
+    if !f.is_finite() || !(0.0..=1.0).contains(&f) {
+        return Err(RhumbLineError::InvalidParameter);
+    }
+    let lat1 = p1.lat.to_radians();
+    let lat2 = p2.lat.to_radians();
+    let dlat = lat2 - lat1;
+    let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
+    let lat_f = lat1 + f * dlat;
+    let dpsi = mercator_project(lat2) - mercator_project(lat1);
+    let dlon_f = if dpsi.abs() < 1e-12 {
+        f * dlon
+    } else {
+        (mercator_project(lat_f) - mercator_project(lat1)) * (dlon / dpsi)
+    };
+    let lon_f = (p1.lon + dlon_f.to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    Ok(RhumbWaypoint::new(lat_f.to_degrees(), lon_f))
+}
