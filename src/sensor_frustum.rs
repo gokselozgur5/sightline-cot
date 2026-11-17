@@ -293,3 +293,27 @@ pub fn generate_sensor_footprint(
         slant_range_m: slant,
     })
 }
+
+
+impl FrustumFootprint {
+    /// Format the ground footprint polygon as a CoT `<shape>` XML element string.
+    pub fn to_cot_shape_xml(&self, stroke_color: i32, fill_color: i32) -> String {
+        let mut inner = String::new();
+        for pt in &self.vertices_geo {
+            inner.push_str(&format!("<vertex lat=\"{:.6}\" lon=\"{:.6}\" hae=\"{:.2}\"/>", pt[0], pt[1], pt[2]));
+        }
+        format!(
+            "<shape><polyline closed=\"true\" color=\"{stroke_color}\" fillColor=\"{fill_color}\">{inner}</polyline></shape>"
+        )
+    }
+}
+
+impl SensorGimbal {
+    /// Format sensor gimbal pointing as `<sensor .../>` XML element string.
+    pub fn to_cot_sensor_xml(&self, fov_deg: f64, range_m: f64) -> String {
+        format!(
+            "<sensor azimuth=\"{:.2}\" elevation=\"{:.2}\" fov=\"{:.2}\" range=\"{:.2}\"/>",
+            self.azimuth_deg, self.elevation_deg, fov_deg, range_m
+        )
+    }
+}
