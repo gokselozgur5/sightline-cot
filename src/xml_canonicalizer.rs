@@ -358,3 +358,27 @@ impl CotSchemaValidator {
         let le_str = map.get("le").ok_or(CotValidationError::MissingRequiredAttribute {
             element: "point",
             attribute: "le",
+        })?;
+        let le: f64 = le_str.parse().map_err(|_| CotValidationError::MalformedXml(
+            format!("invalid float for point le: '{le_str}'"),
+        ))?;
+        if !le.is_finite() {
+            return Err(CotValidationError::NonFiniteNumber("le"));
+        }
+        if le < 0.0 {
+            return Err(CotValidationError::NegativeValueError { field: "le", value: le });
+        }
+
+        Ok(())
+    }
+
+    /// Validate CoT hierarchical type string format.
+    pub fn validate_cot_type(cot_type: &str) -> Result<(), CotValidationError> {
+        let trimmed = cot_type.trim();
+        if trimmed.is_empty() {
+            return Err(CotValidationError::InvalidCotType("empty type".into()));
+        }
+        for c in trimmed.chars() {
+            if !c.is_ascii_alphanumeric() && c != '-' && c != '.' && c != '_' {
+                return Err(CotValidationError::InvalidCotType(format!(
+                    "invalid character '{c}' in CoT type '{trimmed}'"
