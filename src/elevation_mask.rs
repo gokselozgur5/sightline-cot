@@ -146,3 +146,25 @@ impl ObstaclePoint {
         Ok(Self { distance_m, elevation_m, height_agl_m })
     }
 }
+
+/// Profile of terrain obstacle samples along an azimuth radial.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ObstacleProfile {
+    /// Ordered sequence of obstacle sample points.
+    pub points: Vec<ObstaclePoint>,
+}
+
+impl ObstacleProfile {
+    /// Create and validate an obstacle profile along a radial.
+    pub fn new(points: Vec<ObstaclePoint>) -> Result<Self, ElevationMaskError> {
+        if points.is_empty() {
+            return Err(ElevationMaskError::EmptyProfile);
+        }
+        for i in 1..points.len() {
+            if points[i].distance_m <= points[i - 1].distance_m {
+                return Err(ElevationMaskError::NonMonotonicProfile);
+            }
+        }
+        Ok(Self { points })
+    }
+}
