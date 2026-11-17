@@ -64,3 +64,8 @@ fn test_redundant_namespace_stripping() {
             <item xmlns:cot="http://cot.example.com" name="test"/>
         </detail>
     </event>"#;
+
+    let canon = canonicalize_cot_xml(xml).expect("canonicalization");
+    assert!(canon.contains("<item name=\"test\"/>"));
+    assert!(!canon.contains("<item xmlns:cot"));
+}
