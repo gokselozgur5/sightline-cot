@@ -105,4 +105,17 @@ impl MaskSector {
         }
         Ok(Self { start_azimuth_deg: start_az, end_azimuth_deg: end_az, mask_elevation_deg: mask_el })
     }
+
+    /// Check if an azimuth angle falls within this sector.
+    pub fn contains_azimuth(&self, az_deg: f64) -> bool {
+        if !az_deg.is_finite() {
+            return false;
+        }
+        let az = (az_deg % 360.0 + 360.0) % 360.0;
+        if self.start_azimuth_deg <= self.end_azimuth_deg {
+            az >= self.start_azimuth_deg && az <= self.end_azimuth_deg
+        } else {
+            az >= self.start_azimuth_deg || az <= self.end_azimuth_deg
+        }
+    }
 }
