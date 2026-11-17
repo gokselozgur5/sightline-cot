@@ -545,3 +545,20 @@ impl TacticalTargetFilter {
         self.last_update_ms = timestamp_ms;
         self.update_count += 1;
         self.coast_count = 0;
+        Ok(d_sq)
+    }
+
+    /// Process full state (position and velocity) measurement update.
+    pub fn update_full_state(
+        &mut self,
+        pos: [f64; 3],
+        vel: [f64; 3],
+        pos_var: Option<[f64; 3]>,
+        vel_var: Option<[f64; 3]>,
+        timestamp_ms: i64,
+    ) -> Result<(f64, f64), KalmanTargetError> {
+        let pos_d2 = self.update_position(pos, pos_var, timestamp_ms)?;
+        let vel_d2 = self.update_velocity(vel, vel_var, timestamp_ms)?;
+        Ok((pos_d2, vel_d2))
+    }
+
