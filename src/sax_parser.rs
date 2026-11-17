@@ -214,3 +214,27 @@ impl<'a> SaxReader<'a> {
     pub fn position(&self) -> usize {
         self.cursor
     }
+
+    /// Read the next SAX event from the stream.
+    pub fn next_event(&mut self) -> Result<Option<SaxEvent<'a>>, SaxError> {
+        if !self.started {
+            self.started = true;
+            return Ok(Some(SaxEvent::StartDocument));
+        }
+
+        if self.ended {
+            return Ok(None);
+        }
+
+        let bytes = self.input.as_bytes();
+        let len = bytes.len();
+
+        if self.cursor >= len {
+            if let Some(unclosed) = self.tag_stack.pop() {
+                return Err(SaxError::UnclosedElement(unclosed.to_string()));
+            }
+            self.ended = true;
+            return Ok(Some(SaxEvent::EndDocument));
+        }
+
+        if bytes[self.cursor] == b'<' {
