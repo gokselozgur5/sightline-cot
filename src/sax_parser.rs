@@ -118,3 +118,27 @@ impl<'a> Iterator for SaxAttributesIter<'a> {
             return None;
         }
 
+        // Skip whitespace before '='
+        while self.cursor < len && bytes[self.cursor].is_ascii_whitespace() {
+            self.cursor += 1;
+        }
+
+        if self.cursor >= len || bytes[self.cursor] != b'=' {
+            return Some(Err(SaxError::InvalidSyntax(format!(
+                "missing '=' after attribute '{name}'"
+            ))));
+        }
+        self.cursor += 1; // Consume '='
+
+        // Skip whitespace after '='
+        while self.cursor < len && bytes[self.cursor].is_ascii_whitespace() {
+            self.cursor += 1;
+        }
+
+        if self.cursor >= len {
+            return Some(Err(SaxError::UnexpectedEof));
+        }
+
+        let quote = bytes[self.cursor];
+        if quote != b'"' && quote != b'\'' {
+            return Some(Err(SaxError::InvalidSyntax(format!(
