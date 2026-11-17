@@ -256,3 +256,8 @@ pub use terrain_sampler::{
     cot_target_from_intercept, GeoTiffElevationGrid, InterpolationMethod, TerrainIntercept,
     TerrainInterceptSolver, TerrainRay, TerrainSamplerError,
 };
+
+pub mod kalman_target;
+pub use kalman_target::{
+    KalmanTargetError, KinematicState, TacticalTargetFilter, TargetFilterConfig,
+};
