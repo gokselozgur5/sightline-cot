@@ -76,3 +76,21 @@ pub fn rhumb_distance_and_bearing(
     let bearing = dlon.atan2(dpsi).to_degrees().rem_euclid(360.0);
     Ok((distance, bearing))
 }
+
+/// Computes great-circle distance between two waypoints using haversine formula.
+pub fn great_circle_distance(
+    p1: &RhumbWaypoint,
+    p2: &RhumbWaypoint,
+    radius: f64,
+) -> Result<f64, RhumbLineError> {
+    p1.validate()?;
+    p2.validate()?;
+    let lat1 = p1.lat.to_radians();
+    let lat2 = p2.lat.to_radians();
+    let dlat = lat2 - lat1;
+    let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
+    let a = (dlat / 2.0).sin().powi(2)
+        + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
+    let c = 2.0 * a.sqrt().clamp(0.0, 1.0).asin();
+    Ok(radius * c)
+}
