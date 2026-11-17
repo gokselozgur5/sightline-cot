@@ -574,3 +574,27 @@ fn parse_attributes_list(mut s: &str, el_name: &str) -> Result<Vec<XmlAttribute>
             return Err(CotValidationError::MalformedXml(format!(
                 "unquoted attribute value for '{attr_name}' on <{el_name}>"
             )));
+        }
+
+        let value_start = quote_char.len_utf8();
+        let end_quote = after_eq[value_start..].find(quote_char).ok_or_else(|| {
+            CotValidationError::MalformedXml(format!(
+                "unclosed attribute quote for '{attr_name}' on <{el_name}>"
+            ))
+        })? + value_start;
+
+        let raw_val = &after_eq[value_start..end_quote];
+        attrs.push(XmlAttribute {
+            name: attr_name.to_string(),
+            value: unescape_xml_entities(raw_val),
+        });
+
+        s = &after_eq[end_quote + quote_char.len_utf8()..];
+    }
+
+    Ok(attrs)
+}
+
+fn unescape_xml_entities(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut rest = s;
