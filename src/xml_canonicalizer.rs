@@ -502,3 +502,27 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
 }
 
 fn find_tag_closing(slice: &str) -> Result<usize, CotValidationError> {
+    let mut in_quote = None;
+    for (i, c) in slice.char_indices().skip(1) {
+        match c {
+            '"' | '\'' => {
+                if in_quote == Some(c) {
+                    in_quote = None;
+                } else if in_quote.is_none() {
+                    in_quote = Some(c);
+                }
+            }
+            '>' if in_quote.is_none() => return Ok(i),
+            _ => {}
+        }
+    }
+    Err(CotValidationError::MalformedXml("unclosed tag < without matching >".into()))
+}
+
+fn parse_tag_open_and_attrs(inner: &str) -> Result<(String, Vec<XmlAttribute>), CotValidationError> {
+    let mut parts = inner.split_whitespace();
+    let name = parts.next().ok_or_else(|| {
+        CotValidationError::MalformedXml("empty tag name".into())
+    })?.to_string();
+
+    let after_name = inner[name.len()..].trim_start();
