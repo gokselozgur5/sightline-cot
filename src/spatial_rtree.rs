@@ -64,3 +64,25 @@ impl SpatialEnvelope {
         for pt in &coords[1..] {
             min_lat = min_lat.min(pt[0]);
             max_lat = max_lat.max(pt[0]);
+            let n_lon = normalize_lon(pt[1]);
+            min_lon = min_lon.min(n_lon);
+            max_lon = max_lon.max(n_lon);
+        }
+
+        Some(Self::new(min_lat, min_lon, max_lat, max_lon))
+    }
+
+    /// Returns true if this envelope contains the given point.
+    pub fn contains_point(&self, lat: f64, lon: f64) -> bool {
+        let n_lon = normalize_lon(lon);
+        lat >= self.min_lat && lat <= self.max_lat && n_lon >= self.min_lon && n_lon <= self.max_lon
+    }
+
+    /// Returns true if this envelope fully encloses another envelope.
+    pub fn contains_envelope(&self, other: &Self) -> bool {
+        self.min_lat <= other.min_lat
+            && self.max_lat >= other.max_lat
+            && self.min_lon <= other.min_lon
+            && self.max_lon >= other.max_lon
+    }
+
