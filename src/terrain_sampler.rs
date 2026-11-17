@@ -286,3 +286,27 @@ impl GeoTiffElevationGrid {
     }
 
     /// Compute terrain aspect compass azimuth in degrees [0.0, 360.0) at (x, y).
+    pub fn aspect_deg(&self, x: f64, y: f64) -> Option<f64> {
+        let (gx, gy) = self.surface_gradient(x, y)?;
+        if gx.abs() < 1e-9 && gy.abs() < 1e-9 {
+            return Some(0.0);
+        }
+        let rad = (-gy).atan2(-gx);
+        let mut deg = 90.0 - rad.to_degrees();
+        if deg < 0.0 {
+            deg += 360.0;
+        }
+        if deg >= 360.0 {
+            deg -= 360.0;
+        }
+        Some(deg)
+    }
+}
+
+/// 3D ray in the elevation coordinate frame [X, Y, Z].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TerrainRay {
+    /// Ray origin point [X, Y, Z].
+    pub origin: [f64; 3],
+    /// Normalized direction unit vector.
+    pub direction: [f64; 3],
