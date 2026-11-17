@@ -262,3 +262,27 @@ impl GeoTiffElevationGrid {
         let dy = y_hi - y_lo;
         if dx < 1e-9 || dy < 1e-9 {
             return None;
+        }
+
+        let z_x_lo = self.sample_bilinear(x_lo, y)?;
+        let z_x_hi = self.sample_bilinear(x_hi, y)?;
+        let z_y_lo = self.sample_bilinear(x, y_lo)?;
+        let z_y_hi = self.sample_bilinear(x, y_hi)?;
+
+        Some(((z_x_hi - z_x_lo) / dx, (z_y_hi - z_y_lo) / dy))
+    }
+
+    /// Compute upward unit surface normal vector [nx, ny, nz] at (x, y).
+    pub fn surface_normal(&self, x: f64, y: f64) -> Option<[f64; 3]> {
+        let (gx, gy) = self.surface_gradient(x, y)?;
+        let norm = (gx * gx + gy * gy + 1.0).sqrt();
+        Some([-gx / norm, -gy / norm, 1.0 / norm])
+    }
+
+    /// Compute terrain slope in degrees [0.0, 90.0] at (x, y).
+    pub fn slope_deg(&self, x: f64, y: f64) -> Option<f64> {
+        let (gx, gy) = self.surface_gradient(x, y)?;
+        Some((gx * gx + gy * gy).sqrt().atan().to_degrees())
+    }
+
+    /// Compute terrain aspect compass azimuth in degrees [0.0, 360.0) at (x, y).
