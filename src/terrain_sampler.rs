@@ -478,3 +478,27 @@ impl TerrainInterceptSolver {
                         return Ok(TerrainIntercept {
                             point: hit_point,
                             distance: best_t,
+                            surface_normal: normal,
+                            slope_deg: slope,
+                            incident_angle_deg: inc_deg,
+                            iterations: iters,
+                        });
+                    }
+                }
+            } else if p[2] < min_elev && ray.direction[2] <= 0.0 {
+                break;
+            }
+
+            t_prev = t_curr;
+            if t_curr >= self.max_range {
+                break;
+            }
+        }
+
+        Err(TerrainSamplerError::NoIntersection)
+    }
+}
+
+/// Convert terrain intercept result to standard Cursor-on-Target event.
+pub fn cot_target_from_intercept(
+    intercept: &TerrainIntercept,
