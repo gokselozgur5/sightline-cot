@@ -128,3 +128,22 @@ pub fn rotate_vec(m: &[[f64; 3]; 3], v: [f64; 3]) -> [f64; 3] {
         m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2],
     ]
 }
+
+
+/// Compute 4 normalized corner ray vectors [Top-Left, Top-Right, Bottom-Right, Bottom-Left] in sensor body frame.
+pub fn compute_frustum_corner_rays(h_fov_deg: f64, v_fov_deg: f64) -> [[f64; 3]; 4] {
+    let tan_h = (h_fov_deg * 0.5).to_radians().tan();
+    let tan_v = (v_fov_deg * 0.5).to_radians().tan();
+    let corners = [
+        [-tan_h, 1.0, tan_v],
+        [tan_h, 1.0, tan_v],
+        [tan_h, 1.0, -tan_v],
+        [-tan_h, 1.0, -tan_v],
+    ];
+    let mut out = [[0.0; 3]; 4];
+    for (i, c) in corners.iter().enumerate() {
+        let norm = (c[0] * c[0] + c[1] * c[1] + c[2] * c[2]).sqrt();
+        out[i] = [c[0] / norm, c[1] / norm, c[2] / norm];
+    }
+    out
+}
