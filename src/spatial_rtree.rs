@@ -416,3 +416,25 @@ impl<T: Clone> SpatialRTree<T> {
                     }
                 }
             }
+            RTreeNode::Branch { children, .. } => {
+                for child in children {
+                    Self::search_containing_node(child, lat, lon, results);
+                }
+            }
+        }
+    }
+
+    /// Finds the nearest indexed item to the coordinate and returns reference and distance in meters.
+    pub fn nearest_neighbor(&self, lat: f64, lon: f64) -> Option<(&T, f64)> {
+        let root = self.root.as_ref()?;
+        let mut best: Option<(&T, f64)> = None;
+        Self::nearest_recursive(root, lat, lon, &mut best);
+        best
+    }
+
+    fn nearest_recursive<'a>(
+        node: &'a RTreeNode<T>,
+        lat: f64,
+        lon: f64,
+        best: &mut Option<(&'a T, f64)>,
+    ) {
