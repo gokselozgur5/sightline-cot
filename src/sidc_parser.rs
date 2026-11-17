@@ -293,3 +293,13 @@ impl MilStd2525DSymbol {
             self.modifier2 % 100
         )
     }
+    pub fn to_cot_type(&self) -> String {
+        let aff = self.identity.cot_char();
+        let dim = self.symbol_set.cot_dimension_str();
+        match self.symbol_set {
+            SymbolSet::LandEquipment => format!("a-{aff}-{dim}-E"),
+            SymbolSet::LandInstallation => format!("a-{aff}-{dim}-I"),
+            SymbolSet::AirMissile => format!("a-{aff}-{dim}-M"),
+            _ => format!("a-{aff}-{dim}"),
+        }
+    }
