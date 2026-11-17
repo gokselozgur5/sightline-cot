@@ -191,3 +191,28 @@ impl KinematicState {
         ((var_vx + var_vy + var_vz) / 3.0).sqrt()
     }
 
+    /// Extrapolate kinematic state forward by time delta dt_sec.
+    pub fn extrapolate(&self, dt_sec: f64, q: f64) -> Result<Self, KalmanTargetError> {
+        if !dt_sec.is_finite() || dt_sec < 0.0 {
+            return Err(KalmanTargetError::InvalidDeltaTime);
+        }
+        if !q.is_finite() || q < 0.0 {
+            return Err(KalmanTargetError::NonFiniteInput);
+        }
+        let (x_pred, cov_pred) = predict_step(&self.x, &self.cov, dt_sec, q);
+        let dt_ms = (dt_sec * 1000.0).round() as i64;
+        Ok(Self {
+            x: x_pred,
+            cov: cov_pred,
+            timestamp_ms: self.timestamp_ms + dt_ms,
+        })
+    }
+}
+
+/// Compute state and covariance prediction step under continuous white noise acceleration.
+fn predict_step(x: &[f64; 6], cov: &[[f64; 6]; 6], dt: f64, q: f64) -> ([f64; 6], [[f64; 6]; 6]) {
+    let mut x_pred = *x;
+    x_pred[0] += dt * x[3];
+    x_pred[1] += dt * x[4];
+    x_pred[2] += dt * x[5];
+
