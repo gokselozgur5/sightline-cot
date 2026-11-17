@@ -194,3 +194,16 @@ impl ObstacleProfile {
         Ok(max_angle_rad.to_degrees())
     }
 }
+
+/// Tactical line-of-sight terrain elevation masking validator.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ElevationMaskValidator {
+    /// Observer altitude / height in meters above datum.
+    pub observer_height_m: f64,
+    /// Default masking elevation angle in degrees for uncovered sectors.
+    pub default_mask_deg: f64,
+    /// Angular tolerance margin in degrees for grazing classification.
+    pub margin_threshold_deg: f64,
+    /// Configured azimuth masking sectors.
+    pub sectors: Vec<MaskSector>,
+}
