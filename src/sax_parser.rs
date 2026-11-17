@@ -334,3 +334,27 @@ impl<'a> SaxReader<'a> {
             }
             if self.cursor >= len {
                 return Err(SaxError::UnexpectedEof);
+            }
+            self.cursor += 1; // Consume '>'
+
+            if let Some(expected) = self.tag_stack.pop() {
+                if expected != name {
+                    return Err(SaxError::MismatchedTag {
+                        expected: expected.to_string(),
+                        found: name.to_string(),
+                    });
+                }
+            } else {
+                return Err(SaxError::InvalidSyntax(format!(
+                    "unexpected closing tag </{name}>"
+                )));
+            }
+
+            return Ok(Some(SaxEvent::EndElement { name }));
+        }
+
+        // Start tag or self-closing tag <tag ... > or <tag ... />
+        let name_start = self.cursor;
+        while self.cursor < len
+            && !bytes[self.cursor].is_ascii_whitespace()
+            && bytes[self.cursor] != b'>'
