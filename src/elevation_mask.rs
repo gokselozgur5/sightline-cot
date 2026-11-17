@@ -207,3 +207,21 @@ pub struct ElevationMaskValidator {
     /// Configured azimuth masking sectors.
     pub sectors: Vec<MaskSector>,
 }
+
+impl ElevationMaskValidator {
+    /// Create a new elevation mask validator.
+    pub fn new(observer_height_m: f64, default_mask_deg: f64) -> Result<Self, ElevationMaskError> {
+        if !observer_height_m.is_finite() || !default_mask_deg.is_finite() {
+            return Err(ElevationMaskError::NonFiniteValue);
+        }
+        if !(-90.0..=90.0).contains(&default_mask_deg) {
+            return Err(ElevationMaskError::InvalidElevation);
+        }
+        Ok(Self {
+            observer_height_m,
+            default_mask_deg,
+            margin_threshold_deg: 0.5,
+            sectors: Vec::new(),
+        })
+    }
+}
