@@ -218,3 +218,25 @@ impl<T: Clone> SpatialRTree<T> {
     }
 
     /// Inserts an item with its corresponding spatial envelope into the tree.
+    pub fn insert(&mut self, envelope: SpatialEnvelope, data: T) {
+        let entry = RTreeEntry::new(envelope, data);
+        self.len += 1;
+
+        if self.root.is_none() {
+            self.root = Some(RTreeNode::Leaf {
+                entries: vec![entry],
+                envelope,
+            });
+            return;
+        }
+
+        let mut root = self.root.take().unwrap();
+        if let Some((left, right)) = Self::insert_recursive(&mut root, entry, self.max_entries) {
+            let combined = left.envelope().merge(&right.envelope());
+            self.root = Some(RTreeNode::Branch {
+                children: vec![left, right],
+                envelope: combined,
+            });
+        } else {
+            self.root = Some(root);
+        }
