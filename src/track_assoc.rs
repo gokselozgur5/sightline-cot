@@ -256,3 +256,19 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
             a[i + 1][j + 1] = val;
         }
     }
+
+    let mut u = vec![0.0; k + 1];
+    let mut v = vec![0.0; k + 1];
+    let mut p = vec![0usize; k + 1];
+    let mut way = vec![0usize; k + 1];
+
+    for i in 1..=k {
+        p[0] = i;
+        let mut j0 = 0usize;
+        let mut minv = vec![f64::INFINITY; k + 1];
+        let mut used = vec![false; k + 1];
+        loop {
+            used[j0] = true;
+            let i0 = p[j0];
+            let mut delta = f64::INFINITY;
+            let mut j1 = 0usize;
