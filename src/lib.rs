@@ -243,5 +243,5 @@ pub use xml_canonicalizer::{
 
 pub mod spatial_rtree;
 pub use spatial_rtree::{
-    haversine_distance_m, normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree,
+    normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree,
 };
