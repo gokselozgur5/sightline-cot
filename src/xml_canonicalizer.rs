@@ -310,3 +310,27 @@ impl CotSchemaValidator {
             return Err(CotValidationError::CoordinateOutOfBounds {
                 coordinate: "lat",
                 value: lat,
+            });
+        }
+
+        let lon_str = map.get("lon").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "point",
+            attribute: "lon",
+        })?;
+        let lon: f64 = lon_str.parse().map_err(|_| CotValidationError::MalformedXml(
+            format!("invalid float for point lon: '{lon_str}'"),
+        ))?;
+        if !lon.is_finite() {
+            return Err(CotValidationError::NonFiniteNumber("lon"));
+        }
+        if !(-180.0..=180.0).contains(&lon) {
+            return Err(CotValidationError::CoordinateOutOfBounds {
+                coordinate: "lon",
+                value: lon,
+            });
+        }
+
+        let hae_str = map.get("hae").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "point",
+            attribute: "hae",
+        })?;
