@@ -372,3 +372,25 @@ impl<T: Clone> SpatialRTree<T> {
         if !node.envelope().intersects(query) {
             return;
         }
+
+        match node {
+            RTreeNode::Leaf { entries, .. } => {
+                for entry in entries {
+                    if entry.envelope.intersects(query) {
+                        results.push(&entry.data);
+                    }
+                }
+            }
+            RTreeNode::Branch { children, .. } => {
+                for child in children {
+                    Self::search_node(child, query, results);
+                }
+            }
+        }
+    }
+
+    /// Queries all items whose bounding envelope contains the given point coordinate.
+    pub fn search_containing(&self, lat: f64, lon: f64) -> Vec<&T> {
+        let mut results = Vec::new();
+        if let Some(ref root) = self.root {
+            Self::search_containing_node(root, lat, lon, &mut results);
