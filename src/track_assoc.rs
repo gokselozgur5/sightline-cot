@@ -401,3 +401,13 @@ mod tests {
         assert_eq!(res_gated.matches[0].track_idx, 1);
         assert_eq!(res_gated.matches[0].det_idx, 1);
     }
+
+    #[test]
+    fn test_solve_optimal_hungarian_optimality() {
+        let nested = vec![vec![10.0, 11.0], vec![12.0, 100.0]];
+        let mat = DistanceMatrix::from_nested(&nested).unwrap();
+        let res = solve_optimal_hungarian(&mat, 50.0);
+        assert_eq!(res.matches.len(), 2);
+        assert_eq!(res.matches[0], AssocMatch { track_idx: 0, det_idx: 1, cost: 11.0 });
+        assert_eq!(res.matches[1], AssocMatch { track_idx: 1, det_idx: 0, cost: 12.0 });
+    }
