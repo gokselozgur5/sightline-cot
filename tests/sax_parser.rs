@@ -46,3 +46,13 @@ fn test_integration_chunk_streamer_reassembly() {
     let mut all_events = Vec::new();
     for part in parts {
         let batch = streamer.feed(part);
+        for item in batch {
+            all_events.push(item);
+        }
+    }
+
+    assert_eq!(all_events.len(), 1);
+    let parsed = CotSaxParser::parse_events(&all_events[0]).unwrap();
+    assert_eq!(parsed.len(), 1);
+    assert_eq!(parsed[0].uid, "T1");
+}
