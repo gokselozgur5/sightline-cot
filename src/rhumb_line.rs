@@ -40,3 +40,17 @@ impl RhumbWaypoint {
         Ok(())
     }
 }
+
+use std::f64::consts::{FRAC_PI_2, FRAC_PI_4};
+
+const MAX_MERCATOR_LAT: f64 = FRAC_PI_2 - 1e-15;
+
+fn mercator_project(lat_rad: f64) -> f64 {
+    let clamped = lat_rad.clamp(-MAX_MERCATOR_LAT, MAX_MERCATOR_LAT);
+    (FRAC_PI_4 + clamped / 2.0).tan().ln()
+}
+
+fn unwrap_lon_diff_rad(lon1_deg: f64, lon2_deg: f64) -> f64 {
+    let diff = (lon2_deg - lon1_deg + 540.0).rem_euclid(360.0) - 180.0;
+    diff.to_radians()
+}
