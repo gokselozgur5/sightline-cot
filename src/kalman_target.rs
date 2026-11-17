@@ -757,3 +757,26 @@ mod tests {
     #[test]
     fn test_filter_full_state_update() {
         let cfg = TargetFilterConfig::default();
+        let mut filter = TacticalTargetFilter::new(
+            "TGT-03",
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            50.0,
+            10.0,
+            0,
+            cfg,
+        )
+        .unwrap();
+
+        let (d_pos, d_vel) = filter
+            .update_full_state([1.0, 2.0, 3.0], [0.1, 0.2, 0.3], None, None, 1000)
+            .unwrap();
+        assert!(d_pos >= 0.0);
+        assert!(d_vel >= 0.0);
+        assert_eq!(filter.update_count, 2);
+    }
+
+    #[test]
+    fn test_gating_threshold_rejection() {
+        let mut cfg = TargetFilterConfig::default();
+        cfg.gate_threshold = 4.0;
