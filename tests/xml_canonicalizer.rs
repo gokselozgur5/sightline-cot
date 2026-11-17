@@ -42,3 +42,25 @@ fn test_malformed_xml_and_unclosed_tags() {
     let dup_attr = r#"<event version="2.0" uid="U" uid="U2" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
     assert!(matches!(validate_cot_xml(dup_attr), Err(CotValidationError::DuplicateAttribute { .. })));
 }
+
+#[test]
+fn test_canonicalization_sorting_and_namespaces() {
+    let xml = r#"<event stale="2026-11-17T04:35:00.000Z" start="2026-11-17T04:30:00.000Z" time="2026-11-17T04:30:00.000Z" how="m-g" type="a-f-G-U-C" uid="U" version="2.0" xmlns:cot="http://cot.example.com" xmlns="http://default.example.com">
+        <!-- sample comment -->
+        <point le="0.0" ce="0.0" hae="10.0" lon="20.0" lat="10.0"/>
+    </event>"#;
+
+    let canon = canonicalize_cot_xml(xml).expect("canonicalization");
+    assert!(!canon.contains("sample comment"));
+    assert!(canon.starts_with("<event xmlns=\"http://default.example.com\" xmlns:cot=\"http://cot.example.com\" how=\"m-g\" stale=\"2026-11-17T04:35:00.000Z\" start=\"2026-11-17T04:30:00.000Z\" time=\"2026-11-17T04:30:00.000Z\" type=\"a-f-G-U-C\" uid=\"U\" version=\"2.0\">"));
+    assert!(canon.contains("<point ce=\"0.0\" hae=\"10.0\" lat=\"10.0\" le=\"0.0\" lon=\"20.0\"/>"));
+}
+
+#[test]
+fn test_redundant_namespace_stripping() {
+    let xml = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z" xmlns:cot="http://cot.example.com">
+        <point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/>
+        <detail>
+            <item xmlns:cot="http://cot.example.com" name="test"/>
+        </detail>
+    </event>"#;
