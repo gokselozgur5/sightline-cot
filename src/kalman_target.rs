@@ -117,3 +117,28 @@ impl KinematicState {
                 return Err(KalmanTargetError::NonFiniteInput);
             }
         }
+        for row in cov.iter() {
+            for v in row.iter() {
+                if !v.is_finite() {
+                    return Err(KalmanTargetError::NonFiniteInput);
+                }
+            }
+        }
+        Ok(Self {
+            x,
+            cov,
+            timestamp_ms,
+        })
+    }
+
+    /// Extract 3D position [x, y, z] in meters.
+    #[inline]
+    pub fn position(&self) -> [f64; 3] {
+        [self.x[0], self.x[1], self.x[2]]
+    }
+
+    /// Extract 3D velocity vector [vx, vy, vz] in meters per second.
+    #[inline]
+    pub fn velocity(&self) -> [f64; 3] {
+        [self.x[3], self.x[4], self.x[5]]
+    }
