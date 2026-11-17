@@ -396,4 +396,19 @@ mod tests {
         assert!(fp.contains_enu_point(0.0, 500.0));
         assert!(!fp.contains_enu_point(0.0, -500.0));
     }
+
+    #[test]
+    fn test_cot_xml_roundtrip() {
+        let platform = PlatformPose::new(37.7749, -122.4194, 800.0, 45.0, 0.0, 0.0).unwrap();
+        let gimbal = SensorGimbal::new(10.0, -30.0, 0.0).unwrap();
+        let cfg = SensorFrustumConfig::new(40.0, 30.0, 4000.0, 1.0).unwrap();
+        let fp = generate_sensor_footprint(&platform, &gimbal, &cfg, 10.0).unwrap();
+        let xml = fp.to_cot_event_xml("UID-1", "DRONE-1", 1700000000000, 1700000060000);
+        assert!(xml.contains("DRONE-1"));
+        assert!(xml.contains("<shape><polyline"));
+        let sensor_xml = gimbal.to_cot_sensor_xml(cfg.h_fov_deg, cfg.max_range_m);
+        let (parsed_g, parsed_fov, _) = SensorGimbal::parse_cot_sensor(&sensor_xml).unwrap();
+        assert!((parsed_g.azimuth_deg - gimbal.azimuth_deg).abs() < 1e-2);
+        assert!((parsed_fov - cfg.h_fov_deg).abs() < 1e-2);
+    }
 }
