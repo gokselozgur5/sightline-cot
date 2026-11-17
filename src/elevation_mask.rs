@@ -301,4 +301,29 @@ impl ElevationMaskValidator {
         };
         Ok(((height_m - drop_m - self.observer_height_m).atan2(dist_m)).to_degrees())
     }
+
+    /// Validate line-of-sight elevation against radial obstacle profile.
+    pub fn validate_target_profile(
+        &self, az_deg: f64, dist_m: f64, height_m: f64, profile: &ObstacleProfile, curvature: bool,
+    ) -> Result<MaskingEvaluation, ElevationMaskError> {
+        let target_el = self.compute_target_elevation_deg(dist_m, height_m, curvature)?;
+        let prof_mask = profile.compute_mask_angle_deg(self.observer_height_m, curvature)?;
+        let sect_mask = self.get_mask_angle_at_azimuth(az_deg)?;
+        let eff_mask = prof_mask.max(sect_mask);
+        let margin = target_el - eff_mask;
+        let status = if margin > self.margin_threshold_deg {
+            MaskingStatus::Clear
+        } else if margin >= -self.margin_threshold_deg {
+            MaskingStatus::Grazing
+        } else {
+            MaskingStatus::Masked
+        };
+        Ok(MaskingEvaluation {
+            target_azimuth_deg: az_deg,
+            target_elevation_deg: target_el,
+            mask_elevation_deg: eff_mask,
+            clearance_margin_deg: margin,
+            status,
+        })
+    }
 }
