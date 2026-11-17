@@ -108,3 +108,25 @@ impl SpatialEnvelope {
     pub fn area(&self) -> f64 {
         let d_lat = (self.max_lat - self.min_lat).max(0.0);
         let d_lon = (self.max_lon - self.min_lon).max(0.0);
+        d_lat * d_lon
+    }
+
+    /// Computes the semi-perimeter margin of the bounding box.
+    pub fn margin(&self) -> f64 {
+        let d_lat = (self.max_lat - self.min_lat).max(0.0);
+        let d_lon = (self.max_lon - self.min_lon).max(0.0);
+        d_lat + d_lon
+    }
+
+    /// Computes center coordinate [lat, lon] of the envelope.
+    pub fn center(&self) -> [f64; 2] {
+        [
+            (self.min_lat + self.max_lat) * 0.5,
+            (self.min_lon + self.max_lon) * 0.5,
+        ]
+    }
+
+    /// Computes minimal geodesic distance in meters from point to the envelope boundary.
+    pub fn distance_to_point(&self, lat: f64, lon: f64) -> f64 {
+        if self.contains_point(lat, lon) {
+            return 0.0;
