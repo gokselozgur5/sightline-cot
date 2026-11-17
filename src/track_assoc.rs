@@ -235,3 +235,24 @@ pub fn solve_nearest_neighbor(mat: &DistanceMatrix, gate: f64) -> AssocResult {
         unmatched_dets,
     }
 }
+
+/// Solve optimal bipartite track association using Hungarian algorithm with gating.
+pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
+    let n = mat.rows();
+    let m = mat.cols();
+    if n == 0 || m == 0 {
+        return AssocResult {
+            matches: Vec::new(),
+            unmatched_tracks: (0..n).collect(),
+            unmatched_dets: (0..m).collect(),
+        };
+    }
+    let k = n.max(m);
+    let dummy = 1e9;
+    let mut a = vec![vec![0.0; k + 1]; k + 1];
+    for i in 0..k {
+        for j in 0..k {
+            let val = if i < n && j < m { mat.get(i, j).unwrap_or(dummy) } else { dummy };
+            a[i + 1][j + 1] = val;
+        }
+    }
