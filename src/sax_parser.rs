@@ -382,3 +382,27 @@ impl<'a> SaxReader<'a> {
                 let q = bytes[self.cursor];
                 self.cursor += 1;
                 while self.cursor < len && bytes[self.cursor] != q {
+                    self.cursor += 1;
+                }
+                if self.cursor < len {
+                    self.cursor += 1;
+                }
+            } else {
+                self.cursor += 1;
+            }
+        }
+
+        if self.cursor >= len {
+            return Err(SaxError::UnexpectedEof);
+        }
+
+        let raw_attrs = &self.input[attr_start..self.cursor].trim();
+        let attributes = SaxAttributes::new(raw_attrs);
+
+        if self_closing {
+            self.cursor += 2; // Consume '/>'
+            Ok(Some(SaxEvent::EmptyElement { name, attributes }))
+        } else {
+            self.cursor += 1; // Consume '>'
+            self.tag_stack.push(name);
+            Ok(Some(SaxEvent::StartElement { name, attributes }))
