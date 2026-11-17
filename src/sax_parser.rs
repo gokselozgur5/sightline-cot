@@ -478,3 +478,27 @@ pub struct CotSaxParser;
 
 impl CotSaxParser {
     /// Parse all `<event>` elements from a zero-copy XML string slice.
+    pub fn parse_events<'a>(xml: &'a str) -> Result<Vec<CotEventView<'a>>, SaxError> {
+        let mut reader = SaxReader::new(xml);
+        let mut events = Vec::new();
+        let mut current_event: Option<CotEventView<'a>> = None;
+
+        while let Some(ev) = reader.next_event()? {
+            match ev {
+                SaxEvent::StartElement { name, attributes } if name == "event" => {
+                    let version = attributes.get("version").unwrap_or("2.0");
+                    let uid = attributes.get("uid").unwrap_or("");
+                    let cot_type = attributes.get("type").unwrap_or("");
+                    let how = attributes.get("how").unwrap_or("");
+                    let time = attributes.get("time").unwrap_or("");
+                    let start = attributes.get("start").unwrap_or("");
+                    let stale = attributes.get("stale").unwrap_or("");
+
+                    current_event = Some(CotEventView {
+                        version,
+                        uid,
+                        cot_type,
+                        how,
+                        time,
+                        start,
+                        stale,
