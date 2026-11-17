@@ -241,3 +241,28 @@ fn predict_step(x: &[f64; 6], cov: &[[f64; 6]; 6], dt: f64, q: f64) -> ([f64; 6]
                 sum += f[i][k] * cov[k][j];
             }
             f_p[i][j] = sum;
+        }
+    }
+
+    let mut cov_pred = q_mat;
+    for i in 0..6 {
+        for j in 0..6 {
+            let mut sum = 0.0;
+            for k in 0..6 {
+                sum += f_p[i][k] * f[j][k];
+            }
+            cov_pred[i][j] += sum;
+        }
+    }
+
+    for i in 0..6 {
+        for j in (i + 1)..6 {
+            let sym = 0.5 * (cov_pred[i][j] + cov_pred[j][i]);
+            cov_pred[i][j] = sym;
+            cov_pred[j][i] = sym;
+        }
+    }
+
+    (x_pred, cov_pred)
+}
+
