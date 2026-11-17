@@ -306,3 +306,25 @@ impl<T: Clone> SpatialRTree<T> {
     fn split_leaf(mut entries: Vec<RTreeEntry<T>>) -> (RTreeNode<T>, RTreeNode<T>) {
         let split_at = entries.len() / 2;
         let right_entries = entries.split_off(split_at);
+
+        let mut left_env = entries[0].envelope;
+        for e in &entries[1..] {
+            left_env = left_env.merge(&e.envelope);
+        }
+
+        let mut right_env = right_entries[0].envelope;
+        for e in &right_entries[1..] {
+            right_env = right_env.merge(&e.envelope);
+        }
+
+        (
+            RTreeNode::Leaf {
+                entries,
+                envelope: left_env,
+            },
+            RTreeNode::Leaf {
+                entries: right_entries,
+                envelope: right_env,
+            },
+        )
+    }
