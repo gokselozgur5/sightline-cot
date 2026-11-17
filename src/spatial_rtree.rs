@@ -174,3 +174,25 @@ impl<T: Clone> RTreeNode<T> {
 
 /// 2D spatial indexing R-Tree for fast tactical Cursor-on-Target queries.
 #[derive(Debug, Clone)]
+pub struct SpatialRTree<T> {
+    root: Option<RTreeNode<T>>,
+    len: usize,
+    max_entries: usize,
+}
+
+impl<T: Clone> Default for SpatialRTree<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<T: Clone> SpatialRTree<T> {
+    /// Creates a new empty spatial R-Tree with default branch capacity (4).
+    pub fn new() -> Self {
+        Self::with_max_entries(4)
+    }
+
+    /// Creates a new empty spatial R-Tree with a custom maximum node capacity.
+    pub fn with_max_entries(max_entries: usize) -> Self {
+        let max_entries = max_entries.max(2);
+        Self {
