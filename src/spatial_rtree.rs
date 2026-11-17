@@ -262,3 +262,25 @@ impl<T: Clone> SpatialRTree<T> {
                 if let Some((n1, n2)) =
                     Self::insert_recursive(&mut children[best_idx], entry, max_entries)
                 {
+                    children[best_idx] = n1;
+                    children.push(n2);
+                    let mut new_env = children[0].envelope();
+                    for c in &children[1..] {
+                        new_env = new_env.merge(&c.envelope());
+                    }
+                    *envelope = new_env;
+                    if children.len() > max_entries {
+                        Some(Self::split_branch(std::mem::take(children)))
+                    } else {
+                        None
+                    }
+                } else {
+                    *envelope = envelope.merge(&children[best_idx].envelope());
+                    None
+                }
+            }
+        }
+    }
+
+    fn choose_best_child(children: &[RTreeNode<T>], env: &SpatialEnvelope) -> usize {
+        let mut best_idx = 0;
