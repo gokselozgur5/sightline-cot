@@ -20,3 +20,25 @@ fn test_missing_or_invalid_event_attributes() {
 
     let stale_before = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:35:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:32:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
     assert!(matches!(validate_cot_xml(stale_before), Err(CotValidationError::TimestampOrderViolation { .. })));
+}
+
+#[test]
+fn test_point_coordinate_bounds_and_errors() {
+    let lat_oob = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="95.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
+    assert!(matches!(validate_cot_xml(lat_oob), Err(CotValidationError::CoordinateOutOfBounds { coordinate: "lat", .. })));
+
+    let lon_oob = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="-190.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
+    assert!(matches!(validate_cot_xml(lon_oob), Err(CotValidationError::CoordinateOutOfBounds { coordinate: "lon", .. })));
+
+    let neg_ce = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="-1.0" le="0.0"/></event>"#;
+    assert!(matches!(validate_cot_xml(neg_ce), Err(CotValidationError::NegativeValueError { field: "ce", .. })));
+}
+
+#[test]
+fn test_malformed_xml_and_unclosed_tags() {
+    let unclosed = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/>"#;
+    assert!(matches!(validate_cot_xml(unclosed), Err(CotValidationError::UnclosedTag(_))));
+
+    let dup_attr = r#"<event version="2.0" uid="U" uid="U2" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
+    assert!(matches!(validate_cot_xml(dup_attr), Err(CotValidationError::DuplicateAttribute { .. })));
+}
