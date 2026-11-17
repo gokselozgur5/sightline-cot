@@ -526,3 +526,27 @@ pub fn cot_target_from_intercept(
 impl From<&crate::dem_bilinear::DemRaster> for GeoTiffElevationGrid {
     fn from(dem: &crate::dem_bilinear::DemRaster) -> Self {
         Self {
+            origin_x: dem.origin_e_m,
+            origin_y: dem.origin_n_m,
+            step_x: dem.cell_step_m,
+            step_y: dem.cell_step_m,
+            cols: dem.cols,
+            rows: dem.rows,
+            elevations: dem.elevations.clone(),
+            nodata_value: None,
+        }
+    }
+}
+
+impl From<&crate::camera::DemGrid> for GeoTiffElevationGrid {
+    fn from(grid: &crate::camera::DemGrid) -> Self {
+        Self {
+            origin_x: grid.origin_e_m,
+            origin_y: grid.origin_n_m,
+            step_x: grid.cell_step_m,
+            step_y: grid.cell_step_m,
+            cols: grid.cols,
+            rows: grid.rows,
+            elevations: grid.elevations.iter().map(|&h| Some(h)).collect(),
+            nodata_value: None,
+        }
