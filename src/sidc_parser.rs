@@ -314,3 +314,28 @@ impl MilStd2525DSymbol {
         } else {
             StandardIdentity::Unknown
         };
+        let dim_str = if parts.len() > 2 { parts[2] } else { "G" };
+        let mut symbol_set = SymbolSet::from_cot_dimension(dim_str);
+        if parts.len() > 3 {
+            if dim_str == "G" && parts[3] == "E" {
+                symbol_set = SymbolSet::LandEquipment;
+            } else if dim_str == "G" && parts[3] == "I" {
+                symbol_set = SymbolSet::LandInstallation;
+            } else if dim_str == "A" && parts[3] == "M" {
+                symbol_set = SymbolSet::AirMissile;
+            }
+        }
+        Ok(Self {
+            version: 10,
+            context: 0,
+            identity,
+            symbol_set,
+            status: SymbolStatus::Present,
+            hq_tf_dummy: 0,
+            echelon: Echelon::Unspecified,
+            entity_code: 0,
+            modifier1: 0,
+            modifier2: 0,
+        })
+    }
+}
