@@ -659,3 +659,28 @@ mod tests {
         assert!(cfg.validate().is_ok());
 
         let mut bad_cfg = cfg;
+        bad_cfg.process_noise_q = -1.0;
+        assert_eq!(
+            bad_cfg.validate().unwrap_err(),
+            KalmanTargetError::NonFiniteInput
+        );
+    }
+
+    #[test]
+    fn test_kinematic_state_getters_and_course() {
+        let x = [100.0, 200.0, 50.0, 10.0, 0.0, 0.0];
+        let cov = [[0.0; 6]; 6];
+        let state = KinematicState::new(x, cov, 1000).unwrap();
+
+        assert_eq!(state.position(), [100.0, 200.0, 50.0]);
+        assert_eq!(state.velocity(), [10.0, 0.0, 0.0]);
+        assert!((state.speed_mps() - 10.0).abs() < 1e-9);
+        assert!((state.ground_speed_mps() - 10.0).abs() < 1e-9);
+        assert!((state.course_deg() - 90.0).abs() < 1e-6);
+        assert!((state.elevation_deg() - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_extrapolate_constant_velocity() {
+        let x = [0.0, 0.0, 0.0, 10.0, 20.0, -5.0];
+        let cov = [[1.0; 6]; 6];
