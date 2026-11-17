@@ -118,3 +118,27 @@ enum RawXmlToken {
     },
     Text(String),
     Comment,
+    ProcessingInstruction,
+}
+
+/// Cursor-on-Target XML schema validator.
+pub struct CotSchemaValidator;
+
+impl CotSchemaValidator {
+    /// Validate that an XML document conforms to CoT 2.0 schema rules.
+    pub fn validate(xml: &str) -> Result<(), CotValidationError> {
+        let trimmed = xml.trim();
+        if trimmed.is_empty() {
+            return Err(CotValidationError::EmptyXml);
+        }
+
+        let tokens = tokenize_xml(trimmed)?;
+        let mut tag_stack: Vec<String> = Vec::new();
+        let mut root_seen = false;
+        let mut point_seen = false;
+        let mut event_attrs: Option<Vec<XmlAttribute>> = None;
+
+        for token in tokens {
+            match token {
+                RawXmlToken::Comment | RawXmlToken::ProcessingInstruction => {}
+                RawXmlToken::Text(text) => {
