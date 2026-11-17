@@ -334,3 +334,27 @@ impl CotSchemaValidator {
             element: "point",
             attribute: "hae",
         })?;
+        let hae: f64 = hae_str.parse().map_err(|_| CotValidationError::MalformedXml(
+            format!("invalid float for point hae: '{hae_str}'"),
+        ))?;
+        if !hae.is_finite() {
+            return Err(CotValidationError::NonFiniteNumber("hae"));
+        }
+
+        let ce_str = map.get("ce").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "point",
+            attribute: "ce",
+        })?;
+        let ce: f64 = ce_str.parse().map_err(|_| CotValidationError::MalformedXml(
+            format!("invalid float for point ce: '{ce_str}'"),
+        ))?;
+        if !ce.is_finite() {
+            return Err(CotValidationError::NonFiniteNumber("ce"));
+        }
+        if ce < 0.0 {
+            return Err(CotValidationError::NegativeValueError { field: "ce", value: ce });
+        }
+
+        let le_str = map.get("le").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "point",
+            attribute: "le",
