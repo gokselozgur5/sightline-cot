@@ -106,3 +106,25 @@ impl SensorFrustumConfig {
         Ok(Self { h_fov_deg: h_fov, v_fov_deg: v_fov, max_range_m: max_rng, min_range_m: min_rng })
     }
 }
+
+
+/// Compute 3x3 rotation matrix from yaw (azimuth clockwise from North), pitch, and roll in ENU.
+pub fn euler_to_rot_matrix(yaw_deg: f64, pitch_deg: f64, roll_deg: f64) -> [[f64; 3]; 3] {
+    let (s_y, c_y) = yaw_deg.to_radians().sin_cos();
+    let (s_p, c_p) = pitch_deg.to_radians().sin_cos();
+    let (s_r, c_r) = roll_deg.to_radians().sin_cos();
+    [
+        [c_y * c_r + s_y * s_p * s_r, -s_y * c_p, c_y * s_r - s_y * s_p * c_r],
+        [s_y * c_r - c_y * s_p * s_r, c_y * c_p, s_y * s_r + c_y * s_p * c_r],
+        [-c_p * s_r, -s_p, c_p * c_r],
+    ]
+}
+
+/// Multiply a 3x3 matrix by a 3D vector.
+pub fn rotate_vec(m: &[[f64; 3]; 3], v: [f64; 3]) -> [f64; 3] {
+    [
+        m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
+        m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
+        m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2],
+    ]
+}
