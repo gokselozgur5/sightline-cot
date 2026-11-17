@@ -334,3 +334,27 @@ impl TerrainRay {
         [
             self.origin[0] + t * self.direction[0],
             self.origin[1] + t * self.direction[1],
+            self.origin[2] + t * self.direction[2],
+        ]
+    }
+}
+
+/// Result of a line-of-sight terrain intersection.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TerrainIntercept {
+    /// 3D coordinates [X, Y, Z] of intercept.
+    pub point: [f64; 3],
+    /// Slant range distance from ray origin to intercept.
+    pub distance: f64,
+    /// Upward unit normal vector at surface intercept.
+    pub surface_normal: [f64; 3],
+    /// Terrain slope at intercept in degrees [0.0, 90.0].
+    pub slope_deg: f64,
+    /// Incident angle between ray direction and surface normal in degrees.
+    pub incident_angle_deg: f64,
+    /// Number of bisection iterations performed.
+    pub iterations: usize,
+}
+
+/// Line-of-sight terrain intercept solver.
+#[derive(Debug, Clone, PartialEq)]
