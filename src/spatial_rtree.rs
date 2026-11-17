@@ -86,3 +86,25 @@ impl SpatialEnvelope {
             && self.max_lon >= other.max_lon
     }
 
+    /// Returns true if this envelope intersects with another envelope.
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.min_lat <= other.max_lat
+            && self.max_lat >= other.min_lat
+            && self.min_lon <= other.max_lon
+            && self.max_lon >= other.min_lon
+    }
+
+    /// Computes the union envelope of this and another envelope.
+    pub fn merge(&self, other: &Self) -> Self {
+        Self::new(
+            self.min_lat.min(other.min_lat),
+            self.min_lon.min(other.min_lon),
+            self.max_lat.max(other.max_lat),
+            self.max_lon.max(other.max_lon),
+        )
+    }
+
+    /// Computes the area metric of the bounding box in degrees squared.
+    pub fn area(&self) -> f64 {
+        let d_lat = (self.max_lat - self.min_lat).max(0.0);
+        let d_lon = (self.max_lon - self.min_lon).max(0.0);
