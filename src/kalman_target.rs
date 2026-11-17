@@ -609,3 +609,28 @@ impl TacticalTargetFilter {
             return Some(0.0);
         }
 
+        let (vx, vy, vz) = (
+            self.current_state.x[3],
+            self.current_state.x[4],
+            self.current_state.x[5],
+        );
+        let v_sq = vx * vx + vy * vy + vz * vz;
+        let s_sq = pursuer_speed_mps * pursuer_speed_mps;
+
+        let a = v_sq - s_sq;
+        let b = 2.0 * (rx * vx + ry * vy + rz * vz);
+        let c = dist_sq;
+
+        if a.abs() < 1e-9 {
+            if b.abs() < 1e-9 {
+                return None;
+            }
+            let t = -c / b;
+            return if t > 1e-6 { Some(t) } else { None };
+        }
+
+        let disc = b * b - 4.0 * a * c;
+        if disc < 0.0 {
+            return None;
+        }
+        let sqrt_disc = disc.sqrt();
