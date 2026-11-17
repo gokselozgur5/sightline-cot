@@ -363,4 +363,20 @@ mod tests {
         assert_eq!(eval_masked.status, MaskingStatus::Masked);
         assert!(!eval_masked.is_visible());
     }
+
+    #[test]
+    fn test_obstacle_profile_and_mask_computation() {
+        let p1 = ObstaclePoint::new(1000.0, 50.0, 10.0).unwrap();
+        let p2 = ObstaclePoint::new(2000.0, 120.0, 0.0).unwrap();
+        let prof = ObstacleProfile::new(vec![p1, p2]).unwrap();
+        let angle_flat = prof.compute_mask_angle_deg(10.0, false).unwrap();
+        assert!(angle_flat > 0.0);
+
+        let val = ElevationMaskValidator::new(10.0, 0.0).unwrap();
+        let res = val.validate_target_profile(90.0, 3000.0, 250.0, &prof, false).unwrap();
+        assert_eq!(res.status, MaskingStatus::Clear);
+
+        let res_blocked = val.validate_target_profile(90.0, 3000.0, 50.0, &prof, false).unwrap();
+        assert_eq!(res_blocked.status, MaskingStatus::Masked);
+    }
 }
