@@ -54,3 +54,25 @@ fn unwrap_lon_diff_rad(lon1_deg: f64, lon2_deg: f64) -> f64 {
     let diff = (lon2_deg - lon1_deg + 540.0).rem_euclid(360.0) - 180.0;
     diff.to_radians()
 }
+
+/// Computes rhumb line distance (meters) and constant bearing (degrees).
+pub fn rhumb_distance_and_bearing(
+    p1: &RhumbWaypoint,
+    p2: &RhumbWaypoint,
+    radius: f64,
+) -> Result<(f64, f64), RhumbLineError> {
+    p1.validate()?;
+    p2.validate()?;
+    let (lat1, lat2) = (p1.lat.to_radians(), p2.lat.to_radians());
+    let dlat = lat2 - lat1;
+    let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
+    let dpsi = mercator_project(lat2) - mercator_project(lat1);
+    let q = if dpsi.abs() < 1e-12 {
+        lat1.cos()
+    } else {
+        dlat / dpsi
+    };
+    let distance = radius * (dlat * dlat + q * q * dlon * dlon).sqrt();
+    let bearing = dlon.atan2(dpsi).to_degrees().rem_euclid(360.0);
+    Ok((distance, bearing))
+}
