@@ -142,3 +142,27 @@ impl CotSchemaValidator {
             match token {
                 RawXmlToken::Comment | RawXmlToken::ProcessingInstruction => {}
                 RawXmlToken::Text(text) => {
+                    if !tag_stack.is_empty() && text.chars().any(|c| !c.is_whitespace()) {
+                        // Non-whitespace text inside elements is acceptable in CoT (e.g. remarks)
+                    }
+                }
+                RawXmlToken::StartTag { name, attributes, self_closing } => {
+                    let local_name = strip_prefix(&name);
+                    if tag_stack.is_empty() {
+                        if root_seen {
+                            return Err(CotValidationError::MalformedXml(
+                                "multiple root elements detected".into(),
+                            ));
+                        }
+                        if local_name != "event" {
+                            return Err(CotValidationError::MalformedXml(format!(
+                                "root element must be <event>, found <{name}>"
+                            )));
+                        }
+                        root_seen = true;
+                        Self::validate_event_attributes(&attributes)?;
+                        event_attrs = Some(attributes.clone());
+                    } else if local_name == "point" {
+                        let parent = tag_stack.last().map(|s| strip_prefix(s)).unwrap_or("");
+                        if parent == "event" {
+                            point_seen = true;
