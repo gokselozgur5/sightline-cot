@@ -70,3 +70,27 @@ fn test_terrain_intercept_sloped_surface() {
     for _r in 0..11 {
         for c in 0..11 {
             raw.push(c as f64 * 5.0);
+        }
+    }
+    let grid = GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 11, 11, &raw, None).unwrap();
+
+    // Slanted ray pointing downward at 45 degrees toward x=50, y=50
+    let ray = TerrainRay::new([20.0, 50.0, 50.0], [1.0, 0.0, -1.0]).unwrap();
+    let solver = TerrainInterceptSolver::new(5.0, 1000.0, 0.01, 100).unwrap();
+    let intercept = solver.solve(&grid, &ray).unwrap();
+
+    assert!(intercept.point[0] >= 0.0 && intercept.point[0] <= 100.0);
+    assert!((intercept.point[1] - 50.0).abs() < 0.1);
+    let terrain_h = grid
+        .sample_bilinear(intercept.point[0], intercept.point[1])
+        .unwrap();
+    assert!((intercept.point[2] - terrain_h).abs() < 0.05);
+}
+
+#[test]
+fn test_ray_pointing_away_error() {
+    let grid = GeoTiffElevationGrid::flat(0.0, 0.0, 10.0, 10.0, 5, 5, 100.0).unwrap();
+    let ray = TerrainRay::new([20.0, 20.0, 200.0], [0.0, 0.0, 1.0]).unwrap();
+    let solver = TerrainInterceptSolver::default();
+    let res = solver.solve(&grid, &ray);
+    assert_eq!(res, Err(TerrainSamplerError::RayPointsAway));
