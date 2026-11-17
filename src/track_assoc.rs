@@ -58,3 +58,29 @@ impl AssocConfig {
         Ok(())
     }
 }
+
+/// 2D dense distance / cost matrix representation.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DistanceMatrix {
+    rows: usize,
+    cols: usize,
+    data: Vec<f64>,
+}
+
+impl DistanceMatrix {
+    pub fn new(rows: usize, cols: usize, fill: f64) -> Self {
+        Self {
+            rows,
+            cols,
+            data: vec![fill; rows * cols],
+        }
+    }
+
+    pub fn rows(&self) -> usize {
+        self.rows
+    }
+
+    pub fn cols(&self) -> usize {
+        self.cols
+    }
+}
