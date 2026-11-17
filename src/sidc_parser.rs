@@ -54,3 +54,29 @@ impl StandardIdentity {
             _ => Err(SidcParseError::InvalidAffiliation),
         }
     }
+    pub fn code(&self) -> u8 {
+        *self as u8
+    }
+
+    pub fn cot_char(&self) -> char {
+        match self {
+            Self::Friend | Self::AssumedFriend => 'f',
+            Self::Hostile => 'h',
+            Self::Neutral => 'n',
+            Self::Suspect => 's',
+            Self::Pending => 'p',
+            Self::Unknown => 'u',
+        }
+    }
+
+    pub fn from_cot_char(c: char) -> Self {
+        match c {
+            'f' | 'F' | 'a' | 'A' => Self::Friend,
+            'h' | 'H' | 'j' | 'J' | 'k' | 'K' => Self::Hostile,
+            'n' | 'N' => Self::Neutral,
+            's' | 'S' => Self::Suspect,
+            'p' | 'P' => Self::Pending,
+            _ => Self::Unknown,
+        }
+    }
+}
