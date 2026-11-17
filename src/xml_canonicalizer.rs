@@ -646,3 +646,27 @@ fn escape_xml_attr_val(s: &str) -> String {
             '&' => out.push_str("&amp;"),
             '<' => out.push_str("&lt;"),
             '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            '\n' => out.push_str("&#10;"),
+            '\r' => out.push_str("&#13;"),
+            '\t' => out.push_str("&#9;"),
+            other => out.push(other),
+        }
+    }
+    out
+}
+
+fn escape_xml_text(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 8);
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            other => out.push(other),
+        }
+    }
+    out
+}
+
+fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, CotValidationError> {
