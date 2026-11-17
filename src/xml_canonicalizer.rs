@@ -790,3 +790,27 @@ fn serialize_node(
             }
 
             active_ns.push(scope_ns);
+
+            if children.is_empty() {
+                if opts.self_closing_tags {
+                    out.push_str("/>");
+                } else {
+                    out.push_str("></");
+                    out.push_str(name);
+                    out.push('>');
+                }
+            } else {
+                out.push('>');
+                for child in children {
+                    serialize_node(child, opts, active_ns, out);
+                }
+                out.push_str("</");
+                out.push_str(name);
+                out.push('>');
+            }
+
+            active_ns.pop();
+        }
+    }
+}
+
