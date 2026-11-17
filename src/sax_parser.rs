@@ -670,3 +670,27 @@ mod tests {
             other => panic!("expected PI, got {other:?}"),
         }
         match reader.next_event().unwrap().unwrap() {
+            SaxEvent::Comment(text) => assert_eq!(text, " a comment "),
+            other => panic!("expected Comment, got {other:?}"),
+        }
+        match reader.next_event().unwrap().unwrap() {
+            SaxEvent::CData(content) => assert_eq!(content, "raw content"),
+            other => panic!("expected CData, got {other:?}"),
+        }
+        match reader.next_event().unwrap().unwrap() {
+            SaxEvent::EmptyElement { name, .. } => assert_eq!(name, "node"),
+            other => panic!("expected node EmptyElement, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_cot_sax_parser_zero_copy() {
+        let xml = r#"<event version="2.0" uid="ALPHA-1" type="a-f-G-U-C" how="m-g" time="2026-02-16T12:00:00.000Z" start="2026-02-16T12:00:00.000Z" stale="2026-02-16T12:05:00.000Z">
+            <point lat="34.0522" lon="-118.2437" hae="120.5" ce="15.0" le="25.0"/>
+            <detail>
+                <contact callsign="VIPER" />
+            </detail>
+        </event>"#;
+
+        let events = CotSaxParser::parse_events(xml).expect("parse failed");
+        assert_eq!(events.len(), 1);
