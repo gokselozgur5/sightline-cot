@@ -240,3 +240,24 @@ impl RhumbPath {
         })
     }
 }
+
+impl RhumbPath {
+    /// Return the count of segments in the path.
+    pub fn segment_count(&self) -> usize {
+        self.waypoints.len() - 1
+    }
+
+    /// Resample the entire path with a maximum distance step between points.
+    pub fn resample_by_step(&self, step_m: f64) -> Result<Vec<RhumbWaypoint>, RhumbLineError> {
+        let mut full_path = Vec::new();
+        for i in 0..self.segment_count() {
+            let seg_points = interpolate_by_step(&self.waypoints[i], &self.waypoints[i + 1], step_m)?;
+            if i > 0 {
+                full_path.extend_from_slice(&seg_points[1..]);
+            } else {
+                full_path.extend(seg_points);
+            }
+        }
+        Ok(full_path)
+    }
+}
