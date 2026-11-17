@@ -526,3 +526,25 @@ mod tests {
     #[test]
     fn test_rtree_insert_and_queries() {
         let mut tree = SpatialRTree::with_max_entries(2);
+        assert!(tree.is_empty());
+        assert_eq!(tree.len(), 0);
+
+        tree.insert(SpatialEnvelope::new(0.0, 0.0, 2.0, 2.0), "A");
+        tree.insert(SpatialEnvelope::new(5.0, 5.0, 7.0, 7.0), "B");
+        tree.insert(SpatialEnvelope::new(10.0, 10.0, 12.0, 12.0), "C");
+        tree.insert(SpatialEnvelope::new(15.0, 15.0, 17.0, 17.0), "D");
+
+        assert_eq!(tree.len(), 4);
+        assert!(!tree.is_empty());
+
+        let q1 = SpatialEnvelope::new(1.0, 1.0, 6.0, 6.0);
+        let found = tree.search_intersecting(&q1);
+        assert_eq!(found.len(), 2);
+        assert!(found.contains(&&"A"));
+        assert!(found.contains(&&"B"));
+
+        let containing = tree.search_containing(1.0, 1.0);
+        assert_eq!(containing, vec![&"A"]);
+    }
+
+    #[test]
