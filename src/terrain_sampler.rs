@@ -94,3 +94,27 @@ impl GeoTiffElevationGrid {
     pub fn new(
         origin_x: f64,
         origin_y: f64,
+        step_x: f64,
+        step_y: f64,
+        cols: usize,
+        rows: usize,
+        elevations: Vec<Option<f64>>,
+    ) -> Result<Self, TerrainSamplerError> {
+        if !origin_x.is_finite() || !origin_y.is_finite() {
+            return Err(TerrainSamplerError::NonFiniteInput);
+        }
+        if !step_x.is_finite() || step_x <= 0.0 || !step_y.is_finite() || step_y <= 0.0 {
+            return Err(TerrainSamplerError::InvalidResolution);
+        }
+        if cols < 2 || rows < 2 {
+            return Err(TerrainSamplerError::InvalidDimensions);
+        }
+        if elevations.len() != cols * rows {
+            return Err(TerrainSamplerError::DataLengthMismatch);
+        }
+        Ok(Self {
+            origin_x,
+            origin_y,
+            step_x,
+            step_y,
+            cols,
