@@ -286,3 +286,27 @@ impl CotSchemaValidator {
             });
         }
 
+        Ok(())
+    }
+
+    /// Validate required and optional attributes of <point> element.
+    pub fn validate_point_attributes(attrs: &[XmlAttribute]) -> Result<(), CotValidationError> {
+        let mut map: HashMap<&str, &str> = HashMap::new();
+        for a in attrs {
+            map.insert(a.name.as_str(), a.value.as_str());
+        }
+
+        let lat_str = map.get("lat").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "point",
+            attribute: "lat",
+        })?;
+        let lat: f64 = lat_str.parse().map_err(|_| CotValidationError::MalformedXml(
+            format!("invalid float for point lat: '{lat_str}'"),
+        ))?;
+        if !lat.is_finite() {
+            return Err(CotValidationError::NonFiniteNumber("lat"));
+        }
+        if !(-90.0..=90.0).contains(&lat) {
+            return Err(CotValidationError::CoordinateOutOfBounds {
+                coordinate: "lat",
+                value: lat,
