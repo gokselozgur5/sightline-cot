@@ -46,3 +46,28 @@ impl std::fmt::Display for KalmanTargetError {
 
 impl std::error::Error for KalmanTargetError {}
 
+/// Tuning and validation configuration for tactical target filter.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TargetFilterConfig {
+    /// Continuous-time acceleration spectral density q (m^2 / s^3).
+    pub process_noise_q: f64,
+    /// Default position measurement variance (m^2).
+    pub default_pos_var: f64,
+    /// Default velocity measurement variance (m^2 / s^2).
+    pub default_vel_var: f64,
+    /// Maximum allowed extrapolation coasting duration (seconds).
+    pub max_coast_sec: f64,
+    /// Mahalanobis gating threshold (chi-squared gate value).
+    pub gate_threshold: f64,
+}
+
+impl Default for TargetFilterConfig {
+    fn default() -> Self {
+        Self {
+            process_noise_q: 1.0,
+            default_pos_var: 25.0,
+            default_vel_var: 4.0,
+            max_coast_sec: 60.0,
+            gate_threshold: 16.0,
+        }
+    }
