@@ -550,3 +550,27 @@ impl From<&crate::camera::DemGrid> for GeoTiffElevationGrid {
             elevations: grid.elevations.iter().map(|&h| Some(h)).collect(),
             nodata_value: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_grid_creation_and_bounds() {
+        let elev = vec![Some(100.0), Some(120.0), Some(140.0), Some(160.0)];
+        let grid = GeoTiffElevationGrid::new(10.0, 20.0, 1.0, 2.0, 2, 2, elev).unwrap();
+        assert_eq!(grid.bounding_box(), (10.0, 20.0, 11.0, 22.0));
+        assert!(grid.contains(10.5, 21.0));
+        assert!(!grid.contains(9.9, 21.0));
+        assert_eq!(grid.min_max_elevation(), Some((100.0, 160.0)));
+    }
+
+    #[test]
+    fn test_bilinear_and_nearest_sampling() {
+        let elev = vec![Some(10.0), Some(20.0), Some(30.0), Some(40.0)];
+        let grid = GeoTiffElevationGrid::new(0.0, 0.0, 10.0, 10.0, 2, 2, elev).unwrap();
+
+        let mid = grid.sample_bilinear(5.0, 5.0).unwrap();
+        assert!((mid - 25.0).abs() < 1e-6);
