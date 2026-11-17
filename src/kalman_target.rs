@@ -478,3 +478,27 @@ impl TacticalTargetFilter {
         let dt_ms = timestamp_ms - self.current_state.timestamp_ms;
         if dt_ms == 0 {
             return Ok(());
+        }
+        let dt_sec = dt_ms as f64 / 1000.0;
+        let time_since_update_sec = (timestamp_ms - self.last_update_ms) as f64 / 1000.0;
+        if time_since_update_sec > self.config.max_coast_sec {
+            return Err(KalmanTargetError::CoastLimitExceeded {
+                dt_sec: time_since_update_sec,
+                max_coast_sec: self.config.max_coast_sec,
+            });
+        }
+        self.current_state = self
+            .current_state
+            .extrapolate(dt_sec, self.config.process_noise_q)?;
+        self.coast_count += 1;
+        Ok(())
+    }
+
+    /// Process 3D position measurement update with residual gating.
+    pub fn update_position(
+        &mut self,
+        pos: [f64; 3],
+        pos_var: Option<[f64; 3]>,
+        timestamp_ms: i64,
+    ) -> Result<f64, KalmanTargetError> {
+        self.predict_to(timestamp_ms)?;
