@@ -454,3 +454,27 @@ impl TerrainInterceptSolver {
                                 } else {
                                     high = mid;
                                     best_t = mid;
+                                }
+                            } else {
+                                low = mid;
+                            }
+
+                            if (high - low) < 1e-4 {
+                                best_t = 0.5 * (low + high);
+                                break;
+                            }
+                        }
+
+                        let hit_point = ray.point_at(best_t);
+                        let normal = grid
+                            .surface_normal(hit_point[0], hit_point[1])
+                            .unwrap_or([0.0, 0.0, 1.0]);
+                        let slope = grid.slope_deg(hit_point[0], hit_point[1]).unwrap_or(0.0);
+                        let dot = ray.direction[0] * normal[0]
+                            + ray.direction[1] * normal[1]
+                            + ray.direction[2] * normal[2];
+                        let inc_deg = (-dot).clamp(-1.0, 1.0).acos().to_degrees();
+
+                        return Ok(TerrainIntercept {
+                            point: hit_point,
+                            distance: best_t,
