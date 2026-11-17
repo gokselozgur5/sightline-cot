@@ -316,3 +316,28 @@ fn update_3d(
 
     let y = [z[0] - x[offset], z[1] - x[offset + 1], z[2] - x[offset + 2]];
     let mut s = [[0.0; 3]; 3];
+    for i in 0..3 {
+        for j in 0..3 {
+            s[i][j] = cov[offset + i][offset + j];
+        }
+        s[i][i] += r_diag[i];
+    }
+
+    let s_inv = invert_3x3(&s)?;
+    let mut mahalanobis_sq = 0.0;
+    for i in 0..3 {
+        let mut term = 0.0;
+        for j in 0..3 {
+            term += s_inv[i][j] * y[j];
+        }
+        mahalanobis_sq += y[i] * term;
+    }
+
+    if mahalanobis_sq > gate_threshold {
+        return Err(KalmanTargetError::GatedMeasurement {
+            residual: mahalanobis_sq,
+            threshold: gate_threshold,
+        });
+    }
+
+    let mut k_gain = [[0.0; 3]; 6];
