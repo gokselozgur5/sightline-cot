@@ -335,3 +335,17 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
         unmatched_dets,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_assoc_error_and_config() {
+        let err = AssocError::InvalidConfig;
+        assert_eq!(err.to_string(), "invalid association configuration");
+        let cfg = AssocConfig::default();
+        assert!(cfg.validate().is_ok());
+        let bad = AssocConfig { gate_threshold: -1.0, ..cfg };
+        assert_eq!(bad.validate(), Err(AssocError::InvalidConfig));
+    }
