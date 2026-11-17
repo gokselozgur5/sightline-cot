@@ -502,3 +502,27 @@ impl TerrainInterceptSolver {
 /// Convert terrain intercept result to standard Cursor-on-Target event.
 pub fn cot_target_from_intercept(
     intercept: &TerrainIntercept,
+    uid: &str,
+    cot_type: &str,
+    time_ms: i64,
+    stale_duration_ms: i64,
+) -> crate::cot::CotEvent {
+    crate::cot::CotEvent {
+        uid: uid.to_string(),
+        cot_type: cot_type.to_string(),
+        how: "m-g".to_string(),
+        time_ms,
+        stale_ms: time_ms + stale_duration_ms,
+        lat_deg: intercept.point[1],
+        lon_deg: intercept.point[0],
+        hae_m: intercept.point[2],
+        ce_m: 5.0,
+        le_m: 3.0,
+        course_deg: 0.0,
+        speed_mps: 0.0,
+    }
+}
+
+impl From<&crate::dem_bilinear::DemRaster> for GeoTiffElevationGrid {
+    fn from(dem: &crate::dem_bilinear::DemRaster) -> Self {
+        Self {
