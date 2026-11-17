@@ -163,3 +163,22 @@ pub fn compute_spatial_matrix_2d(
     }
     Ok(mat)
 }
+
+/// Build pairwise 3D distance matrix between tracks and detections.
+pub fn compute_spatial_matrix_3d(
+    tracks: &[[f64; 3]],
+    dets: &[[f64; 3]],
+) -> Result<DistanceMatrix, AssocError> {
+    for p in tracks.iter().chain(dets.iter()) {
+        if !p[0].is_finite() || !p[1].is_finite() || !p[2].is_finite() {
+            return Err(AssocError::NonFiniteInput);
+        }
+    }
+    let mut mat = DistanceMatrix::new(tracks.len(), dets.len(), 0.0);
+    for (i, t) in tracks.iter().enumerate() {
+        for (j, d) in dets.iter().enumerate() {
+            let _ = mat.set(i, j, euclidean_dist_3d(*t, *d));
+        }
+    }
+    Ok(mat)
+}
