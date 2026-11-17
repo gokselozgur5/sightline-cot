@@ -166,3 +166,27 @@ impl GeoTiffElevationGrid {
     }
 
     /// Maximum Y coordinate in grid coverage.
+    #[inline]
+    pub fn max_y(&self) -> f64 {
+        self.origin_y + (self.rows - 1) as f64 * self.step_y
+    }
+
+    /// Check if continuous coordinate (x, y) falls within grid boundaries.
+    pub fn contains(&self, x: f64, y: f64) -> bool {
+        x >= self.origin_x && x <= self.max_x() && y >= self.origin_y && y <= self.max_y()
+    }
+
+    /// Return bounding box (min_x, min_y, max_x, max_y).
+    pub fn bounding_box(&self) -> (f64, f64, f64, f64) {
+        (self.origin_x, self.origin_y, self.max_x(), self.max_y())
+    }
+
+    /// Return minimum and maximum valid elevations in the grid.
+    pub fn min_max_elevation(&self) -> Option<(f64, f64)> {
+        let mut min_h = f64::INFINITY;
+        let mut max_h = f64::NEG_INFINITY;
+        let mut found = false;
+        for &opt in &self.elevations {
+            if let Some(h) = opt {
+                if h < min_h {
+                    min_h = h;
