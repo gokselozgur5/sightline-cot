@@ -21,3 +21,28 @@ impl std::fmt::Display for KalmanTargetError {
             Self::NonFiniteInput => {
                 write!(f, "non-finite input encountered in Kalman target filter")
             }
+            Self::InvalidDeltaTime => write!(f, "invalid delta time (must be positive and finite)"),
+            Self::SingularMatrix => {
+                write!(f, "singular or ill-conditioned matrix inversion failure")
+            }
+            Self::GatedMeasurement {
+                residual,
+                threshold,
+            } => {
+                write!(
+                    f,
+                    "measurement gated out: residual {residual} > gate {threshold}"
+                )
+            }
+            Self::CoastLimitExceeded {
+                dt_sec,
+                max_coast_sec,
+            } => {
+                write!(f, "coast limit exceeded: {dt_sec}s > {max_coast_sec}s")
+            }
+        }
+    }
+}
+
+impl std::error::Error for KalmanTargetError {}
+
