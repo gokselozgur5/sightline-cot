@@ -394,3 +394,25 @@ impl<T: Clone> SpatialRTree<T> {
         let mut results = Vec::new();
         if let Some(ref root) = self.root {
             Self::search_containing_node(root, lat, lon, &mut results);
+        }
+        results
+    }
+
+    fn search_containing_node<'a>(
+        node: &'a RTreeNode<T>,
+        lat: f64,
+        lon: f64,
+        results: &mut Vec<&'a T>,
+    ) {
+        if !node.envelope().contains_point(lat, lon) {
+            return;
+        }
+
+        match node {
+            RTreeNode::Leaf { entries, .. } => {
+                for entry in entries {
+                    if entry.envelope.contains_point(lat, lon) {
+                        results.push(&entry.data);
+                    }
+                }
+            }
