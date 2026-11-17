@@ -54,3 +54,26 @@ impl PlatformPose {
         Ok(Self { lat_deg: lat, lon_deg: lon, alt_hae_m: alt, heading_deg: hdg_norm, pitch_deg: pitch, roll_deg: roll })
     }
 }
+
+
+/// Gimbal pointing angles relative to platform frame or North-referenced.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SensorGimbal {
+    pub azimuth_deg: f64,
+    pub elevation_deg: f64,
+    pub roll_deg: f64,
+}
+
+impl SensorGimbal {
+    /// Create and validate a SensorGimbal pointing angles.
+    pub fn new(az: f64, el: f64, roll: f64) -> Result<Self, FrustumError> {
+        if !az.is_finite() || !el.is_finite() || !roll.is_finite() {
+            return Err(FrustumError::NonFiniteParameter("sensor gimbal"));
+        }
+        if !(-90.0..=90.0).contains(&el) {
+            return Err(FrustumError::InvalidAltitude("elevation [-90, 90]"));
+        }
+        let az_norm = (az % 360.0 + 360.0) % 360.0;
+        Ok(Self { azimuth_deg: az_norm, elevation_deg: el, roll_deg: roll })
+    }
+}
