@@ -27,3 +27,30 @@ impl core::fmt::Display for FrustumError {
 }
 
 impl std::error::Error for FrustumError {}
+
+
+/// Position and orientation of the sensor host platform.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PlatformPose {
+    pub lat_deg: f64,
+    pub lon_deg: f64,
+    pub alt_hae_m: f64,
+    pub heading_deg: f64,
+    pub pitch_deg: f64,
+    pub roll_deg: f64,
+}
+
+impl PlatformPose {
+    /// Create and validate a new PlatformPose.
+    pub fn new(lat: f64, lon: f64, alt: f64, hdg: f64, pitch: f64, roll: f64) -> Result<Self, FrustumError> {
+        if !lat.is_finite() || !lon.is_finite() || !alt.is_finite()
+            || !hdg.is_finite() || !pitch.is_finite() || !roll.is_finite() {
+            return Err(FrustumError::NonFiniteParameter("platform pose"));
+        }
+        if !(-90.0..=90.0).contains(&lat) {
+            return Err(FrustumError::InvalidAltitude("latitude out of range"));
+        }
+        let hdg_norm = (hdg % 360.0 + 360.0) % 360.0;
+        Ok(Self { lat_deg: lat, lon_deg: lon, alt_hae_m: alt, heading_deg: hdg_norm, pitch_deg: pitch, roll_deg: roll })
+    }
+}
