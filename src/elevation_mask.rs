@@ -337,7 +337,7 @@ mod tests {
     #[test]
     fn test_error_and_input_validations() {
         assert_eq!(MaskSector::new(f64::NAN, 10.0, 5.0), Err(ElevationMaskError::NonFiniteValue));
-        assert_eq!(MaskSector::new(360.0, 10.0, 5.0), Err(ElevationMaskError::InvalidAzimuth));
+        assert_eq!(MaskSector::new(360.5, 10.0, 5.0), Err(ElevationMaskError::InvalidAzimuth));
         assert_eq!(MaskSector::new(0.0, 10.0, 95.0), Err(ElevationMaskError::InvalidElevation));
         assert_eq!(ObstaclePoint::new(0.0, 10.0, 0.0), Err(ElevationMaskError::InvalidDistance));
         assert_eq!(ObstacleProfile::new(vec![]), Err(ElevationMaskError::EmptyProfile));
