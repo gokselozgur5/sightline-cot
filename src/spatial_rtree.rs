@@ -350,3 +350,25 @@ impl<T: Clone> SpatialRTree<T> {
             },
             RTreeNode::Branch {
                 children: right_children,
+                envelope: right_env,
+            },
+        )
+    }
+
+    /// Queries all items whose bounding envelope intersects with the search envelope.
+    pub fn search_intersecting(&self, query: &SpatialEnvelope) -> Vec<&T> {
+        let mut results = Vec::new();
+        if let Some(ref root) = self.root {
+            Self::search_node(root, query, &mut results);
+        }
+        results
+    }
+
+    fn search_node<'a>(
+        node: &'a RTreeNode<T>,
+        query: &SpatialEnvelope,
+        results: &mut Vec<&'a T>,
+    ) {
+        if !node.envelope().intersects(query) {
+            return;
+        }
