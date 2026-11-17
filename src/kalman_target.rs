@@ -634,3 +634,28 @@ impl TacticalTargetFilter {
             return None;
         }
         let sqrt_disc = disc.sqrt();
+        let t1 = (-b - sqrt_disc) / (2.0 * a);
+        let t2 = (-b + sqrt_disc) / (2.0 * a);
+
+        let valid1 = t1 > 1e-6;
+        let valid2 = t2 > 1e-6;
+
+        match (valid1, valid2) {
+            (true, true) => Some(t1.min(t2)),
+            (true, false) => Some(t1),
+            (false, true) => Some(t2),
+            (false, false) => None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_defaults_and_validation() {
+        let cfg = TargetFilterConfig::default();
+        assert!(cfg.validate().is_ok());
+
+        let mut bad_cfg = cfg;
