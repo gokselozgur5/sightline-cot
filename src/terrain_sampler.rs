@@ -574,3 +574,27 @@ mod tests {
 
         let mid = grid.sample_bilinear(5.0, 5.0).unwrap();
         assert!((mid - 25.0).abs() < 1e-6);
+
+        let near_orig = grid.sample_nearest(2.0, 2.0).unwrap();
+        assert_eq!(near_orig, 10.0);
+
+        let near_corner = grid.sample_nearest(8.0, 8.0).unwrap();
+        assert_eq!(near_corner, 40.0);
+    }
+
+    #[test]
+    fn test_gradient_slope_normal() {
+        let elev = vec![Some(0.0), Some(10.0), Some(0.0), Some(10.0)];
+        let grid = GeoTiffElevationGrid::new(0.0, 0.0, 10.0, 10.0, 2, 2, elev).unwrap();
+
+        let (gx, gy) = grid.surface_gradient(5.0, 5.0).unwrap();
+        assert!((gx - 1.0).abs() < 1e-3);
+        assert!(gy.abs() < 1e-3);
+
+        let slope = grid.slope_deg(5.0, 5.0).unwrap();
+        assert!((slope - 45.0).abs() < 1e-1);
+
+        let normal = grid.surface_normal(5.0, 5.0).unwrap();
+        assert!(normal[2] > 0.0);
+        assert!(
+            (normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2] - 1.0).abs()
