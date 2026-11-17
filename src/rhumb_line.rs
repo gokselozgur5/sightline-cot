@@ -188,3 +188,30 @@ pub fn interpolate_by_step(
     waypoints.push(*p2);
     Ok(waypoints)
 }
+
+/// Multi-waypoint rhumb line flight or maritime navigation path.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RhumbPath {
+    waypoints: Vec<RhumbWaypoint>,
+    segment_rhumb_distances: Vec<f64>,
+    segment_gc_distances: Vec<f64>,
+    total_rhumb_distance: f64,
+    total_gc_distance: f64,
+}
+
+impl RhumbPath {
+    /// Return the list of waypoints in the path.
+    pub fn waypoints(&self) -> &[RhumbWaypoint] {
+        &self.waypoints
+    }
+
+    /// Return total rhumb distance in meters.
+    pub fn total_rhumb_distance(&self) -> f64 {
+        self.total_rhumb_distance
+    }
+
+    /// Return total great circle distance in meters.
+    pub fn total_gc_distance(&self) -> f64 {
+        self.total_gc_distance
+    }
+}
