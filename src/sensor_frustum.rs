@@ -147,3 +147,24 @@ pub fn compute_frustum_corner_rays(h_fov_deg: f64, v_fov_deg: f64) -> [[f64; 3];
     }
     out
 }
+
+
+/// Intersect a ray with the flat ground plane (Z = 0 in local ENU).
+pub fn intersect_ray_ground(
+    ray_enu: [f64; 3],
+    sensor_h: f64,
+    max_range_m: f64,
+) -> Result<([f64; 3], f64), FrustumError> {
+    if sensor_h <= 0.0 {
+        return Err(FrustumError::InvalidAltitude("sensor altitude must be above ground"));
+    }
+    if ray_enu[2] >= -1e-6 {
+        return Err(FrustumError::NoGroundIntersection);
+    }
+    let t = -sensor_h / ray_enu[2];
+    if t > max_range_m {
+        return Err(FrustumError::InvalidRange("intersection exceeds max range"));
+    }
+    let p = [t * ray_enu[0], t * ray_enu[1], 0.0];
+    Ok((p, t))
+}
