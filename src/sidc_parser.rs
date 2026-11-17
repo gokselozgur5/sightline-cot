@@ -220,3 +220,20 @@ pub struct MilStd2525DSymbol {
     pub modifier1: u8,
     pub modifier2: u8,
 }
+
+impl Default for MilStd2525DSymbol {
+    fn default() -> Self {
+        Self {
+            version: 10,
+            context: 0,
+            identity: StandardIdentity::Friend,
+            symbol_set: SymbolSet::LandUnit,
+            status: SymbolStatus::Present,
+            hq_tf_dummy: 0,
+            echelon: Echelon::Unspecified,
+            entity_code: 0,
+            modifier1: 0,
+            modifier2: 0,
+        }
+    }
+}
