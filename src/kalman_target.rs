@@ -71,3 +71,26 @@ impl Default for TargetFilterConfig {
             gate_threshold: 16.0,
         }
     }
+}
+
+impl TargetFilterConfig {
+    /// Validate filter configuration values.
+    pub fn validate(&self) -> Result<(), KalmanTargetError> {
+        let valid = self.process_noise_q.is_finite()
+            && self.process_noise_q > 0.0
+            && self.default_pos_var.is_finite()
+            && self.default_pos_var > 0.0
+            && self.default_vel_var.is_finite()
+            && self.default_vel_var > 0.0
+            && self.max_coast_sec.is_finite()
+            && self.max_coast_sec > 0.0
+            && self.gate_threshold.is_finite()
+            && self.gate_threshold > 0.0;
+        if valid {
+            Ok(())
+        } else {
+            Err(KalmanTargetError::NonFiniteInput)
+        }
+    }
+}
+
