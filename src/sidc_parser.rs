@@ -80,3 +80,20 @@ impl StandardIdentity {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SymbolSet {
+    Unknown = 0,
+    Air = 1,
+    AirMissile = 2,
+    Space = 5,
+    #[default]
+    LandUnit = 10,
+    LandCivilian = 11,
+    LandEquipment = 12,
+    LandInstallation = 15,
+    SeaSurface = 20,
+    Subsurface = 25,
+    Activity = 30,
+    Cyberspace = 40,
+}
