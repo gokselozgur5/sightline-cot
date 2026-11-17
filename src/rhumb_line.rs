@@ -307,4 +307,19 @@ mod tests {
         let step_pts = interpolate_by_step(&p1, &p2, 200_000.0).unwrap();
         assert!(step_pts.len() > 2);
     }
+
+    #[test]
+    fn test_rhumb_path_and_errors() {
+        let wps = vec![
+            RhumbWaypoint::new(0.0, 0.0),
+            RhumbWaypoint::new(10.0, 10.0),
+            RhumbWaypoint::new(20.0, 20.0),
+        ];
+        let path = RhumbPath::from_waypoints(wps).unwrap();
+        assert_eq!(path.segment_count(), 2);
+        assert!(path.total_rhumb_distance() > 0.0);
+
+        let invalid_wp = RhumbWaypoint::new(95.0, 0.0);
+        assert_eq!(invalid_wp.validate(), Err(RhumbLineError::InvalidLatitude));
+    }
 }
