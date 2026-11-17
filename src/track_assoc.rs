@@ -411,3 +411,17 @@ mod tests {
         assert_eq!(res.matches[0], AssocMatch { track_idx: 0, det_idx: 1, cost: 11.0 });
         assert_eq!(res.matches[1], AssocMatch { track_idx: 1, det_idx: 0, cost: 12.0 });
     }
+
+    #[test]
+    fn test_hungarian_rectangular_and_empty() {
+        let empty = DistanceMatrix::new(0, 0, 0.0);
+        let res_empty = solve_optimal_hungarian(&empty, 10.0);
+        assert!(res_empty.matches.is_empty());
+        let rect = vec![vec![5.0, 10.0], vec![10.0, 5.0], vec![20.0, 20.0]];
+        let mat_rect = DistanceMatrix::from_nested(&rect).unwrap();
+        let res = solve_optimal_hungarian(&mat_rect, 15.0);
+        assert_eq!(res.matches.len(), 2);
+        assert_eq!(res.unmatched_tracks, vec![2]);
+        assert!(res.unmatched_dets.is_empty());
+    }
+}
