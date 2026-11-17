@@ -339,3 +339,11 @@ impl MilStd2525DSymbol {
         })
     }
 }
+
+pub fn parse_sidc2525d(s: &str) -> Result<MilStd2525DSymbol, SidcParseError> {
+    MilStd2525DSymbol::parse(s)
+}
+
+pub fn generate_sidc2525d(sym: &MilStd2525DSymbol) -> String {
+    sym.to_sidc20()
+}
