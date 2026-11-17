@@ -310,3 +310,27 @@ pub struct TerrainRay {
     pub origin: [f64; 3],
     /// Normalized direction unit vector.
     pub direction: [f64; 3],
+}
+
+impl TerrainRay {
+    /// Create and normalize a new line-of-sight ray.
+    pub fn new(origin: [f64; 3], direction: [f64; 3]) -> Result<Self, TerrainSamplerError> {
+        if !origin.iter().all(|v| v.is_finite()) || !direction.iter().all(|v| v.is_finite()) {
+            return Err(TerrainSamplerError::NonFiniteInput);
+        }
+        let mag_sq =
+            direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2];
+        if mag_sq <= 1e-16 {
+            return Err(TerrainSamplerError::DegenerateRayDirection);
+        }
+        let mag = mag_sq.sqrt();
+        let direction = [direction[0] / mag, direction[1] / mag, direction[2] / mag];
+        Ok(Self { origin, direction })
+    }
+
+    /// Calculate 3D coordinate along the ray at propagation parameter t.
+    #[inline]
+    pub fn point_at(&self, t: f64) -> [f64; 3] {
+        [
+            self.origin[0] + t * self.direction[0],
+            self.origin[1] + t * self.direction[1],
