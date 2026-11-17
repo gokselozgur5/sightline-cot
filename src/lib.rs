@@ -197,3 +197,9 @@ mod tests {
         assert_eq!(VERSION, "0.1.0");
     }
 }
+pub mod track_assoc;
+pub use track_assoc::{
+    compute_spatial_matrix_2d, compute_spatial_matrix_3d, euclidean_dist_2d, euclidean_dist_3d,
+    solve_nearest_neighbor, solve_optimal_hungarian, AssocConfig, AssocError, AssocMatch,
+    AssocResult, DistanceMatrix,
+};
