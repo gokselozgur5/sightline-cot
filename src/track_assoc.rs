@@ -326,3 +326,12 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
         }
     }
     matches.sort_by_key(|m| m.track_idx);
+
+    let unmatched_tracks = (0..n).filter(|&i| !matched_tracks[i]).collect();
+    let unmatched_dets = (0..m).filter(|&j| !matched_dets[j]).collect();
+    AssocResult {
+        matches,
+        unmatched_tracks,
+        unmatched_dets,
+    }
+}
