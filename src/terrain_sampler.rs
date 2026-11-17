@@ -430,3 +430,27 @@ impl TerrainInterceptSolver {
             t_curr = (t_curr + step).min(self.max_range);
             let p = ray.point_at(t_curr);
 
+            if grid.contains(p[0], p[1]) {
+                if let Some(elev) = grid.sample_bilinear(p[0], p[1]) {
+                    if p[2] <= elev {
+                        let mut low = t_prev;
+                        let mut high = t_curr;
+                        let mut best_t = high;
+                        let mut iters = 0;
+
+                        while iters < self.max_iterations {
+                            iters += 1;
+                            let mid = 0.5 * (low + high);
+                            let p_mid = ray.point_at(mid);
+
+                            if let Some(mid_elev) = grid.sample_bilinear(p_mid[0], p_mid[1]) {
+                                let diff = p_mid[2] - mid_elev;
+                                if diff.abs() <= self.tolerance {
+                                    best_t = mid;
+                                    break;
+                                }
+                                if diff > 0.0 {
+                                    low = mid;
+                                } else {
+                                    high = mid;
+                                    best_t = mid;
