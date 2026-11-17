@@ -262,3 +262,27 @@ impl CotSchemaValidator {
         let start_ms = parse_iso8601_utc(start_str).map_err(|_| CotValidationError::InvalidTimestamp {
             attribute: "start",
             value: (*start_str).to_string(),
+        })?;
+
+        let stale_str = map.get("stale").ok_or(CotValidationError::MissingRequiredAttribute {
+            element: "event",
+            attribute: "stale",
+        })?;
+        let stale_ms = parse_iso8601_utc(stale_str).map_err(|_| CotValidationError::InvalidTimestamp {
+            attribute: "stale",
+            value: (*stale_str).to_string(),
+        })?;
+
+        if stale_ms < time_ms {
+            return Err(CotValidationError::TimestampOrderViolation {
+                earlier: "time",
+                later: "stale",
+            });
+        }
+        if stale_ms < start_ms {
+            return Err(CotValidationError::TimestampOrderViolation {
+                earlier: "start",
+                later: "stale",
+            });
+        }
+
