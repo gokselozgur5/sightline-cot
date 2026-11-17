@@ -77,3 +77,32 @@ impl SensorGimbal {
         Ok(Self { azimuth_deg: az_norm, elevation_deg: el, roll_deg: roll })
     }
 }
+
+
+/// Configuration parameters defining the sensor field-of-view frustum.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SensorFrustumConfig {
+    pub h_fov_deg: f64,
+    pub v_fov_deg: f64,
+    pub max_range_m: f64,
+    pub min_range_m: f64,
+}
+
+impl SensorFrustumConfig {
+    /// Create and validate a new SensorFrustumConfig.
+    pub fn new(h_fov: f64, v_fov: f64, max_rng: f64, min_rng: f64) -> Result<Self, FrustumError> {
+        if !h_fov.is_finite() || !v_fov.is_finite() || !max_rng.is_finite() || !min_rng.is_finite() {
+            return Err(FrustumError::NonFiniteParameter("frustum config"));
+        }
+        if h_fov <= 0.0 || h_fov >= 180.0 {
+            return Err(FrustumError::InvalidFov("horizontal FOV in (0, 180)"));
+        }
+        if v_fov <= 0.0 || v_fov >= 180.0 {
+            return Err(FrustumError::InvalidFov("vertical FOV in (0, 180)"));
+        }
+        if min_rng < 0.0 || max_rng <= min_rng {
+            return Err(FrustumError::InvalidRange("max_range must be > min_range >= 0"));
+        }
+        Ok(Self { h_fov_deg: h_fov, v_fov_deg: v_fov, max_range_m: max_rng, min_range_m: min_rng })
+    }
+}
