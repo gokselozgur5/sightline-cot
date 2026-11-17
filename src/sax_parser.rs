@@ -550,3 +550,27 @@ impl CotChunkStreamer {
     pub fn new() -> Self {
         Self {
             buffer: String::new(),
+        }
+    }
+
+    /// Feed an incoming chunk of XML bytes/characters into the streamer.
+    ///
+    /// Returns extracted complete CoT XML event strings.
+    pub fn feed(&mut self, chunk: &str) -> Vec<String> {
+        self.buffer.push_str(chunk);
+        let mut completed = Vec::new();
+
+        loop {
+            let start_idx = match self.buffer.find("<event") {
+                Some(idx) => idx,
+                None => {
+                    let prefixes = ["<event", "<even", "<eve", "<ev", "<e", "<"];
+                    let mut keep = 0;
+                    for p in prefixes {
+                        if self.buffer.ends_with(p) {
+                            keep = p.len();
+                            break;
+                        }
+                    }
+                    if keep > 0 {
+                        let drop = self.buffer.len() - keep;
