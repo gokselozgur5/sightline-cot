@@ -646,3 +646,27 @@ mod tests {
         let attrs = SaxAttributes::new(raw);
         assert_eq!(attrs.get("foo"), Some("123"));
         assert_eq!(attrs.get("bar"), Some("abc"));
+        assert_eq!(attrs.get("baz"), Some("xyz"));
+        assert_eq!(attrs.get("none"), None);
+
+        let list: Result<Vec<_>, _> = attrs.iter().collect();
+        let list = list.unwrap();
+        assert_eq!(list.len(), 3);
+        assert_eq!(list[0].name, "foo");
+        assert_eq!(list[0].value, "123");
+    }
+
+    #[test]
+    fn test_comment_cdata_and_processing_instruction() {
+        let xml = "<?xml version=\"1.0\"?><!-- a comment --><![CDATA[raw content]]><node/>";
+        let mut reader = SaxReader::new(xml);
+
+        assert_eq!(reader.next_event().unwrap(), Some(SaxEvent::StartDocument));
+        match reader.next_event().unwrap().unwrap() {
+            SaxEvent::ProcessingInstruction { target, data } => {
+                assert_eq!(target, "xml");
+                assert_eq!(data, "version=\"1.0\"");
+            }
+            other => panic!("expected PI, got {other:?}"),
+        }
+        match reader.next_event().unwrap().unwrap() {
