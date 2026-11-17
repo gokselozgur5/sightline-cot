@@ -343,4 +343,24 @@ mod tests {
         let p2 = ObstaclePoint::new(50.0, 10.0, 0.0).unwrap();
         assert_eq!(ObstacleProfile::new(vec![p1, p2]), Err(ElevationMaskError::NonMonotonicProfile));
     }
+
+    #[test]
+    fn test_sectors_and_target_validation() {
+        let mut val = ElevationMaskValidator::new(10.0, 2.0).unwrap();
+        val.add_sector(MaskSector::new(350.0, 20.0, 8.0).unwrap());
+        val.add_sector(MaskSector::new(45.0, 90.0, 15.0).unwrap());
+        assert!((val.get_mask_angle_at_azimuth(0.0).unwrap() - 8.0).abs() < 1e-6);
+        assert!((val.get_mask_angle_at_azimuth(180.0).unwrap() - 2.0).abs() < 1e-6);
+
+        let eval_clear = val.validate_target_angles(60.0, 20.0).unwrap();
+        assert_eq!(eval_clear.status, MaskingStatus::Clear);
+        assert!(eval_clear.is_visible());
+
+        let eval_grazing = val.validate_target_angles(60.0, 15.2).unwrap();
+        assert_eq!(eval_grazing.status, MaskingStatus::Grazing);
+
+        let eval_masked = val.validate_target_angles(60.0, 10.0).unwrap();
+        assert_eq!(eval_masked.status, MaskingStatus::Masked);
+        assert!(!eval_masked.is_visible());
+    }
 }
