@@ -284,3 +284,25 @@ impl<T: Clone> SpatialRTree<T> {
 
     fn choose_best_child(children: &[RTreeNode<T>], env: &SpatialEnvelope) -> usize {
         let mut best_idx = 0;
+        let mut min_expansion = f64::MAX;
+        let mut min_area = f64::MAX;
+
+        for (i, child) in children.iter().enumerate() {
+            let cur_env = child.envelope();
+            let merged = cur_env.merge(env);
+            let cur_area = cur_env.area();
+            let exp = merged.area() - cur_area;
+
+            if exp < min_expansion || (exp == min_expansion && cur_area < min_area) {
+                min_expansion = exp;
+                min_area = cur_area;
+                best_idx = i;
+            }
+        }
+
+        best_idx
+    }
+
+    fn split_leaf(mut entries: Vec<RTreeEntry<T>>) -> (RTreeNode<T>, RTreeNode<T>) {
+        let split_at = entries.len() / 2;
+        let right_entries = entries.split_off(split_at);
