@@ -205,6 +205,14 @@ mod tests {
         assert_eq!(task.name, "EXPORT-TEST");
     }
     #[test]
+    fn test_sensor_frustum_crate_export() {
+        let p = PlatformPose::new(0.0, 0.0, 500.0, 0.0, 0.0, 0.0).unwrap();
+        let g = SensorGimbal::new(0.0, -90.0, 0.0).unwrap();
+        let c = SensorFrustumConfig::new(45.0, 45.0, 2000.0, 1.0).unwrap();
+        let fp = generate_sensor_footprint(&p, &g, &c, 0.0).unwrap();
+        assert_eq!(fp.vertices_enu.len(), 4);
+    }
+    #[test]
     fn sanity() {
         assert_eq!(VERSION, "0.1.0");
     }
