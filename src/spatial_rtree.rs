@@ -460,3 +460,25 @@ impl<T: Clone> SpatialRTree<T> {
                         }
                     }
                 }
+            }
+            RTreeNode::Branch { children, .. } => {
+                let mut sorted_children: Vec<&'a RTreeNode<T>> = children.iter().collect();
+                sorted_children.sort_by(|a, b| {
+                    let da = a.envelope().distance_to_point(lat, lon);
+                    let db = b.envelope().distance_to_point(lat, lon);
+                    da.partial_cmp(&db).unwrap_or(std::cmp::Ordering::Equal)
+                });
+
+                for child in sorted_children {
+                    Self::nearest_recursive(child, lat, lon, best);
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
