@@ -245,3 +245,9 @@ pub mod spatial_rtree;
 pub use spatial_rtree::{
     normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree,
 };
+
+pub mod sidc_parser;
+pub use sidc_parser::{
+    cot_type_to_sidc20, generate_sidc2525d, parse_sidc2525d, sidc20_to_cot_type, Echelon,
+    MilStd2525DSymbol, SidcParseError, StandardIdentity, SymbolSet, SymbolStatus,
+};
