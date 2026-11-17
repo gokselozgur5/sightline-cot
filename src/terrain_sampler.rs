@@ -238,3 +238,27 @@ impl GeoTiffElevationGrid {
         let z01 = self.get_node(col0, row0 + 1)?;
         let z11 = self.get_node(col0 + 1, row0 + 1)?;
 
+        Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
+    }
+
+    /// Sample elevation using specified interpolation method.
+    pub fn sample(&self, x: f64, y: f64, method: InterpolationMethod) -> Option<f64> {
+        match method {
+            InterpolationMethod::Bilinear => self.sample_bilinear(x, y),
+            InterpolationMethod::NearestNeighbor => self.sample_nearest(x, y),
+        }
+    }
+
+    /// Calculate terrain elevation gradient (dz/dx, dz/dy) at (x, y).
+    pub fn surface_gradient(&self, x: f64, y: f64) -> Option<(f64, f64)> {
+        let eps_x = 0.05 * self.step_x;
+        let eps_y = 0.05 * self.step_y;
+        let x_lo = (x - eps_x).max(self.origin_x);
+        let x_hi = (x + eps_x).min(self.max_x());
+        let y_lo = (y - eps_y).max(self.origin_y);
+        let y_hi = (y + eps_y).min(self.max_y());
+
+        let dx = x_hi - x_lo;
+        let dy = y_hi - y_lo;
+        if dx < 1e-9 || dy < 1e-9 {
+            return None;
