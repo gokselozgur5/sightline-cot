@@ -262,3 +262,27 @@ impl<'a> SaxReader<'a> {
         let len = bytes.len();
 
         // Must start with '<'
+        self.cursor += 1;
+        if self.cursor >= len {
+            return Err(SaxError::UnexpectedEof);
+        }
+
+        // Check for comment <!-- or CDATA <![CDATA[
+        if bytes[self.cursor] == b'!' {
+            self.cursor += 1;
+            if self.cursor + 1 < len && bytes[self.cursor] == b'-' && bytes[self.cursor + 1] == b'-'
+            {
+                // Comment
+                self.cursor += 2;
+                let start = self.cursor;
+                if let Some(end_offset) = self.input[self.cursor..].find("-->") {
+                    let comment_text = &self.input[start..self.cursor + end_offset];
+                    self.cursor += end_offset + 3;
+                    return Ok(Some(SaxEvent::Comment(comment_text)));
+                } else {
+                    return Err(SaxError::UnexpectedEof);
+                }
+            } else if self.cursor + 6 < len
+                && &self.input[self.cursor..self.cursor + 7] == "[CDATA["
+            {
+                // CDATA
