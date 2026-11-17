@@ -358,3 +358,27 @@ pub struct TerrainIntercept {
 
 /// Line-of-sight terrain intercept solver.
 #[derive(Debug, Clone, PartialEq)]
+pub struct TerrainInterceptSolver {
+    /// Ray marching step size.
+    pub step_size: f64,
+    /// Maximum search distance along ray.
+    pub max_range: f64,
+    /// Height convergence tolerance.
+    pub tolerance: f64,
+    /// Maximum bisection refinement iterations.
+    pub max_iterations: usize,
+}
+
+impl Default for TerrainInterceptSolver {
+    fn default() -> Self {
+        Self {
+            step_size: 10.0,
+            max_range: 50_000.0,
+            tolerance: 0.05,
+            max_iterations: 64,
+        }
+    }
+}
+
+impl TerrainInterceptSolver {
+    /// Create a configured terrain intercept solver.
