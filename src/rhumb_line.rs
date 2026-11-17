@@ -164,3 +164,27 @@ pub fn interpolate_by_count(
     waypoints.push(*p2);
     Ok(waypoints)
 }
+
+/// Interpolates intermediate waypoints along a rhumb line by max step distance in meters.
+pub fn interpolate_by_step(
+    p1: &RhumbWaypoint,
+    p2: &RhumbWaypoint,
+    step_m: f64,
+) -> Result<Vec<RhumbWaypoint>, RhumbLineError> {
+    if !step_m.is_finite() || step_m <= 0.0 {
+        return Err(RhumbLineError::InvalidParameter);
+    }
+    let (total_dist, _) = rhumb_distance_and_bearing(p1, p2, EARTH_RADIUS_M)?;
+    if total_dist <= step_m {
+        return Ok(vec![*p1, *p2]);
+    }
+    let steps = (total_dist / step_m).ceil() as usize;
+    let mut waypoints = Vec::with_capacity(steps + 1);
+    waypoints.push(*p1);
+    for i in 1..steps {
+        let f = (i as f64) / (steps as f64);
+        waypoints.push(rhumb_intermediate_fraction(p1, p2, f)?);
+    }
+    waypoints.push(*p2);
+    Ok(waypoints)
+}
