@@ -684,3 +684,28 @@ mod tests {
     fn test_extrapolate_constant_velocity() {
         let x = [0.0, 0.0, 0.0, 10.0, 20.0, -5.0];
         let cov = [[1.0; 6]; 6];
+        let state = KinematicState::new(x, cov, 0).unwrap();
+
+        let pred = state.extrapolate(2.0, 0.5).unwrap();
+        assert_eq!(pred.timestamp_ms, 2000);
+        assert!((pred.x[0] - 20.0).abs() < 1e-9);
+        assert!((pred.x[1] - 40.0).abs() < 1e-9);
+        assert!((pred.x[2] - (-10.0)).abs() < 1e-9);
+        assert!((pred.x[3] - 10.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn test_covariance_growth_over_time() {
+        let x = [0.0; 6];
+        let mut cov = [[0.0; 6]; 6];
+        for i in 0..6 {
+            cov[i][i] = 1.0;
+        }
+        let state = KinematicState::new(x, cov, 0).unwrap();
+        let pred = state.extrapolate(5.0, 2.0).unwrap();
+
+        assert!(pred.cov[0][0] > 1.0);
+        assert!(pred.cov[1][1] > 1.0);
+        assert!(pred.cov[2][2] > 1.0);
+        assert!(pred.position_uncertainty_cep() > state.position_uncertainty_cep());
+    }
