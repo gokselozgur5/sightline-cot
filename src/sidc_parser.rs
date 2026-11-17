@@ -347,3 +347,13 @@ pub fn parse_sidc2525d(s: &str) -> Result<MilStd2525DSymbol, SidcParseError> {
 pub fn generate_sidc2525d(sym: &MilStd2525DSymbol) -> String {
     sym.to_sidc20()
 }
+
+pub fn cot_type_to_sidc20(cot: &str) -> Result<String, SidcParseError> {
+    let sym = MilStd2525DSymbol::from_cot_type(cot)?;
+    Ok(sym.to_sidc20())
+}
+
+pub fn sidc20_to_cot_type(sidc: &str) -> Result<String, SidcParseError> {
+    let sym = MilStd2525DSymbol::parse(sidc)?;
+    Ok(sym.to_cot_type())
+}
