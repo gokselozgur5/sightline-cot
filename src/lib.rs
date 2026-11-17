@@ -209,3 +209,9 @@ pub use track_assoc::{
     solve_nearest_neighbor, solve_optimal_hungarian, AssocConfig, AssocError, AssocMatch,
     AssocResult, DistanceMatrix,
 };
+
+pub mod xml_canonicalizer;
+pub use xml_canonicalizer::{
+    canonicalize_cot_xml, validate_cot_xml, CanonicalizeOptions, CotSchemaValidator,
+    CotValidationError, CotXmlCanonicalizer,
+};
