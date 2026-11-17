@@ -191,3 +191,27 @@ impl FrustumFootprint {
         [lat, lon, alt]
     }
 }
+
+
+/// Compute 2D polygon area in square meters using Shoelace formula on ENU coordinates.
+pub fn polygon_area_enu(pts: &[[f64; 3]]) -> f64 {
+    if pts.len() < 3 { return 0.0; }
+    let mut area = 0.0;
+    for i in 0..pts.len() {
+        let j = (i + 1) % pts.len();
+        area += pts[i][0] * pts[j][1] - pts[j][0] * pts[i][1];
+    }
+    (area * 0.5).abs()
+}
+
+/// Compute 2D polygon perimeter in meters on ENU coordinates.
+pub fn polygon_perimeter_enu(pts: &[[f64; 3]]) -> f64 {
+    if pts.len() < 2 { return 0.0; }
+    let mut p = 0.0;
+    for i in 0..pts.len() {
+        let j = (i + 1) % pts.len();
+        let (dx, dy) = (pts[j][0] - pts[i][0], pts[j][1] - pts[i][1]);
+        p += (dx * dx + dy * dy).sqrt();
+    }
+    p
+}
