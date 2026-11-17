@@ -166,3 +166,27 @@ impl CotSchemaValidator {
                         let parent = tag_stack.last().map(|s| strip_prefix(s)).unwrap_or("");
                         if parent == "event" {
                             point_seen = true;
+                            Self::validate_point_attributes(&attributes)?;
+                        }
+                    }
+
+                    if !self_closing {
+                        tag_stack.push(name);
+                    }
+                }
+                RawXmlToken::EndTag { name } => {
+                    match tag_stack.pop() {
+                        Some(expected) => {
+                            if expected != name {
+                                return Err(CotValidationError::MismatchedClosingTag {
+                                    expected,
+                                    found: name,
+                                });
+                            }
+                        }
+                        None => {
+                            return Err(CotValidationError::MalformedXml(format!(
+                                "unexpected closing tag </{name}> without matching open tag"
+                            )));
+                        }
+                    }
