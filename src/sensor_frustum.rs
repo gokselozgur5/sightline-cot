@@ -358,3 +358,19 @@ impl SensorGimbal {
         Ok((gimbal, fov, rng))
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_frustum_parameter_validation() {
+        assert!(PlatformPose::new(f64::NAN, 0.0, 100.0, 0.0, 0.0, 0.0).is_err());
+        assert!(PlatformPose::new(95.0, 0.0, 100.0, 0.0, 0.0, 0.0).is_err());
+        assert!(SensorGimbal::new(0.0, -95.0, 0.0).is_err());
+        assert!(SensorFrustumConfig::new(0.0, 45.0, 1000.0, 0.0).is_err());
+        assert!(SensorFrustumConfig::new(190.0, 45.0, 1000.0, 0.0).is_err());
+        assert!(SensorFrustumConfig::new(60.0, 45.0, 100.0, 200.0).is_err());
+    }
+}
