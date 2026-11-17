@@ -766,3 +766,27 @@ fn serialize_node(
                 } else {
                     standard_attrs.push(attr);
                 }
+            }
+
+            if opts.sort_attributes {
+                ns_attrs.sort_by(|a, b| a.name.cmp(&b.name));
+                standard_attrs.sort_by(|a, b| a.name.cmp(&b.name));
+            }
+
+            for a in ns_attrs {
+                out.push(' ');
+                out.push_str(&a.name);
+                out.push_str("=\"");
+                out.push_str(&escape_xml_attr_val(&a.value));
+                out.push('"');
+            }
+
+            for a in standard_attrs {
+                out.push(' ');
+                out.push_str(&a.name);
+                out.push_str("=\"");
+                out.push_str(&escape_xml_attr_val(&a.value));
+                out.push('"');
+            }
+
+            active_ns.push(scope_ns);
