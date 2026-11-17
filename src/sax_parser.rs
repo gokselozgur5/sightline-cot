@@ -502,3 +502,27 @@ impl CotSaxParser {
                         time,
                         start,
                         stale,
+                        point: None,
+                        callsign: None,
+                    });
+                }
+                SaxEvent::EmptyElement { name, attributes }
+                | SaxEvent::StartElement { name, attributes }
+                    if name == "point" =>
+                {
+                    if let Some(ref mut evt) = current_event {
+                        if let Ok(pt) = CotPointView::from_attributes(&attributes) {
+                            evt.point = Some(pt);
+                        }
+                    }
+                }
+                SaxEvent::EmptyElement { name, attributes }
+                | SaxEvent::StartElement { name, attributes }
+                    if name == "contact" =>
+                {
+                    if let Some(ref mut evt) = current_event {
+                        if let Some(cs) = attributes.get("callsign") {
+                            evt.callsign = Some(cs);
+                        }
+                    }
+                }
