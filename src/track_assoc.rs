@@ -377,3 +377,13 @@ mod tests {
         assert!((smat.get(0, 0).unwrap() - 3.0).abs() < 1e-9);
         assert!((smat.get(1, 1).unwrap() - 4.0).abs() < 1e-9);
     }
+
+    #[test]
+    fn test_spatial_matrix_3d_and_helpers() {
+        assert_eq!(euclidean_dist_2d([0.0, 0.0], [3.0, 4.0]), 5.0);
+        assert_eq!(euclidean_dist_3d([0.0, 0.0, 0.0], [1.0, 2.0, 2.0]), 3.0);
+        let t3 = [[0.0, 0.0, 0.0]];
+        let d3 = [[1.0, 2.0, 2.0]];
+        let m3 = compute_spatial_matrix_3d(&t3, &d3).unwrap();
+        assert_eq!(m3.get(0, 0), Some(3.0));
+    }
