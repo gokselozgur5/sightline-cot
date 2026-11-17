@@ -428,3 +428,28 @@ pub struct TacticalTargetFilter {
     pub coast_count: usize,
 }
 
+impl TacticalTargetFilter {
+    /// Initialize a new tactical target Kalman filter.
+    pub fn new(
+        target_id: impl Into<String>,
+        initial_pos: [f64; 3],
+        initial_vel: [f64; 3],
+        pos_var: f64,
+        vel_var: f64,
+        timestamp_ms: i64,
+        config: TargetFilterConfig,
+    ) -> Result<Self, KalmanTargetError> {
+        config.validate()?;
+        if !pos_var.is_finite() || pos_var <= 0.0 || !vel_var.is_finite() || vel_var <= 0.0 {
+            return Err(KalmanTargetError::NonFiniteInput);
+        }
+
+        let x = [
+            initial_pos[0],
+            initial_pos[1],
+            initial_pos[2],
+            initial_vel[0],
+            initial_vel[1],
+            initial_vel[2],
+        ];
+
