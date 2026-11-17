@@ -57,3 +57,25 @@ impl MaskingStatus {
         matches!(self, Self::Clear)
     }
 }
+
+/// Result of evaluating line-of-sight against terrain elevation mask.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MaskingEvaluation {
+    /// Target azimuth in degrees [0.0, 360.0).
+    pub target_azimuth_deg: f64,
+    /// Target elevation angle in degrees [-90.0, 90.0].
+    pub target_elevation_deg: f64,
+    /// Minimum required masking elevation angle in degrees.
+    pub mask_elevation_deg: f64,
+    /// Angular clearance margin in degrees (target - mask).
+    pub clearance_margin_deg: f64,
+    /// Classified masking status.
+    pub status: MaskingStatus,
+}
+
+impl MaskingEvaluation {
+    /// Return true if the evaluation indicates visible line-of-sight.
+    pub fn is_visible(&self) -> bool {
+        self.status.is_visible()
+    }
+}
