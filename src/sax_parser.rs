@@ -310,3 +310,27 @@ impl<'a> SaxReader<'a> {
                 let pi_content = &self.input[start..self.cursor + end_offset];
                 self.cursor += end_offset + 2;
                 let mut parts = pi_content.splitn(2, |c: char| c.is_ascii_whitespace());
+                let target = parts.next().unwrap_or("").trim();
+                let data = parts.next().unwrap_or("").trim();
+                return Ok(Some(SaxEvent::ProcessingInstruction { target, data }));
+            } else {
+                return Err(SaxError::UnexpectedEof);
+            }
+        }
+
+        // Check for closing tag </tag>
+        if bytes[self.cursor] == b'/' {
+            self.cursor += 1;
+            let start = self.cursor;
+            while self.cursor < len
+                && bytes[self.cursor] != b'>'
+                && !bytes[self.cursor].is_ascii_whitespace()
+            {
+                self.cursor += 1;
+            }
+            let name = &self.input[start..self.cursor];
+            while self.cursor < len && bytes[self.cursor] != b'>' {
+                self.cursor += 1;
+            }
+            if self.cursor >= len {
+                return Err(SaxError::UnexpectedEof);
