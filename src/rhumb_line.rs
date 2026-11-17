@@ -94,3 +94,26 @@ pub fn great_circle_distance(
     let c = 2.0 * a.sqrt().clamp(0.0, 1.0).asin();
     Ok(radius * c)
 }
+
+/// Comparison between rhumb line and great-circle navigation along a segment.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RhumbSegmentComparison {
+    pub rhumb_distance_m: f64,
+    pub great_circle_distance_m: f64,
+    pub rhumb_bearing_deg: f64,
+    pub distance_difference_m: f64,
+}
+
+impl RhumbSegmentComparison {
+    /// Compare rhumb line and great-circle trajectories between two waypoints.
+    pub fn compute(p1: &RhumbWaypoint, p2: &RhumbWaypoint) -> Result<Self, RhumbLineError> {
+        let (rhumb_dist, bearing) = rhumb_distance_and_bearing(p1, p2, EARTH_RADIUS_M)?;
+        let gc_dist = great_circle_distance(p1, p2, EARTH_RADIUS_M)?;
+        Ok(Self {
+            rhumb_distance_m: rhumb_dist,
+            great_circle_distance_m: gc_dist,
+            rhumb_bearing_deg: bearing,
+            distance_difference_m: (rhumb_dist - gc_dist).max(0.0),
+        })
+    }
+}
