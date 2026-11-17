@@ -814,3 +814,27 @@ fn serialize_node(
     }
 }
 
+fn is_ns_declared(active_ns: &[HashMap<String, String>], prefix: &str, uri: &str) -> bool {
+    for scope in active_ns.iter().rev() {
+        if let Some(existing_uri) = scope.get(prefix) {
+            return existing_uri == uri;
+        }
+    }
+    false
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_empty_xml_rejected() {
+        assert_eq!(validate_cot_xml(""), Err(CotValidationError::EmptyXml));
+        assert_eq!(validate_cot_xml("   \n\t "), Err(CotValidationError::EmptyXml));
+    }
+
+    #[test]
+    fn test_non_event_root_rejected() {
+        let xml = "<not_event><point lat=\"0.0\" lon=\"0.0\" hae=\"0.0\" ce=\"0.0\" le=\"0.0\"/></not_event>";
+        assert!(matches!(validate_cot_xml(xml), Err(CotValidationError::MalformedXml(_))));
+    }
