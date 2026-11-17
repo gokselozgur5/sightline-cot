@@ -742,3 +742,13 @@ mod tests {
         let res1 = streamer.feed(chunk1);
         assert_eq!(res1.len(), 0);
 
+        let res2 = streamer.feed(chunk2);
+        assert_eq!(res2.len(), 1);
+        assert!(res2[0].contains("uid=\"1\""));
+
+        let res3 = streamer.feed(chunk3);
+        assert_eq!(res3.len(), 1);
+        assert!(res3[0].contains("uid=\"2\""));
+        assert_eq!(streamer.pending_len(), 0);
+    }
+}
