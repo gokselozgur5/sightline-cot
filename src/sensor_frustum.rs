@@ -373,4 +373,16 @@ mod tests {
         assert!(SensorFrustumConfig::new(190.0, 45.0, 1000.0, 0.0).is_err());
         assert!(SensorFrustumConfig::new(60.0, 45.0, 100.0, 200.0).is_err());
     }
+
+    #[test]
+    fn test_nadir_footprint_generation() {
+        let platform = PlatformPose::new(0.0, 0.0, 1000.0, 0.0, 0.0, 0.0).unwrap();
+        let gimbal = SensorGimbal::new(0.0, -90.0, 0.0).unwrap();
+        let cfg = SensorFrustumConfig::new(60.0, 60.0, 5000.0, 10.0).unwrap();
+        let fp = generate_sensor_footprint(&platform, &gimbal, &cfg, 0.0).unwrap();
+        assert_eq!(fp.vertices_enu.len(), 4);
+        assert!((fp.slant_range_m - 1000.0).abs() < 1e-3);
+        assert!(fp.area_sq_m > 0.0);
+        assert!(fp.perimeter_m > 0.0);
+    }
 }
