@@ -585,3 +585,27 @@ impl TacticalTargetFilter {
         Ok(traj)
     }
 
+    /// Compute estimated intercept flight time in seconds for a pursuing platform.
+    pub fn estimate_intercept_time(
+        &self,
+        pursuer_pos: [f64; 3],
+        pursuer_speed_mps: f64,
+    ) -> Option<f64> {
+        if !pursuer_speed_mps.is_finite() || pursuer_speed_mps <= 0.0 {
+            return None;
+        }
+        for &coord in &pursuer_pos {
+            if !coord.is_finite() {
+                return None;
+            }
+        }
+        let (rx, ry, rz) = (
+            self.current_state.x[0] - pursuer_pos[0],
+            self.current_state.x[1] - pursuer_pos[1],
+            self.current_state.x[2] - pursuer_pos[2],
+        );
+        let dist_sq = rx * rx + ry * ry + rz * rz;
+        if dist_sq < 1e-12 {
+            return Some(0.0);
+        }
+
