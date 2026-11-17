@@ -291,3 +291,28 @@ fn invert_3x3(m: &[[f64; 3]; 3]) -> Result<[[f64; 3]; 3], KalmanTargetError> {
             (m[0][1] * m[2][0] - m[0][0] * m[2][1]) * inv_det,
             (m[0][0] * m[1][1] - m[0][1] * m[1][0]) * inv_det,
         ],
+    ])
+}
+
+/// Perform 3D linear Kalman measurement update with Joseph form covariance.
+fn update_3d(
+    x: &mut [f64; 6],
+    cov: &mut [[f64; 6]; 6],
+    z: [f64; 3],
+    r_diag: [f64; 3],
+    offset: usize,
+    gate_threshold: f64,
+) -> Result<f64, KalmanTargetError> {
+    for &val in &z {
+        if !val.is_finite() {
+            return Err(KalmanTargetError::NonFiniteInput);
+        }
+    }
+    for &val in &r_diag {
+        if !val.is_finite() || val <= 0.0 {
+            return Err(KalmanTargetError::NonFiniteInput);
+        }
+    }
+
+    let y = [z[0] - x[offset], z[1] - x[offset + 1], z[2] - x[offset + 2]];
+    let mut s = [[0.0; 3]; 3];
