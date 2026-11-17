@@ -521,3 +521,27 @@ impl TacticalTargetFilter {
         Ok(d_sq)
     }
 
+    /// Process 3D velocity measurement update with residual gating.
+    pub fn update_velocity(
+        &mut self,
+        vel: [f64; 3],
+        vel_var: Option<[f64; 3]>,
+        timestamp_ms: i64,
+    ) -> Result<f64, KalmanTargetError> {
+        self.predict_to(timestamp_ms)?;
+        let r_diag = vel_var.unwrap_or([
+            self.config.default_vel_var,
+            self.config.default_vel_var,
+            self.config.default_vel_var,
+        ]);
+        let d_sq = update_3d(
+            &mut self.current_state.x,
+            &mut self.current_state.cov,
+            vel,
+            r_diag,
+            3,
+            self.config.gate_threshold,
+        )?;
+        self.last_update_ms = timestamp_ms;
+        self.update_count += 1;
+        self.coast_count = 0;
