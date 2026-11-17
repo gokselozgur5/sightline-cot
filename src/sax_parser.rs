@@ -694,3 +694,27 @@ mod tests {
 
         let events = CotSaxParser::parse_events(xml).expect("parse failed");
         assert_eq!(events.len(), 1);
+        let evt = &events[0];
+        assert_eq!(evt.uid, "ALPHA-1");
+        assert_eq!(evt.cot_type, "a-f-G-U-C");
+        assert_eq!(evt.how, "m-g");
+        assert_eq!(evt.callsign, Some("VIPER"));
+
+        let pt = evt.point.expect("missing point");
+        assert!((pt.lat - 34.0522).abs() < 1e-5);
+        assert!((pt.lon - -118.2437).abs() < 1e-5);
+        assert!((pt.hae - 120.5).abs() < 1e-5);
+    }
+
+    #[test]
+    fn test_mismatched_and_unclosed_tags() {
+        let xml = "<a><b></c></a>";
+        let mut reader = SaxReader::new(xml);
+        assert_eq!(reader.next_event().unwrap(), Some(SaxEvent::StartDocument));
+        let _ = reader.next_event().unwrap(); // <a>
+        let _ = reader.next_event().unwrap(); // <b>
+        match reader.next_event() {
+            Err(SaxError::MismatchedTag { expected, found }) => {
+                assert_eq!(expected, "b");
+                assert_eq!(found, "c");
+            }
