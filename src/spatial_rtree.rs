@@ -240,3 +240,25 @@ impl<T: Clone> SpatialRTree<T> {
         } else {
             self.root = Some(root);
         }
+    }
+
+    fn insert_recursive(
+        node: &mut RTreeNode<T>,
+        entry: RTreeEntry<T>,
+        max_entries: usize,
+    ) -> Option<(RTreeNode<T>, RTreeNode<T>)> {
+        match node {
+            RTreeNode::Leaf { entries, envelope } => {
+                entries.push(entry);
+                *envelope = envelope.merge(&entries.last().unwrap().envelope);
+                if entries.len() > max_entries {
+                    Some(Self::split_leaf(std::mem::take(entries)))
+                } else {
+                    None
+                }
+            }
+            RTreeNode::Branch { children, envelope } => {
+                let best_idx = Self::choose_best_child(children, &entry.envelope);
+                if let Some((n1, n2)) =
+                    Self::insert_recursive(&mut children[best_idx], entry, max_entries)
+                {
