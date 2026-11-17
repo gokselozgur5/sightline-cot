@@ -406,3 +406,27 @@ impl TerrainInterceptSolver {
             tolerance,
             max_iterations,
         })
+    }
+
+    /// Intersect a line-of-sight ray with the elevation grid.
+    pub fn solve(
+        &self,
+        grid: &GeoTiffElevationGrid,
+        ray: &TerrainRay,
+    ) -> Result<TerrainIntercept, TerrainSamplerError> {
+        let (min_elev, max_elev) = grid
+            .min_max_elevation()
+            .ok_or(TerrainSamplerError::NoIntersection)?;
+
+        if ray.origin[2] > max_elev && ray.direction[2] >= 0.0 {
+            return Err(TerrainSamplerError::RayPointsAway);
+        }
+
+        let mut t_prev = 0.0;
+        let mut t_curr = 0.0;
+        let step = self.step_size.max(0.1);
+
+        while t_curr < self.max_range {
+            t_curr = (t_curr + step).min(self.max_range);
+            let p = ray.point_at(t_curr);
+
