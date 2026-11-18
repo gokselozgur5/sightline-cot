@@ -12,6 +12,16 @@ fn test_flinders_peak_to_buninyong() {
         "distance diff {} >= 1mm",
         (inv.distance_m - 54972.271).abs()
     );
+    assert!(
+        (inv.forward_azimuth_deg - (306.0 + 52.0 / 60.0 + 5.37 / 3600.0)).abs() < 1e-4,
+        "forward azimuth diff {} >= 1e-4",
+        (inv.forward_azimuth_deg - (306.0 + 52.0 / 60.0 + 5.37 / 3600.0)).abs()
+    );
+    assert!(
+        (inv.reverse_azimuth_deg - (127.0 + 10.0 / 60.0 + 25.07 / 3600.0)).abs() < 1e-4,
+        "reverse azimuth diff {} >= 1e-4",
+        (inv.reverse_azimuth_deg - (127.0 + 10.0 / 60.0 + 25.07 / 3600.0)).abs()
+    );
 }
 
 #[test]
