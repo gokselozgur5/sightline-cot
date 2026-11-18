@@ -58,7 +58,7 @@ impl<'a> SaxAttributes<'a> {
     /// Lookup an attribute value by name.
     pub fn get(&self, target_name: &str) -> Option<&'a str> {
         let mut iter = self.iter();
-        while let Some(attr) = iter.next() {
+        for attr in iter {
             if let Ok(a) = attr {
                 if a.name == target_name {
                     return Some(a.value);

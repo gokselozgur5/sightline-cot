@@ -214,7 +214,7 @@ pub fn parse_geoid_ascii(ascii: &str) -> Result<GeoidGrid, GeoidError> {
         let v: f64 = tok
             .parse()
             .map_err(|_| GeoidError::InvalidDataValue(tok.into()))?;
-        let is_nd = !v.is_finite() || nodata.map_or(false, |nd| (v - nd).abs() < 1e-5);
+        let is_nd = !v.is_finite() || nodata.is_some_and(|nd| (v - nd).abs() < 1e-5);
         data.push((!is_nd).then_some(v));
     }
     GeoidGrid::new(cols, rows, x0, y0, step, nodata, data)
