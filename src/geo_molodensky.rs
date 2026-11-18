@@ -1,4 +1,4 @@
-//! Abridged Molodensky datum shift on geodetic coordinates.
+//! Standard Molodensky datum shift on geodetic coordinates.
 
 /// Source ellipsoid and the shift to the target datum.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -31,7 +31,11 @@ impl MolodenskyShift {
             + self.da * rn * e2 * sp * cp / self.a
             + self.df * (rm / one_f + rn * one_f) * sp * cp)
             / (rm + h);
-        let dlam = (-dx * sl + dy * cl) / ((rn + h) * cp);
+        let dlam = if cp.abs() < 1e-9 {
+            0.0
+        } else {
+            (-dx * sl + dy * cl) / ((rn + h) * cp)
+        };
         let dh = dx * cp * cl + dy * cp * sl + dz * sp - self.da * self.a / rn
             + self.df * one_f * rn * sp * sp;
         (
