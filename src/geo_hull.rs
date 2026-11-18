@@ -1,5 +1,8 @@
 //! 2D convex hull of geodetic points in a local tangent frame.
 
+/// Earth semi-major axis in meters (WGS84).
+const EARTH_RADIUS_M: f64 = 6_378_137.0;
+
 /// Point in a local tangent projection with its original index.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct LocalPoint {
@@ -37,8 +40,8 @@ impl LocalPoint {
                 } else if dlon < -180.0 {
                     dlon += 360.0;
                 }
-                let x = dlon.to_radians() * 6_378_137.0 * cos0;
-                let y = (p[0] - lat0).to_radians() * 6_378_137.0;
+                let x = dlon.to_radians() * EARTH_RADIUS_M * cos0;
+                let y = (p[0] - lat0).to_radians() * EARTH_RADIUS_M;
                 Self { x, y, idx }
             })
             .collect()
