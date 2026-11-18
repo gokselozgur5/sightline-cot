@@ -217,8 +217,8 @@ fn predict_step(x: &[f64; 6], cov: &[[f64; 6]; 6], dt: f64, q: f64) -> ([f64; 6]
     x_pred[2] += dt * x[5];
 
     let mut f = [[0.0; 6]; 6];
-    for i in 0..6 {
-        f[i][i] = 1.0;
+    for (i, row) in f.iter_mut().enumerate() {
+        row[i] = 1.0;
     }
     f[0][3] = dt;
     f[1][4] = dt;

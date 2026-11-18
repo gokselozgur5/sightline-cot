@@ -38,8 +38,8 @@ fn conformal_radius(lat_rad: f64, e: f64) -> f64 {
     let half_pi = std::f64::consts::FRAC_PI_2;
     let s = lat_rad.sin();
     let es = e * s;
-    let t = ((half_pi - lat_rad) / 2.0).tan() * ((1.0 + es) / (1.0 - es)).powf(e / 2.0);
-    t
+    
+    ((half_pi - lat_rad) / 2.0).tan() * ((1.0 + es) / (1.0 - es)).powf(e / 2.0)
 }
 
 /// Convert WGS-84 latitude and longitude into UPS coordinates.

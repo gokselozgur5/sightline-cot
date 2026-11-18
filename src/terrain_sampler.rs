@@ -382,6 +382,13 @@ impl Default for TerrainInterceptSolver {
 
 impl TerrainInterceptSolver {
     /// Create a configured terrain intercept solver.
+    ///
+    /// # Arguments
+    ///
+    /// * `step_size` - Ray marching step size in meters.
+    /// * `max_range` - Maximum search distance along the ray in meters.
+    /// * `tolerance` - Height convergence tolerance in meters.
+    /// * `max_iterations` - Maximum bisection refinement iterations.
     pub fn new(
         step_size: f64,
         max_range: f64,
@@ -409,6 +416,15 @@ impl TerrainInterceptSolver {
     }
 
     /// Intersect a line-of-sight ray with the elevation grid.
+    ///
+    /// # Arguments
+    ///
+    /// * `grid` - The elevation grid to intersect with.
+    /// * `ray` - The line-of-sight ray to trace.
+    ///
+    /// # Returns
+    ///
+    /// The intersection point and meta-data, or an error if no intersection is found.
     pub fn solve(
         &self,
         grid: &GeoTiffElevationGrid,
