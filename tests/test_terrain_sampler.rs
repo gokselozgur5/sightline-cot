@@ -15,7 +15,7 @@ fn test_geotiff_grid_validation_errors() {
 fn test_geotiff_from_raw_with_nodata() {
     let raw = vec![-9999.0, 100.0, 200.0, -9999.0];
     let grid =
-        GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 2, 2, &raw, Some(-9999.0)).unwrap();
+        GeoTiffElevationGrid::from_raw([0.0, 0.0], [10.0, 10.0], 2, 2, &raw, Some(-9999.0)).unwrap();
     assert_eq!(grid.get_node(0, 0), None);
     assert_eq!(grid.get_node(1, 0), Some(100.0));
     assert_eq!(grid.get_node(0, 1), Some(200.0));
@@ -26,7 +26,7 @@ fn test_geotiff_from_raw_with_nodata() {
 #[test]
 fn test_interpolation_modes() {
     let raw = vec![0.0, 10.0, 20.0, 30.0];
-    let grid = GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 2, 2, &raw, None).unwrap();
+    let grid = GeoTiffElevationGrid::from_raw([0.0, 0.0], [10.0, 10.0], 2, 2, &raw, None).unwrap();
 
     let linear_val = grid
         .sample(5.0, 5.0, InterpolationMethod::Bilinear)
@@ -43,7 +43,7 @@ fn test_interpolation_modes() {
 fn test_aspect_and_slope() {
     // East-facing slope: height increases with x
     let raw = vec![0.0, 10.0, 0.0, 10.0];
-    let grid = GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 2, 2, &raw, None).unwrap();
+    let grid = GeoTiffElevationGrid::from_raw([0.0, 0.0], [10.0, 10.0], 2, 2, &raw, None).unwrap();
     let slope = grid.slope_deg(5.0, 5.0).unwrap();
     assert!((slope - 45.0).abs() < 0.5);
 
@@ -72,7 +72,7 @@ fn test_terrain_intercept_sloped_surface() {
             raw.push(c as f64 * 5.0);
         }
     }
-    let grid = GeoTiffElevationGrid::from_raw(0.0, 0.0, 10.0, 10.0, 11, 11, &raw, None).unwrap();
+    let grid = GeoTiffElevationGrid::from_raw([0.0, 0.0], [10.0, 10.0], 11, 11, &raw, None).unwrap();
 
     // Slanted ray pointing downward at 45 degrees toward x=50, y=50
     let ray = TerrainRay::new([20.0, 50.0, 50.0], [1.0, 0.0, -1.0]).unwrap();
