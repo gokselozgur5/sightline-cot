@@ -57,16 +57,14 @@ impl<'a> SaxAttributes<'a> {
 
     /// Lookup an attribute value by name.
     pub fn get(&self, target_name: &str) -> Option<&'a str> {
-        let mut iter = self.iter();
-        while let Some(attr) = iter.next() {
-            if let Ok(a) = attr {
-                if a.name == target_name {
-                    return Some(a.value);
-                }
+        for a in self.iter().flatten() {
+            if a.name == target_name {
+                return Some(a.value);
             }
         }
         None
     }
+
 
     /// Create an iterator over all attributes.
     pub fn iter(&self) -> SaxAttributesIter<'a> {
@@ -483,7 +481,7 @@ impl CotSaxParser {
 
         while let Some(ev) = reader.next_event()? {
             match ev {
-                SaxEvent::StartElement { name, attributes } if name == "event" => {
+                SaxEvent::StartElement { name: "event", attributes } => {
                     let version = attributes.get("version").unwrap_or("2.0");
                     let uid = attributes.get("uid").unwrap_or("");
                     let cot_type = attributes.get("type").unwrap_or("");
