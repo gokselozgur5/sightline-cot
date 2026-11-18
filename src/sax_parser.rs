@@ -9,7 +9,6 @@ pub enum SaxError {
     InvalidSyntax(String),
     UnclosedElement(String),
     MismatchedTag { expected: String, found: String },
-    InvalidEntity(String),
     InvalidNumericValue(&'static str),
 }
 
@@ -25,7 +24,6 @@ impl fmt::Display for SaxError {
                     "mismatched closing tag: expected </{expected}>, found </{found}>"
                 )
             }
-            Self::InvalidEntity(e) => write!(f, "invalid XML entity: {e}"),
             Self::InvalidNumericValue(v) => write!(f, "invalid numeric value for field: {v}"),
         }
     }
