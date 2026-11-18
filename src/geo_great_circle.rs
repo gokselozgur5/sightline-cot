@@ -69,7 +69,14 @@ fn from_cartesian(v: [f64; 3]) -> Waypoint {
 fn interpolate_segment(w1: &Waypoint, w2: &Waypoint, f: f64) -> Waypoint {
     let (v1, v2) = (to_cartesian(w1), to_cartesian(w2));
     let dot = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]).clamp(-1.0, 1.0);
-    let d = dot.acos();
+    let cross = [
+        v1[1] * v2[2] - v1[2] * v2[1],
+        v1[2] * v2[0] - v1[0] * v2[2],
+        v1[0] * v2[1] - v1[1] * v2[0],
+    ];
+    let d = (cross[0] * cross[0] + cross[1] * cross[1] + cross[2] * cross[2])
+        .sqrt()
+        .atan2(dot);
     if d < 1e-15 {
         return *w1;
     }
@@ -84,10 +91,18 @@ fn interpolate_segment(w1: &Waypoint, w2: &Waypoint, f: f64) -> Waypoint {
 fn segment_distance_m(w1: &Waypoint, w2: &Waypoint) -> Result<f64, GreatCircleError> {
     let (v1, v2) = (to_cartesian(w1), to_cartesian(w2));
     let dot = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]).clamp(-1.0, 1.0);
+    let cross = [
+        v1[1] * v2[2] - v1[2] * v2[1],
+        v1[2] * v2[0] - v1[0] * v2[2],
+        v1[0] * v2[1] - v1[1] * v2[0],
+    ];
+    let d = (cross[0] * cross[0] + cross[1] * cross[1] + cross[2] * cross[2])
+        .sqrt()
+        .atan2(dot);
     if dot <= -1.0 + 1e-12 {
         return Err(GreatCircleError::AntipodalWaypoints);
     }
-    Ok(dot.acos() * EARTH_RADIUS_M)
+    Ok(d * EARTH_RADIUS_M)
 }
 
 impl GreatCirclePath {
