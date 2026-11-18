@@ -193,7 +193,7 @@ fn compute_inverse_result_ellipsoid(
     VincentyInverse {
         distance_m: s,
         forward_azimuth_deg: wrap_azimuth(a1),
-        reverse_azimuth_deg: wrap_azimuth(a2),
+        reverse_azimuth_deg: wrap_azimuth(a2 + 180.0),
     }
 }
 
@@ -292,7 +292,7 @@ fn compute_direct_coords(
     VincentyDirect {
         lat_deg: lat2,
         lon_deg: lon2,
-        reverse_azimuth_deg: wrap_azimuth(s_alp.atan2(-x).to_degrees()),
+        reverse_azimuth_deg: wrap_azimuth(s_alp.atan2(-x).to_degrees() + 180.0),
     }
 }
 

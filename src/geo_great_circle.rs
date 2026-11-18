@@ -206,11 +206,10 @@ impl GreatCirclePath {
         let (idx, _) = self.locate_segment(distance_m);
         let current_pt = self.interpolate_at_distance(distance_m)?;
         let target_pt = &self.waypoints[idx + 1];
-        if (current_pt.lat - target_pt.lat).abs() < 1e-9 && (current_pt.lon - target_pt.lon).abs() < 1e-9 {
-            if idx + 2 < self.waypoints.len() {
+        if (current_pt.lat - target_pt.lat).abs() < 1e-9 && (current_pt.lon - target_pt.lon).abs() < 1e-9
+            && idx + 2 < self.waypoints.len() {
                 return Ok(segment_bearing_deg(&current_pt, &self.waypoints[idx + 2]));
             }
-        }
         Ok(segment_bearing_deg(&current_pt, target_pt))
     }
 }

@@ -287,13 +287,15 @@ impl MilStdSymbol {
         for (i, c) in chars[4..10].iter().enumerate() {
             fid[i] = *c;
         }
-        let mut sym = Self::default();
-        sym.affiliation = aff;
-        sym.dimension = dim;
-        sym.status = status;
-        sym.function_id = fid;
-        sym.modifier = [chars[10], chars[11]];
-        sym.country_code = [chars[12], chars[13]];
+        let sym = MilStdSymbol {
+            affiliation: aff,
+            dimension: dim,
+            status,
+            function_id: fid,
+            modifier: [chars[10], chars[11]],
+            country_code: [chars[12], chars[13]],
+            ..Default::default()
+        };
         Ok(sym)
     }
 }
@@ -311,13 +313,16 @@ impl MilStdSymbol {
         let status_ch = s.chars().nth(6).unwrap_or('0');
         let status = MilStdStatus::from_char(status_ch)?;
         let echelon = MilStdEchelon::from_2525d_code(&s[8..10])?;
-        let mut sym = Self::default();
-        sym.affiliation = aff;
-        sym.dimension = dim;
-        sym.status = status;
-        sym.echelon = echelon;
+        let sym = MilStdSymbol {
+            affiliation: aff,
+            dimension: dim,
+            status,
+            echelon,
+            ..Default::default()
+        };
         Ok(sym)
     }
+
 }
 
 pub fn parse_mil_std(sidc: &str) -> Result<MilStdSymbol, MilStdError> {
