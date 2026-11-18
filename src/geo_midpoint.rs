@@ -6,6 +6,8 @@ pub enum MidpointError {
     InvalidLatitude,
     InvalidLongitude,
     AntipodalPoints,
+    InvalidFraction,
+    NoConvergence,
 }
 
 fn validate_coords(lat: f64, lon: f64) -> Result<(), MidpointError> {
@@ -52,16 +54,17 @@ impl From<VincentyError> for MidpointError {
         match err {
             VincentyError::InvalidLatitude => MidpointError::InvalidLatitude,
             VincentyError::InvalidLongitude => MidpointError::InvalidLongitude,
-            VincentyError::NoConvergence
-            | VincentyError::NegativeDistance
-            | VincentyError::NonFiniteInput => MidpointError::AntipodalPoints,
+            VincentyError::NoConvergence => MidpointError::NoConvergence,
+            VincentyError::NegativeDistance | VincentyError::NonFiniteInput => {
+                MidpointError::AntipodalPoints
+            }
         }
     }
 }
 
 fn validate_fraction(f: f64) -> Result<(), MidpointError> {
     if !f.is_finite() || !(0.0..=1.0).contains(&f) {
-        Err(MidpointError::AntipodalPoints)
+        Err(MidpointError::InvalidFraction)
     } else {
         Ok(())
     }
