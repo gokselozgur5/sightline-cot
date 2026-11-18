@@ -141,8 +141,10 @@ struct AsciiHeader {
     nodata: Option<f64>,
 }
 
+pub type GeoidResolveResult = (usize, usize, f64, f64, f64, Option<f64>);
+
 impl AsciiHeader {
-    fn resolve(self) -> Result<(usize, usize, f64, f64, f64, Option<f64>), GeoidError> {
+    fn resolve(self) -> Result<GeoidResolveResult, GeoidError> {
         let cols = self.cols.ok_or(GeoidError::MissingHeader("ncols"))?;
         let rows = self.rows.ok_or(GeoidError::MissingHeader("nrows"))?;
         let step = self.cellsize.ok_or(GeoidError::MissingHeader("cellsize"))?;
@@ -214,7 +216,7 @@ pub fn parse_geoid_ascii(ascii: &str) -> Result<GeoidGrid, GeoidError> {
         let v: f64 = tok
             .parse()
             .map_err(|_| GeoidError::InvalidDataValue(tok.into()))?;
-        let is_nd = !v.is_finite() || nodata.map_or(false, |nd| (v - nd).abs() < 1e-5);
+        let is_nd = !v.is_finite() || nodata.is_some_and(|nd| (v - nd).abs() < 1e-5);
         data.push((!is_nd).then_some(v));
     }
     GeoidGrid::new(cols, rows, x0, y0, step, nodata, data)
