@@ -24,6 +24,14 @@ fn test_integration_transcontinental_flight_path() {
 }
 
 #[test]
+fn test_jfk_lhr_great_circle_distance() {
+    let jfk = Waypoint::new(40.6413, -73.7781);
+    let lhr = Waypoint::new(51.4700, -0.4543);
+    let path = GreatCirclePath::from_waypoints(&[jfk, lhr]).expect("build path");
+    assert!((path.total_distance_m() - 5540018.97).abs() < 1.0);
+}
+
+#[test]
 fn test_integration_equatorial_sampling() {
     let p1 = Waypoint::new(0.0, 0.0);
     let p2 = Waypoint::new(0.0, 10.0);
