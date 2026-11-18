@@ -1,5 +1,8 @@
 //! 2D convex hull of geodetic points in a local tangent frame.
 
+/// Earth semi-major axis in meters (WGS84).
+const EARTH_RADIUS_M: f64 = 6_378_137.0;
+
 /// Point in a local tangent projection with its original index.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct LocalPoint {
@@ -16,14 +19,20 @@ impl LocalPoint {
 
     /// Projects geodetic points into a local tangent plane.
     pub fn project_all(points: &[[f64; 2]]) -> Vec<Self> {
-        if points.is_empty() {
-            return Vec::new();
-        }
-        let (lat0, lon0) = (points[0][0], points[0][1]);
-        let cos0 = lat0.to_radians().cos().max(1e-6);
-        points
+        let finite_points: Vec<(usize, &[f64; 2])> = points
             .iter()
             .enumerate()
+            .filter(|(_, p)| p[0].is_finite() && p[1].is_finite())
+            .collect();
+
+        if finite_points.is_empty() {
+            return Vec::new();
+        }
+
+        let (lat0, lon0) = (finite_points[0].1[0], finite_points[0].1[1]);
+        let cos0 = lat0.to_radians().cos().max(1e-6);
+        finite_points
+            .into_iter()
             .map(|(idx, p)| {
                 let mut dlon = p[1] - lon0;
                 if dlon > 180.0 {
@@ -31,8 +40,8 @@ impl LocalPoint {
                 } else if dlon < -180.0 {
                     dlon += 360.0;
                 }
-                let x = dlon.to_radians() * 6_378_137.0 * cos0;
-                let y = (p[0] - lat0).to_radians() * 6_378_137.0;
+                let x = dlon.to_radians() * EARTH_RADIUS_M * cos0;
+                let y = (p[0] - lat0).to_radians() * EARTH_RADIUS_M;
                 Self { x, y, idx }
             })
             .collect()
