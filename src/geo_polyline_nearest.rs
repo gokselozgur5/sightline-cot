@@ -40,7 +40,9 @@ fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
 }
 
 fn angle_rad(a: [f64; 3], b: [f64; 3]) -> f64 {
-    dot(a, b).clamp(-1.0, 1.0).acos()
+    let cp = cross(a, b);
+    let norm = (cp[0] * cp[0] + cp[1] * cp[1] + cp[2] * cp[2]).sqrt();
+    norm.atan2(dot(a, b))
 }
 
 fn segment_normal(va: [f64; 3], vb: [f64; 3]) -> (Option<[f64; 3]>, f64) {

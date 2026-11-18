@@ -728,7 +728,7 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
         }
     }
 
-    root.ok_or_else(|| CotValidationError::MissingRequiredElement("event"))
+    root.ok_or(CotValidationError::MissingRequiredElement("event"))
 }
 
 fn serialize_node(

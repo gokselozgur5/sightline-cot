@@ -156,7 +156,7 @@ pub fn time_to_go_sec(dist_m: f64, speed_mps: f64) -> Option<f64> {
 
 /// Checks whether course over ground in degrees is a valid number.
 pub fn is_valid_cog_deg(cog_deg: f64) -> bool {
-    cog_deg.is_finite() && cog_deg >= 0.0 && cog_deg < 360.0
+    cog_deg.is_finite() && (0.0..360.0).contains(&cog_deg)
 }
 
 /// Checks whether speed over ground in m/s is non-negative and finite.
