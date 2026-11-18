@@ -311,8 +311,8 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
     let mut matches = Vec::new();
     let mut matched_tracks = vec![false; n];
     let mut matched_dets = vec![false; m];
-    for j in 1..=m {
-        let i = p[j];
+    for (j, &i) in p.iter().enumerate().skip(1).take(m) {
+
         if i >= 1 && i <= n {
             let r = i - 1;
             let c = j - 1;
