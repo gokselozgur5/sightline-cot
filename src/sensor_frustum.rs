@@ -263,13 +263,15 @@ pub fn compute_frustum_rays_enu(
     (b, corners)
 }
 
+pub type FrustumFootprintResult = ([f64; 3], f64, Vec<[f64; 3]>);
+
 /// Compute ENU boresight and 4 corner ground intersection points.
 pub fn compute_frustum_ground_enu(
     platform: &PlatformPose,
     gimbal: &SensorGimbal,
     config: &SensorFrustumConfig,
     ground_alt_hae_m: f64,
-) -> Result<([f64; 3], f64, Vec<[f64; 3]>), FrustumError> {
+) -> Result<FrustumFootprintResult, FrustumError> {
     let sensor_h = platform.alt_hae_m - ground_alt_hae_m;
     let (b_enu, corner_rays) = compute_frustum_rays_enu(
         platform.heading_deg + gimbal.azimuth_deg,

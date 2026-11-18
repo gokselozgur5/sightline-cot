@@ -46,7 +46,7 @@ impl EmergencyType {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse(s: &str) -> Self {
         match s {
             "911 Alert" => Self::Alert911,
             "Mayday" => Self::Mayday,
@@ -320,7 +320,7 @@ impl EmergencyBeacon {
         Ok(Self {
             uid: uid.to_string(),
             callsign: callsign.to_string(),
-            emergency_type: EmergencyType::from_str(etype_s),
+            emergency_type: EmergencyType::parse(etype_s),
             severity: if cancel {
                 EmergencySeverity::Low
             } else {
