@@ -16,14 +16,20 @@ impl LocalPoint {
 
     /// Projects geodetic points into a local tangent plane.
     pub fn project_all(points: &[[f64; 2]]) -> Vec<Self> {
-        if points.is_empty() {
-            return Vec::new();
-        }
-        let (lat0, lon0) = (points[0][0], points[0][1]);
-        let cos0 = lat0.to_radians().cos().max(1e-6);
-        points
+        let finite_points: Vec<(usize, &[f64; 2])> = points
             .iter()
             .enumerate()
+            .filter(|(_, p)| p[0].is_finite() && p[1].is_finite())
+            .collect();
+
+        if finite_points.is_empty() {
+            return Vec::new();
+        }
+
+        let (lat0, lon0) = (finite_points[0].1[0], finite_points[0].1[1]);
+        let cos0 = lat0.to_radians().cos().max(1e-6);
+        finite_points
+            .into_iter()
             .map(|(idx, p)| {
                 let mut dlon = p[1] - lon0;
                 if dlon > 180.0 {
