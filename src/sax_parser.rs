@@ -524,7 +524,7 @@ impl CotSaxParser {
                         }
                     }
                 }
-                SaxEvent::EndElement { name } if name == "event" => {
+                SaxEvent::EndElement { name: "event" } => {
                     if let Some(evt) = current_event.take() {
                         events.push(evt);
                     }
