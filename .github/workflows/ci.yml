@@ -19,3 +19,13 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
       - name: Run tests
         run: cargo test --all-targets
+      - name: Build static library
+        run: cargo build --release
+      - name: Compile and run C test
+        run: |
+          cat <<EOF > test.c
+          #include "include/sightline.h"
+          int main() { return 0; }
+          EOF
+          cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline -o test
+          ./test
