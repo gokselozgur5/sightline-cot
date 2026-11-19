@@ -652,20 +652,7 @@ fn decode_numeric_char_ref(ent: &str) -> Option<char> {
 }
 
 fn escape_xml_attr_val(s: &str) -> String {
-    let mut out = String::with_capacity(s.len() + 10);
-    for c in s.chars() {
-        match c {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            '\n' => out.push_str("&#10;"),
-            '\r' => out.push_str("&#13;"),
-            '\t' => out.push_str("&#9;"),
-            other => out.push(other),
-        }
-    }
-    out
+    crate::cot::escape_xml_attr(s)
 }
 
 fn escape_xml_text(s: &str) -> String {
