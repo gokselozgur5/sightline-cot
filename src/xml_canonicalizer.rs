@@ -608,34 +608,7 @@ fn parse_attributes_list(mut s: &str, el_name: &str) -> Result<Vec<XmlAttribute>
 }
 
 fn unescape_xml_entities(s: &str) -> String {
-    let mut out = String::with_capacity(s.len());
-    let mut rest = s;
-    while let Some(idx) = rest.find('&') {
-        out.push_str(&rest[..idx]);
-        let rem = &rest[idx..];
-        if let Some(semi) = rem.find(';') {
-            match &rem[..=semi] {
-                "&quot;" => out.push('"'),
-                "&apos;" => out.push('\''),
-                "&lt;" => out.push('<'),
-                "&gt;" => out.push('>'),
-                "&amp;" => out.push('&'),
-                other => {
-                    if let Some(c) = decode_numeric_char_ref(other) {
-                        out.push(c);
-                    } else {
-                        out.push_str(other);
-                    }
-                }
-            }
-            rest = &rem[semi + 1..];
-        } else {
-            out.push_str(rem);
-            return out;
-        }
-    }
-    out.push_str(rest);
-    out
+    crate::cot::unescape_xml_attr(s)
 }
 
 fn decode_numeric_char_ref(ent: &str) -> Option<char> {
