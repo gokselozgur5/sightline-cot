@@ -398,7 +398,10 @@ impl MultiTargetTracker {
             trk.bbox.iou(&det.bbox),
             cosine_distance(&trk.embedding, &det.embedding),
         );
-        if iou_val >= 0.1 || cos_dist <= 0.4 {
+        let has_appearance =
+            (det.bbox.x2 - det.bbox.x1).max(0.0) * (det.bbox.y2 - det.bbox.y1).max(0.0) > 1e-12
+                || det.embedding.iter().any(|&x| x != 0.0);
+        if !has_appearance || iou_val >= 0.1 || cos_dist <= 0.4 {
             Some(d2 + cos_dist)
         } else {
             None
