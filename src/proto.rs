@@ -272,8 +272,12 @@ impl TakCotEvent {
                     .to_string()
             }
             (3, WireType::Varint) | (6, WireType::Varint) => self.send_time = decode_varint(raw)?.0,
-            (4, WireType::Varint) | (7, WireType::Varint) => self.start_time = decode_varint(raw)?.0,
-            (5, WireType::Varint) | (8, WireType::Varint) => self.stale_time = decode_varint(raw)?.0,
+            (4, WireType::Varint) | (7, WireType::Varint) => {
+                self.start_time = decode_varint(raw)?.0
+            }
+            (5, WireType::Varint) | (8, WireType::Varint) => {
+                self.stale_time = decode_varint(raw)?.0
+            }
             (6, WireType::LengthDelimited) | (9, WireType::LengthDelimited) => {
                 self.how = std::str::from_utf8(raw)
                     .map_err(|_| ProtoError::InvalidUtf8)?
