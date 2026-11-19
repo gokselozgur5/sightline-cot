@@ -92,13 +92,13 @@ impl MilStdAffiliation {
 impl MilStdAffiliation {
     pub fn to_2525d_code(&self) -> &'static str {
         match self {
-            Self::Pending => "01",
-            Self::Unknown => "02",
+            Self::Pending => "00",
+            Self::Unknown => "01",
+            Self::AssumedFriend => "02",
             Self::Friend => "03",
-            Self::AssumedFriend => "04",
-            Self::Neutral => "05",
+            Self::Neutral => "04",
+            Self::Suspect => "05",
             Self::Hostile => "06",
-            Self::Suspect => "07",
             Self::Joker => "08",
             Self::Faker => "09",
         }
