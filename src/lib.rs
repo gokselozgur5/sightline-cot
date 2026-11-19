@@ -181,7 +181,7 @@ pub use geo_los::{
 pub use geo_ups::{ups_to_wgs84, wgs84_to_ups, UpsCoord, UpsError, UpsHemisphere};
 pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
-pub const VERSION: &str = "0.1.0";
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg(test)]
 mod tests {
