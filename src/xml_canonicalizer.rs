@@ -728,7 +728,7 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
         }
     }
 
-    root.ok_or_else(|| CotValidationError::MissingRequiredElement("event"))
+    root.ok_or(CotValidationError::MissingRequiredElement("event"))
 }
 
 fn serialize_node(
@@ -860,8 +860,10 @@ mod tests {
     #[test]
     fn test_canonicalize_non_self_closing() {
         let xml = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
-        let mut opts = CanonicalizeOptions::default();
-        opts.self_closing_tags = false;
+        let opts = CanonicalizeOptions {
+            self_closing_tags: false,
+            ..Default::default()
+        };
         let canon = CotXmlCanonicalizer::canonicalize_with_options(xml, &opts).unwrap();
         assert!(canon.contains("<point ce=\"0.0\" hae=\"0.0\" lat=\"0.0\" le=\"0.0\" lon=\"0.0\"></point>"));
     }
