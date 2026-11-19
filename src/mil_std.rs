@@ -312,12 +312,13 @@ impl MilStdSymbol {
         let status_ch = s.chars().nth(6).unwrap_or('0');
         let status = MilStdStatus::from_char(status_ch)?;
         let echelon = MilStdEchelon::from_2525d_code(&s[8..10])?;
-        let mut sym = Self::default();
-        sym.affiliation = aff;
-        sym.dimension = dim;
-        sym.status = status;
-        sym.echelon = echelon;
-        Ok(sym)
+        Ok(Self {
+            affiliation: aff,
+            dimension: dim,
+            status,
+            echelon,
+            ..Default::default()
+        })
     }
 }
 
