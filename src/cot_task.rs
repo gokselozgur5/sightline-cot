@@ -151,6 +151,14 @@ impl TaskStatus {
     }
 }
 
+impl std::str::FromStr for TaskStatus {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self::parse_str(s))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct TaskPoint {
     pub order: u32,
@@ -265,7 +273,7 @@ impl TaskPoint {
             pt = pt.with_hae(h)?;
         }
         if let Some(act_s) = extract_attr(xml, "action") {
-            pt = pt.with_action(TaskAction::from_str(&act_s));
+            pt = pt.with_action(TaskAction::parse_str(&act_s));
         }
         if let Some(s_s) = extract_attr(xml, "speed") {
             let s = s_s.parse::<f64>().map_err(|_| CotTaskError::InvalidParameter("speed"))?;
@@ -412,8 +420,8 @@ impl TacticalTask {
         let header = &xml[t_start..t_start + header_end];
         let name = extract_attr(header, "name").unwrap_or_else(|| "task".into());
         let task_type = extract_attr(header, "type").unwrap_or_else(|| "route".into());
-        let priority = extract_attr(header, "priority").map(|p| TaskPriority::from_str(&p)).unwrap_or_default();
-        let status = extract_attr(header, "status").map(|s| TaskStatus::from_str(&s)).unwrap_or_default();
+        let priority = extract_attr(header, "priority").map(|p| TaskPriority::parse_str(&p)).unwrap_or_default();
+        let status = extract_attr(header, "status").map(|s| TaskStatus::parse_str(&s)).unwrap_or_default();
 
         let mut points = Vec::new();
         let mut rest = &xml[t_start + header_end..];
