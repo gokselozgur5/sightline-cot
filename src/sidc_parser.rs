@@ -150,6 +150,10 @@ pub enum SymbolStatus {
     #[default]
     Present = 0,
     Planned = 1,
+    PresentFullyCapable = 2,
+    PresentDamaged = 3,
+    PresentDestroyed = 4,
+    PresentFullToCapacity = 5,
 }
 
 impl SymbolStatus {
@@ -157,6 +161,10 @@ impl SymbolStatus {
         match val {
             0 => Ok(Self::Present),
             1 => Ok(Self::Planned),
+            2 => Ok(Self::PresentFullyCapable),
+            3 => Ok(Self::PresentDamaged),
+            4 => Ok(Self::PresentDestroyed),
+            5 => Ok(Self::PresentFullToCapacity),
             _ => Err(SidcParseError::InvalidStatus),
         }
     }
