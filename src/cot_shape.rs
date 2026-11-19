@@ -148,7 +148,13 @@ impl CotShape {
     pub fn centroid(&self) -> [f64; 2] {
         let n = self.vertices.len() as f64;
         let lat = self.vertices.iter().map(|v| v.lat).sum::<f64>() / n;
-        let lon = self.vertices.iter().map(|v| v.lon).sum::<f64>() / n;
+        let ref_lon = self.vertices.first().map(|v| v.lon).unwrap_or(0.0);
+        let sum_unwrapped: f64 = self
+            .vertices
+            .iter()
+            .map(|v| ref_lon + (v.lon - ref_lon + 180.0).rem_euclid(360.0) - 180.0)
+            .sum();
+        let lon = (sum_unwrapped / n + 180.0).rem_euclid(360.0) - 180.0;
         [lat, lon]
     }
 }
