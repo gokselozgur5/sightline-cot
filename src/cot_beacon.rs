@@ -304,6 +304,13 @@ impl EmergencyBeacon {
             .unwrap_or("");
         let etype_s = extract_attr(em_tag, "type").unwrap_or("911 Alert");
         let desc = extract_tag_content(xml, "emergency").map(|s| s.to_string());
+        let time_ms = extract_attr(xml, "time")
+            .and_then(|t| crate::cot::parse_iso8601_utc(t).ok())
+            .unwrap_or(0);
+        let stale_sec = extract_attr(xml, "stale")
+            .and_then(|s| crate::cot::parse_iso8601_utc(s).ok())
+            .map(|stale_ms| (stale_ms - time_ms).max(0) / 1000)
+            .unwrap_or(120);
         Ok(Self {
             uid: uid.to_string(),
             callsign: callsign.to_string(),
@@ -325,8 +332,8 @@ impl EmergencyBeacon {
             le_m: extract_attr(xml, "le")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(10.0),
-            time_ms: 0,
-            stale_sec: 120,
+            time_ms,
+            stale_sec,
             details: desc,
         })
     }
