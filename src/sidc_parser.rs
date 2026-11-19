@@ -90,12 +90,12 @@ pub enum SymbolSet {
     #[default]
     LandUnit = 10,
     LandCivilian = 11,
-    LandEquipment = 12,
-    LandInstallation = 15,
-    SeaSurface = 20,
-    Subsurface = 25,
-    Activity = 30,
-    Cyberspace = 40,
+    LandEquipment = 15,
+    LandInstallation = 20,
+    SeaSurface = 30,
+    Subsurface = 35,
+    Activity = 40,
+    Cyberspace = 60,
 }
 
 impl SymbolSet {
@@ -107,12 +107,12 @@ impl SymbolSet {
             5 => Ok(Self::Space),
             10 => Ok(Self::LandUnit),
             11 => Ok(Self::LandCivilian),
-            12 => Ok(Self::LandEquipment),
-            15 => Ok(Self::LandInstallation),
-            20 => Ok(Self::SeaSurface),
-            25 => Ok(Self::Subsurface),
-            30 => Ok(Self::Activity),
-            40 => Ok(Self::Cyberspace),
+            15 => Ok(Self::LandEquipment),
+            20 => Ok(Self::LandInstallation),
+            30 => Ok(Self::SeaSurface),
+            35 => Ok(Self::Subsurface),
+            40 => Ok(Self::Activity),
+            60 => Ok(Self::Cyberspace),
             _ => Err(SidcParseError::InvalidSymbolSet),
         }
     }
