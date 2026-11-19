@@ -141,12 +141,13 @@ impl StanagTimestamp {
             return Err(StanagError::NegativeTimestamp);
         }
         let mut micros = (ms as u64) * 1_000;
+        let s = s.trim();
         if let Some(dot_idx) = s.find('.') {
             let frac = s[dot_idx + 1..].trim_end_matches('Z');
-            if frac.len() >= 6 {
-                if let Ok(extra_us) = frac[3..6].parse::<u64>() {
-                    micros += extra_us;
-                }
+            let digits: String = frac.chars().take_while(|c| c.is_ascii_digit()).collect();
+            let padded = format!("{:0<6}", digits);
+            if let Ok(extra_us) = padded[3..6].parse::<u64>() {
+                micros += extra_us;
             }
         }
         Ok(Self::from_micros(micros))
