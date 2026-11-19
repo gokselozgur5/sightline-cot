@@ -230,24 +230,7 @@ fn escape_xml(s: &str) -> String {
 }
 
 fn format_iso8601(epoch_ms: i64) -> String {
-    let total_secs = epoch_ms / 1000;
-    let days = total_secs / 86400;
-    let rem_secs = total_secs % 86400;
-    let hours = rem_secs / 3600;
-    let mins = (rem_secs % 3600) / 60;
-    let secs = rem_secs % 60;
-    let (year, month, day) = days_to_ymd(days);
-    format!("{year:04}-{month:02}-{day:02}T{hours:02}:{mins:02}:{secs:02}Z")
-}
-
-fn days_to_ymd(days: i64) -> (i64, i64, i64) {
-    let mut y = 1970 + days / 365;
-    let mut d = days % 365;
-    if d < 0 {
-        d += 365;
-        y -= 1;
-    }
-    (y, 1, (d % 28) + 1)
+    crate::cot::format_iso8601_utc(epoch_ms)
 }
 
 impl EmergencyBeacon {
