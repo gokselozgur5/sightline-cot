@@ -30,6 +30,10 @@ typedef struct SightlineEngine SightlineEngine;
 typedef struct {
     double fx, fy, cx, cy, k1, k2;
     int32_t is_fisheye;
+    /* roll_rad: roll about optical axis (rad).
+     * pitch_rad: pitch elevation angle (rad).
+     * yaw_rad: counter-clockwise rotation about ENU Up axis (rad; 0 = East, +pi/2 = North).
+     * Note: unlike platform heading/azimuth (clockwise from North), yaw_rad is CCW from East. */
     double roll_rad, pitch_rad, yaw_rad, cam_up_m, ground_up_m;
     double pixel_sigma_px, attitude_sigma_rad;
     double ref_lat_deg, ref_lon_deg, ref_hae_m;
