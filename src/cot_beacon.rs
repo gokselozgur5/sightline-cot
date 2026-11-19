@@ -262,7 +262,7 @@ impl EmergencyBeacon {
 }
 
 fn extract_attr<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
-    let key = format!("{name}=\"");
+    let key = format!(" {name}=\"");
     let start = tag.find(&key)? + key.len();
     let end = tag[start..].find('\"')? + start;
     Some(&tag[start..end])
@@ -277,9 +277,16 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
     Some(&xml[content_start..end])
 }
 
-fn parse_point_coords(xml: &str) -> Result<(f64, f64), CotBeaconError> {
-    let lat_s = extract_attr(xml, "lat").ok_or(CotBeaconError::MissingField("lat"))?;
-    let lon_s = extract_attr(xml, "lon").ok_or(CotBeaconError::MissingField("lon"))?;
+fn extract_tag<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
+    let open = format!("<{tag}");
+    let start = xml.find(&open)?;
+    let end = xml[start..].find('>')? + start;
+    Some(&xml[start..=end])
+}
+
+fn parse_point_coords(pt: &str) -> Result<(f64, f64), CotBeaconError> {
+    let lat_s = extract_attr(pt, "lat").ok_or(CotBeaconError::MissingField("lat"))?;
+    let lon_s = extract_attr(pt, "lon").ok_or(CotBeaconError::MissingField("lon"))?;
     let lat: f64 = lat_s
         .parse()
         .map_err(|_| CotBeaconError::InvalidCoordinate("lat"))?;
@@ -292,8 +299,9 @@ fn parse_point_coords(xml: &str) -> Result<(f64, f64), CotBeaconError> {
 
 impl EmergencyBeacon {
     pub fn from_cot_xml(xml: &str) -> Result<Self, CotBeaconError> {
+        let pt = extract_tag(xml, "point").unwrap_or("");
         let uid = extract_attr(xml, "uid").ok_or(CotBeaconError::MissingField("uid"))?;
-        let (lat, lon) = parse_point_coords(xml)?;
+        let (lat, lon) = parse_point_coords(pt)?;
         let callsign = extract_attr(xml, "callsign").unwrap_or("UNKNOWN");
         let cancel = extract_attr(xml, "cancel")
             .map(|c| c == "true")
@@ -323,13 +331,13 @@ impl EmergencyBeacon {
             cancel,
             lat_deg: lat,
             lon_deg: lon,
-            hae_m: extract_attr(xml, "hae")
+            hae_m: extract_attr(pt, "hae")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(0.0),
-            ce_m: extract_attr(xml, "ce")
+            ce_m: extract_attr(pt, "ce")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(10.0),
-            le_m: extract_attr(xml, "le")
+            le_m: extract_attr(pt, "le")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(10.0),
             time_ms,
