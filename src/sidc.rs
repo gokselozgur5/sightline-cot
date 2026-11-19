@@ -120,13 +120,13 @@ impl SidcAffiliation {
 impl SidcAffiliation {
     pub fn from_2525d_code(code: &str) -> Result<Self, SidcError> {
         match code {
-            "01" => Ok(Self::Pending),
-            "02" => Ok(Self::Unknown),
+            "00" => Ok(Self::Pending),
+            "01" => Ok(Self::Unknown),
+            "02" => Ok(Self::AssumedFriend),
             "03" => Ok(Self::Friend),
-            "04" => Ok(Self::AssumedFriend),
-            "05" => Ok(Self::Neutral),
+            "04" => Ok(Self::Neutral),
+            "05" => Ok(Self::Suspect),
             "06" => Ok(Self::Hostile),
-            "07" => Ok(Self::Suspect),
             "08" => Ok(Self::Joker),
             "09" => Ok(Self::Faker),
             _ => Err(SidcError::InvalidAffiliation),
