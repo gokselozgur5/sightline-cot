@@ -171,6 +171,25 @@ pub const MISB_0601_UNIVERSAL_KEY: [u8; 16] = [
     0x06, 0x0E, 0x2B, 0x34, 0x02, 0x0B, 0x01, 0x01, 0x0E, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00,
 ];
 
+fn parse_ber_len(slice: &[u8]) -> Result<(usize, usize), StanagError> {
+    if slice.is_empty() {
+        return Err(StanagError::BufferTooShort);
+    }
+    let first = slice[0];
+    if first < 0x80 {
+        return Ok((first as usize, 1));
+    }
+    let n = (first & 0x7F) as usize;
+    if n == 0 || slice.len() < 1 + n {
+        return Err(StanagError::BufferTooShort);
+    }
+    let mut len = 0usize;
+    for &b in &slice[1..=n] {
+        len = (len << 8) | (b as usize);
+    }
+    Ok((len, 1 + n))
+}
+
 impl StanagTimestamp {
     /// Format standalone MISB ST 0601 KLV packet containing this timestamp.
     pub fn to_klv_packet(&self) -> Vec<u8> {
