@@ -13,16 +13,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: Cargo fmt check
         run: cargo fmt --all -- --check
-  build:
-    runs-on: macos-latest
+
+  clippy:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup toolchain install stable && rustup default stable
-      - name: Cargo fmt check
-        run: cargo fmt --all -- --check
       - name: Cargo clippy
         run: cargo clippy --all-targets -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup toolchain install stable && rustup default stable
+      - name: Run tests
+        run: cargo test --all-targets
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup toolchain install stable && rustup default stable
       - name: Run tests
         run: cargo test --all-targets
       - name: Build static library
@@ -35,3 +49,4 @@ jobs:
           EOF
           cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline -o test
           ./test
+
