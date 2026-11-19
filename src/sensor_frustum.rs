@@ -30,6 +30,7 @@ impl std::error::Error for FrustumError {}
 
 
 /// Position and orientation of the sensor host platform.
+/// Heading is clockwise from North (degrees).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PlatformPose {
     pub lat_deg: f64,
