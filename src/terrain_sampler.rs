@@ -125,6 +125,7 @@ impl GeoTiffElevationGrid {
     }
 
     /// Construct grid from raw floats, treating NaN and nodata sentinel as None.
+    #[allow(clippy::too_many_arguments)]
     pub fn from_raw(
         origin_x: f64,
         origin_y: f64,
