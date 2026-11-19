@@ -50,3 +50,15 @@ fn test_cot_task_empty_and_error_handling() {
     let bad_pt = TaskPoint::new(1, "ERR", 91.0, 0.0);
     assert!(matches!(bad_pt, Err(CotTaskError::InvalidCoordinate(_))));
 }
+
+#[test]
+fn eta_attribute_is_quoted_and_round_trips() {
+    let pt = TaskPoint::new(1, "WP1", 10.0, 20.0)
+        .unwrap()
+        .with_eta(1_700_000_000_000)
+        .with_remarks("hold");
+    let xml = pt.to_xml();
+    assert!(xml.contains("eta=\"1700000000000\""), "{xml}");
+    assert_eq!(TaskPoint::parse(&xml).unwrap().eta_ms, Some(1_700_000_000_000));
+}
+
