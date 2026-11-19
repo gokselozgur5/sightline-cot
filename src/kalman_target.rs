@@ -217,8 +217,8 @@ fn predict_step(x: &[f64; 6], cov: &[[f64; 6]; 6], dt: f64, q: f64) -> ([f64; 6]
     x_pred[2] += dt * x[5];
 
     let mut f = [[0.0; 6]; 6];
-    for i in 0..6 {
-        f[i][i] = 1.0;
+    for (i, row) in f.iter_mut().enumerate() {
+        row[i] = 1.0;
     }
     f[0][3] = dt;
     f[1][4] = dt;
@@ -698,8 +698,8 @@ mod tests {
     fn test_covariance_growth_over_time() {
         let x = [0.0; 6];
         let mut cov = [[0.0; 6]; 6];
-        for i in 0..6 {
-            cov[i][i] = 1.0;
+        for (i, row) in cov.iter_mut().enumerate() {
+            row[i] = 1.0;
         }
         let state = KinematicState::new(x, cov, 0).unwrap();
         let pred = state.extrapolate(5.0, 2.0).unwrap();
@@ -778,8 +778,10 @@ mod tests {
 
     #[test]
     fn test_gating_threshold_rejection() {
-        let mut cfg = TargetFilterConfig::default();
-        cfg.gate_threshold = 4.0;
+        let cfg = TargetFilterConfig {
+            gate_threshold: 4.0,
+            ..Default::default()
+        };
         let mut filter =
             TacticalTargetFilter::new("TGT-04", [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], 1.0, 1.0, 0, cfg)
                 .unwrap();
@@ -793,8 +795,10 @@ mod tests {
 
     #[test]
     fn test_max_coast_limit_exceeded() {
-        let mut cfg = TargetFilterConfig::default();
-        cfg.max_coast_sec = 10.0;
+        let cfg = TargetFilterConfig {
+            max_coast_sec: 10.0,
+            ..Default::default()
+        };
         let mut filter = TacticalTargetFilter::new(
             "TGT-05",
             [0.0, 0.0, 0.0],
