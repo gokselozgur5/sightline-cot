@@ -364,6 +364,21 @@ impl TakCotEvent {
     }
 }
 
+fn extract_tak_cot_payload(buf: &[u8]) -> &[u8] {
+    let mut cur = buf;
+    while let Ok((num, wire, tag_len)) = decode_tag(cur) {
+        if let Ok((raw, rem)) = skip_wire_field(wire, &cur[tag_len..]) {
+            if num == 2 && wire == WireType::LengthDelimited {
+                return raw;
+            }
+            cur = rem;
+        } else {
+            break;
+        }
+    }
+    buf
+}
+
 /// Decodes a framed TAK Protocol Version 1 packet (validating 0xBF magic byte).
 pub fn decode_tak_packet(packet: &[u8]) -> Result<TakCotEvent, ProtoError> {
     if packet.is_empty() || packet[0] != TAK_PROTO_MAGIC {
