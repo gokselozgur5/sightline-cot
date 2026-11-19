@@ -62,3 +62,12 @@ fn eta_attribute_is_quoted_and_round_trips() {
     assert_eq!(TaskPoint::parse(&xml).unwrap().eta_ms, Some(1_700_000_000_000));
 }
 
+#[test]
+fn custom_action_is_escaped_in_xml() {
+    let pt = TaskPoint::new(1, "WP1", 10.0, 20.0)
+        .unwrap()
+        .with_action(TaskAction::Custom("a\"b<c&d".to_string()));
+    let xml = pt.to_xml();
+    assert!(!xml.contains("a\"b<c"), "{xml}");
+    assert!(xml.contains("action=\"a&quot;b&lt;c&amp;d\""), "{xml}");
+}
