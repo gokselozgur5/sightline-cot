@@ -711,6 +711,12 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
                         root = Some(node);
                     }
                 } else {
+                    if stack.len() >= CotSchemaValidator::MAX_DEPTH {
+                        return Err(CotValidationError::MalformedXml(format!(
+                            "element nesting depth exceeds limit of {}",
+                            CotSchemaValidator::MAX_DEPTH
+                        )));
+                    }
                     stack.push((name, attributes, Vec::new()));
                 }
             }
