@@ -599,6 +599,9 @@ impl CotChunkStreamer {
                     if start_idx > 0 {
                         self.buffer.drain(..start_idx);
                     }
+                    if self.buffer.len() > self.max_event_size {
+                        self.buffer.drain(..self.buffer.len() - (end_pattern.len() - 1));
+                    }
                     break;
                 }
             };
