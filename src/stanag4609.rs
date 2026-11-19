@@ -229,6 +229,24 @@ impl StanagTimestamp {
         packet.extend_from_slice(&ck.to_be_bytes());
         packet
     }
+
+    /// Parse a standalone MISB ST 0601 KLV packet and extract the timestamp.
+    pub fn from_klv_packet(packet: &[u8]) -> Result<Self, StanagError> {
+        if packet.len() < 22 || &packet[..16] != &MISB_0601_UNIVERSAL_KEY {
+            return Err(StanagError::BufferTooShort);
+        }
+        let (body_len, len_bytes) = parse_ber_len(&packet[16..])?;
+        let offset = 16 + len_bytes;
+        if packet.len() < offset + body_len || body_len < 4 {
+            return Err(StanagError::BufferTooShort);
+        }
+        let full_len = offset + body_len;
+        let ck_bytes = [packet[full_len - 2], packet[full_len - 1]];
+        if compute_st0601_checksum(&packet[..full_len - 2]) != u16::from_be_bytes(ck_bytes) {
+            return Err(StanagError::InvalidChecksum);
+        }
+        scan_for_tag2(&packet[offset..full_len - 4])
+    }
 }
 
 #[cfg(test)]
