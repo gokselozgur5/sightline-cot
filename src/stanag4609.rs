@@ -190,6 +190,31 @@ fn parse_ber_len(slice: &[u8]) -> Result<(usize, usize), StanagError> {
     Ok((len, 1 + n))
 }
 
+fn scan_for_tag2(payload: &[u8]) -> Result<StanagTimestamp, StanagError> {
+    let mut idx = 0;
+    while idx < payload.len() {
+        let tag = payload[idx];
+        if idx + 1 >= payload.len() {
+            return Err(StanagError::BufferTooShort);
+        }
+        let (len, len_bytes) = parse_ber_len(&payload[idx + 1..])?;
+        let val_start = idx + 1 + len_bytes;
+        if payload.len() < val_start + len {
+            return Err(StanagError::BufferTooShort);
+        }
+        if tag == MISB_TAG_PRECISION_TIME_STAMP {
+            if len != (MISB_LEN_PRECISION_TIME_STAMP as usize) {
+                return Err(StanagError::InvalidKlvLength(len));
+            }
+            let mut val = [0u8; 8];
+            val.copy_from_slice(&payload[val_start..val_start + 8]);
+            return Ok(StanagTimestamp::from_be_bytes(val));
+        }
+        idx = val_start + len;
+    }
+    Err(StanagError::BufferTooShort)
+}
+
 impl StanagTimestamp {
     /// Format standalone MISB ST 0601 KLV packet containing this timestamp.
     pub fn to_klv_packet(&self) -> Vec<u8> {
