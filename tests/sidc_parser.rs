@@ -62,14 +62,17 @@ fn test_error_handling_on_invalid_sidc() {
 fn test_cot_bidirectional_mapping() {
     assert_eq!(sidc20_to_cot_type("10031000000000000000").unwrap(), "a-f-G");
     assert_eq!(sidc20_to_cot_type("10060100000000000000").unwrap(), "a-h-A");
-    assert_eq!(sidc20_to_cot_type("10042000000000000000").unwrap(), "a-n-S");
-    assert_eq!(sidc20_to_cot_type("10012500000000000000").unwrap(), "a-u-U");
+    let sea_track = sidc20_to_cot_type("10043000000000000000").unwrap();
+    assert_eq!(sea_track, "a-n-S");
+    let sub_track = sidc20_to_cot_type("10013500000000000000").unwrap();
+    assert_eq!(sub_track, "a-u-U");
 
     let sidc_air = cot_type_to_sidc20("a-h-A").unwrap();
     assert_eq!(&sidc_air[3..6], "601");
 
     let sidc_ground = cot_type_to_sidc20("a-f-G-E").unwrap();
-    assert_eq!(&sidc_ground[3..6], "312");
+    let ground_code = &sidc_ground[3..6];
+    assert_eq!(ground_code, "315");
 
     assert_eq!(
         cot_type_to_sidc20("invalid"),
