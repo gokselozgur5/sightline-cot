@@ -250,7 +250,7 @@ impl TaskPoint {
             xml.push_str(&format!(r#" speed="{:.2}""#, spd));
         }
         if let Some(eta) = self.eta_ms {
-            xml.push_str(&format!(r#" eta="{}"#, eta));
+            xml.push_str(&format!(r#" eta="{}""#, eta));
         }
         if let Some(rem) = &self.remarks {
             xml.push_str(&format!(r#" remarks="{}""#, crate::cot::escape_xml_attr(rem)));
@@ -499,6 +499,7 @@ mod tests {
         assert_eq!(parsed.action, TaskAction::Ingress);
         assert_eq!(parsed.hae, Some(1500.0));
         assert_eq!(parsed.speed_mps, Some(120.5));
+        assert_eq!(parsed.eta_ms, Some(1700000000));
     }
 
     #[test]
