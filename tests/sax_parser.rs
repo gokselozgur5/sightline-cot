@@ -56,3 +56,9 @@ fn test_integration_chunk_streamer_reassembly() {
     assert_eq!(parsed.len(), 1);
     assert_eq!(parsed[0].uid, "T1");
 }
+
+#[test]
+fn markup_declaration_with_multibyte_char_is_an_error_not_a_panic() {
+    let xml = "<event uid=\"U\"><!aaaaaa\u{e9}></event>";
+    assert!(CotSaxParser::parse_events(xml).is_err());
+}
