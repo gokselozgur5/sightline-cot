@@ -249,7 +249,7 @@ impl CotCircle {
         let mut circle = Self::new(lat, lon, radius)?;
         circle.hae = hae;
         if let Some(c) = xml.find("<contact").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
-            circle.callsign = extract_attr(c, "callsign");
+            circle.callsign = extract_attr(c, "callsign").map(|s| crate::cot::unescape_xml_attr(&s));
         }
         if let Some(s) = xml.find("<strokeColor").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
             circle.stroke_color = extract_attr(s, "value").and_then(|v| v.parse().ok());
@@ -260,7 +260,7 @@ impl CotCircle {
         if let Some(f) = xml.find("<fillColor").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
             circle.fill_color = extract_attr(f, "value").and_then(|v| v.parse().ok());
         }
-        circle.remarks = extract_tag_content(xml, "remarks").map(|s| s.to_string());
+        circle.remarks = extract_tag_content(xml, "remarks").map(|s| crate::cot::unescape_xml_attr(s));
         Ok(circle)
     }
 }
