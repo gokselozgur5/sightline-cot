@@ -60,3 +60,17 @@ fn test_klv_error_handling() {
         Err(sightline_cot::stanag4609::StanagError::InvalidKlvLength(4))
     ));
 }
+
+#[test]
+fn test_klv_packet_roundtrip_and_checksum_verification() {
+    let ts = StanagTimestamp::from_micros(1_700_000_000_123_456);
+    let mut packet = ts.to_klv_packet();
+    assert_eq!(StanagTimestamp::from_klv_packet(&packet), Ok(ts));
+
+    let len = packet.len();
+    packet[len - 1] ^= 0xFF;
+    assert_eq!(
+        StanagTimestamp::from_klv_packet(&packet),
+        Err(sightline_cot::stanag4609::StanagError::InvalidChecksum)
+    );
+}
