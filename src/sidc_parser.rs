@@ -189,6 +189,20 @@ pub enum Echelon {
     Division = 21,
     Corps = 22,
     Army = 23,
+    ArmyGroup = 24,
+    Region = 25,
+    Command = 26,
+    WheeledLimited = 31,
+    WheeledCrossCountry = 32,
+    Tracked = 33,
+    WheeledTrackedCombination = 34,
+    Towed = 35,
+    Rail = 36,
+    PackAnimals = 37,
+    OverSnow = 41,
+    Sled = 42,
+    Amphibious = 51,
+    TowedArray = 52,
 }
 
 impl Echelon {
