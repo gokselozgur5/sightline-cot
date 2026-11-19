@@ -4,11 +4,15 @@ use std::fmt;
 use std::io::Write;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs, UdpSocket};
 
-/// Non-blocking/reconnecting TCP streamer to a TAK Server endpoint.
+/// Reconnecting TCP streamer to a TAK Server endpoint.
+///
+/// Writes are bounded by a configurable timeout (default 2 seconds); on
+/// timeout the connection is dropped and a network error is returned.
 #[derive(Debug)]
 pub struct CotTcpStreamer {
     server_addr: SocketAddr,
     stream: Option<TcpStream>,
+    write_timeout: std::time::Duration,
 }
 
 /// Errors produced during CoT parsing, validation, or dispatch.
@@ -560,7 +564,13 @@ impl CotTcpStreamer {
         Ok(Self {
             server_addr,
             stream: None,
+            write_timeout: std::time::Duration::from_secs(2),
         })
+    }
+
+    /// Sets the write timeout applied to connections made after this call.
+    pub fn set_write_timeout(&mut self, timeout: std::time::Duration) {
+        self.write_timeout = timeout;
     }
 
     pub fn server_addr(&self) -> SocketAddr {
@@ -578,6 +588,7 @@ impl CotTcpStreamer {
             Ok(s) => {
                 let _ = s.set_nonblocking(false);
                 let _ = s.set_nodelay(true);
+                let _ = s.set_write_timeout(Some(self.write_timeout));
                 self.stream = Some(s);
                 Ok(())
             }
