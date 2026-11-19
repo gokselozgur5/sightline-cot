@@ -533,17 +533,33 @@ impl CotSaxParser {
     }
 }
 
+/// Default maximum size (1 MiB) for a single buffered CoT event.
+pub const DEFAULT_MAX_EVENT_SIZE: usize = 1024 * 1024;
+
 /// Buffer-based chunk streaming receiver for fragmented CoT data streams.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct CotChunkStreamer {
     buffer: String,
+    max_event_size: usize,
+}
+
+impl Default for CotChunkStreamer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CotChunkStreamer {
-    /// Create a new empty chunk streamer.
+    /// Create a new empty chunk streamer with the default size limit.
     pub fn new() -> Self {
+        Self::with_max_event_size(DEFAULT_MAX_EVENT_SIZE)
+    }
+
+    /// Create a new chunk streamer with a custom maximum event size.
+    pub fn with_max_event_size(max_event_size: usize) -> Self {
         Self {
             buffer: String::new(),
+            max_event_size,
         }
     }
 
