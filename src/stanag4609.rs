@@ -8,16 +8,20 @@ pub enum StanagError {
     InvalidKlvLength(usize),
     BufferTooShort,
     InvalidIso8601(String),
+    InvalidChecksum,
 }
 
 impl std::fmt::Display for StanagError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::NegativeTimestamp => write!(f, "timestamp cannot be negative"),
-            Self::InvalidKlvTag(t) => write!(f, "invalid KLV tag: 0x{t:02X}, expected Tag 2 (0x02)"),
+            Self::InvalidKlvTag(t) => {
+                write!(f, "invalid KLV tag: 0x{t:02X}, expected Tag 2 (0x02)")
+            }
             Self::InvalidKlvLength(len) => write!(f, "invalid KLV length: {len}, expected 8"),
             Self::BufferTooShort => write!(f, "buffer is too short for KLV timestamp"),
             Self::InvalidIso8601(s) => write!(f, "invalid ISO 8601 date string: {s}"),
+            Self::InvalidChecksum => write!(f, "invalid ST 0601 checksum"),
         }
     }
 }
@@ -165,7 +169,6 @@ impl StanagTimestamp {
         packet
     }
 }
-
 
 #[cfg(test)]
 mod tests {
