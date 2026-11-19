@@ -50,7 +50,7 @@ fn test_ups_validation_and_errors() {
 
 #[test]
 fn test_ups_root_exports() {
-    use sightline_cot::{wgs84_to_ups, ups_to_wgs84, UpsCoord, UpsHemisphere};
+    use sightline_cot::{wgs84_to_ups, ups_to_wgs84};
     let ups = wgs84_to_ups(89.0, 10.0).unwrap();
     let (lat, lon) = ups_to_wgs84(ups).unwrap();
     assert!((lat - 89.0).abs() < 1e-5);
