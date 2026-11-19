@@ -7,6 +7,12 @@ on:
     branches: [main]
 
 jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cargo fmt check
+        run: cargo fmt --all -- --check
   build:
     runs-on: macos-latest
     steps:
