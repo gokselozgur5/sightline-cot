@@ -264,6 +264,7 @@ pub fn compute_frustum_rays_enu(
 }
 
 /// Compute ENU boresight and 4 corner ground intersection points.
+#[allow(clippy::type_complexity)]
 pub fn compute_frustum_ground_enu(
     platform: &PlatformPose,
     gimbal: &SensorGimbal,
