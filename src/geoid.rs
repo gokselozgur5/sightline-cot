@@ -167,6 +167,7 @@ impl GeoidGrid {
 }
 
 impl GeoidGrid {
+    #[allow(clippy::too_many_arguments)]
     pub fn from_f64(
         min_lat_deg: f64,
         min_lon_deg: f64,
