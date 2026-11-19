@@ -504,7 +504,7 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
             let next_tag = rest.find('<').unwrap_or(rest.len());
             let text = &rest[..next_tag];
             if !text.is_empty() {
-                tokens.push(RawXmlToken::Text(text.to_string()));
+                tokens.push(RawXmlToken::Text(unescape_xml_entities(text)));
             }
             rest = &rest[next_tag..];
         }
