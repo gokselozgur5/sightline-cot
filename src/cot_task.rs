@@ -60,7 +60,7 @@ impl TaskAction {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s {
             "flyover" => Self::FlyOver,
             "flyby" => Self::FlyBy,
@@ -74,6 +74,14 @@ impl TaskAction {
             "rendezvous" => Self::Rendezvous,
             other => Self::Custom(other.to_string()),
         }
+    }
+}
+
+impl std::str::FromStr for TaskAction {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self::parse_str(s))
     }
 }
 
@@ -96,13 +104,21 @@ impl TaskPriority {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s {
             "priority" => Self::Priority,
             "immediate" => Self::Immediate,
             "flash" => Self::Flash,
             _ => Self::Routine,
         }
+    }
+}
+
+impl std::str::FromStr for TaskPriority {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self::parse_str(s))
     }
 }
 
@@ -125,7 +141,7 @@ impl TaskStatus {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_str(s: &str) -> Self {
         match s {
             "in_progress" => Self::InProgress,
             "completed" => Self::Completed,
