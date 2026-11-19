@@ -259,7 +259,7 @@ impl TacticalSymbol {
         if !trimmed.is_ascii() {
             return Err(SidcError::InvalidCharacter);
         }
-        if trimmed.len() == 30 {
+        if trimmed.len() == 20 || trimmed.len() == 30 {
             Self::parse_2525d(trimmed)
         } else if trimmed.len() == 15 {
             Self::parse_2525c(trimmed)
