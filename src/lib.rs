@@ -172,13 +172,11 @@ pub use geohash_neighbors::{
     geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
 pub mod geohash;
-pub mod geo_ups;
 pub mod geo_los;
 pub use geo_los::{
     compute_geo_los, elevation_angle_rad, has_line_of_sight, horizon_distance_m,
     slant_range_geodetic, GeoLosError, GeoPoint3D, LosGeometry,
 };
-pub use geo_ups::{ups_to_wgs84, wgs84_to_ups, UpsCoord, UpsError, UpsHemisphere};
 pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
 pub const VERSION: &str = "0.1.0";
@@ -267,3 +265,5 @@ pub use sax_parser::{
     CotChunkStreamer, CotEventView, CotPointView, CotSaxParser, SaxAttribute, SaxAttributes,
     SaxAttributesIter, SaxError, SaxEvent, SaxReader,
 };
+pub mod geo_ups;
+pub use geo_ups::{ups_to_wgs84, wgs84_to_ups, UpsCoord, UpsError, UpsHemisphere};
