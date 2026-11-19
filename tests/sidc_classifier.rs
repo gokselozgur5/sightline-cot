@@ -1,13 +1,13 @@
 use sightline_cot::sidc::{SidcAffiliation, SidcDomain, SidcError, TacticalSymbol};
 
 const AFFILIATIONS: [(SidcAffiliation, &str, char); 9] = [
-    (SidcAffiliation::Pending, "01", 'P'),
-    (SidcAffiliation::Unknown, "02", 'U'),
+    (SidcAffiliation::Pending, "00", 'P'),
+    (SidcAffiliation::Unknown, "01", 'U'),
+    (SidcAffiliation::AssumedFriend, "02", 'A'),
     (SidcAffiliation::Friend, "03", 'F'),
-    (SidcAffiliation::AssumedFriend, "04", 'A'),
-    (SidcAffiliation::Neutral, "05", 'N'),
+    (SidcAffiliation::Neutral, "04", 'N'),
+    (SidcAffiliation::Suspect, "05", 'S'),
     (SidcAffiliation::Hostile, "06", 'H'),
-    (SidcAffiliation::Suspect, "07", 'S'),
     (SidcAffiliation::Joker, "08", 'J'),
     (SidcAffiliation::Faker, "09", 'K'),
 ];
