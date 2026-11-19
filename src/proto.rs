@@ -286,11 +286,11 @@ impl TakCotEvent {
         if wire == WireType::Fixed64 {
             let val = decode_fixed64(raw)?.0;
             match num {
-                7 => self.lat = val,
-                8 => self.lon = val,
-                9 => self.hae = val,
-                10 => self.ce = val,
-                11 => self.le = val,
+                10 => self.lat = val,
+                11 => self.lon = val,
+                12 => self.hae = val,
+                13 => self.ce = val,
+                14 => self.le = val,
                 _ => {}
             }
         }
@@ -300,11 +300,8 @@ impl TakCotEvent {
 
 impl TakCotEvent {
     fn decode_field(&mut self, num: u32, wire: WireType, raw: &[u8]) -> Result<(), ProtoError> {
-        if num <= 6 {
-            self.decode_field_str_time(num, wire, raw)
-        } else {
-            self.decode_field_fixed64(num, wire, raw)
-        }
+        self.decode_field_str_time(num, wire, raw)?;
+        self.decode_field_fixed64(num, wire, raw)
     }
 }
 
