@@ -252,7 +252,12 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
     let mut a = vec![vec![0.0; k + 1]; k + 1];
     for i in 0..k {
         for j in 0..k {
-            let val = if i < n && j < m { mat.get(i, j).unwrap_or(dummy) } else { dummy };
+            let val = if i < n && j < m {
+                let cost = mat.get(i, j).unwrap_or(dummy);
+                if cost <= gate { cost } else { dummy }
+            } else {
+                dummy
+            };
             a[i + 1][j + 1] = val;
         }
     }
