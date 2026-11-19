@@ -22,6 +22,8 @@ fn test_911_beacon_xml_roundtrip() {
     assert_eq!(parsed.uid, "UID-911");
     assert_eq!(parsed.callsign, "MEDEVAC-1");
     assert_eq!(parsed.emergency_type, EmergencyType::Alert911);
+    assert_eq!(parsed.time_ms, 0);
+    assert_eq!(parsed.stale_sec, 120);
 }
 
 #[test]
