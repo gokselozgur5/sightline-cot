@@ -340,14 +340,17 @@ impl TacticalTask {
     }
 
     pub fn centroid(&self) -> Result<[f64; 2], CotTaskError> {
-        if self.points.is_empty() {
-            return Err(CotTaskError::EmptyRoute);
-        }
-        let (sum_lat, sum_lon) = self.points.iter().fold((0.0, 0.0), |(a_lat, a_lon), p| {
-            (a_lat + p.lat, a_lon + p.lon)
-        });
+        let first = self.points.first().ok_or(CotTaskError::EmptyRoute)?;
+        let ref_lon = first.lon;
         let n = self.points.len() as f64;
-        Ok([sum_lat / n, sum_lon / n])
+        let sum_lat: f64 = self.points.iter().map(|p| p.lat).sum();
+        let sum_unwrapped: f64 = self
+            .points
+            .iter()
+            .map(|p| ref_lon + (p.lon - ref_lon + 180.0).rem_euclid(360.0) - 180.0)
+            .sum();
+        let lon = (sum_unwrapped / n + 180.0).rem_euclid(360.0) - 180.0;
+        Ok([sum_lat / n, lon])
     }
 
     pub fn total_distance_m(&self) -> f64 {
