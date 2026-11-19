@@ -48,7 +48,10 @@ impl StanagTimestamp {
         if millis < 0 {
             return Err(StanagError::NegativeTimestamp);
         }
-        Ok(Self::from_micros((millis as u64) * 1_000))
+        let micros = (millis as u64)
+            .checked_mul(1_000)
+            .ok_or_else(|| StanagError::InvalidIso8601("timestamp overflow".to_string()))?;
+        Ok(Self::from_micros(micros))
     }
 
     /// Convert timestamp to Unix epoch milliseconds used in CoT event attributes.
