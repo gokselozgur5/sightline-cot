@@ -278,9 +278,7 @@ impl<'a> SaxReader<'a> {
                 } else {
                     return Err(SaxError::UnexpectedEof);
                 }
-            } else if self.cursor + 6 < len
-                && &self.input[self.cursor..self.cursor + 7] == "[CDATA["
-            {
+            } else if self.input.as_bytes()[self.cursor..].starts_with(b"[CDATA[") {
                 // CDATA
                 self.cursor += 7;
                 let start = self.cursor;
