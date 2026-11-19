@@ -379,12 +379,29 @@ fn extract_tak_cot_payload(buf: &[u8]) -> &[u8] {
     buf
 }
 
+fn unwrap_tak_payload(packet: &[u8]) -> &[u8] {
+    if packet.len() >= 3 && packet[1] == 0x01 && packet[2] == TAK_PROTO_MAGIC {
+        return extract_tak_cot_payload(&packet[3..]);
+    }
+    let rest = &packet[1..];
+    if let Ok((len, n)) = decode_varint(rest) {
+        if len > 0 && rest.len() == n + (len as usize) {
+            return extract_tak_cot_payload(&rest[n..]);
+        }
+    }
+    let ext = extract_tak_cot_payload(rest);
+    if ext != rest && TakCotEvent::decode_protobuf(ext).is_ok() {
+        return ext;
+    }
+    rest
+}
+
 /// Decodes a framed TAK Protocol Version 1 packet (validating 0xBF magic byte).
 pub fn decode_tak_packet(packet: &[u8]) -> Result<TakCotEvent, ProtoError> {
     if packet.is_empty() || packet[0] != TAK_PROTO_MAGIC {
         return Err(ProtoError::InvalidMagic);
     }
-    TakCotEvent::decode_protobuf(&packet[1..])
+    TakCotEvent::decode_protobuf(unwrap_tak_payload(packet))
 }
 
 #[cfg(test)]
