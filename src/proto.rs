@@ -238,10 +238,19 @@ impl TakCotEvent {
     }
 }
 
-/// Encodes a framed TAK Protocol Version 1 packet (0xBF magic + payload).
+/// Encodes a framed TAK Protocol Version 1 packet (0xBF 0x01 0xBF mesh frame + TakMessage payload).
 pub fn encode_tak_packet(event: &TakCotEvent, out: &mut Vec<u8>) -> Result<(), ProtoError> {
-    out.push(TAK_PROTO_MAGIC);
-    event.encode_protobuf(out)
+    out.extend_from_slice(&[TAK_PROTO_MAGIC, 0x01, TAK_PROTO_MAGIC]);
+    let mut cot_buf = Vec::new();
+    event.encode_protobuf(&mut cot_buf)?;
+    let mut tag_buf = [0u8; 10];
+    let n_tag = encode_tag(2, WireType::LengthDelimited, &mut tag_buf)?;
+    out.extend_from_slice(&tag_buf[..n_tag]);
+    let mut len_buf = [0u8; 10];
+    let n_len = encode_varint(cot_buf.len() as u64, &mut len_buf)?;
+    out.extend_from_slice(&len_buf[..n_len]);
+    out.extend_from_slice(&cot_buf);
+    Ok(())
 }
 
 impl TakCotEvent {
