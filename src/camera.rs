@@ -247,6 +247,9 @@ impl Intrinsics {
 }
 
 /// Camera attitude angles in radians (Tait-Bryan Z-X-Y / ENU frame).
+///
+/// Positive `yaw_rad` rotates counter-clockwise around the local ENU Up axis
+/// (0 = East, +pi/2 = North), unlike platform heading which is clockwise from North.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CameraPose {
     pub roll_rad: f64,
