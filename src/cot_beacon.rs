@@ -320,8 +320,8 @@ impl EmergencyBeacon {
             .map(|stale_ms| (stale_ms - time_ms).max(0) / 1000)
             .unwrap_or(120);
         Ok(Self {
-            uid: uid.to_string(),
-            callsign: callsign.to_string(),
+            uid: crate::cot::unescape_xml_attr(uid),
+            callsign: crate::cot::unescape_xml_attr(callsign),
             emergency_type: etype_s.parse::<EmergencyType>().unwrap(),
             severity: if cancel {
                 EmergencySeverity::Low
@@ -342,7 +342,7 @@ impl EmergencyBeacon {
                 .unwrap_or(10.0),
             time_ms,
             stale_sec,
-            details: desc,
+            details: desc.map(|s| crate::cot::unescape_xml_attr(&s)),
         })
     }
 }
