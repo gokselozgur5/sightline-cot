@@ -427,6 +427,9 @@ pub fn validate_cot_xml(xml: &str) -> Result<(), CotValidationError> {
 }
 
 /// Canonicalize CoT XML into deterministic C14N attribute order and namespace normalization.
+///
+/// Documents with element nesting depth exceeding [`CotSchemaValidator::MAX_DEPTH`] (256)
+/// are rejected with [`CotValidationError::MalformedXml`] to prevent stack overflow.
 pub fn canonicalize_cot_xml(xml: &str) -> Result<String, CotValidationError> {
     CotXmlCanonicalizer::canonicalize(xml)
 }
