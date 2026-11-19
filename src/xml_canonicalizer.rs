@@ -76,7 +76,7 @@ pub struct CanonicalizeOptions {
     pub normalize_whitespace: bool,
     /// Strip XML comments.
     pub remove_comments: bool,
-    /// Format empty elements as self-closing tags (<tag />).
+    /// Format empty elements as self-closing tags (`<tag />`).
     pub self_closing_tags: bool,
     /// Strip redundant namespace declarations already declared in ancestor scopes.
     pub strip_redundant_namespaces: bool,
@@ -209,7 +209,7 @@ impl CotSchemaValidator {
         Ok(())
     }
 
-    /// Validate required and optional attributes of <event> element.
+    /// Validate required and optional attributes of `<event>` element.
     pub fn validate_event_attributes(attrs: &[XmlAttribute]) -> Result<(), CotValidationError> {
         let mut map: HashMap<&str, &str> = HashMap::new();
         for a in attrs {
@@ -289,7 +289,7 @@ impl CotSchemaValidator {
         Ok(())
     }
 
-    /// Validate required and optional attributes of <point> element.
+    /// Validate required and optional attributes of `<point>` element.
     pub fn validate_point_attributes(attrs: &[XmlAttribute]) -> Result<(), CotValidationError> {
         let mut map: HashMap<&str, &str> = HashMap::new();
         for a in attrs {
