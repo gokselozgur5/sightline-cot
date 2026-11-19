@@ -287,14 +287,15 @@ impl MilStdSymbol {
         for (i, c) in chars[4..10].iter().enumerate() {
             fid[i] = *c;
         }
-        let mut sym = Self::default();
-        sym.affiliation = aff;
-        sym.dimension = dim;
-        sym.status = status;
-        sym.function_id = fid;
-        sym.modifier = [chars[10], chars[11]];
-        sym.country_code = [chars[12], chars[13]];
-        Ok(sym)
+        Ok(Self {
+            affiliation: aff,
+            dimension: dim,
+            status,
+            function_id: fid,
+            modifier: [chars[10], chars[11]],
+            country_code: [chars[12], chars[13]],
+            ..Default::default()
+        })
     }
 }
 
