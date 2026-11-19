@@ -324,7 +324,7 @@ impl EmergencyBeacon {
         Ok(Self {
             uid: uid.to_string(),
             callsign: callsign.to_string(),
-            emergency_type: EmergencyType::parse(etype_s),
+            emergency_type: etype_s.parse().unwrap_or(EmergencyType::Alert911),
             severity: if cancel {
                 EmergencySeverity::Low
             } else {
