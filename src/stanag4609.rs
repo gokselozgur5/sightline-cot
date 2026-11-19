@@ -153,6 +153,19 @@ impl StanagTimestamp {
     }
 }
 
+/// Compute the MISB ST 0601 16-bit running sum checksum over a byte slice.
+pub fn compute_st0601_checksum(data: &[u8]) -> u16 {
+    let mut sum: u32 = 0;
+    for (i, &b) in data.iter().enumerate() {
+        if i % 2 == 0 {
+            sum += (b as u32) << 8;
+        } else {
+            sum += b as u32;
+        }
+    }
+    (sum & 0xFFFF) as u16
+}
+
 /// 16-byte Universal Metadata Key for MISB ST 0601 UAS Datalink Local Set.
 pub const MISB_0601_UNIVERSAL_KEY: [u8; 16] = [
     0x06, 0x0E, 0x2B, 0x34, 0x02, 0x0B, 0x01, 0x01, 0x0E, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00,
@@ -162,10 +175,14 @@ impl StanagTimestamp {
     /// Format standalone MISB ST 0601 KLV packet containing this timestamp.
     pub fn to_klv_packet(&self) -> Vec<u8> {
         let tag2 = self.to_klv_tag2();
-        let mut packet = Vec::with_capacity(16 + 2 + tag2.len());
+        let payload_len = tag2.len() + 4;
+        let mut packet = Vec::with_capacity(16 + 2 + payload_len);
         packet.extend_from_slice(&MISB_0601_UNIVERSAL_KEY);
-        packet.push(tag2.len() as u8);
+        packet.push(payload_len as u8);
         packet.extend_from_slice(&tag2);
+        packet.extend_from_slice(&[0x01, 0x02]);
+        let ck = compute_st0601_checksum(&packet);
+        packet.extend_from_slice(&ck.to_be_bytes());
         packet
     }
 }
@@ -178,7 +195,7 @@ mod tests {
     fn test_internal_packet_sanity() {
         let ts = StanagTimestamp::from_micros(1_000_000);
         let packet = ts.to_klv_packet();
-        assert_eq!(packet.len(), 16 + 1 + 10);
+        assert_eq!(packet.len(), 31);
         assert_eq!(&packet[..16], &MISB_0601_UNIVERSAL_KEY);
     }
 }
