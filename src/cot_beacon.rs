@@ -45,9 +45,13 @@ impl EmergencyType {
             Self::Custom(s) => s.as_str(),
         }
     }
+}
 
-    pub fn from_str(s: &str) -> Self {
-        match s {
+impl std::str::FromStr for EmergencyType {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
             "911 Alert" => Self::Alert911,
             "Mayday" => Self::Mayday,
             "Ring The Bell" => Self::RingTheBell,
@@ -55,7 +59,7 @@ impl EmergencyType {
             "Geo-fence Breach" => Self::GeoFenceBreach,
             "Cancel" => Self::Cancel,
             other => Self::Custom(other.to_string()),
-        }
+        })
     }
 }
 
@@ -320,7 +324,7 @@ impl EmergencyBeacon {
         Ok(Self {
             uid: uid.to_string(),
             callsign: callsign.to_string(),
-            emergency_type: EmergencyType::from_str(etype_s),
+            emergency_type: EmergencyType::parse(etype_s),
             severity: if cancel {
                 EmergencySeverity::Low
             } else {
