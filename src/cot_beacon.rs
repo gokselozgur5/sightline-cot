@@ -63,13 +63,6 @@ impl std::str::FromStr for EmergencyType {
     }
 }
 
-impl std::str::FromStr for EmergencyType {
-    type Err = std::convert::Infallible;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self::from_str(s))
-    }
-}
-
 impl EmergencyType {
     pub fn default_cot_type(&self) -> &'static str {
         match self {
