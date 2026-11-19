@@ -17,4 +17,12 @@ fn test_camera_frustum_compiles() {
     };
     let res = CameraFrustum::compute(&cam, &pose, 1920.0, 1080.0, 1.0, 100.0, 0.0, 0.0, 0.0);
     assert!(res.is_ok());
+    let frustum = res.unwrap();
+    // At nadir (roll=0, pitch=0, yaw=0), +X_cam maps to East (+X_enu) and +Y_cam maps to South (-Y_enu).
+    // Near plane corner 0 corresponds to pixel (0, 0): top-left -> West and North.
+    assert!(frustum.corners_enu[0][0] < 0.0);
+    assert!(frustum.corners_enu[0][1] > 0.0);
+    // Near plane corner 2 corresponds to pixel (w, h): bottom-right -> East and South.
+    assert!(frustum.corners_enu[2][0] > 0.0);
+    assert!(frustum.corners_enu[2][1] < 0.0);
 }
