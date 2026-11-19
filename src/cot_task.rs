@@ -423,8 +423,12 @@ impl TacticalTask {
         let t_start = xml.find("<task").ok_or_else(|| CotTaskError::XmlParseError("missing <task tag".into()))?;
         let header_end = xml[t_start..].find('>').ok_or_else(|| CotTaskError::XmlParseError("unclosed <task tag".into()))?;
         let header = &xml[t_start..t_start + header_end];
-        let name = extract_attr(header, "name").unwrap_or_else(|| "task".into());
-        let task_type = extract_attr(header, "type").unwrap_or_else(|| "route".into());
+        let name = extract_attr(header, "name")
+            .map(|s| crate::cot::unescape_xml_attr(&s))
+            .unwrap_or_else(|| "task".into());
+        let task_type = extract_attr(header, "type")
+            .map(|s| crate::cot::unescape_xml_attr(&s))
+            .unwrap_or_else(|| "route".into());
         let priority = extract_attr(header, "priority").map(|p| TaskPriority::parse_str(&p)).unwrap_or_default();
         let status = extract_attr(header, "status").map(|s| TaskStatus::parse_str(&s)).unwrap_or_default();
 
