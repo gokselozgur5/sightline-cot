@@ -125,6 +125,9 @@ enum RawXmlToken {
 pub struct CotSchemaValidator;
 
 impl CotSchemaValidator {
+    /// Maximum allowed element nesting depth to prevent stack overflow.
+    pub const MAX_DEPTH: usize = 256;
+
     /// Validate that an XML document conforms to CoT 2.0 schema rules.
     pub fn validate(xml: &str) -> Result<(), CotValidationError> {
         let trimmed = xml.trim();
