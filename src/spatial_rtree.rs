@@ -4,14 +4,16 @@
 pub const EARTH_RADIUS_M: f64 = 6_371_008.8;
 
 /// Normalizes a longitude coordinate into the standard [-180.0, 180.0) range.
-pub fn normalize_lon(mut lon: f64) -> f64 {
-    while lon >= 180.0 {
-        lon -= 360.0;
+pub fn normalize_lon(lon: f64) -> f64 {
+    if !lon.is_finite() {
+        return f64::NAN;
     }
-    while lon < -180.0 {
-        lon += 360.0;
+    let r = (lon + 180.0).rem_euclid(360.0) - 180.0;
+    if r >= 180.0 {
+        -180.0
+    } else {
+        r
     }
-    lon
 }
 
 /// Great-circle distance between two geodetic coordinates in meters.
