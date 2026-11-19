@@ -63,6 +63,13 @@ impl std::str::FromStr for EmergencyType {
     }
 }
 
+impl std::str::FromStr for EmergencyType {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self::from_str(s))
+    }
+}
+
 impl EmergencyType {
     pub fn default_cot_type(&self) -> &'static str {
         match self {
@@ -324,7 +331,7 @@ impl EmergencyBeacon {
         Ok(Self {
             uid: uid.to_string(),
             callsign: callsign.to_string(),
-            emergency_type: etype_s.parse().unwrap_or(EmergencyType::Alert911),
+            emergency_type: etype_s.parse::<EmergencyType>().unwrap(),
             severity: if cancel {
                 EmergencySeverity::Low
             } else {
