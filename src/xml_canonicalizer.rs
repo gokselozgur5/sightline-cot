@@ -174,6 +174,12 @@ impl CotSchemaValidator {
                     }
 
                     if !self_closing {
+                        if tag_stack.len() >= Self::MAX_DEPTH {
+                            return Err(CotValidationError::MalformedXml(format!(
+                                "element nesting depth exceeds limit of {}",
+                                Self::MAX_DEPTH
+                            )));
+                        }
                         tag_stack.push(name);
                     }
                 }
