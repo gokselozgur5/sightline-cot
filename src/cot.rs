@@ -272,10 +272,8 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
 }
 
 fn find_attr_in_tag<'a>(tag_str: &'a str, attr: &str) -> Option<&'a str> {
-    let needle = format!(" {attr}=\"");
-    let start = tag_str.find(&needle)? + needle.len();
-    let end = tag_str[start..].find('"')? + start;
-    Some(&tag_str[start..end])
+    let raw = tag_str.trim_start_matches(|c: char| c == '<' || !c.is_ascii_whitespace());
+    crate::sax_parser::SaxAttributes::new(raw).get(attr)
 }
 impl CotEvent {
     /// Serialize CotEvent into canonical CoT 2.0 XML.
