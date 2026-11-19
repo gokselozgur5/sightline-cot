@@ -74,3 +74,17 @@ fn test_klv_packet_roundtrip_and_checksum_verification() {
         Err(sightline_cot::stanag4609::StanagError::InvalidChecksum)
     );
 }
+
+#[test]
+fn trailing_non_ascii_whitespace_does_not_panic() {
+    let input = "2026-11-16T08:41:00.12Z\u{a0}\u{a0}";
+    if let Ok(ts) = StanagTimestamp::from_iso8601(input) {
+        assert_eq!(ts.as_micros(), 1_794_818_460_120_000);
+    }
+}
+
+#[test]
+fn four_digit_fraction_keeps_its_sub_millisecond_part() {
+    let ts = StanagTimestamp::from_iso8601("2026-11-16T08:41:00.1234Z").unwrap();
+    assert_eq!(ts.as_micros(), 1_794_818_460_123_400);
+}
