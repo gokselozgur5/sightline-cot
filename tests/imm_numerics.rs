@@ -8,9 +8,11 @@ fn assert_psd(f: &SubFilter) {
             assert!(d <= 1e-9 * (1.0 + f.cov[i][j].abs()), "asym {i}{j}");
         }
     }
-    for i in 0..3 {
-        let det = f.cov[i][i] * f.cov[i + 3][i + 3] - f.cov[i][i + 3].powi(2);
-        assert!(det >= -1e-9, "negative minor {i}: {det}");
+    for i in 0..6 {
+        for j in (i + 1)..6 {
+            let det = f.cov[i][i] * f.cov[j][j] - f.cov[i][j] * f.cov[j][i];
+            assert!(det >= -1e-9, "negative 2x2 minor ({i},{j}): {det}");
+        }
     }
 }
 
