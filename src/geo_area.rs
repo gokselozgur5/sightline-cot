@@ -42,8 +42,13 @@ fn project_poly_enu(poly: &[[f64; 2]]) -> Option<Vec<[f64; 2]>> {
     if n < 3 || poly.iter().flatten().any(|c| !c.is_finite()) {
         return None;
     }
+    let ref_lon = poly[0][1];
+    let sum_unwrapped: f64 = poly
+        .iter()
+        .map(|p| ref_lon + (p[1] - ref_lon + 180.0).rem_euclid(360.0) - 180.0)
+        .sum();
+    let lon0 = sum_unwrapped / n as f64;
     let lat0 = poly.iter().map(|p| p[0]).sum::<f64>() / n as f64;
-    let lon0 = poly.iter().map(|p| p[1]).sum::<f64>() / n as f64;
     let cos_lat = lat0.to_radians().cos().max(1e-12);
     Some(
         poly.iter()
