@@ -101,8 +101,8 @@ impl Dms {
         let mut deg = mag.floor() as u32;
         let rem_min = (mag - deg as f64) * 60.0;
         let mut min = rem_min.floor() as u32;
-        let mut sec = (rem_min - min as f64) * 60.0;
-        if sec >= 59.9999995 {
+        let mut sec = ((rem_min - min as f64) * 60.0 * 100.0).round() / 100.0;
+        if sec >= 60.0 {
             sec = 0.0;
             min += 1;
             if min >= 60 {
