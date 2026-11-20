@@ -394,9 +394,7 @@ pub fn estimate_covariance_ce_le(
     let r_enu = pose.transform_ray(ray);
     let var_u = ((pose.cam_up_m - g_up) * (d_u[1].abs() * px_sig + d_p[1].abs() * att_sig)
         / (-r_enu[2]).max(1e-3))
-    .powi(2)
-        * 1e-4
-        + 0.25;
+    .powi(2);
     let le90 = 1.6449 * var_u.sqrt();
     Ok((ce90, le90))
 }
