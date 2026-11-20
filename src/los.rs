@@ -60,7 +60,7 @@ pub fn check_los(dem: &DemGrid, obs: Position3D, tgt: Position3D, n: usize) -> L
     let (steps, mut min_clr) = (n.max(2), f64::MAX);
     let (dx, dy) = (tgt.east_m - obs.east_m, tgt.north_m - obs.north_m);
     let full_drop = earth_curvature_drop((dx * dx + dy * dy).sqrt());
-    for i in 1..steps {
+    for i in 1..=steps {
         let frac = i as f64 / steps as f64;
         let bulge = full_drop * frac * (1.0 - frac);
         let (clr, obs_pt) = check_step(dem, sample_point(obs, tgt, frac), bulge);
