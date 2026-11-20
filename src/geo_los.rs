@@ -67,7 +67,7 @@ impl LosGeometry {
 
 pub const WGS84_MEAN_RADIUS_M: f64 = 6_371_000.0;
 
-/// Compute geometric horizon line-of-sight limit distance between two heights.
+/// Compute geometric horizon line-of-sight limit distance between two heights above ground.
 pub fn horizon_distance_m(h1_m: f64, h2_m: f64) -> Result<f64, GeoLosError> {
     if !h1_m.is_finite() || !h2_m.is_finite() {
         return Err(GeoLosError::NonFiniteCoordinate);
@@ -77,6 +77,7 @@ pub fn horizon_distance_m(h1_m: f64, h2_m: f64) -> Result<f64, GeoLosError> {
     Ok(d1 + d2)
 }
 
+use crate::egm96_geoid::Egm96Geoid;
 use crate::geo_enu::geodetic_to_enu;
 
 /// Compute line-of-sight slant range, elevation, azimuth and horizon clearance.
@@ -94,7 +95,12 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
     let elevation_angle_rad = u.atan2(ground_range_m);
     let az_raw = e.atan2(n);
     let azimuth_rad = if az_raw < 0.0 { az_raw + 2.0 * std::f64::consts::PI } else { az_raw };
-    let horiz_m = horizon_distance_m(obs.hae_m, target.hae_m)?;
+    let geoid = Egm96Geoid::coarse_reference_grid();
+    let n1 = geoid.undulation(obs.lat_deg, obs.lon_deg).unwrap_or(0.0);
+    let n2 = geoid.undulation(target.lat_deg, target.lon_deg).unwrap_or(0.0);
+    let h1_m = (obs.hae_m - n1).max(0.0);
+    let h2_m = (target.hae_m - n2).max(0.0);
+    let horiz_m = horizon_distance_m(h1_m, h2_m)?;
     let is_direct_los = ground_range_m <= horiz_m;
     Ok(LosGeometry { slant_range_m, ground_range_m, elevation_angle_rad, azimuth_rad, horizon_distance_m: horiz_m, is_direct_los })
 }
@@ -171,8 +177,8 @@ mod tests {
         let expected = (2.0 * WGS84_MEAN_RADIUS_M * 100.0 + 10000.0).sqrt();
         assert!((d - expected).abs() < 1.0);
 
-        let obs = GeoPoint3D::new(0.0, 0.0, 10.0).unwrap();
-        let close_target = GeoPoint3D::new(0.01, 0.0, 10.0).unwrap();
+        let obs = GeoPoint3D::new(0.0, 0.0, 30.0).unwrap();
+        let close_target = GeoPoint3D::new(0.01, 0.0, 30.0).unwrap();
         assert!(has_line_of_sight(&obs, &close_target).unwrap());
     }
 }
