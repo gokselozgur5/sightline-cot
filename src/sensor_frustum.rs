@@ -187,7 +187,13 @@ impl FrustumFootprint {
     pub fn centroid_geo(&self) -> [f64; 3] {
         let n = self.vertices_geo.len() as f64;
         let lat = self.vertices_geo.iter().map(|p| p[0]).sum::<f64>() / n;
-        let lon = self.vertices_geo.iter().map(|p| p[1]).sum::<f64>() / n;
+        let ref_lon = self.vertices_geo.first().map(|p| p[1]).unwrap_or(0.0);
+        let sum_unwrapped: f64 = self
+            .vertices_geo
+            .iter()
+            .map(|p| ref_lon + (p[1] - ref_lon + 180.0).rem_euclid(360.0) - 180.0)
+            .sum();
+        let lon = (sum_unwrapped / n + 180.0).rem_euclid(360.0) - 180.0;
         let alt = self.vertices_geo.iter().map(|p| p[2]).sum::<f64>() / n;
         [lat, lon, alt]
     }
