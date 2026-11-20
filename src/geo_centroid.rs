@@ -41,8 +41,13 @@ pub fn polygon_centroid(poly: &[[f64; 2]]) -> Option<[f64; 2]> {
     if n < 3 || poly.iter().flatten().any(|c| !c.is_finite()) {
         return None;
     }
+    let ref_lon = poly[0][1];
+    let sum_unwrapped: f64 = poly
+        .iter()
+        .map(|p| ref_lon + (p[1] - ref_lon + 180.0).rem_euclid(360.0) - 180.0)
+        .sum();
+    let lon0 = sum_unwrapped / n as f64;
     let lat0 = poly.iter().map(|p| p[0]).sum::<f64>() / n as f64;
-    let lon0 = poly.iter().map(|p| p[1]).sum::<f64>() / n as f64;
     let cos_lat = lat0.to_radians().cos().max(1e-12);
     let pts: Vec<[f64; 2]> = poly
         .iter()
@@ -54,6 +59,6 @@ pub fn polygon_centroid(poly: &[[f64; 2]]) -> Option<[f64; 2]> {
         .collect();
     let [cx, cy] = planar_centroid(&pts)?;
     let lat = lat0 + cy / METERS_PER_DEG;
-    let lon = lon0 + cx / (cos_lat * METERS_PER_DEG);
+    let lon = (lon0 + cx / (cos_lat * METERS_PER_DEG) + 540.0).rem_euclid(360.0) - 180.0;
     Some([lat, lon])
 }
