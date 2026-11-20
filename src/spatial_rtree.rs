@@ -108,10 +108,16 @@ impl SpatialEnvelope {
 
     /// Returns true if this envelope intersects with another envelope.
     pub fn intersects(&self, other: &Self) -> bool {
-        self.min_lat <= other.max_lat
-            && self.max_lat >= other.min_lat
-            && self.min_lon <= other.max_lon
-            && self.max_lon >= other.min_lon
+        let lat_overlap = self.min_lat <= other.max_lat && self.max_lat >= other.min_lat;
+        let s_wrap = self.min_lon > self.max_lon;
+        let o_wrap = other.min_lon > other.max_lon;
+        let lon_overlap = match (s_wrap, o_wrap) {
+            (false, false) => self.min_lon <= other.max_lon && self.max_lon >= other.min_lon,
+            (true, false) => other.max_lon >= self.min_lon || other.min_lon <= self.max_lon,
+            (false, true) => self.max_lon >= other.min_lon || self.min_lon <= other.max_lon,
+            (true, true) => true,
+        };
+        lat_overlap && lon_overlap
     }
 
     /// Computes the union envelope of this and another envelope.
