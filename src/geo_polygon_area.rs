@@ -78,6 +78,7 @@ pub fn wrap_delta_lon(dlon_rad: f64) -> f64 {
 }
 
 /// Compute geodesic area of a polygon on the WGS84 ellipsoid in square meters.
+/// Edges follow great-circle arcs on the authalic sphere (remaining error < 1%).
 pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaError> {
     let n = vertices.len();
     if n < 3 {
@@ -100,11 +101,9 @@ pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaE
     for i in 0..n {
         let (p1, p2) = (vertices[i], vertices[(i + 1) % n]);
         lat_sum += p1[0];
-        let sin_beta1 = authalic_sin_beta(p1[0])?;
-        let sin_beta2 = authalic_sin_beta(p2[0])?;
-        let dlon = wrap_delta_lon((p2[1] - p1[1]).to_radians());
-        dlon_sum += dlon;
-        sum += dlon * (2.0 + sin_beta1 + sin_beta2);
+        let (step_sum, step_dlon) = great_circle_edge_step(p1, p2);
+        dlon_sum += step_dlon;
+        sum += step_sum;
     }
     let r = WGS84_AUTHALIC_RADIUS_M;
     let mut area = (0.5 * r * r * sum).abs();
