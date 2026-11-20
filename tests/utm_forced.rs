@@ -62,3 +62,12 @@ fn test_utm_forced_antimeridian_and_adjacency() {
     assert!((lat - lat_out).abs() < 1e-5);
     assert!((lon - lon_out).abs() < 1e-5);
 }
+
+#[test]
+fn test_utm_forced_forward_snyder_ep2_terms() {
+    let forced = wgs84_to_utm_forced(50.0, 35.0, 33).expect("force zone 33");
+    let proj_easting = 1927743.78;
+    let proj_northing = 5733137.34;
+    assert!((forced.easting - proj_easting).abs() < 1.0);
+    assert!((forced.northing - proj_northing).abs() < 3.0);
+}
