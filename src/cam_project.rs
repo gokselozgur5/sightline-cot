@@ -1,4 +1,4 @@
-use crate::camera::CameraError;
+use crate::camera::{equidistant_monotonic_limit_sq, CameraError};
 
 /// Error returned when forward camera projection fails.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,11 +70,18 @@ fn project_fisheye(
         return Err(ProjectionError::InvalidRay);
     }
     let r_xy = (ray[0] * ray[0] + ray[1] * ray[1]).sqrt();
-    let theta = r_xy.atan2(ray[2]);
-    if theta <= 1e-12 {
-        return Ok((cx, cy));
+    if r_xy <= 1e-12 {
+        return if ray[2] < 0.0 {
+            Err(ProjectionError::BehindCamera)
+        } else {
+            Ok((cx, cy))
+        };
     }
+    let theta = r_xy.atan2(ray[2]);
     let theta2 = theta * theta;
+    if theta2 >= equidistant_monotonic_limit_sq(k1, k2) {
+        return Err(ProjectionError::DistortionFailed);
+    }
     let r_d = theta * (1.0 + k1 * theta2 + k2 * theta2 * theta2);
     let scale = r_d / r_xy;
     Ok((cx + fx * ray[0] * scale, cy + fy * ray[1] * scale))

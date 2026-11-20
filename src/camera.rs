@@ -113,7 +113,7 @@ pub enum Intrinsics {
 }
 
 /// First positive root in theta^2 of d/dtheta [theta (1 + k1 theta^2 + k2 theta^4)].
-fn equidistant_monotonic_limit_sq(k1: f64, k2: f64) -> f64 {
+pub(crate) fn equidistant_monotonic_limit_sq(k1: f64, k2: f64) -> f64 {
     if k2 == 0.0 {
         return if k1 < 0.0 {
             -1.0 / (3.0 * k1)
