@@ -586,8 +586,10 @@ impl TacticalTargetFilter {
         let steps = (horizon_sec / step_sec).round() as usize;
         let mut traj = Vec::with_capacity(steps);
         let mut state = self.current_state.clone();
-        for _ in 0..steps {
+        let base_ts = self.current_state.timestamp_ms;
+        for i in 1..=steps {
             state = state.extrapolate(step_sec, self.config.process_noise_q)?;
+            state.timestamp_ms = base_ts + (i as f64 * step_sec * 1000.0).round() as i64;
             traj.push(state.clone());
         }
         Ok(traj)
