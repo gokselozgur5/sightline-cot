@@ -245,7 +245,8 @@ impl TaskPoint {
         if let Some(h) = self.hae {
             xml.push_str(&format!(r#" hae="{:.2}""#, h));
         }
-        xml.push_str(&format!(r#" action="{}""#, self.action.as_str()));
+        let action_esc = crate::cot::escape_xml_attr(self.action.as_str());
+        xml.push_str(&format!(r#" action="{}""#, action_esc));
         if let Some(spd) = self.speed_mps {
             xml.push_str(&format!(r#" speed="{:.2}""#, spd));
         }
