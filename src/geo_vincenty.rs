@@ -359,6 +359,10 @@ pub fn vincenty_geodesic_path(
         return Err(VincentyError::NegativeDistance);
     }
     let inv = vincenty_inverse(lat1, lon1, lat2, lon2)?;
+    let steps_f = (inv.distance_m / step_m).ceil();
+    if !steps_f.is_finite() || steps_f > crate::rhumb_line::MAX_SAMPLE_COUNT as f64 {
+        return Err(VincentyError::NegativeDistance);
+    }
     let mut path = vec![(lat1, lon1)];
     if inv.distance_m > 1e-6 {
         let mut d = step_m;
