@@ -637,7 +637,14 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
 
     for tok in tokens {
         match tok {
-            RawXmlToken::Comment | RawXmlToken::ProcessingInstruction => {}
+            RawXmlToken::ProcessingInstruction => {}
+            RawXmlToken::Comment(comment) => {
+                if !opts.remove_comments {
+                    if let Some((_, _, ref mut children)) = stack.last_mut() {
+                        children.push(XmlNode::Comment(comment));
+                    }
+                }
+            }
             RawXmlToken::Text(txt) => {
                 let text_val = if opts.normalize_whitespace {
                     txt.trim().to_string()
