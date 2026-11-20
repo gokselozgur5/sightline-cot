@@ -1,0 +1,23 @@
+use sightline_cot::camera::{estimate_covariance_ce_le, CameraPose, Intrinsics};
+
+#[test]
+fn test_ce90_le90_zero_and_nonzero_sigmas() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1000.0,
+        fy: 1000.0,
+        cx: 500.0,
+        cy: 500.0,
+    };
+    let pose = CameraPose {
+        roll_rad: 0.0,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: 100.0,
+    };
+    let (ce0, le0) = estimate_covariance_ce_le(&cam, &pose, 500.0, 500.0, 0.0, 0.0, 0.0).unwrap();
+    assert_eq!(ce0, 0.0);
+    assert_eq!(le0, 0.0);
+    let (ce1, le1) = estimate_covariance_ce_le(&cam, &pose, 500.0, 500.0, 0.0, 1.0, 0.001).unwrap();
+    assert!(ce1 > 0.0);
+    assert!(le1 > 0.0);
+}
