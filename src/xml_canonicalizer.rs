@@ -399,7 +399,7 @@ impl CotSchemaValidator {
     }
 }
 
-/// CoT XML canonicalizer for standard C14N attribute sorting and namespace management.
+/// CoT XML canonicalizer producing crate-specific deterministic normal forms.
 pub struct CotXmlCanonicalizer;
 
 impl CotXmlCanonicalizer {
@@ -427,7 +427,7 @@ pub fn validate_cot_xml(xml: &str) -> Result<(), CotValidationError> {
     CotSchemaValidator::validate(xml)
 }
 
-/// Canonicalize CoT XML into deterministic C14N attribute order and namespace normalization.
+/// Canonicalize CoT XML into a crate-specific deterministic normal form.
 ///
 /// Documents with element nesting depth exceeding [`CotSchemaValidator::MAX_DEPTH`] (256)
 /// are rejected with [`CotValidationError::MalformedXml`] to prevent stack overflow.
