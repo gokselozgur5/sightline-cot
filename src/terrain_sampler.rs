@@ -423,6 +423,12 @@ impl TerrainInterceptSolver {
             return Err(TerrainSamplerError::RayPointsAway);
         }
 
+        if let Some(elev) = grid.sample_bilinear(ray.origin[0], ray.origin[1]) {
+            if ray.origin[2] < elev {
+                return Err(TerrainSamplerError::NoIntersection);
+            }
+        }
+
         let mut t_prev = 0.0;
         let mut t_curr = 0.0;
         let step = self.step_size.max(0.1);
