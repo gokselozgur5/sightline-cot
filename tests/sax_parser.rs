@@ -62,3 +62,15 @@ fn markup_declaration_with_multibyte_char_is_an_error_not_a_panic() {
     let xml = "<event uid=\"U\"><!aaaaaa\u{e9}></event>";
     assert!(CotSaxParser::parse_events(xml).is_err());
 }
+
+#[test]
+fn test_cot_chunk_streamer_self_closing_event() {
+    let mut streamer = CotChunkStreamer::new();
+    let xml = "<event uid=\"a\"/><event uid=\"b\"><point lat=\"1\" lon=\"2\" hae=\"3\" ce=\"4\" le=\"5\"/></event>";
+    let chunks = streamer.feed(xml);
+    assert_eq!(chunks.len(), 2);
+    assert_eq!(chunks[0], "<event uid=\"a\"/>");
+    let evts = CotSaxParser::parse_events(&chunks[0]).unwrap();
+    assert_eq!(evts.len(), 1);
+    assert_eq!(evts[0].uid, "a");
+}
