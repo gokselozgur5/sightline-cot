@@ -599,17 +599,22 @@ impl CotChunkStreamer {
             };
 
             let end_pattern = "</event>";
-            let end_idx = match self.buffer[start_idx..].find(end_pattern) {
-                Some(rel) => start_idx + rel + end_pattern.len(),
-                None => {
-                    if start_idx > 0 {
-                        self.buffer.drain(..start_idx);
-                    }
-                    if self.buffer.len() > self.max_event_size {
-                        self.buffer.drain(..self.buffer.len() - (end_pattern.len() - 1));
-                    }
-                    break;
+            let end_idx = match self.buffer[start_idx..].find('>') {
+                Some(rel) if self.buffer[start_idx..start_idx + rel].ends_with('/') => {
+                    start_idx + rel + 1
                 }
+                _ => match self.buffer[start_idx..].find(end_pattern) {
+                    Some(rel) => start_idx + rel + end_pattern.len(),
+                    None => {
+                        if start_idx > 0 {
+                            self.buffer.drain(..start_idx);
+                        }
+                        if self.buffer.len() > self.max_event_size {
+                            self.buffer.drain(..self.buffer.len() - (end_pattern.len() - 1));
+                        }
+                        break;
+                    }
+                },
             };
 
             let event_xml = self.buffer[start_idx..end_idx].to_string();
