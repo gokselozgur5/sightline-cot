@@ -24,12 +24,33 @@ impl GeoBbox {
     pub fn from_points(points: &[[f64; 2]]) -> Option<Self> {
         let first = points.first()?;
         let (mut min_lat, mut max_lat) = (first[0], first[0]);
-        let (mut min_lon, mut max_lon) = (first[1], first[1]);
         for p in &points[1..] {
             min_lat = min_lat.min(p[0]);
             max_lat = max_lat.max(p[0]);
-            min_lon = min_lon.min(p[1]);
-            max_lon = max_lon.max(p[1]);
+        }
+        let mut lons: Vec<f64> = points
+            .iter()
+            .map(|p| {
+                let r = (p[1] + 180.0).rem_euclid(360.0) - 180.0;
+                if r == 180.0 {
+                    -180.0
+                } else {
+                    r
+                }
+            })
+            .collect();
+        lons.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+        lons.dedup();
+        let (mut min_lon, mut max_lon) = (lons[0], lons[0]);
+        let mut max_gap = -1.0;
+        for i in 0..lons.len() {
+            let nxt = (i + 1) % lons.len();
+            let gap = (lons[nxt] - lons[i]).rem_euclid(360.0);
+            if gap > max_gap {
+                max_gap = gap;
+                min_lon = lons[nxt];
+                max_lon = lons[i];
+            }
         }
         Some(Self::new(min_lat, min_lon, max_lat, max_lon))
     }
