@@ -24,3 +24,30 @@ fn test_integration_kalman_target_pipeline() {
     let traj = filter.predict_horizon(3.0, 1.0).unwrap();
     assert_eq!(traj.len(), 3);
 }
+
+fn sample_filter(vel: [f64; 3]) -> TacticalTargetFilter {
+    let cfg = TargetFilterConfig::default();
+    TacticalTargetFilter::new("T", [0.0; 3], vel, 25.0, 4.0, 0, cfg).unwrap()
+}
+
+#[test]
+fn full_state_update_is_atomic_when_the_velocity_is_gated() {
+    let mut f = sample_filter([0.0; 3]);
+    let res = f.update_full_state([1.0; 3], [500.0, 0.0, 0.0], None, None, 1000);
+    assert!(res.is_err());
+    assert_eq!(f.update_count, 0, "position applied although Err returned");
+}
+
+#[test]
+fn measurement_after_the_coast_limit_is_not_rejected_forever() {
+    let mut f = sample_filter([0.0; 3]);
+    assert!(f.update_position([0.0; 3], None, 61_000).is_ok());
+}
+
+#[test]
+fn horizon_timestamps_do_not_drift() {
+    let traj = sample_filter([1.0, 0.0, 0.0])
+        .predict_horizon(1.0, 1.0 / 30.0)
+        .unwrap();
+    assert_eq!(traj.last().unwrap().timestamp_ms, 1000);
+}
