@@ -76,8 +76,13 @@ impl SpatialEnvelope {
 
     /// Returns true if this envelope contains the given point.
     pub fn contains_point(&self, lat: f64, lon: f64) -> bool {
-        let n_lon = normalize_lon(lon);
-        lat >= self.min_lat && lat <= self.max_lat && n_lon >= self.min_lon && n_lon <= self.max_lon
+        let n = normalize_lon(lon);
+        let lon_ok = if self.min_lon <= self.max_lon {
+            n >= self.min_lon && n <= self.max_lon
+        } else {
+            n >= self.min_lon || n <= self.max_lon
+        };
+        lat >= self.min_lat && lat <= self.max_lat && lon_ok
     }
 
     /// Returns true if this envelope fully encloses another envelope.
