@@ -565,8 +565,21 @@ impl TacticalTargetFilter {
         vel_var: Option<[f64; 3]>,
         timestamp_ms: i64,
     ) -> Result<(f64, f64), KalmanTargetError> {
-        let pos_d2 = self.update_position(pos, pos_var, timestamp_ms)?;
-        let vel_d2 = self.update_velocity(vel, vel_var, timestamp_ms)?;
+        let backup = self.clone();
+        let pos_d2 = match self.update_position(pos, pos_var, timestamp_ms) {
+            Ok(d2) => d2,
+            Err(e) => {
+                *self = backup;
+                return Err(e);
+            }
+        };
+        let vel_d2 = match self.update_velocity(vel, vel_var, timestamp_ms) {
+            Ok(d2) => d2,
+            Err(e) => {
+                *self = backup;
+                return Err(e);
+            }
+        };
         Ok((pos_d2, vel_d2))
     }
 
