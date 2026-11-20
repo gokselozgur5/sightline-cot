@@ -55,6 +55,26 @@ impl SpatialEnvelope {
         Self::new(lat, norm_lon, lat, norm_lon)
     }
 
+    fn polygon_lon_bounds(coords: &[[f64; 2]]) -> Option<(f64, f64)> {
+        let mut lons: Vec<f64> = coords.iter().map(|p| normalize_lon(p[1])).collect();
+        lons.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+        lons.dedup();
+        let (mut min_lon, mut max_lon) = (*lons.first()?, *lons.first()?);
+        if lons.len() > 1 {
+            let mut max_gap = -1.0;
+            for i in 0..lons.len() {
+                let nxt = (i + 1) % lons.len();
+                let gap = (lons[nxt] - lons[i]).rem_euclid(360.0);
+                if gap > max_gap {
+                    max_gap = gap;
+                    min_lon = lons[nxt];
+                    max_lon = lons[i];
+                }
+            }
+        }
+        Some((min_lon, max_lon))
+    }
+
     /// Computes the bounding envelope from a slice of polygon vertices [lat, lon].
     pub fn from_geodesic_polygon(coords: &[[f64; 2]]) -> Option<Self> {
         let first = coords.first()?;
