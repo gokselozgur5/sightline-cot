@@ -129,13 +129,36 @@ impl SpatialEnvelope {
         lat_overlap && lon_overlap
     }
 
+    fn merge_lon_bounds(a: &Self, b: &Self) -> (f64, f64) {
+        if a.contains_envelope(b) {
+            return (a.min_lon, a.max_lon);
+        }
+        if b.contains_envelope(a) {
+            return (b.min_lon, b.max_lon);
+        }
+        let candidates = [
+            (a.min_lon, b.max_lon),
+            (b.min_lon, a.max_lon),
+            (a.min_lon.min(b.min_lon), a.max_lon.max(b.max_lon)),
+        ];
+        let mut best = (f64::MAX, a.min_lon, a.max_lon);
+        for &(s, e) in &candidates {
+            let env = Self::new(-90.0, s, 90.0, e);
+            if env.contains_envelope(a) && env.contains_envelope(b) && env.lon_span() < best.0 {
+                best = (env.lon_span(), s, e);
+            }
+        }
+        (best.1, best.2)
+    }
+
     /// Computes the union envelope of this and another envelope.
     pub fn merge(&self, other: &Self) -> Self {
+        let (min_lon, max_lon) = Self::merge_lon_bounds(self, other);
         Self::new(
             self.min_lat.min(other.min_lat),
-            self.min_lon.min(other.min_lon),
+            min_lon,
             self.max_lat.max(other.max_lat),
-            self.max_lon.max(other.max_lon),
+            max_lon,
         )
     }
 
