@@ -54,11 +54,11 @@ cellsize 1.0
 30.0 40.0
 ";
     let grid = parse_geoid_ascii(ascii).unwrap();
-    assert_eq!(grid.undulation_at(0.0, 1.0), Some(10.0));
-    assert_eq!(grid.undulation_at(1.0, 1.0), Some(20.0));
-    assert_eq!(grid.undulation_at(0.0, 0.0), Some(30.0));
-    assert_eq!(grid.undulation_at(1.0, 0.0), Some(40.0));
-    assert_eq!(grid.undulation_at(0.5, 0.5), Some(25.0));
+    assert_eq!(grid.undulation_at(0.5, 1.5), Some(10.0)); // cell centre
+    assert_eq!(grid.undulation_at(1.5, 1.5), Some(20.0)); // cell centre
+    assert_eq!(grid.undulation_at(0.5, 0.5), Some(30.0)); // cell centre
+    assert_eq!(grid.undulation_at(1.5, 0.5), Some(40.0)); // cell centre
+    assert_eq!(grid.undulation_at(1.0, 1.0), Some(25.0)); // cell centre
 }
 
 #[test]

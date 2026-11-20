@@ -117,8 +117,8 @@ impl GeoidGrid {
         if self.cols == 1 && self.rows == 1 {
             return self.get(0, 0);
         }
-        let u = ((lon - self.xllcorner) / self.cellsize).max(0.0);
-        let v_norm = ((lat - self.yllcorner) / self.cellsize).max(0.0);
+        let u = ((lon - self.xllcorner) / self.cellsize - 0.5).max(0.0);
+        let v_norm = ((lat - self.yllcorner) / self.cellsize - 0.5).max(0.0);
         let v_top = (self.rows.saturating_sub(1) as f64 - v_norm).max(0.0);
         let c0 = (u.floor() as usize).min(self.cols.saturating_sub(2));
         let r0 = (v_top.floor() as usize).min(self.rows.saturating_sub(2));
