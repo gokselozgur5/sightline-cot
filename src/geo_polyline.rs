@@ -69,6 +69,10 @@ pub fn polyline_resample_radius(points: &[[f64; 2]], step_m: f64, radius: f64) -
     if total_len == 0.0 {
         return vec![points[0]];
     }
+    let steps_f = (total_len / step_m).ceil();
+    if !steps_f.is_finite() || steps_f > crate::rhumb_line::MAX_SAMPLE_COUNT as f64 {
+        return points.to_vec();
+    }
     let segs: Vec<f64> = points
         .windows(2)
         .map(|w| haversine_distance_radius(w[0], w[1], radius))
