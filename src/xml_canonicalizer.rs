@@ -712,6 +712,11 @@ fn serialize_node(
     out: &mut String,
 ) {
     match node {
+        XmlNode::Comment(comment) => {
+            out.push_str("<!--");
+            out.push_str(comment);
+            out.push_str("-->");
+        }
         XmlNode::Text(txt) => {
             out.push_str(&escape_xml_text(txt));
         }
