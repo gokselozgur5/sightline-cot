@@ -179,12 +179,25 @@ impl ObstacleProfile {
         observer_height_m: f64,
         include_earth_curvature: bool,
     ) -> Result<f64, ElevationMaskError> {
-        if !observer_height_m.is_finite() {
+        self.compute_mask_angle_up_to_deg(observer_height_m, f64::INFINITY, include_earth_curvature)
+    }
+
+    /// Compute maximum masking elevation angle in degrees along profile up to max_dist_m.
+    pub fn compute_mask_angle_up_to_deg(
+        &self,
+        observer_height_m: f64,
+        max_dist_m: f64,
+        include_earth_curvature: bool,
+    ) -> Result<f64, ElevationMaskError> {
+        if !observer_height_m.is_finite() || !max_dist_m.is_finite() && !max_dist_m.is_infinite() {
             return Err(ElevationMaskError::NonFiniteValue);
         }
         let mut max_angle_rad = -std::f64::consts::FRAC_PI_2;
         let r_eff = (4.0 / 3.0) * 6_371_000.0;
         for pt in &self.points {
+            if pt.distance_m > max_dist_m {
+                break;
+            }
             let drop_m = if include_earth_curvature {
                 (pt.distance_m * pt.distance_m) / (2.0 * r_eff)
             } else {
