@@ -757,6 +757,21 @@ impl DemGrid {
         Err(CameraError::RayAboveHorizon)
     }
 
+    fn march_dem(&self, r: [f64; 3], p: &CameraPose, mi: usize) -> Result<[f64; 3], CameraError> {
+        let (t_end, mut a, mut prev) = (-p.cam_up_m / r[2], 0.0, 0.0);
+        let (step, mut b) = (t_end / (mi.max(1) as f64), t_end);
+        for i in 1..=mi {
+            let tc = (i as f64 * step).min(t_end);
+            let (e, n) = (tc * r[0], tc * r[1]);
+            let h = self.elevation_at(e, n).ok_or(CameraError::RayAboveHorizon)?;
+            let d = p.cam_up_m + tc * r[2] - h;
+            if d.abs() < 1e-3 { return Ok([e, n, h]); }
+            if d < 0.0 { a = prev; b = tc; break; }
+            prev = tc;
+        }
+        self.bisect_dem(r, p, a, b)
+    }
+
     /// Intersect camera ray with DEM surface via bounded iterative step.
     pub fn intersect_dem(
         &self,
