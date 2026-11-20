@@ -52,3 +52,18 @@ fn test_local_frame_roundtrip() {
     assert!((back[0] - pt[0]).abs() < 1e-9);
     assert!((back[1] - pt[1]).abs() < 1e-9);
 }
+
+#[test]
+fn simplify_handles_twenty_thousand_point_zigzag() {
+    let n = 20_000usize;
+    let pts: Vec<[f64; 2]> = (0..n)
+        .map(|i| {
+            let amp = (n - i) as f64 * 1e-6;
+            [if i % 2 == 0 { amp } else { -amp }, i as f64 * 1e-7]
+        })
+        .collect();
+    let out = simplify_polyline(&pts, 0.01);
+    assert_eq!(out.first(), pts.first());
+    assert_eq!(out.last(), pts.last());
+    assert!(out.len() <= n);
+}
