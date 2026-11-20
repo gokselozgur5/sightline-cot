@@ -118,7 +118,7 @@ enum RawXmlToken {
         name: String,
     },
     Text(String),
-    Comment,
+    Comment(String),
     ProcessingInstruction,
 }
 
@@ -144,7 +144,7 @@ impl CotSchemaValidator {
 
         for token in tokens {
             match token {
-                RawXmlToken::Comment | RawXmlToken::ProcessingInstruction => {}
+                RawXmlToken::Comment(_) | RawXmlToken::ProcessingInstruction => {}
                 RawXmlToken::Text(text) => {
                     if !tag_stack.is_empty() && text.chars().any(|c| !c.is_whitespace()) {
                         // Non-whitespace text inside elements is acceptable in CoT (e.g. remarks)
@@ -452,7 +452,8 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
             let end_idx = rest.find("-->").ok_or_else(|| {
                 CotValidationError::MalformedXml("unclosed comment <!--".into())
             })?;
-            tokens.push(RawXmlToken::Comment);
+            let comment_text = &rest[4..end_idx];
+            tokens.push(RawXmlToken::Comment(comment_text.to_string()));
             rest = &rest[end_idx + 3..];
         } else if rest.starts_with("<?") {
             let end_idx = rest.find("?>").ok_or_else(|| {
