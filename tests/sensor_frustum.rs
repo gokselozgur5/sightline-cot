@@ -30,3 +30,19 @@ fn nadir_footprint_centroid_stays_under_the_platform_at_the_antimeridian() {
         "centroid lon {lon} is {sep_deg} degrees from the platform"
     );
 }
+
+#[test]
+fn parse_cot_sensor_reads_the_exact_attribute_names() {
+    let xml = r#"<sensor azimuth="10" elevation="-30" vfov="20" fov="40" range="1000"/>"#;
+    let (gimbal, fov, range) = SensorGimbal::parse_cot_sensor(xml).unwrap();
+    assert_eq!(gimbal.azimuth_deg, 10.0);
+    assert_eq!(fov, 40.0, "fov must not be read from vfov");
+    assert_eq!(range, 1000.0);
+}
+
+#[test]
+fn parse_cot_sensor_rejects_non_finite_fov_and_range() {
+    let xml = r#"<sensor azimuth="10" elevation="-30" fov="inf" range="NaN"/>"#;
+    assert!(SensorGimbal::parse_cot_sensor(xml).is_err());
+}
+
