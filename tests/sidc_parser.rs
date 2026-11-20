@@ -79,3 +79,17 @@ fn test_cot_bidirectional_mapping() {
         Err(SidcParseError::InvalidCotType)
     );
 }
+
+#[test]
+fn test_cot_affiliation_assumed_friend_mapping() {
+    let sidc = cot_type_to_sidc20("a-a-G").unwrap();
+    assert_eq!(&sidc[3..6], "210");
+    assert_eq!(
+        StandardIdentity::from_cot_char('a'),
+        StandardIdentity::AssumedFriend
+    );
+    assert_eq!(
+        StandardIdentity::from_cot_char('A'),
+        StandardIdentity::AssumedFriend
+    );
+}
