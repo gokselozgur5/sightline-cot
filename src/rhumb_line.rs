@@ -3,6 +3,9 @@
 /// Default mean Earth radius in meters (WGS84 spherical approximation).
 pub const EARTH_RADIUS_M: f64 = 6_371_008.8;
 
+/// Maximum number of samples allowed along an interpolated path.
+pub const MAX_SAMPLE_COUNT: usize = 100_000;
+
 /// Error types encountered during rhumb line navigation and interpolation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RhumbLineError {
@@ -178,7 +181,11 @@ pub fn interpolate_by_step(
     if total_dist <= step_m {
         return Ok(vec![*p1, *p2]);
     }
-    let steps = (total_dist / step_m).ceil() as usize;
+    let steps_f = (total_dist / step_m).ceil();
+    if !steps_f.is_finite() || steps_f > MAX_SAMPLE_COUNT as f64 {
+        return Err(RhumbLineError::InvalidParameter);
+    }
+    let steps = steps_f as usize;
     let mut waypoints = Vec::with_capacity(steps + 1);
     waypoints.push(*p1);
     for i in 1..steps {
