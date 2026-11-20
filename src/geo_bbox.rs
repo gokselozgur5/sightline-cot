@@ -36,15 +36,28 @@ impl GeoBbox {
 
     /// Checks if a geodetic point lies inside or on the boundary of the box.
     pub fn contains(&self, lat: f64, lon: f64) -> bool {
-        lat >= self.min_lat && lat <= self.max_lat && lon >= self.min_lon && lon <= self.max_lon
+        let n = (lon + 180.0).rem_euclid(360.0) - 180.0;
+        let n = if n == 180.0 { -180.0 } else { n };
+        let lon_ok = if self.min_lon <= self.max_lon {
+            (lon >= self.min_lon && lon <= self.max_lon) || (n >= self.min_lon && n <= self.max_lon)
+        } else {
+            lon >= self.min_lon || lon <= self.max_lon || n >= self.min_lon || n <= self.max_lon
+        };
+        lat >= self.min_lat && lat <= self.max_lat && lon_ok
     }
 
     /// Computes the center coordinates of the bounding box.
     pub fn center(&self) -> [f64; 2] {
-        [
-            (self.min_lat + self.max_lat) * 0.5,
-            (self.min_lon + self.max_lon) * 0.5,
-        ]
+        let span = if self.min_lon <= self.max_lon {
+            self.max_lon - self.min_lon
+        } else {
+            (self.max_lon - self.min_lon).rem_euclid(360.0)
+        };
+        let mut mid_lon = (self.min_lon + span * 0.5 + 180.0).rem_euclid(360.0) - 180.0;
+        if mid_lon == 180.0 {
+            mid_lon = -180.0;
+        }
+        [(self.min_lat + self.max_lat) * 0.5, mid_lon]
     }
 
     /// Returns the four corners in counter-clockwise order starting from southwest.
