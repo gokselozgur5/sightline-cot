@@ -54,9 +54,14 @@ pub fn authalic_sin_beta(lat_deg: f64) -> Result<f64, GeodesicAreaError> {
     if !(-90.0..=90.0).contains(&lat_deg) {
         return Err(GeodesicAreaError::LatitudeOutOfRange);
     }
+    Ok(authalic_sin_beta_unchecked(lat_deg))
+}
+
+#[inline]
+fn authalic_sin_beta_unchecked(lat_deg: f64) -> f64 {
     let q = authalic_q(lat_deg.to_radians());
     let q_polar = authalic_q(core::f64::consts::FRAC_PI_2);
-    Ok((q / q_polar).clamp(-1.0, 1.0))
+    (q / q_polar).clamp(-1.0, 1.0)
 }
 
 /// Wrap longitude difference into [-PI, PI] radians.
