@@ -479,7 +479,8 @@ impl CotSaxParser {
 
         while let Some(ev) = reader.next_event()? {
             match ev {
-                SaxEvent::StartElement { name: "event", attributes } => {
+                SaxEvent::EmptyElement { name: "event", attributes }
+                | SaxEvent::StartElement { name: "event", attributes } => {
                     let version = attributes.get("version").unwrap_or("2.0");
                     let uid = attributes.get("uid").unwrap_or("");
                     let cot_type = attributes.get("type").unwrap_or("");
@@ -488,7 +489,7 @@ impl CotSaxParser {
                     let start = attributes.get("start").unwrap_or("");
                     let stale = attributes.get("stale").unwrap_or("");
 
-                    current_event = Some(CotEventView {
+                    let evt = CotEventView {
                         version,
                         uid,
                         cot_type,
@@ -498,7 +499,12 @@ impl CotSaxParser {
                         stale,
                         point: None,
                         callsign: None,
-                    });
+                    };
+                    if matches!(ev, SaxEvent::EmptyElement { .. }) {
+                        events.push(evt);
+                    } else {
+                        current_event = Some(evt);
+                    }
                 }
                 SaxEvent::EmptyElement { name, attributes }
                 | SaxEvent::StartElement { name, attributes }
