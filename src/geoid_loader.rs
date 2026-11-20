@@ -64,8 +64,11 @@ impl GeoidGrid {
         if !x0.is_finite() || !y0.is_finite() {
             return Err(GeoidError::InvalidHeader("non-finite origin".into()));
         }
-        if data.len() != cols * rows {
-            let (expected, found) = (cols * rows, data.len());
+        let total = cols
+            .checked_mul(rows)
+            .ok_or(GeoidError::InvalidDimensions { cols, rows })?;
+        if data.len() != total {
+            let (expected, found) = (total, data.len());
             return Err(GeoidError::DataCountMismatch { expected, found });
         }
         Ok(Self {
@@ -210,7 +213,7 @@ pub fn parse_geoid_ascii(ascii: &str) -> Result<GeoidGrid, GeoidError> {
         header.set_field(key, val)?;
     }
     let (cols, rows, x0, y0, step, nodata) = header.resolve()?;
-    let mut data = Vec::with_capacity(cols * rows);
+    let mut data = Vec::new();
     for tok in tokens {
         let v: f64 = tok
             .parse()
