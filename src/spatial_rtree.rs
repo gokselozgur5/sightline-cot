@@ -150,10 +150,8 @@ impl SpatialEnvelope {
 
     /// Computes center coordinate [lat, lon] of the envelope.
     pub fn center(&self) -> [f64; 2] {
-        [
-            (self.min_lat + self.max_lat) * 0.5,
-            (self.min_lon + self.max_lon) * 0.5,
-        ]
+        let mid_lon = normalize_lon(self.min_lon + self.lon_span() * 0.5);
+        [(self.min_lat + self.max_lat) * 0.5, mid_lon]
     }
 
     /// Computes minimal geodesic distance in meters from point to the envelope boundary.
@@ -162,7 +160,14 @@ impl SpatialEnvelope {
             return 0.0;
         }
         let clamped_lat = lat.clamp(self.min_lat, self.max_lat);
-        let clamped_lon = normalize_lon(lon).clamp(self.min_lon, self.max_lon);
+        let n_lon = normalize_lon(lon);
+        let clamped_lon = if self.contains_point(lat, lon) {
+            n_lon
+        } else {
+            let d_min = haversine_distance_m(lat, lon, clamped_lat, self.min_lon);
+            let d_max = haversine_distance_m(lat, lon, clamped_lat, self.max_lon);
+            if d_min < d_max { self.min_lon } else { self.max_lon }
+        };
         haversine_distance_m(lat, lon, clamped_lat, clamped_lon)
     }
 }
