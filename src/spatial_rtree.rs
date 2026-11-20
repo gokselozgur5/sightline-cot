@@ -100,10 +100,19 @@ impl SpatialEnvelope {
 
     /// Returns true if this envelope fully encloses another envelope.
     pub fn contains_envelope(&self, other: &Self) -> bool {
-        self.min_lat <= other.min_lat
-            && self.max_lat >= other.max_lat
-            && self.min_lon <= other.min_lon
-            && self.max_lon >= other.max_lon
+        let lat_ok = self.min_lat <= other.min_lat && self.max_lat >= other.max_lat;
+        let s_wrap = self.min_lon > self.max_lon;
+        let o_wrap = other.min_lon > other.max_lon;
+        let lon_ok = match (s_wrap, o_wrap) {
+            (false, false) => self.min_lon <= other.min_lon && self.max_lon >= other.max_lon,
+            (true, false) => {
+                (other.min_lon >= self.min_lon && other.max_lon >= self.min_lon)
+                    || (other.min_lon <= self.max_lon && other.max_lon <= self.max_lon)
+            }
+            (false, true) => false,
+            (true, true) => other.min_lon >= self.min_lon && other.max_lon <= self.max_lon,
+        };
+        lat_ok && lon_ok
     }
 
     /// Returns true if this envelope intersects with another envelope.
