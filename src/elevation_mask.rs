@@ -103,6 +103,9 @@ impl MaskSector {
         if !(-90.0..=90.0).contains(&mask_el) {
             return Err(ElevationMaskError::InvalidElevation);
         }
+        if (end_az - start_az).abs() >= 360.0 {
+            return Err(ElevationMaskError::InvalidSectorSpan);
+        }
         let start = (start_az % 360.0 + 360.0) % 360.0;
         let end = (end_az % 360.0 + 360.0) % 360.0;
         Ok(Self { start_azimuth_deg: start, end_azimuth_deg: end, mask_elevation_deg: mask_el })
