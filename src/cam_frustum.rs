@@ -124,8 +124,12 @@ fn compute_cam_corners(
     let mut corners = [[0.0; 3]; 8];
     for (i, p) in px.iter().enumerate() {
         let ray = cam.pixel_to_ray(p[0], p[1])?;
-        corners[i] = [ray[0] * near_m, ray[1] * near_m, ray[2] * near_m];
-        corners[i + 4] = [ray[0] * far_m, ray[1] * far_m, ray[2] * far_m];
+        if ray[2] <= 0.0 {
+            return Err(FrustumError::InvalidParameters);
+        }
+        let (s_near, s_far) = (near_m / ray[2], far_m / ray[2]);
+        corners[i] = [ray[0] * s_near, ray[1] * s_near, near_m];
+        corners[i + 4] = [ray[0] * s_far, ray[1] * s_far, far_m];
     }
     Ok(corners)
 }
