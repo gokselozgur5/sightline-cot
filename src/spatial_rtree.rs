@@ -130,18 +130,22 @@ impl SpatialEnvelope {
         )
     }
 
+    fn lon_span(&self) -> f64 {
+        if self.min_lon <= self.max_lon {
+            (self.max_lon - self.min_lon).max(0.0)
+        } else {
+            (self.max_lon - self.min_lon).rem_euclid(360.0)
+        }
+    }
+
     /// Computes the area metric of the bounding box in degrees squared.
     pub fn area(&self) -> f64 {
-        let d_lat = (self.max_lat - self.min_lat).max(0.0);
-        let d_lon = (self.max_lon - self.min_lon).max(0.0);
-        d_lat * d_lon
+        (self.max_lat - self.min_lat).max(0.0) * self.lon_span()
     }
 
     /// Computes the semi-perimeter margin of the bounding box.
     pub fn margin(&self) -> f64 {
-        let d_lat = (self.max_lat - self.min_lat).max(0.0);
-        let d_lon = (self.max_lon - self.min_lon).max(0.0);
-        d_lat + d_lon
+        (self.max_lat - self.min_lat).max(0.0) + self.lon_span()
     }
 
     /// Computes center coordinate [lat, lon] of the envelope.
