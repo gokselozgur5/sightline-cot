@@ -121,6 +121,34 @@ fn great_circle_interp(v1: [f64; 3], v2: [f64; 3], d: f64, sin_d: f64, f: f64) -
     (vy.atan2(vx), authalic_sin_beta_unchecked(lat))
 }
 
+fn great_circle_edge_step(p1: [f64; 2], p2: [f64; 2]) -> (f64, f64) {
+    let (r1, r2) = (
+        (p1[0].to_radians(), p1[1].to_radians()),
+        (p2[0].to_radians(), p2[1].to_radians()),
+    );
+    let v1 = [r1.0.cos() * r1.1.cos(), r1.0.cos() * r1.1.sin(), r1.0.sin()];
+    let v2 = [r2.0.cos() * r2.1.cos(), r2.0.cos() * r2.1.sin(), r2.0.sin()];
+    let d = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]).clamp(-1.0, 1.0).acos();
+    let steps = ((d / 1.0_f64.to_radians()).ceil() as usize).max(1);
+    let sin_d = d.sin();
+    let (mut prev_lon, mut prev_sb) = (r1.1, authalic_sin_beta_unchecked(p1[0]));
+    let (mut acc_sum, mut acc_dlon) = (0.0, 0.0);
+    for s in 1..=steps {
+        let f = s as f64 / steps as f64;
+        let (curr_lon, curr_sb) = if sin_d < 1e-15 {
+            (r2.1, prev_sb)
+        } else {
+            great_circle_interp(v1, v2, d, sin_d, f)
+        };
+        let dlon = wrap_delta_lon(curr_lon - prev_lon);
+        acc_dlon += dlon;
+        acc_sum += dlon * (2.0 + prev_sb + curr_sb);
+        prev_lon = curr_lon;
+        prev_sb = curr_sb;
+    }
+    (acc_sum, acc_dlon)
+}
+
 /// Comprehensive geometry metrics for a polygonal CoT zone.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct GeodesicPolygonArea {
