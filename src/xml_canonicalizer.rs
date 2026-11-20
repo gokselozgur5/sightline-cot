@@ -103,6 +103,7 @@ enum XmlNode {
         children: Vec<XmlNode>,
     },
     Text(String),
+    Comment(String),
 }
 
 /// Tokenizer token produced when scanning XML stream.
