@@ -187,20 +187,28 @@ impl SpatialEnvelope {
     }
 
     /// Computes minimal geodesic distance in meters from point to the envelope boundary.
+    fn edge_dist(lat: f64, lon: f64, min_lat: f64, max_lat: f64, edge_lon: f64) -> f64 {
+        let (ql, dl) = (lat.to_radians(), normalize_lon(edge_lon - lon).to_radians());
+        let mut d = haversine_distance_m(lat, lon, min_lat, edge_lon).min(haversine_distance_m(lat, lon, max_lat, edge_lon));
+        let c = ql.sin().atan2(ql.cos() * dl.cos()).to_degrees();
+        if (-90.0..=90.0).contains(&c) && c > min_lat && c < max_lat {
+            d = d.min(haversine_distance_m(lat, lon, c, edge_lon));
+        }
+        d
+    }
+
     pub fn distance_to_point(&self, lat: f64, lon: f64) -> f64 {
         if self.contains_point(lat, lon) {
             return 0.0;
         }
-        let clamped_lat = lat.clamp(self.min_lat, self.max_lat);
-        let n_lon = normalize_lon(lon);
-        let clamped_lon = if self.contains_point(lat, lon) {
-            n_lon
-        } else {
-            let d_min = haversine_distance_m(lat, lon, clamped_lat, self.min_lon);
-            let d_max = haversine_distance_m(lat, lon, clamped_lat, self.max_lon);
-            if d_min < d_max { self.min_lon } else { self.max_lon }
+        let dm = Self::edge_dist(lat, lon, self.min_lat, self.max_lat, self.min_lon)
+            .min(Self::edge_dist(lat, lon, self.min_lat, self.max_lat, self.max_lon));
+        let par = |plat: f64| {
+            let nl = normalize_lon(lon);
+            let ok = if self.min_lon <= self.max_lon { nl >= self.min_lon && nl <= self.max_lon } else { nl >= self.min_lon || nl <= self.max_lon };
+            if ok { haversine_distance_m(lat, lon, plat, nl) } else { haversine_distance_m(lat, lon, plat, self.min_lon).min(haversine_distance_m(lat, lon, plat, self.max_lon)) }
         };
-        haversine_distance_m(lat, lon, clamped_lat, clamped_lon)
+        dm.min(par(self.min_lat)).min(par(self.max_lat))
     }
 }
 
