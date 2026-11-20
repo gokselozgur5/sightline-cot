@@ -325,7 +325,7 @@ impl ElevationMaskValidator {
         &self, az_deg: f64, dist_m: f64, height_m: f64, profile: &ObstacleProfile, curvature: bool,
     ) -> Result<MaskingEvaluation, ElevationMaskError> {
         let target_el = self.compute_target_elevation_deg(dist_m, height_m, curvature)?;
-        let prof_mask = profile.compute_mask_angle_deg(self.observer_height_m, curvature)?;
+        let prof_mask = profile.compute_mask_angle_up_to_deg(self.observer_height_m, dist_m, curvature)?;
         let sect_mask = self.get_mask_angle_at_azimuth(az_deg)?;
         let eff_mask = prof_mask.max(sect_mask);
         let margin = target_el - eff_mask;
