@@ -601,12 +601,15 @@ pub fn parse_mgrs_10figure(s: &str) -> Result<Mgrs10Figure, GridError> {
         return Err(GridError::InvalidZone);
     }
     let (zone, r) = if len == 15 {
-        (
-            (cleaned[0].wrapping_sub(b'0')) * 10 + (cleaned[1].wrapping_sub(b'0')),
-            2,
-        )
+        if !cleaned[0].is_ascii_digit() || !cleaned[1].is_ascii_digit() {
+            return Err(GridError::InvalidZone);
+        }
+        ((cleaned[0] - b'0') * 10 + (cleaned[1] - b'0'), 2)
     } else {
-        (cleaned[0].wrapping_sub(b'0'), 1)
+        if !cleaned[0].is_ascii_digit() {
+            return Err(GridError::InvalidZone);
+        }
+        (cleaned[0] - b'0', 1)
     };
     if !(1..=60).contains(&zone) {
         return Err(GridError::InvalidZone);
