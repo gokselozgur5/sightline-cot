@@ -88,7 +88,16 @@ impl GeoBbox {
     pub fn expand(&mut self, lat: f64, lon: f64) {
         self.min_lat = self.min_lat.min(lat);
         self.max_lat = self.max_lat.max(lat);
-        self.min_lon = self.min_lon.min(lon);
-        self.max_lon = self.max_lon.max(lon);
+        if !self.contains(lat, lon) {
+            let mut n = (lon + 180.0).rem_euclid(360.0) - 180.0;
+            if n == 180.0 {
+                n = -180.0;
+            }
+            if (n - self.min_lon).rem_euclid(360.0) <= (self.max_lon - n).rem_euclid(360.0) {
+                self.max_lon = n;
+            } else {
+                self.min_lon = n;
+            }
+        }
     }
 }
