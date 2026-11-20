@@ -198,12 +198,12 @@ impl Geofence {
         margin_m: f64,
     ) -> GeofenceBreach {
         let raw = self.evaluate_breach(lat, lon, alt, prev);
-        let now_inside = matches!(raw.state, GeofenceState::Inside | GeofenceState::Entered);
-        let flipped = matches!(prev, Some(p) if p != now_inside);
+        let poly_inside = self.is_point_inside_polygon(lat, lon);
+        let flipped = matches!(prev, Some(p) if p != poly_inside);
         if !flipped || raw.distance_to_boundary_m >= margin_m {
             return raw;
         }
-        let state = if now_inside {
+        let state = if poly_inside {
             GeofenceState::Outside
         } else {
             GeofenceState::Inside
