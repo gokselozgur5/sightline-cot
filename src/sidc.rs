@@ -332,19 +332,21 @@ impl TacticalSymbol {
     }
 }
 
+static COT_TYPES: [[&str; 6]; 9] = [
+    ["a-p-G", "a-p-A", "a-p-S", "a-p-U", "a-p-P", "a-p-X"],
+    ["a-u-G", "a-u-A", "a-u-S", "a-u-U", "a-u-P", "a-u-X"],
+    ["a-f-G", "a-f-A", "a-f-S", "a-f-U", "a-f-P", "a-f-X"],
+    ["a-n-G", "a-n-A", "a-n-S", "a-n-U", "a-n-P", "a-n-X"],
+    ["a-h-G", "a-h-A", "a-h-S", "a-h-U", "a-h-P", "a-h-X"],
+    ["a-a-G", "a-a-A", "a-a-S", "a-a-U", "a-a-P", "a-a-X"],
+    ["a-s-G", "a-s-A", "a-s-S", "a-s-U", "a-s-P", "a-s-X"],
+    ["a-j-G", "a-j-A", "a-j-S", "a-j-U", "a-j-P", "a-j-X"],
+    ["a-k-G", "a-k-A", "a-k-S", "a-k-U", "a-k-P", "a-k-X"],
+];
+
 impl TacticalSymbol {
     pub fn to_cot_type(&self) -> &'static str {
-        match (self.affiliation, self.domain) {
-            (SidcAffiliation::Friend, SidcDomain::Air) => "a-f-A",
-            (SidcAffiliation::Hostile, SidcDomain::Air) => "a-h-A",
-            (SidcAffiliation::Friend, SidcDomain::Surface) => "a-f-S",
-            (SidcAffiliation::Hostile, SidcDomain::Surface) => "a-h-S",
-            (SidcAffiliation::Friend, SidcDomain::Land) => "a-f-G",
-            (SidcAffiliation::Hostile, SidcDomain::Land) => "a-h-G",
-            (SidcAffiliation::Neutral, SidcDomain::Land) => "a-n-G",
-            (SidcAffiliation::Neutral, SidcDomain::Air) => "a-n-A",
-            _ => "a-u-G",
-        }
+        COT_TYPES[self.affiliation as usize][self.domain as usize]
     }
 }
 
