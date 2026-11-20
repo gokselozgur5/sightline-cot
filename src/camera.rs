@@ -704,7 +704,11 @@ impl DemGrid {
         if !e0.is_finite() || !n0.is_finite() || !step.is_finite() || step <= 0.0 {
             return Err(CameraError::InvalidParameters);
         }
-        if cols < 2 || rows < 2 || elevations.len() != cols * rows {
+        let expected_len = match cols.checked_mul(rows) {
+            Some(n) => n,
+            None => return Err(CameraError::InvalidParameters),
+        };
+        if cols < 2 || rows < 2 || elevations.len() != expected_len {
             return Err(CameraError::InvalidParameters);
         }
         if !elevations.iter().all(|h| h.is_finite()) {
