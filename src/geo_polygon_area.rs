@@ -181,7 +181,7 @@ pub fn is_counter_clockwise(vertices: &[[f64; 2]]) -> Result<bool, GeodesicAreaE
     if sum.abs() < 1e-15 {
         return Err(GeodesicAreaError::DegeneratePolygon);
     }
-    Ok(sum > 0.0)
+    Ok(sum < 0.0)
 }
 
 #[cfg(test)]
@@ -252,8 +252,8 @@ mod tests {
             [1.0, 1.0],
             [1.0, 0.0],
         ];
-        assert_eq!(is_counter_clockwise(&ccw), Ok(true));
-        assert_eq!(is_counter_clockwise(&cw), Ok(false));
+        assert_eq!(is_counter_clockwise(&ccw), Ok(false));
+        assert_eq!(is_counter_clockwise(&cw), Ok(true));
     }
 
     #[test]
