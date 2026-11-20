@@ -114,6 +114,13 @@ pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaE
     Ok(area)
 }
 
+fn great_circle_interp(v1: [f64; 3], v2: [f64; 3], d: f64, sin_d: f64, f: f64) -> (f64, f64) {
+    let (a, b) = (((1.0 - f) * d).sin() / sin_d, (f * d).sin() / sin_d);
+    let (vx, vy, vz) = (a * v1[0] + b * v2[0], a * v1[1] + b * v2[1], a * v1[2] + b * v2[2]);
+    let lat = vz.atan2((vx * vx + vy * vy).sqrt()).to_degrees();
+    (vy.atan2(vx), authalic_sin_beta_unchecked(lat))
+}
+
 /// Comprehensive geometry metrics for a polygonal CoT zone.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct GeodesicPolygonArea {
