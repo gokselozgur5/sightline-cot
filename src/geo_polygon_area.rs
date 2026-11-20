@@ -90,15 +90,23 @@ pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaE
         }
     }
     let mut sum = 0.0;
+    let mut dlon_sum = 0.0;
+    let mut lat_sum = 0.0;
     for i in 0..n {
         let (p1, p2) = (vertices[i], vertices[(i + 1) % n]);
+        lat_sum += p1[0];
         let sin_beta1 = authalic_sin_beta(p1[0])?;
         let sin_beta2 = authalic_sin_beta(p2[0])?;
         let dlon = wrap_delta_lon((p2[1] - p1[1]).to_radians());
+        dlon_sum += dlon;
         sum += dlon * (2.0 + sin_beta1 + sin_beta2);
     }
     let r = WGS84_AUTHALIC_RADIUS_M;
-    Ok((0.5 * r * r * sum).abs())
+    let mut area = (0.5 * r * r * sum).abs();
+    if (dlon_sum.abs() - 2.0 * core::f64::consts::PI).abs() < 1e-6 && lat_sum > 0.0 {
+        area = (4.0 * core::f64::consts::PI * r * r - area).abs();
+    }
+    Ok(area)
 }
 
 /// Comprehensive geometry metrics for a polygonal CoT zone.
