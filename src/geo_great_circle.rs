@@ -223,6 +223,10 @@ impl GreatCirclePath {
         if !step_m.is_finite() || step_m <= 0.0 {
             return Err(GreatCircleError::InvalidParameter);
         }
+        let steps_f = (self.total_length / step_m).ceil();
+        if !steps_f.is_finite() || steps_f > crate::rhumb_line::MAX_SAMPLE_COUNT as f64 {
+            return Err(GreatCircleError::InvalidParameter);
+        }
         let mut result = Vec::new();
         let mut d = 0.0;
         while d < self.total_length {
