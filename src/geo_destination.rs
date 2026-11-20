@@ -14,7 +14,12 @@ pub fn destination_point_with_radius(
         .clamp(-1.0, 1.0)
         .asin();
     let lon2 = if 90.0 - lat.abs() < 1e-12 {
-        (bearing_deg + 540.0).rem_euclid(360.0) - 180.0
+        let l = if lat > 0.0 {
+            lon + 180.0 - bearing_deg
+        } else {
+            lon + bearing_deg
+        };
+        (l + 540.0).rem_euclid(360.0) - 180.0
     } else {
         let l2 = l1 + (b.sin() * d.sin() * p1.cos()).atan2(d.cos() - p1.sin() * p2.sin());
         (l2.to_degrees() + 540.0).rem_euclid(360.0) - 180.0
