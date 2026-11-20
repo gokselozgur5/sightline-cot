@@ -79,7 +79,7 @@ fn compute_destination(
     let t = c_2sm + c * c_s * (-1.0 + 2.0 * c_2sm * c_2sm);
     let omega = (1.0 - c) * f * s_alp * (sig + c * s_s * t);
     let lon2 = (lon1 + (lam - omega).to_degrees() + 540.0).rem_euclid(360.0) - 180.0;
-    let rev_az = (s_alp.atan2(-x).to_degrees() + 360.0).rem_euclid(360.0);
+    let rev_az = (s_alp.atan2(-x).to_degrees() + 540.0).rem_euclid(360.0);
     VincentyDirect { lat_deg: lat2, lon_deg: lon2, reverse_azimuth_deg: rev_az }
 }
 
