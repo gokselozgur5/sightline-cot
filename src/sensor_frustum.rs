@@ -370,7 +370,7 @@ impl FrustumFootprint {
 
 
 fn extract_xml_attr(tag: &str, attr: &str) -> Option<String> {
-    let needle = format!("{attr}=\"");
+    let needle = format!(" {attr}=\"");
     let start = tag.find(&needle)? + needle.len();
     let end = tag[start..].find('"')?;
     Some(tag[start..start + end].to_string())
@@ -384,8 +384,11 @@ impl SensorGimbal {
         let tag = &xml[tag_start..tag_start + tag_end + 1];
         let az = extract_xml_attr(tag, "azimuth").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("azimuth".into()))?;
         let el = extract_xml_attr(tag, "elevation").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("elevation".into()))?;
-        let fov = extract_xml_attr(tag, "fov").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("fov".into()))?;
-        let rng = extract_xml_attr(tag, "range").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("range".into()))?;
+        let fov: f64 = extract_xml_attr(tag, "fov").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("fov".into()))?;
+        let rng: f64 = extract_xml_attr(tag, "range").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("range".into()))?;
+        if !fov.is_finite() || !rng.is_finite() {
+            return Err(FrustumError::NonFiniteParameter("fov or range"));
+        }
         let gimbal = Self::new(az, el, 0.0)?;
         Ok((gimbal, fov, rng))
     }
