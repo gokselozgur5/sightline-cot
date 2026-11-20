@@ -71,7 +71,8 @@ impl StandardIdentity {
 
     pub fn from_cot_char(c: char) -> Self {
         match c {
-            'f' | 'F' | 'a' | 'A' => Self::Friend,
+            'a' | 'A' => Self::AssumedFriend,
+            'f' | 'F' => Self::Friend,
             'h' | 'H' | 'j' | 'J' | 'k' | 'K' => Self::Hostile,
             'n' | 'N' => Self::Neutral,
             's' | 'S' => Self::Suspect,
