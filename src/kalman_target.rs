@@ -470,8 +470,11 @@ impl TacticalTargetFilter {
         })
     }
 
-    /// Advance target filter forward in time to the target timestamp.
-    pub fn predict_to(&mut self, timestamp_ms: i64) -> Result<(), KalmanTargetError> {
+    fn predict_internal(
+        &mut self,
+        timestamp_ms: i64,
+        check_coast: bool,
+    ) -> Result<(), KalmanTargetError> {
         if timestamp_ms < self.current_state.timestamp_ms {
             return Err(KalmanTargetError::InvalidDeltaTime);
         }
@@ -481,7 +484,7 @@ impl TacticalTargetFilter {
         }
         let dt_sec = dt_ms as f64 / 1000.0;
         let time_since_update_sec = (timestamp_ms - self.last_update_ms) as f64 / 1000.0;
-        if time_since_update_sec > self.config.max_coast_sec {
+        if check_coast && time_since_update_sec > self.config.max_coast_sec {
             return Err(KalmanTargetError::CoastLimitExceeded {
                 dt_sec: time_since_update_sec,
                 max_coast_sec: self.config.max_coast_sec,
@@ -494,6 +497,11 @@ impl TacticalTargetFilter {
         Ok(())
     }
 
+    /// Advance target filter forward in time to the target timestamp.
+    pub fn predict_to(&mut self, timestamp_ms: i64) -> Result<(), KalmanTargetError> {
+        self.predict_internal(timestamp_ms, true)
+    }
+
     /// Process 3D position measurement update with residual gating.
     pub fn update_position(
         &mut self,
@@ -501,7 +509,7 @@ impl TacticalTargetFilter {
         pos_var: Option<[f64; 3]>,
         timestamp_ms: i64,
     ) -> Result<f64, KalmanTargetError> {
-        self.predict_to(timestamp_ms)?;
+        self.predict_internal(timestamp_ms, false)?;
         let r_diag = pos_var.unwrap_or([
             self.config.default_pos_var,
             self.config.default_pos_var,
@@ -528,7 +536,7 @@ impl TacticalTargetFilter {
         vel_var: Option<[f64; 3]>,
         timestamp_ms: i64,
     ) -> Result<f64, KalmanTargetError> {
-        self.predict_to(timestamp_ms)?;
+        self.predict_internal(timestamp_ms, false)?;
         let r_diag = vel_var.unwrap_or([
             self.config.default_vel_var,
             self.config.default_vel_var,
