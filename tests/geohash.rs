@@ -38,7 +38,10 @@ fn test_geohash_known_locations() {
 fn test_geohash_error_handling() {
     use sightline_cot::geohash::GeohashError;
     assert_eq!(encode(91.0, 0.0, 5), Err(GeohashError::LatitudeOutOfRange));
-    assert_eq!(encode(0.0, 181.0, 5), Err(GeohashError::LongitudeOutOfRange));
+    assert_eq!(
+        encode(0.0, 181.0, 5),
+        Err(GeohashError::LongitudeOutOfRange)
+    );
     assert_eq!(encode(0.0, 0.0, 0), Err(GeohashError::InvalidPrecision));
     assert_eq!(encode(0.0, 0.0, 13), Err(GeohashError::InvalidPrecision));
     assert_eq!(decode(""), Err(GeohashError::EmptyHash));
