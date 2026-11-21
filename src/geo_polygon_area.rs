@@ -79,11 +79,8 @@ pub fn wrap_delta_lon(dlon_rad: f64) -> f64 {
     rem
 }
 
-/// Compute geodesic area of a polygon on the WGS84 ellipsoid in square meters.
-/// Edges follow great-circle arcs on the authalic sphere (remaining error < 1%).
-pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaError> {
-    let n = vertices.len();
-    if n < 3 {
+fn validate_polygon_vertices(vertices: &[[f64; 2]]) -> Result<(), GeodesicAreaError> {
+    if vertices.len() < 3 {
         return Err(GeodesicAreaError::InsufficientVertices);
     }
     for p in vertices {
@@ -97,6 +94,14 @@ pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaE
             return Err(GeodesicAreaError::LongitudeOutOfRange);
         }
     }
+    Ok(())
+}
+
+/// Compute geodesic area of a polygon on the WGS84 ellipsoid in square meters.
+/// Edges follow great-circle arcs on the authalic sphere (remaining error < 1%).
+pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaError> {
+    validate_polygon_vertices(vertices)?;
+    let n = vertices.len();
     let mut sum = 0.0;
     let mut dlon_sum = 0.0;
     let mut lat_sum = 0.0;
@@ -182,10 +187,8 @@ impl GeodesicPolygonArea {
 
 /// Compute polygon perimeter along great-circle arcs in meters.
 pub fn polygon_geodesic_perimeter(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaError> {
+    validate_polygon_vertices(vertices)?;
     let n = vertices.len();
-    if n < 3 {
-        return Err(GeodesicAreaError::InsufficientVertices);
-    }
     let mut total_rad = 0.0;
     for i in 0..n {
         let (p1, p2) = (vertices[i], vertices[(i + 1) % n]);
@@ -213,10 +216,8 @@ pub fn compute_cot_polygon_geometry(
 
 /// Check whether polygon vertices are ordered counter-clockwise (positive signed area).
 pub fn is_counter_clockwise(vertices: &[[f64; 2]]) -> Result<bool, GeodesicAreaError> {
+    validate_polygon_vertices(vertices)?;
     let n = vertices.len();
-    if n < 3 {
-        return Err(GeodesicAreaError::InsufficientVertices);
-    }
     let mut sum = 0.0;
     for i in 0..n {
         let (p1, p2) = (vertices[i], vertices[(i + 1) % n]);
