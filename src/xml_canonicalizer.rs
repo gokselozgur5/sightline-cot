@@ -258,34 +258,46 @@ impl CotSchemaValidator {
             map.insert(a.name.as_str(), a.value.as_str());
         }
 
-        let version = map.get("version").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "version",
-        })?;
+        let version = map
+            .get("version")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "version",
+            })?;
         if *version != "2.0" {
             return Err(CotValidationError::InvalidVersion((*version).to_string()));
         }
 
-        let uid = map.get("uid").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "uid",
-        })?;
+        let uid = map
+            .get("uid")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "uid",
+            })?;
         if uid.trim().is_empty() {
-            return Err(CotValidationError::MalformedXml("event uid cannot be empty".into()));
+            return Err(CotValidationError::MalformedXml(
+                "event uid cannot be empty".into(),
+            ));
         }
 
-        let cot_type = map.get("type").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "type",
-        })?;
+        let cot_type = map
+            .get("type")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "type",
+            })?;
         Self::validate_cot_type(cot_type)?;
 
-        let how = map.get("how").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "how",
-        })?;
+        let how = map
+            .get("how")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "how",
+            })?;
         if how.trim().is_empty() {
-            return Err(CotValidationError::MalformedXml("event how cannot be empty".into()));
+            return Err(CotValidationError::MalformedXml(
+                "event how cannot be empty".into(),
+            ));
         }
 
         let time_str = map.get("time").ok_or(CotValidationError::MissingRequiredAttribute {
