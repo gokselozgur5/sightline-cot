@@ -271,9 +271,11 @@ pub fn point_in_polygon_enu(pt: [f64; 2], poly: &[[f64; 3]]) -> bool {
     for i in 0..poly.len() {
         let (xi, yi) = (poly[i][0], poly[i][1]);
         let (xj, yj) = (poly[j][0], poly[j][1]);
-        let intersect = ((yi > y) != (yj > y))
-            && (x < (xj - xi) * (y - yi) / (yj - yi + 1e-15) + xi);
-        if intersect { inside = !inside; }
+        let intersect =
+            ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi + 1e-15) + xi);
+        if intersect {
+            inside = !inside;
+        }
         j = i;
     }
     inside
@@ -288,20 +290,42 @@ impl FrustumFootprint {
 
 /// Compute boresight and 4 corner ray unit vectors in ENU coordinates.
 pub fn compute_frustum_rays_enu(
-    az_deg: f64, el_deg: f64, roll_deg: f64, h_fov_deg: f64, v_fov_deg: f64,
+    az_deg: f64,
+    el_deg: f64,
+    roll_deg: f64,
+    h_fov_deg: f64,
+    v_fov_deg: f64,
 ) -> ([f64; 3], [[f64; 3]; 4]) {
-    let (az_rad, el_rad, roll_rad) = (az_deg.to_radians(), el_deg.to_radians(), roll_deg.to_radians());
+    let (az_rad, el_rad, roll_rad) = (
+        az_deg.to_radians(),
+        el_deg.to_radians(),
+        roll_deg.to_radians(),
+    );
     let (cos_el, sin_el) = (el_rad.cos(), el_rad.sin());
     let b = [az_rad.sin() * cos_el, az_rad.cos() * cos_el, sin_el];
-    let (r0, u0) = ([az_rad.cos(), -az_rad.sin(), 0.0], [az_rad.sin() * sin_el, az_rad.cos() * sin_el, -cos_el]);
+    let (r0, u0) = (
+        [az_rad.cos(), -az_rad.sin(), 0.0],
+        [az_rad.sin() * sin_el, az_rad.cos() * sin_el, -cos_el],
+    );
     let (cr, sr) = (roll_rad.cos(), roll_rad.sin());
     let r = [r0[0] * cr + u0[0] * sr, r0[1] * cr + u0[1] * sr, u0[2] * sr];
-    let u = [-r0[0] * sr + u0[0] * cr, -r0[1] * sr + u0[1] * cr, u0[2] * cr];
-    let (th, tv) = ((h_fov_deg * 0.5).to_radians().tan(), (v_fov_deg * 0.5).to_radians().tan());
+    let u = [
+        -r0[0] * sr + u0[0] * cr,
+        -r0[1] * sr + u0[1] * cr,
+        u0[2] * cr,
+    ];
+    let (th, tv) = (
+        (h_fov_deg * 0.5).to_radians().tan(),
+        (v_fov_deg * 0.5).to_radians().tan(),
+    );
     let deltas = [(-th, tv), (th, tv), (th, -tv), (-th, -tv)];
     let mut corners = [[0.0; 3]; 4];
     for (i, (dx, dy)) in deltas.iter().enumerate() {
-        let v = [b[0] + r[0] * dx + u[0] * dy, b[1] + r[1] * dx + u[1] * dy, b[2] + r[2] * dx + u[2] * dy];
+        let v = [
+            b[0] + r[0] * dx + u[0] * dy,
+            b[1] + r[1] * dx + u[1] * dy,
+            b[2] + r[2] * dx + u[2] * dy,
+        ];
         let m = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt();
         corners[i] = [v[0] / m, v[1] / m, v[2] / m];
     }
@@ -329,12 +353,12 @@ pub fn compute_frustum_ground_enu(
     let (b_pt, slant_range) = intersect_ray_ground(b_enu, sensor_h, config.max_range_m)?;
     let mut corners_enu = Vec::with_capacity(4);
     for c_ray in corner_rays {
-        let (c_pt, _) = intersect_ray_ground(rotate_vec(&rot, c_ray), sensor_h, config.max_range_m)?;
+        let (c_pt, _) =
+            intersect_ray_ground(rotate_vec(&rot, c_ray), sensor_h, config.max_range_m)?;
         corners_enu.push(c_pt);
     }
     Ok((b_pt, slant_range, corners_enu))
 }
-
 
 /// Generate complete sensor ground footprint polygon from platform, gimbal, and sensor configuration.
 pub fn generate_sensor_footprint(
