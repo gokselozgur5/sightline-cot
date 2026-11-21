@@ -22,9 +22,15 @@ fn test_camera_frustum_compiles() {
     // Near plane corner 0 corresponds to pixel (0, 0): top-left -> West and North.
     assert!(frustum.corners_enu[0][0] < 0.0);
     assert!(frustum.corners_enu[0][1] > 0.0);
+    assert!((frustum.corners_enu[0][0] - (-0.96)).abs() < 1e-9);
+    assert!((frustum.corners_enu[0][1] - 0.54).abs() < 1e-9);
+    assert!((frustum.corners_enu[0][2] - 99.0).abs() < 1e-9);
     // Near plane corner 2 corresponds to pixel (w, h): bottom-right -> East and South.
     assert!(frustum.corners_enu[2][0] > 0.0);
     assert!(frustum.corners_enu[2][1] < 0.0);
+    assert!((frustum.corners_enu[2][0] - 0.96).abs() < 1e-9);
+    assert!((frustum.corners_enu[2][1] - (-0.54)).abs() < 1e-9);
+    assert!((frustum.corners_enu[2][2] - 99.0).abs() < 1e-9);
 }
 
 #[test]
