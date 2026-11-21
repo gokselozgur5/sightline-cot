@@ -57,3 +57,10 @@ fn test_ups_root_exports() {
     assert!((lat - 89.0).abs() < 1e-5);
     assert!((lon - 10.0).abs() < 1e-5);
 }
+
+#[test]
+fn test_ups_reference_scale() {
+    let ups = wgs84_to_ups(85.0, 0.0).unwrap();
+    assert!((ups.northing - 1444542.61).abs() < 1.0);
+    assert!((ups.easting - 2000000.0).abs() < 1e-4);
+}
