@@ -15,6 +15,7 @@ fn test_from_points_tightly_encloses() {
 #[test]
 fn test_empty_input_returns_none() {
     assert!(GeoBbox::from_points(&[]).is_none());
+    assert_eq!(GeoBbox::from_points(&[]), None);
 }
 
 #[test]
