@@ -51,3 +51,11 @@ fn horizon_timestamps_do_not_drift() {
         .unwrap();
     assert_eq!(traj.last().unwrap().timestamp_ms, 1000);
 }
+
+#[test]
+fn predict_horizon_rejects_excessive_or_zero_step_counts() {
+    let filter = sample_filter([1.0, 0.0, 0.0]);
+    assert!(filter.predict_horizon(0.4, 1.0).is_err());
+    assert!(filter.predict_horizon(200_000.0, 1.0).is_err());
+}
+
