@@ -154,7 +154,7 @@ pub fn interpolate_by_count(
 ) -> Result<Vec<RhumbWaypoint>, RhumbLineError> {
     p1.validate()?;
     p2.validate()?;
-    if count == 0 {
+    if count == 0 || count > MAX_SAMPLE_COUNT {
         return Err(RhumbLineError::InvalidParameter);
     }
     let mut waypoints = Vec::with_capacity(count + 2);
