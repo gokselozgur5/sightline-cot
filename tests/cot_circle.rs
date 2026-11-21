@@ -91,3 +91,13 @@ fn test_range_rings_generation_and_lookup() {
     assert!(events[0].contains("BASE-ring-1"));
     assert!(events[1].contains("AIRPORT Ring 2"));
 }
+
+#[test]
+fn test_circle_parse_missing_point_element_errors() {
+    let xml = r#"<ellipse major="500.00" minor="500.00"/>"#;
+    let res = CotCircle::parse(xml);
+    assert!(
+        matches!(res, Err(CotCircleError::XmlParseError(_))),
+        "expected XmlParseError for missing point element, got: {res:?}"
+    );
+}
