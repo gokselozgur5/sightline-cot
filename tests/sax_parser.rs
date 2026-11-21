@@ -74,3 +74,24 @@ fn test_cot_chunk_streamer_self_closing_event() {
     assert_eq!(evts.len(), 1);
     assert_eq!(evts[0].uid, "a");
 }
+
+#[test]
+fn sax_point_with_nan_or_out_of_range_values_is_not_reported() {
+    let xml = "<event uid=\"U\"><point lat=\"NaN\" lon=\"500\" hae=\"inf\"/></event>";
+    let events = CotSaxParser::parse_events(xml).unwrap_or_default();
+    assert!(events.iter().all(|e| e.point.is_none()), "{events:?}");
+}
+
+#[test]
+fn proto_event_with_nan_latitude_is_rejected() {
+    use sightline_cot::proto::{decode_tak_packet, encode_tak_packet, TakCotEvent};
+    let evt = TakCotEvent {
+        uid: "U".into(),
+        lat: f64::NAN,
+        lon: 500.0,
+        ..Default::default()
+    };
+    let mut packet = Vec::new();
+    encode_tak_packet(&evt, &mut packet).unwrap();
+    assert!(decode_tak_packet(&packet).is_err());
+}
