@@ -77,6 +77,7 @@ fn convert_track_to_cot(
         cot_type: "a-f-G-E-V".into(),
         how: "m-g".into(),
         time_ms,
+        start_ms: time_ms,
         stale_ms: time_ms + 10_000,
         lat_deg,
         lon_deg,

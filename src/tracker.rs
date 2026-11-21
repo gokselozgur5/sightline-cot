@@ -156,6 +156,7 @@ impl Track {
             cot_type: cot_type.to_string(),
             how: "m-g".to_string(),
             time_ms,
+            start_ms: time_ms,
             stale_ms,
             lat_deg,
             lon_deg,
