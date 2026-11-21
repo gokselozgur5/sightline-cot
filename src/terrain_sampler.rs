@@ -451,9 +451,15 @@ impl TerrainInterceptSolver {
         let mut t_prev = 0.0;
         let mut t_curr = 0.0;
         let step = self.step_size.max(0.1);
+        let mut march_steps: usize = 0;
 
-        while t_curr < self.max_range {
-            t_curr = (t_curr + step).min(self.max_range);
+        while t_curr < self.max_range && march_steps < 100_000 {
+            march_steps += 1;
+            let next_t = (t_curr + step).min(self.max_range);
+            if next_t <= t_curr {
+                break;
+            }
+            t_curr = next_t;
             let p = ray.point_at(t_curr);
 
             if grid.contains(p[0], p[1]) {
