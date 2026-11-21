@@ -84,7 +84,10 @@ impl Egm96Geoid {
         }
         let expected = cols * rows;
         if data_len != expected {
-            return Err(Egm96Error::DataLengthMismatch { expected, found: data_len });
+            return Err(Egm96Error::DataLengthMismatch {
+                expected,
+                found: data_len,
+            });
         }
         Ok(())
     }
@@ -195,16 +198,16 @@ impl crate::geoid::GeoidModel for Egm96Geoid {
 }
 
 const COARSE_EGM96_SOUTH: [f64; 36] = [
-    -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0,
-    -10.0, 5.0, 12.0, -8.0, -25.0, 10.0, 18.0, 12.0, -5.0, -15.0, -20.0, -18.0,
-    15.0, 18.0, -40.0, -60.0, 10.0, 30.0, 25.0, 18.0, 5.0, -10.0, -20.0, 5.0,
+    -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -10.0, 5.0,
+    12.0, -8.0, -25.0, 10.0, 18.0, 12.0, -5.0, -15.0, -20.0, -18.0, 15.0, 18.0, -40.0, -60.0, 10.0,
+    30.0, 25.0, 18.0, 5.0, -10.0, -20.0, 5.0,
 ];
 
 const COARSE_EGM96_NORTH: [f64; 48] = [
-    17.0, 2.0, -15.0, -106.0, 15.0, 45.0, 20.0, 10.0, -5.0, -25.0, 15.0, 20.0,
-    -30.0, -15.0, -35.0, -40.0, -20.0, 25.0, 10.0, -15.0, -30.0, -40.0, -10.0, -20.0,
-    45.0, 30.0, -10.0, -25.0, -15.0, 10.0, 15.0, 5.0, -15.0, -30.0, -10.0, 25.0,
-    14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0,
+    17.0, 2.0, -15.0, -106.0, 15.0, 45.0, 20.0, 10.0, -5.0, -25.0, 15.0, 20.0, -30.0, -15.0, -35.0,
+    -40.0, -20.0, 25.0, 10.0, -15.0, -30.0, -40.0, -10.0, -20.0, 45.0, 30.0, -10.0, -25.0, -15.0,
+    10.0, 15.0, 5.0, -15.0, -30.0, -10.0, 25.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0,
+    14.0, 14.0, 14.0, 14.0,
 ];
 
 impl Egm96Geoid {
@@ -254,10 +257,22 @@ mod tests {
         let err = Egm96Geoid::new(-1.0, 30.0, vec![0.0; 84]);
         assert_eq!(err, Err(Egm96Error::InvalidStep));
         let err2 = Egm96Geoid::new(30.0, 30.0, vec![0.0; 10]);
-        assert_eq!(err2, Err(Egm96Error::DataLengthMismatch { expected: 84, found: 10 }));
+        assert_eq!(
+            err2,
+            Err(Egm96Error::DataLengthMismatch {
+                expected: 84,
+                found: 10
+            })
+        );
         let grid = Egm96Geoid::coarse_reference_grid();
-        assert_eq!(grid.undulation(95.0, 0.0), Err(Egm96Error::LatitudeOutOfRange(95.0)));
-        assert_eq!(grid.undulation(f64::NAN, 0.0), Err(Egm96Error::NonFiniteCoordinate));
+        assert_eq!(
+            grid.undulation(95.0, 0.0),
+            Err(Egm96Error::LatitudeOutOfRange(95.0))
+        );
+        assert_eq!(
+            grid.undulation(f64::NAN, 0.0),
+            Err(Egm96Error::NonFiniteCoordinate)
+        );
     }
 
     #[test]
