@@ -496,6 +496,7 @@ mod tests_cot_conversion {
             cot_type: "a-u-A-M-F-Q".into(),
             how: "m-g".into(),
             time_ms: 1731398500000,
+            start_ms: 1731398500000,
             stale_ms: 1731398560000,
             lat_deg: 41.0,
             lon_deg: 29.0,
