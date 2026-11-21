@@ -6,6 +6,8 @@ pub enum FrustumError {
     NonFiniteParameter(&'static str),
     InvalidFov(&'static str),
     InvalidAltitude(&'static str),
+    InvalidLatitude(&'static str),
+    InvalidElevation(&'static str),
     InvalidRange(&'static str),
     NoGroundIntersection,
     DegenerateFrustum,
@@ -18,6 +20,8 @@ impl core::fmt::Display for FrustumError {
             Self::NonFiniteParameter(s) => write!(f, "parameter is non-finite: {s}"),
             Self::InvalidFov(s) => write!(f, "invalid FOV angle: {s}"),
             Self::InvalidAltitude(s) => write!(f, "invalid altitude: {s}"),
+            Self::InvalidLatitude(s) => write!(f, "invalid latitude: {s}"),
+            Self::InvalidElevation(s) => write!(f, "invalid elevation: {s}"),
             Self::InvalidRange(s) => write!(f, "invalid range: {s}"),
             Self::NoGroundIntersection => write!(f, "sensor frustum does not intersect ground"),
             Self::DegenerateFrustum => write!(f, "degenerate sensor frustum geometry"),
@@ -60,7 +64,7 @@ impl PlatformPose {
             return Err(FrustumError::NonFiniteParameter("platform pose"));
         }
         if !(-90.0..=90.0).contains(&lat) {
-            return Err(FrustumError::InvalidAltitude("latitude out of range"));
+            return Err(FrustumError::InvalidLatitude("latitude out of range"));
         }
         let hdg_norm = (hdg % 360.0 + 360.0) % 360.0;
         Ok(Self {
@@ -89,7 +93,7 @@ impl SensorGimbal {
             return Err(FrustumError::NonFiniteParameter("sensor gimbal"));
         }
         if !(-90.0..=90.0).contains(&el) {
-            return Err(FrustumError::InvalidAltitude("elevation [-90, 90]"));
+            return Err(FrustumError::InvalidElevation("elevation [-90, 90]"));
         }
         let az_norm = (az % 360.0 + 360.0) % 360.0;
         Ok(Self {
