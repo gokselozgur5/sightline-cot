@@ -33,3 +33,16 @@ fn test_camera_pose_roll_tait_bryan_displacement() {
     let pt = sightline_cot::camera::intersect_ground([0.0, 0.0, 1.0], &pose, 0.0).unwrap();
     assert!(pt[0].abs() > 9.0);
 }
+
+#[test]
+fn test_pinhole_unproject_squared_norm_overflow() {
+    let cam = Intrinsics::Pinhole {
+        fx: 1e-160,
+        fy: 1e-160,
+        cx: 0.0,
+        cy: 0.0,
+    };
+    let ray = cam.pixel_to_ray(1.0, 0.0).unwrap();
+    let norm = (ray[0] * ray[0] + ray[1] * ray[1] + ray[2] * ray[2]).sqrt();
+    assert!((norm - 1.0).abs() < 1e-12);
+}
