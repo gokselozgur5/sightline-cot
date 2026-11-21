@@ -82,7 +82,9 @@ impl Egm96Geoid {
         if cols < 2 || rows < 2 {
             return Err(Egm96Error::InvalidDimensions { cols, rows });
         }
-        let expected = cols * rows;
+        let expected = cols
+            .checked_mul(rows)
+            .ok_or(Egm96Error::InvalidDimensions { cols, rows })?;
         if data_len != expected {
             return Err(Egm96Error::DataLengthMismatch {
                 expected,
@@ -100,7 +102,19 @@ impl Egm96Geoid {
         lon_step_deg: f64,
         undulations: Vec<f64>,
     ) -> Result<Self, Egm96Error> {
-        let rows = ((180.0 / lat_step_deg).round() as usize) + 1;
+        if !lat_step_deg.is_finite()
+            || lat_step_deg <= 0.0
+            || !lon_step_deg.is_finite()
+            || lon_step_deg <= 0.0
+        {
+            return Err(Egm96Error::InvalidStep);
+        }
+        let rows = ((180.0 / lat_step_deg).round() as usize)
+            .checked_add(1)
+            .ok_or(Egm96Error::InvalidDimensions {
+                cols: (360.0 / lon_step_deg).round() as usize,
+                rows: usize::MAX,
+            })?;
         let cols = (360.0 / lon_step_deg).round() as usize;
         Self::validate_grid(lat_step_deg, lon_step_deg, cols, rows, undulations.len())?;
         Ok(Self {
