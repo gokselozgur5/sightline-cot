@@ -145,19 +145,24 @@ fn sample_cone_perimeter_rays(
     n: usize,
 ) -> Vec<[f64; 3]> {
     let (cos_half, sin_half) = (half_fov.cos(), half_fov.sin());
-    (0..n).map(|i| {
-        let phi = 2.0 * std::f64::consts::PI * (i as f64) / (n as f64);
-        [
-            cos_half * b[0] + sin_half * (phi.cos() * u1[0] + phi.sin() * u2[0]),
-            cos_half * b[1] + sin_half * (phi.cos() * u1[1] + phi.sin() * u2[1]),
-            cos_half * b[2] + sin_half * (phi.cos() * u1[2] + phi.sin() * u2[2]),
-        ]
-    }).collect()
+    (0..n)
+        .map(|i| {
+            let phi = 2.0 * std::f64::consts::PI * (i as f64) / (n as f64);
+            [
+                cos_half * b[0] + sin_half * (phi.cos() * u1[0] + phi.sin() * u2[0]),
+                cos_half * b[1] + sin_half * (phi.cos() * u1[1] + phi.sin() * u2[1]),
+                cos_half * b[2] + sin_half * (phi.cos() * u1[2] + phi.sin() * u2[2]),
+            ]
+        })
+        .collect()
 }
 
 /// Compute ground plane intersection footprint for sensor cone with `num_points` perimeter samples.
 pub fn compute_ground_footprint(
-    cone: &SensorCone, sensor_alt_m: f64, ground_alt_m: f64, num_points: usize,
+    cone: &SensorCone,
+    sensor_alt_m: f64,
+    ground_alt_m: f64,
+    num_points: usize,
 ) -> Result<SensorFootprint, SensorFovError> {
     if !sensor_alt_m.is_finite() || !ground_alt_m.is_finite() || sensor_alt_m <= ground_alt_m {
         return Err(SensorFovError::NonFiniteParameter);
@@ -166,11 +171,19 @@ pub fn compute_ground_footprint(
     let b = cone.boresight_vector();
     let boresight_ground = intersect_ray_ground(b, dz, ground_alt_m)
         .ok_or(SensorFovError::RayDoesNotIntersectGround)?;
-    let slant_range = (boresight_ground[0].powi(2) + boresight_ground[1].powi(2) + dz.powi(2)).sqrt();
+    let slant_range =
+        (boresight_ground[0].powi(2) + boresight_ground[1].powi(2) + dz.powi(2)).sqrt();
     let (u1, u2) = compute_basis_axes(b);
     let rays = sample_cone_perimeter_rays(b, u1, u2, (cone.fov_deg * 0.5).to_radians(), num_points);
-    let perimeter = rays.into_iter().filter_map(|r| intersect_ray_ground(r, dz, ground_alt_m)).collect();
-    Ok(SensorFootprint { boresight_ground, perimeter_points: perimeter, slant_range_boresight_m: slant_range })
+    let perimeter = rays
+        .into_iter()
+        .filter_map(|r| intersect_ray_ground(r, dz, ground_alt_m))
+        .collect();
+    Ok(SensorFootprint {
+        boresight_ground,
+        perimeter_points: perimeter,
+        slant_range_boresight_m: slant_range,
+    })
 }
 
 use crate::geo_enu::geodetic_to_enu;
@@ -185,8 +198,10 @@ pub fn is_target_in_sensor_fov(
     target_hae: f64,
     cone: &SensorCone,
 ) -> Result<bool, SensorFovError> {
-    let enu = geodetic_to_enu(target_lat, target_lon, target_hae, sensor_lat, sensor_lon, sensor_hae)
-        .map_err(|_| SensorFovError::NonFiniteParameter)?;
+    let enu = geodetic_to_enu(
+        target_lat, target_lon, target_hae, sensor_lat, sensor_lon, sensor_hae,
+    )
+    .map_err(|_| SensorFovError::NonFiniteParameter)?;
     Ok(cone.contains_relative_point(enu))
 }
 
