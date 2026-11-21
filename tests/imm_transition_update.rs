@@ -8,6 +8,7 @@ use sightline_cot::imm_transition::{
 fn test_validate_transition_row_valid() {
     let row = [0.8, 0.1, 0.1];
     assert!(validate_transition_row(&row, 1e-6).is_ok());
+    assert_eq!(validate_transition_row(&row, 1e-6), Ok(()));
 }
 
 #[test]
