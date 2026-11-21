@@ -1,6 +1,4 @@
-use sightline_cot::track_assoc::{
-    compute_spatial_matrix_2d, solve_optimal_hungarian,
-};
+use sightline_cot::track_assoc::{compute_spatial_matrix_2d, solve_optimal_hungarian};
 
 #[test]
 fn hungarian_keeps_in_gate_pair_when_cheaper_total_uses_gated_pairs() {
