@@ -118,6 +118,12 @@ fn test_trait_dispatch() {
     let boxed: Box<dyn GeoidModel> = Box::new(geoid);
     assert_eq!(trait_ref.undulation(10.0, 10.0), Some(12.5));
     assert_eq!(boxed.undulation(10.0, 10.0), Some(12.5));
-    assert_eq!(sightline_cot::geoid::orthometric_to_ellipsoidal(&geoid, 10.0, 10.0, 50.0), Some(62.5));
-    assert_eq!(sightline_cot::geoid::ellipsoidal_to_orthometric(&boxed, 10.0, 10.0, 62.5), Some(50.0));
+    assert_eq!(
+        sightline_cot::geoid::orthometric_to_ellipsoidal(&geoid, 10.0, 10.0, 50.0),
+        Some(62.5)
+    );
+    assert_eq!(
+        sightline_cot::geoid::ellipsoidal_to_orthometric(&boxed, 10.0, 10.0, 62.5),
+        Some(50.0)
+    );
 }
