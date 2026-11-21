@@ -57,3 +57,9 @@ fn test_antipodal_antimeridian_no_intersection() {
     let a = segments_intersect([0.0, 0.0], [10.0, 0.0], [5.0, -165.0], [5.0, 175.0]);
     assert!(a.is_none());
 }
+
+#[test]
+fn test_collinear_overlapping_segments_intersect() {
+    let poly = [[0.0, 0.0], [0.0, 2.0], [0.0, 1.0], [0.0, 3.0]];
+    assert!(polyline_has_self_intersection(&poly));
+}
