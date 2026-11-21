@@ -262,11 +262,34 @@ mod tests_ts_digits {
 
     #[test]
     fn signed_components_are_rejected() {
-        assert!(parse_iso8601_utc("2026-02-16T+1:00:00.000Z").is_err());
-        assert!(parse_iso8601_utc("2026-+2-16T01:00:00.000Z").is_err());
-        assert!(parse_iso8601_utc("+026-02-16T01:00:00.000Z").is_err());
-        assert!(parse_iso8601_utc("2026-02-16T01:00:+0.000Z").is_err());
-        assert!(parse_iso8601_utc("2026-02-16T01:00:00.000Z").is_ok());
+        assert_eq!(
+            parse_iso8601_utc("2026-02-16T+1:00:00.000Z"),
+            Err(CotError::InvalidXml(
+                "invalid timestamp: 2026-02-16T+1:00:00.000Z".into()
+            ))
+        );
+        assert_eq!(
+            parse_iso8601_utc("2026-+2-16T01:00:00.000Z"),
+            Err(CotError::InvalidXml(
+                "invalid timestamp: 2026-+2-16T01:00:00.000Z".into()
+            ))
+        );
+        assert_eq!(
+            parse_iso8601_utc("+026-02-16T01:00:00.000Z"),
+            Err(CotError::InvalidXml(
+                "invalid timestamp: +026-02-16T01:00:00.000Z".into()
+            ))
+        );
+        assert_eq!(
+            parse_iso8601_utc("2026-02-16T01:00:+0.000Z"),
+            Err(CotError::InvalidXml(
+                "invalid timestamp: 2026-02-16T01:00:+0.000Z".into()
+            ))
+        );
+        assert_eq!(
+            parse_iso8601_utc("2026-02-16T01:00:00.000Z"),
+            Ok(1771203600000)
+        );
     }
 }
 fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
