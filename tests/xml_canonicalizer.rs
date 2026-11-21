@@ -8,6 +8,7 @@ fn test_valid_cot_event_validation() {
     </event>"#;
 
     assert!(validate_cot_xml(xml).is_ok());
+    assert_eq!(validate_cot_xml(xml), Ok(()));
 }
 
 #[test]
