@@ -584,14 +584,44 @@ mod tests_bounds {
                 <detail><track course=\"{crs}\" speed=\"{spd}\"/></detail></event>"
             )
         };
-        assert!(CotEvent::from_xml(&base_xml("91.0", "0.0", "1.0", "1.0", "0.0", "0.0")).is_err());
-        assert!(CotEvent::from_xml(&base_xml("-91.0", "0.0", "1.0", "1.0", "0.0", "0.0")).is_err());
-        assert!(CotEvent::from_xml(&base_xml("0.0", "181.0", "1.0", "1.0", "0.0", "0.0")).is_err());
-        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "-0.1", "1.0", "0.0", "0.0")).is_err());
-        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "-0.1", "0.0", "0.0")).is_err());
-        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "1.0", "NaN", "0.0")).is_err());
-        assert!(CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "1.0", "0.0", "-1.0")).is_err());
-        assert!(CotEvent::from_xml("not xml").is_err());
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("91.0", "0.0", "1.0", "1.0", "0.0", "0.0")),
+            Err(CotError::CoordinateOutOfBounds(
+                "lat must be in [-90.0, 90.0]"
+            ))
+        );
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("-91.0", "0.0", "1.0", "1.0", "0.0", "0.0")),
+            Err(CotError::CoordinateOutOfBounds(
+                "lat must be in [-90.0, 90.0]"
+            ))
+        );
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("0.0", "181.0", "1.0", "1.0", "0.0", "0.0")),
+            Err(CotError::CoordinateOutOfBounds(
+                "lon must be in [-180.0, 180.0]"
+            ))
+        );
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("0.0", "0.0", "-0.1", "1.0", "0.0", "0.0")),
+            Err(CotError::CoordinateOutOfBounds("ce and le must be >= 0.0"))
+        );
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "-0.1", "0.0", "0.0")),
+            Err(CotError::CoordinateOutOfBounds("ce and le must be >= 0.0"))
+        );
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "1.0", "NaN", "0.0")),
+            Err(CotError::InvalidNumber("course"))
+        );
+        assert_eq!(
+            CotEvent::from_xml(&base_xml("0.0", "0.0", "1.0", "1.0", "0.0", "-1.0")),
+            Err(CotError::CoordinateOutOfBounds("speed must be >= 0.0"))
+        );
+        assert_eq!(
+            CotEvent::from_xml("not xml"),
+            Err(CotError::InvalidXml("missing </event> closing tag".into()))
+        );
     }
 }
 impl CotTcpStreamer {
