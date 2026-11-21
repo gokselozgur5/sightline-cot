@@ -48,3 +48,11 @@ fn test_antimeridian_segment() {
     assert!(res.distance_m < 1e-4);
     assert!((res.fraction - 0.5).abs() < 1e-4);
 }
+
+#[test]
+fn test_nearest_point_past_far_end_picks_closer_endpoint() {
+    let res = nearest_point_on_segment([0.0, 0.0], [0.0, 90.0], [0.0, 200.0]);
+    assert_eq!(res.point, [0.0, 90.0]);
+    assert_eq!(res.fraction, 1.0);
+    assert!((res.distance_m - 12_231_441.93).abs() < 1.0);
+}
