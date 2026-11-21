@@ -22,20 +22,38 @@ const SQUARE: [[f64; 2]; 4] = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]];
 fn rejects_non_finite_and_inverted_envelope() {
     let mut poly = SQUARE;
     poly[1][0] = f64::NAN;
+    assert_eq!(
+        Geofence::new(&poly, 0.0, 100.0).err(),
+        Some("polygon coordinates must be finite")
+    );
     assert!(Geofence::new(&poly, 0.0, 100.0).is_err());
+    assert_eq!(
+        Geofence::new(&SQUARE, 100.0, 0.0).err(),
+        Some("altitude envelope must be finite with min <= max")
+    );
     assert!(Geofence::new(&SQUARE, 100.0, 0.0).is_err());
 }
 
 #[test]
 fn rejects_collinear_polygon() {
     let line = [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]];
+    assert_eq!(
+        Geofence::new(&line, 0.0, 100.0).err(),
+        Some("polygon must have non-zero area")
+    );
     assert!(Geofence::new(&line, 0.0, 100.0).is_err());
 }
 
 #[test]
 fn accepts_concave_polygon() {
     let poly = [[0.0, 0.0], [0.0, 3.0], [3.0, 3.0], [1.0, 1.5], [3.0, 0.0]];
-    assert!(Geofence::new(&poly, 0.0, 100.0).is_ok());
+    let gf = Geofence::new(&poly, 0.0, 100.0);
+    assert!(gf.is_ok());
+    let gf = gf.unwrap();
+    assert_eq!(gf.vertex_count, 5);
+    assert_eq!(gf.min_alt_msl, 0.0);
+    assert_eq!(gf.max_alt_msl, 100.0);
+    assert_eq!(&gf.vertices[..5], &poly);
 }
 
 fn tiny_square() -> Geofence {
