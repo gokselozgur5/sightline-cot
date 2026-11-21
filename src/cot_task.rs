@@ -190,7 +190,12 @@ fn extract_attr(tag: &str, attr: &str) -> Option<String> {
 }
 
 impl TaskPoint {
-    pub fn new(order: u32, name: impl Into<String>, lat: f64, lon: f64) -> Result<Self, CotTaskError> {
+    pub fn new(
+        order: u32,
+        name: impl Into<String>,
+        lat: f64,
+        lon: f64,
+    ) -> Result<Self, CotTaskError> {
         validate_lat_lon(lat, lon)?;
         Ok(Self {
             order,
@@ -220,7 +225,9 @@ impl TaskPoint {
 
     pub fn with_speed(mut self, speed_mps: f64) -> Result<Self, CotTaskError> {
         if !speed_mps.is_finite() || speed_mps < 0.0 {
-            return Err(CotTaskError::InvalidParameter("speed_mps must be non-negative"));
+            return Err(CotTaskError::InvalidParameter(
+                "speed_mps must be non-negative",
+            ));
         }
         self.speed_mps = Some(speed_mps);
         Ok(self)
@@ -254,7 +261,10 @@ impl TaskPoint {
             xml.push_str(&format!(r#" eta="{}""#, eta));
         }
         if let Some(rem) = &self.remarks {
-            xml.push_str(&format!(r#" remarks="{}""#, crate::cot::escape_xml_attr(rem)));
+            xml.push_str(&format!(
+                r#" remarks="{}""#,
+                crate::cot::escape_xml_attr(rem)
+            ));
         }
         xml.push_str("/>");
         xml
@@ -262,24 +272,34 @@ impl TaskPoint {
 
     pub fn parse(xml: &str) -> Result<Self, CotTaskError> {
         let order_s = extract_attr(xml, "order").ok_or(CotTaskError::MissingField("order"))?;
-        let order = order_s.parse::<u32>().map_err(|_| CotTaskError::InvalidParameter("order"))?;
+        let order = order_s
+            .parse::<u32>()
+            .map_err(|_| CotTaskError::InvalidParameter("order"))?;
         let name = extract_attr(xml, "name")
             .map(|s| crate::cot::unescape_xml_attr(&s))
             .unwrap_or_else(|| "WP".to_string());
         let lat_s = extract_attr(xml, "lat").ok_or(CotTaskError::MissingField("lat"))?;
         let lon_s = extract_attr(xml, "lon").ok_or(CotTaskError::MissingField("lon"))?;
-        let lat = lat_s.parse::<f64>().map_err(|_| CotTaskError::InvalidCoordinate("lat"))?;
-        let lon = lon_s.parse::<f64>().map_err(|_| CotTaskError::InvalidCoordinate("lon"))?;
+        let lat = lat_s
+            .parse::<f64>()
+            .map_err(|_| CotTaskError::InvalidCoordinate("lat"))?;
+        let lon = lon_s
+            .parse::<f64>()
+            .map_err(|_| CotTaskError::InvalidCoordinate("lon"))?;
         let mut pt = Self::new(order, name, lat, lon)?;
         if let Some(h_s) = extract_attr(xml, "hae") {
-            let h = h_s.parse::<f64>().map_err(|_| CotTaskError::InvalidParameter("hae"))?;
+            let h = h_s
+                .parse::<f64>()
+                .map_err(|_| CotTaskError::InvalidParameter("hae"))?;
             pt = pt.with_hae(h)?;
         }
         if let Some(act_s) = extract_attr(xml, "action") {
             pt = pt.with_action(TaskAction::parse_str(&act_s));
         }
         if let Some(s_s) = extract_attr(xml, "speed") {
-            let s = s_s.parse::<f64>().map_err(|_| CotTaskError::InvalidParameter("speed"))?;
+            let s = s_s
+                .parse::<f64>()
+                .map_err(|_| CotTaskError::InvalidParameter("speed"))?;
             pt = pt.with_speed(s)?;
         }
         if let Some(e_s) = extract_attr(xml, "eta") {
@@ -369,7 +389,9 @@ impl TacticalTask {
 
     pub fn estimated_duration_secs(&self, default_speed_mps: f64) -> Result<f64, CotTaskError> {
         if !default_speed_mps.is_finite() || default_speed_mps <= 0.0 {
-            return Err(CotTaskError::InvalidParameter("default_speed_mps must be positive"));
+            return Err(CotTaskError::InvalidParameter(
+                "default_speed_mps must be positive",
+            ));
         }
         if self.points.len() < 2 {
             return Ok(0.0);
@@ -421,8 +443,12 @@ impl TacticalTask {
     }
 
     pub fn parse_task_xml(xml: &str) -> Result<Self, CotTaskError> {
-        let t_start = xml.find("<task").ok_or_else(|| CotTaskError::XmlParseError("missing <task tag".into()))?;
-        let header_end = xml[t_start..].find('>').ok_or_else(|| CotTaskError::XmlParseError("unclosed <task tag".into()))?;
+        let t_start = xml
+            .find("<task")
+            .ok_or_else(|| CotTaskError::XmlParseError("missing <task tag".into()))?;
+        let header_end = xml[t_start..]
+            .find('>')
+            .ok_or_else(|| CotTaskError::XmlParseError("unclosed <task tag".into()))?;
         let header = &xml[t_start..t_start + header_end];
         let name = extract_attr(header, "name")
             .map(|s| crate::cot::unescape_xml_attr(&s))
