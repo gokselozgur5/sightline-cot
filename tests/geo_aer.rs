@@ -1,6 +1,4 @@
-use sightline_cot::{
-    aer_to_geodetic, geodetic_to_aer, AerCoord, SezCoord,
-};
+use sightline_cot::{aer_to_geodetic, geodetic_to_aer, AerCoord, SezCoord};
 
 #[test]
 fn test_integration_aer_cardinal_and_zenith() {
