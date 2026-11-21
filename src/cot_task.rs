@@ -456,13 +456,19 @@ impl TacticalTask {
         let task_type = extract_attr(header, "type")
             .map(|s| crate::cot::unescape_xml_attr(&s))
             .unwrap_or_else(|| "route".into());
-        let priority = extract_attr(header, "priority").map(|p| TaskPriority::parse_str(&p)).unwrap_or_default();
-        let status = extract_attr(header, "status").map(|s| TaskStatus::parse_str(&s)).unwrap_or_default();
+        let priority = extract_attr(header, "priority")
+            .map(|p| TaskPriority::parse_str(&p))
+            .unwrap_or_default();
+        let status = extract_attr(header, "status")
+            .map(|s| TaskStatus::parse_str(&s))
+            .unwrap_or_default();
 
         let mut points = Vec::new();
         let mut rest = &xml[t_start + header_end..];
         while let Some(p_start) = rest.find("<point") {
-            let p_end = rest[p_start..].find("/>").ok_or_else(|| CotTaskError::XmlParseError("unclosed <point tag".into()))?;
+            let p_end = rest[p_start..]
+                .find("/>")
+                .ok_or_else(|| CotTaskError::XmlParseError("unclosed <point tag".into()))?;
             let p_xml = &rest[p_start..p_start + p_end + 2];
             points.push(TaskPoint::parse(p_xml)?);
             rest = &rest[p_start + p_end + 2..];
@@ -488,8 +494,8 @@ fn haversine_dist_m(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     let d_lon = (lon2 - lon1).to_radians();
     let lat1_rad = lat1.to_radians();
     let lat2_rad = lat2.to_radians();
-    let a = (d_lat / 2.0).sin().powi(2)
-        + lat1_rad.cos() * lat2_rad.cos() * (d_lon / 2.0).sin().powi(2);
+    let a =
+        (d_lat / 2.0).sin().powi(2) + lat1_rad.cos() * lat2_rad.cos() * (d_lon / 2.0).sin().powi(2);
     let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
     r * c
 }
@@ -545,7 +551,9 @@ mod tests {
             .with_priority(TaskPriority::Immediate)
             .with_status(TaskStatus::InProgress);
         let p1 = TaskPoint::new(1, "START", 35.0, -115.0).unwrap();
-        let p2 = TaskPoint::new(2, "END", 35.5, -114.5).unwrap().with_action(TaskAction::Target);
+        let p2 = TaskPoint::new(2, "END", 35.5, -114.5)
+            .unwrap()
+            .with_action(TaskAction::Target);
         task.add_point(p1);
         task.add_point(p2);
 
@@ -565,7 +573,9 @@ mod tests {
         task.add_point(TaskPoint::new(1, "WP1", 10.0, 20.0).unwrap());
         task.add_point(TaskPoint::new(2, "WP2", 12.0, 22.0).unwrap());
 
-        let event_xml = task.to_cot_event_xml("task-uid-01", "GHOST-1", 1700000000000, 1700000300000).unwrap();
+        let event_xml = task
+            .to_cot_event_xml("task-uid-01", "GHOST-1", 1700000000000, 1700000300000)
+            .unwrap();
         assert!(event_xml.contains("type=\"b-m-r\""));
         assert!(event_xml.contains("uid=\"task-uid-01\""));
         assert!(event_xml.contains("contact callsign=\"GHOST-1\""));
