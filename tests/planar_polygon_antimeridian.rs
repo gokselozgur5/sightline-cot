@@ -6,11 +6,23 @@ const SHIFTED: [[f64; 2]; 4] = [[10.0, 9.0], [10.0, 11.0], [11.0, 11.0], [11.0, 
 
 #[test]
 fn area_and_perimeter_do_not_depend_on_the_antimeridian() {
-    let (a, a_ref) = (polygon_area(&ACROSS).unwrap(), polygon_area(&SHIFTED).unwrap());
+    let (a, a_ref) = (
+        polygon_area(&ACROSS).unwrap(),
+        polygon_area(&SHIFTED).unwrap(),
+    );
     assert!((a_ref - 2.4314e10).abs() / 2.4314e10 < 1e-3);
-    assert!((a - a_ref).abs() / a_ref < 1e-6, "area {a} expected {a_ref}");
-    let (p, p_ref) = (polygon_perimeter(&ACROSS).unwrap(), polygon_perimeter(&SHIFTED).unwrap());
-    assert!((p - p_ref).abs() / p_ref < 1e-6, "perimeter {p} expected {p_ref}");
+    assert!(
+        (a - a_ref).abs() / a_ref < 1e-6,
+        "area {a} expected {a_ref}"
+    );
+    let (p, p_ref) = (
+        polygon_perimeter(&ACROSS).unwrap(),
+        polygon_perimeter(&SHIFTED).unwrap(),
+    );
+    assert!(
+        (p - p_ref).abs() / p_ref < 1e-6,
+        "perimeter {p} expected {p_ref}"
+    );
 }
 
 #[test]
