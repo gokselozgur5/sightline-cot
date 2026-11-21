@@ -28,6 +28,9 @@ pub use crate::geo_bbox::GeoBbox;
 const BASE32_CHARS: &[u8; 32] = b"0123456789bcdefghjkmnpqrstuvwxyz";
 
 fn char_to_value(c: char) -> Result<u8, GeohashError> {
+    if !c.is_ascii() {
+        return Err(GeohashError::InvalidCharacter(c));
+    }
     let lower = c.to_ascii_lowercase();
     match BASE32_CHARS.iter().position(|&b| b == lower as u8) {
         Some(idx) => Ok(idx as u8),

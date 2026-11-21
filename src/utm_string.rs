@@ -25,6 +25,9 @@ impl UtmCoordinate {
         if !(1..=60).contains(&zone) {
             return Err(UtmStringError::InvalidZone);
         }
+        if !band.is_ascii() {
+            return Err(UtmStringError::InvalidBand);
+        }
         let band = band.to_ascii_uppercase();
         if !b"CDEFGHJKLMNPQRSTUVWX".contains(&(band as u8)) {
             return Err(UtmStringError::InvalidBand);
