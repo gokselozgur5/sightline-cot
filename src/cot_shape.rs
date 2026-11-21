@@ -232,7 +232,18 @@ impl CotVertex {
         let lon = lon_str
             .parse::<f64>()
             .map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lon"))?;
-        let hae = extract_attr(xml, "hae").and_then(|h| h.parse::<f64>().ok());
+        let hae = match extract_attr(xml, "hae") {
+            Some(h) => {
+                let val = h
+                    .parse::<f64>()
+                    .map_err(|_| CotShapeError::InvalidParameter("non-numeric hae"))?;
+                if !val.is_finite() {
+                    return Err(CotShapeError::InvalidParameter("hae must be finite"));
+                }
+                Some(val)
+            }
+            None => None,
+        };
         let mut v = Self::new(lat, lon)?;
         v.hae = hae;
         Ok(v)
@@ -254,8 +265,20 @@ impl CotShape {
             .unwrap_or(false);
         let color = extract_attr(header, "color").and_then(|s| s.parse::<i32>().ok());
         let fill_color = extract_attr(header, "fillColor").and_then(|s| s.parse::<i32>().ok());
-        let stroke_weight =
-            extract_attr(header, "strokeWeight").and_then(|s| s.parse::<f64>().ok());
+        let stroke_weight = match extract_attr(header, "strokeWeight") {
+            Some(s) => {
+                let w = s
+                    .parse::<f64>()
+                    .map_err(|_| CotShapeError::InvalidParameter("non-numeric strokeWeight"))?;
+                if !w.is_finite() || w <= 0.0 {
+                    return Err(CotShapeError::InvalidParameter(
+                        "stroke weight must be positive",
+                    ));
+                }
+                Some(w)
+            }
+            None => None,
+        };
 
         let mut vertices = Vec::new();
         let mut rest = &xml[p_start + header_end..];
