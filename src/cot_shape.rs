@@ -280,7 +280,6 @@ impl CotShape {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
