@@ -324,14 +324,17 @@ impl CotSchemaValidator {
                 value: (*start_str).to_string(),
             })?;
 
-        let stale_str = map.get("stale").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "stale",
-        })?;
-        let stale_ms = parse_iso8601_utc(stale_str).map_err(|_| CotValidationError::InvalidTimestamp {
-            attribute: "stale",
-            value: (*stale_str).to_string(),
-        })?;
+        let stale_str = map
+            .get("stale")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "stale",
+            })?;
+        let stale_ms =
+            parse_iso8601_utc(stale_str).map_err(|_| CotValidationError::InvalidTimestamp {
+                attribute: "stale",
+                value: (*stale_str).to_string(),
+            })?;
 
         if stale_ms < time_ms {
             return Err(CotValidationError::TimestampOrderViolation {
@@ -356,13 +359,15 @@ impl CotSchemaValidator {
             map.insert(a.name.as_str(), a.value.as_str());
         }
 
-        let lat_str = map.get("lat").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "point",
-            attribute: "lat",
+        let lat_str = map
+            .get("lat")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "point",
+                attribute: "lat",
+            })?;
+        let lat: f64 = lat_str.parse().map_err(|_| {
+            CotValidationError::MalformedXml(format!("invalid float for point lat: '{lat_str}'"))
         })?;
-        let lat: f64 = lat_str.parse().map_err(|_| CotValidationError::MalformedXml(
-            format!("invalid float for point lat: '{lat_str}'"),
-        ))?;
         if !lat.is_finite() {
             return Err(CotValidationError::NonFiniteNumber("lat"));
         }
@@ -373,13 +378,15 @@ impl CotSchemaValidator {
             });
         }
 
-        let lon_str = map.get("lon").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "point",
-            attribute: "lon",
+        let lon_str = map
+            .get("lon")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "point",
+                attribute: "lon",
+            })?;
+        let lon: f64 = lon_str.parse().map_err(|_| {
+            CotValidationError::MalformedXml(format!("invalid float for point lon: '{lon_str}'"))
         })?;
-        let lon: f64 = lon_str.parse().map_err(|_| CotValidationError::MalformedXml(
-            format!("invalid float for point lon: '{lon_str}'"),
-        ))?;
         if !lon.is_finite() {
             return Err(CotValidationError::NonFiniteNumber("lon"));
         }
