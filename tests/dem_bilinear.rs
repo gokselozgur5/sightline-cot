@@ -72,3 +72,14 @@ fn test_validation_errors_and_camera_grid_conversion() {
     let raster = DemRaster::from(&cam);
     assert_eq!(raster.sample(5.0, 5.0), cam.elevation_at(5.0, 5.0));
 }
+
+#[test]
+fn test_dimension_multiplication_overflow_rejected() {
+    let cols = 1usize << 33;
+    let rows = 1usize << 31;
+    let err = DemRaster::new(0.0, 0.0, 1.0, cols, rows, vec![]).unwrap_err();
+    assert!(
+        err == DemError::DataLengthMismatch || err == DemError::InvalidDimensions,
+        "unexpected error: {err:?}"
+    );
+}
