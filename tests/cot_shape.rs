@@ -10,7 +10,6 @@ fn test_polyline_xml_generation() {
     assert!(xml.contains("closed=\"false\""));
 }
 
-
 #[test]
 fn test_polygon_xml_generation_and_closed_flag() {
     let vertices = vec![
@@ -29,7 +28,6 @@ fn test_polygon_xml_generation_and_closed_flag() {
     assert!(xml.contains("fillColor=\"1073741824\""));
 }
 
-
 #[test]
 fn test_shape_and_vertex_error_validation() {
     assert!(CotVertex::new(95.0, 0.0).is_err());
@@ -44,7 +42,6 @@ fn test_shape_and_vertex_error_validation() {
     assert!(polyline.with_stroke_weight(-1.0).is_err());
 }
 
-
 #[test]
 fn test_shape_xml_roundtrip_parsing() {
     let xml = r#"<shape><polyline closed="true" color="-65536" fillColor="1073741824" strokeWeight="3.50"><vertex lat="34.052200" lon="-118.243700"/><vertex lat="34.055000" lon="-118.250000"/><vertex lat="34.045000" lon="-118.250000"/></polyline></shape>"#;
@@ -55,7 +52,6 @@ fn test_shape_xml_roundtrip_parsing() {
     assert_eq!(shape.stroke_weight, Some(3.5));
     assert_eq!(shape.vertices.len(), 3);
 }
-
 
 #[test]
 fn test_to_cot_event_xml_generation() {
