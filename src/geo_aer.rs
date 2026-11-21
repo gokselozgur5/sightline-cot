@@ -193,8 +193,14 @@ pub fn sez_to_ecef(
         return Err(AerError::LatitudeOutOfRange);
     }
     let obs_ecef = crate::geo_ecef::geodetic_to_ecef(obs_lat_deg, obs_lon_deg, obs_hae_m);
-    let (s_lat, c_lat) = (obs_lat_deg.to_radians().sin(), obs_lat_deg.to_radians().cos());
-    let (s_lon, c_lon) = (obs_lon_deg.to_radians().sin(), obs_lon_deg.to_radians().cos());
+    let (s_lat, c_lat) = (
+        obs_lat_deg.to_radians().sin(),
+        obs_lat_deg.to_radians().cos(),
+    );
+    let (s_lon, c_lon) = (
+        obs_lon_deg.to_radians().sin(),
+        obs_lon_deg.to_radians().cos(),
+    );
     let (s, e, z) = (sez.south_m, sez.east_m, sez.zenith_m);
     let dx = s * s_lat * c_lon - e * s_lon + z * c_lat * c_lon;
     let dy = s * s_lat * s_lon + e * c_lon + z * c_lat * s_lon;
@@ -239,7 +245,8 @@ pub fn geodetic_to_aer(
     if !(-90.0..=90.0).contains(&target_lat_deg) {
         return Err(AerError::LatitudeOutOfRange);
     }
-    let target_ecef = crate::geo_ecef::geodetic_to_ecef(target_lat_deg, target_lon_deg, target_hae_m);
+    let target_ecef =
+        crate::geo_ecef::geodetic_to_ecef(target_lat_deg, target_lon_deg, target_hae_m);
     ecef_to_aer(target_ecef, obs_lat_deg, obs_lon_deg, obs_hae_m)
 }
 
@@ -264,7 +271,10 @@ mod tests {
         assert_eq!(AerCoord::new(-90.0, 0.0, 10.0).unwrap().azimuth_deg, 270.0);
         assert_eq!(AerCoord::new(450.0, 0.0, 10.0).unwrap().azimuth_deg, 90.0);
         assert_eq!(AerCoord::new(f64::NAN, 0.0, 10.0), Err(AerError::NonFinite));
-        assert_eq!(AerCoord::new(0.0, 95.0, 10.0), Err(AerError::ElevationOutOfRange));
+        assert_eq!(
+            AerCoord::new(0.0, 95.0, 10.0),
+            Err(AerError::ElevationOutOfRange)
+        );
         assert_eq!(AerCoord::new(0.0, 0.0, -1.0), Err(AerError::NegativeRange));
     }
     #[test]
