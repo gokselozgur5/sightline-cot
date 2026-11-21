@@ -53,13 +53,7 @@ fn project_poly_enu(poly: &[[f64; 2]]) -> Option<Vec<[f64; 2]>> {
     Some(
         poly.iter()
             .map(|p| {
-                let mut dlon = p[1] - lon0;
-                while dlon > 180.0 {
-                    dlon -= 360.0;
-                }
-                while dlon < -180.0 {
-                    dlon += 360.0;
-                }
+                let dlon = (p[1] - lon0 + 180.0).rem_euclid(360.0) - 180.0;
                 [
                     dlon * cos_lat * METERS_PER_DEG,
                     (p[0] - lat0) * METERS_PER_DEG,
