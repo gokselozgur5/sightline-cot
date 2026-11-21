@@ -14,14 +14,8 @@ pub fn zone_central_meridian_rad(zone: u8) -> f64 {
     ((zone as f64 - 1.0) * 6.0 - 180.0 + 3.0).to_radians()
 }
 
-fn normalize_dlon_rad(mut dlon: f64) -> f64 {
-    while dlon > std::f64::consts::PI {
-        dlon -= 2.0 * std::f64::consts::PI;
-    }
-    while dlon < -std::f64::consts::PI {
-        dlon += 2.0 * std::f64::consts::PI;
-    }
-    dlon
+fn normalize_dlon_rad(dlon: f64) -> f64 {
+    (dlon + std::f64::consts::PI).rem_euclid(2.0 * std::f64::consts::PI) - std::f64::consts::PI
 }
 
 fn meridian_arc(phi: f64, e2: f64) -> f64 {
