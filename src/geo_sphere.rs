@@ -91,7 +91,11 @@ pub fn normalize_bearing_360(bearing: f64) -> f64 {
 /// Normalizes relative angle in degrees to [-180, 180).
 pub fn normalize_bearing_pm180(bearing: f64) -> f64 {
     let b = normalize_bearing_360(bearing);
-    if b >= 180.0 { b - 360.0 } else { b }
+    if b >= 180.0 {
+        b - 360.0
+    } else {
+        b
+    }
 }
 
 /// Converts meters to international nautical miles.
@@ -146,12 +150,20 @@ pub fn line_of_sight_m(h1_m: f64, h2_m: f64, radius_m: f64) -> f64 {
 
 /// Computes speed in m/s given distance in meters and time in seconds.
 pub fn speed_mps(dist_m: f64, dt_sec: f64) -> Option<f64> {
-    if dt_sec > 0.0 { Some(dist_m / dt_sec) } else { None }
+    if dt_sec > 0.0 {
+        Some(dist_m / dt_sec)
+    } else {
+        None
+    }
 }
 
 /// Computes estimated time of arrival (seconds) given distance and speed.
 pub fn time_to_go_sec(dist_m: f64, speed_mps: f64) -> Option<f64> {
-    if speed_mps > 0.0 { Some(dist_m / speed_mps) } else { None }
+    if speed_mps > 0.0 {
+        Some(dist_m / speed_mps)
+    } else {
+        None
+    }
 }
 
 /// Checks whether course over ground in degrees is a valid number.
