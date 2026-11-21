@@ -42,13 +42,7 @@ fn delta_sigma(b: f64, sin_sig: f64, cos_sig: f64, cos_2sm: f64) -> f64 {
                         * (-3.0 + 4.0 * cos2_2sm)))
 }
 
-fn solve_direct_sigma(
-    b_semi: f64,
-    s: f64,
-    a_coeff: f64,
-    sig1: f64,
-    b_coeff: f64,
-) -> (f64, f64) {
+fn solve_direct_sigma(b_semi: f64, s: f64, a_coeff: f64, sig1: f64, b_coeff: f64) -> (f64, f64) {
     let mut sigma = s / (b_semi * a_coeff);
     let mut cos_2sm = 0.0;
     for _ in 0..200 {
@@ -66,8 +60,15 @@ fn solve_direct_sigma(
 
 #[allow(clippy::too_many_arguments)]
 fn compute_destination(
-    lon1: f64, s_u1: f64, c_u1: f64, s_alp: f64, c2_alp: f64,
-    alp1: f64, sig: f64, c_2sm: f64, f: f64,
+    lon1: f64,
+    s_u1: f64,
+    c_u1: f64,
+    s_alp: f64,
+    c2_alp: f64,
+    alp1: f64,
+    sig: f64,
+    c_2sm: f64,
+    f: f64,
 ) -> VincentyDirect {
     let (s_s, c_s) = (sig.sin(), sig.cos());
     let x = s_u1 * s_s - c_u1 * c_s * alp1.cos();
@@ -80,12 +81,20 @@ fn compute_destination(
     let omega = (1.0 - c) * f * s_alp * (sig + c * s_s * t);
     let lon2 = (lon1 + (lam - omega).to_degrees() + 540.0).rem_euclid(360.0) - 180.0;
     let rev_az = (s_alp.atan2(-x).to_degrees() + 540.0).rem_euclid(360.0);
-    VincentyDirect { lat_deg: lat2, lon_deg: lon2, reverse_azimuth_deg: rev_az }
+    VincentyDirect {
+        lat_deg: lat2,
+        lon_deg: lon2,
+        reverse_azimuth_deg: rev_az,
+    }
 }
 
 /// Computes destination coordinates on a reference ellipsoid using Vincenty direct formula.
 pub fn vincenty_direct_ellipsoid(
-    lat1: f64, lon1: f64, bearing1_deg: f64, distance_m: f64, ellipsoid: &Ellipsoid,
+    lat1: f64,
+    lon1: f64,
+    bearing1_deg: f64,
+    distance_m: f64,
+    ellipsoid: &Ellipsoid,
 ) -> Result<VincentyDirect, VincentyError> {
     validate_direct_inputs(lat1, lon1, bearing1_deg, distance_m)?;
     let alp1 = bearing1_deg.to_radians();
@@ -98,13 +107,24 @@ pub fn vincenty_direct_ellipsoid(
     let (a, b) = vincenty_ab(u2);
     let (sig, cos_2sm) = solve_direct_sigma(ellipsoid.b, distance_m, a, sig1, b);
     Ok(compute_destination(
-        lon1, sin_u1, cos_u1, sin_alp, cos2_alp, alp1, sig, cos_2sm, ellipsoid.f,
+        lon1,
+        sin_u1,
+        cos_u1,
+        sin_alp,
+        cos2_alp,
+        alp1,
+        sig,
+        cos_2sm,
+        ellipsoid.f,
     ))
 }
 
 /// Computes destination coordinates on WGS84 using Vincenty direct formula.
 pub fn vincenty_direct(
-    lat1: f64, lon1: f64, bearing1_deg: f64, distance_m: f64,
+    lat1: f64,
+    lon1: f64,
+    bearing1_deg: f64,
+    distance_m: f64,
 ) -> Result<VincentyDirect, VincentyError> {
     vincenty_direct_ellipsoid(lat1, lon1, bearing1_deg, distance_m, &Ellipsoid::WGS84)
 }
