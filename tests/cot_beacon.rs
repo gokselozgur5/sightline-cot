@@ -1,4 +1,4 @@
-use sightline_cot::cot_beacon::{EmergencyBeacon, EmergencyType};
+use sightline_cot::cot_beacon::{CotBeaconError, EmergencyBeacon, EmergencyType};
 
 #[test]
 fn test_repro_911_beacon_creation() {
@@ -40,8 +40,12 @@ fn test_mayday_and_cancel_beacons() {
 
 #[test]
 fn test_beacon_coordinate_errors() {
-    assert!(EmergencyBeacon::new_911("U", "C", 95.0, 0.0).is_err());
-    assert!(EmergencyBeacon::new_911("U", "C", -95.0, 0.0).is_err());
-    assert!(EmergencyBeacon::new_911("U", "C", 0.0, 185.0).is_err());
-    assert!(EmergencyBeacon::new_911("U", "C", f64::NAN, 0.0).is_err());
+    let lat_err = Err(CotBeaconError::InvalidCoordinate("latitude in [-90, 90]"));
+    let lon_err = Err(CotBeaconError::InvalidCoordinate(
+        "longitude in [-180, 180]",
+    ));
+    assert_eq!(EmergencyBeacon::new_911("U", "C", 95.0, 0.0), lat_err);
+    assert_eq!(EmergencyBeacon::new_911("U", "C", -95.0, 0.0), lat_err);
+    assert_eq!(EmergencyBeacon::new_911("U", "C", 0.0, 185.0), lon_err);
+    assert_eq!(EmergencyBeacon::new_911("U", "C", f64::NAN, 0.0), lat_err);
 }
