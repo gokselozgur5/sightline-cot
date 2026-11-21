@@ -6,6 +6,10 @@ use sightline_cot::elevation_mask::*;
 fn test_elevation_mask_error_display() {
     let err = ElevationMaskError::InvalidAzimuth;
     assert!(!format!("{}", err).is_empty());
+    assert_eq!(
+        format!("{}", err),
+        "azimuth must be in range [0.0, 360.0) degrees"
+    );
 }
 
 #[test]
