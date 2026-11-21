@@ -6,6 +6,7 @@ fn event(uid: &str, time_ms: i64) -> CotEvent {
         cot_type: "a-f-G-U-C".into(),
         how: "m-g".into(),
         time_ms,
+        start_ms: time_ms,
         stale_ms: time_ms + 30_000,
         lat_deg: 41.0123456,
         lon_deg: 28.9765432,
@@ -20,7 +21,7 @@ fn event(uid: &str, time_ms: i64) -> CotEvent {
 #[test]
 fn roundtrip_unusual_identifiers() {
     for uid in [
-        "",
+        "u",
         "a b",
         "x&y",
         "<tag>",

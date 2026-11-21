@@ -17,6 +17,7 @@ fn sample_event(i: usize) -> CotEvent {
         cot_type: "a-h-G".to_string(),
         how: "m-r".to_string(),
         time_ms: BASE_TIME_MS + i as i64,
+        start_ms: BASE_TIME_MS + i as i64,
         stale_ms: BASE_TIME_MS + i as i64 + 60_000,
         lat_deg: 37.7749 + i as f64 * 1e-6,
         lon_deg: -122.4194 - i as f64 * 1e-6,

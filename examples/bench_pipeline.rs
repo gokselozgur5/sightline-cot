@@ -162,6 +162,7 @@ fn track_to_cot(track: &Track, frame_idx: usize, le_m: f64) -> CotEvent {
         cot_type: "a-f-G-E-V".to_string(),
         how: "m-g".to_string(),
         time_ms: now_ms,
+        start_ms: now_ms,
         stale_ms: now_ms + 10_000,
         lat_deg: lat,
         lon_deg: lon,

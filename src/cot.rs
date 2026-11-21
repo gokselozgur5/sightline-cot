@@ -44,6 +44,7 @@ pub struct CotEvent {
     pub cot_type: String,
     pub how: String,
     pub time_ms: i64,
+    pub start_ms: i64,
     pub stale_ms: i64,
     pub lat_deg: f64,
     pub lon_deg: f64,
@@ -283,6 +284,7 @@ impl CotEvent {
     /// Serialize CotEvent into canonical CoT 2.0 XML.
     pub fn to_xml(&self) -> String {
         let time_str = format_iso8601_utc(self.time_ms);
+        let start_str = format_iso8601_utc(self.start_ms);
         let stale_str = format_iso8601_utc(self.stale_ms);
         format!(
             "<event version=\"2.0\" uid=\"{}\" type=\"{}\" how=\"{}\" time=\"{}\" start=\"{}\" stale=\"{}\">\
@@ -292,7 +294,7 @@ impl CotEvent {
             escape_xml_attr(&self.cot_type),
             escape_xml_attr(&self.how),
             time_str,
-            time_str,
+            start_str,
             stale_str,
             self.lat_deg,
             self.lon_deg,
@@ -329,24 +331,34 @@ fn parse_opt_f64_attr(
         }
     }
 }
-fn parse_event_header(ev_tag: &str) -> Result<(String, String, String, i64, i64), CotError> {
+fn parse_event_header(ev_tag: &str) -> Result<(String, String, String, i64, i64, i64), CotError> {
     let uid = unescape_xml_attr(
         find_attr_in_tag(ev_tag, "uid").ok_or(CotError::MissingAttribute("uid"))?,
     );
     let cot_type = unescape_xml_attr(
         find_attr_in_tag(ev_tag, "type").ok_or(CotError::MissingAttribute("type"))?,
     );
+    if uid.is_empty() {
+        return Err(CotError::InvalidXml("uid cannot be empty".into()));
+    }
+    if cot_type.is_empty() {
+        return Err(CotError::InvalidXml("type cannot be empty".into()));
+    }
     let how = unescape_xml_attr(
         find_attr_in_tag(ev_tag, "how").ok_or(CotError::MissingAttribute("how"))?,
     );
     let time_str = find_attr_in_tag(ev_tag, "time").ok_or(CotError::MissingAttribute("time"))?;
     let stale_str = find_attr_in_tag(ev_tag, "stale").ok_or(CotError::MissingAttribute("stale"))?;
     let time_ms = parse_iso8601_utc(time_str)?;
+    let start_ms = match find_attr_in_tag(ev_tag, "start") {
+        Some(s) => parse_iso8601_utc(s)?,
+        None => time_ms,
+    };
     let stale_ms = parse_iso8601_utc(stale_str)?;
-    if stale_ms < time_ms {
-        return Err(CotError::InvalidXml("stale precedes time".into()));
+    if start_ms > stale_ms || stale_ms < time_ms {
+        return Err(CotError::InvalidXml("stale precedes start or time".into()));
     }
-    Ok((uid, cot_type, how, time_ms, stale_ms))
+    Ok((uid, cot_type, how, time_ms, start_ms, stale_ms))
 }
 #[cfg(test)]
 mod tests_stale_order {
@@ -369,7 +381,7 @@ mod tests_stale_order {
             .to_string()
     }
 }
-fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, spd: f64) -> Result<(), CotError> {
+fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, crs: f64, spd: f64) -> Result<(), CotError> {
     if !(-90.0..=90.0).contains(&lat) {
         return Err(CotError::CoordinateOutOfBounds(
             "lat must be in [-90.0, 90.0]",
@@ -382,6 +394,9 @@ fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, spd: f64) -> Result
     }
     if ce < 0.0 || le < 0.0 {
         return Err(CotError::CoordinateOutOfBounds("ce and le must be >= 0.0"));
+    }
+    if !(0.0..360.0).contains(&crs) {
+        return Err(CotError::CoordinateOutOfBounds("course must be in [0.0, 360.0)"));
     }
     if spd < 0.0 {
         return Err(CotError::CoordinateOutOfBounds("speed must be >= 0.0"));
@@ -401,7 +416,7 @@ fn parse_point_and_track(pt: &str, tr: Option<&str>) -> Result<PointTrack, CotEr
         parse_opt_f64_attr(tr, "course", 0.0)?,
         parse_opt_f64_attr(tr, "speed", 0.0)?,
     );
-    validate_cot_bounds(lat, lon, ce, le, spd)?;
+    validate_cot_bounds(lat, lon, ce, le, crs, spd)?;
     Ok(PointTrack(lat, lon, hae, ce, le, crs, spd))
 }
 fn extract_core_elements(xml: &str) -> Result<(&str, &str, Option<&str>), CotError> {
@@ -419,7 +434,7 @@ impl CotEvent {
     /// Parse and validate a CoT 2.0 XML string.
     pub fn from_xml(xml: &str) -> Result<Self, CotError> {
         let (ev, pt, tr) = extract_core_elements(xml)?;
-        let (uid, cot_type, how, time_ms, stale_ms) = parse_event_header(ev)?;
+        let (uid, cot_type, how, time_ms, start_ms, stale_ms) = parse_event_header(ev)?;
         let PointTrack(lat_deg, lon_deg, hae_m, ce_m, le_m, course_deg, speed_mps) =
             parse_point_and_track(pt, tr)?;
         Ok(Self {
@@ -427,6 +442,7 @@ impl CotEvent {
             cot_type,
             how,
             time_ms,
+            start_ms,
             stale_ms,
             lat_deg,
             lon_deg,
@@ -512,6 +528,7 @@ mod tests_escape {
             cot_type: "a-f-G-U-C\"".into(),
             how: "m-g&".into(),
             time_ms: 1000,
+            start_ms: 1000,
             stale_ms: 2000,
             lat_deg: 41.0123456,
             lon_deg: 28.9765432,
@@ -634,6 +651,7 @@ impl CotTcpStreamer {
             cot_type: "a-f-G-U-C".to_string(),
             how: "m-g".to_string(),
             time_ms,
+            start_ms: time_ms,
             stale_ms: time_ms + 30_000,
             lat_deg,
             lon_deg,
@@ -656,6 +674,7 @@ mod tests_udp_rt {
             cot_type: "a-f-A-M-F".into(),
             how: "m-g".into(),
             time_ms: 1771234567890,
+            start_ms: 1771234567890,
             stale_ms: 1771234597890,
             lat_deg: 37.7749,
             lon_deg: -122.4194,

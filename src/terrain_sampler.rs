@@ -551,6 +551,7 @@ pub fn cot_target_from_intercept(
         cot_type: cot_type.to_string(),
         how: "m-g".to_string(),
         time_ms,
+        start_ms: time_ms,
         stale_ms: time_ms + stale_duration_ms,
         lat_deg: intercept.point[1],
         lon_deg: intercept.point[0],
