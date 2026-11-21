@@ -282,10 +282,10 @@ impl CameraPose {
 
         let r_z = [[cy, -sy, 0.0], [sy, cy, 0.0], [0.0, 0.0, 1.0]];
         let r_x = [[1.0, 0.0, 0.0], [0.0, cp, -sp], [0.0, sp, cp]];
+        let r_y = [[cr, 0.0, sr], [0.0, 1.0, 0.0], [-sr, 0.0, cr]];
         let r_base = [[1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]];
-        let r_roll = [[cr, -sr, 0.0], [sr, cr, 0.0], [0.0, 0.0, 1.0]];
 
-        mat3_mult(mat3_mult(mat3_mult(r_z, r_x), r_base), r_roll)
+        mat3_mult(mat3_mult(mat3_mult(r_z, r_x), r_y), r_base)
     }
 }
 
