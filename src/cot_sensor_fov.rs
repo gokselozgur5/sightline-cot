@@ -222,7 +222,12 @@ impl TryFrom<&CotSensor> for SensorCone {
     type Error = SensorFovError;
 
     fn try_from(sensor: &CotSensor) -> Result<Self, Self::Error> {
-        SensorCone::new(sensor.azimuth_deg, sensor.elevation_deg, sensor.fov_deg, sensor.range_m)
+        SensorCone::new(
+            sensor.azimuth_deg,
+            sensor.elevation_deg,
+            sensor.fov_deg,
+            sensor.range_m,
+        )
     }
 }
 
