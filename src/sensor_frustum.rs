@@ -459,10 +459,18 @@ impl SensorGimbal {
             .find('>')
             .ok_or_else(|| FrustumError::XmlParseError("unclosed <sensor".into()))?;
         let tag = &xml[tag_start..tag_start + tag_end + 1];
-        let az = extract_xml_attr(tag, "azimuth").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("azimuth".into()))?;
-        let el = extract_xml_attr(tag, "elevation").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("elevation".into()))?;
-        let fov: f64 = extract_xml_attr(tag, "fov").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("fov".into()))?;
-        let rng: f64 = extract_xml_attr(tag, "range").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("range".into()))?;
+        let az = extract_xml_attr(tag, "azimuth")
+            .and_then(|s| s.parse().ok())
+            .ok_or_else(|| FrustumError::XmlParseError("azimuth".into()))?;
+        let el = extract_xml_attr(tag, "elevation")
+            .and_then(|s| s.parse().ok())
+            .ok_or_else(|| FrustumError::XmlParseError("elevation".into()))?;
+        let fov: f64 = extract_xml_attr(tag, "fov")
+            .and_then(|s| s.parse().ok())
+            .ok_or_else(|| FrustumError::XmlParseError("fov".into()))?;
+        let rng: f64 = extract_xml_attr(tag, "range")
+            .and_then(|s| s.parse().ok())
+            .ok_or_else(|| FrustumError::XmlParseError("range".into()))?;
         if !fov.is_finite() || !rng.is_finite() {
             return Err(FrustumError::NonFiniteParameter("fov or range"));
         }
@@ -470,7 +478,6 @@ impl SensorGimbal {
         Ok((gimbal, fov, rng))
     }
 }
-
 
 #[cfg(test)]
 mod tests {
