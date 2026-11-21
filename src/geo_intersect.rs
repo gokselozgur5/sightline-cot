@@ -25,12 +25,30 @@ pub fn segments_intersect(
     let (dx12, dy12) = (lon2 - lon1, lat2 - lat1);
     let (dx34, dy34) = (unwrap_lon(p4[1], lon3_raw) - lon3_raw, p4[0] - lat3);
     let denom = dx12 * dy34 - dy12 * dx34;
-    if denom.abs() < 1e-12 {
-        return None;
-    }
     let base_lon3 = unwrap_lon(lon3_raw, lon1);
     for shift in [-360.0, 0.0, 360.0] {
         let (dx31, dy31) = (base_lon3 + shift - lon1, lat3 - lat1);
+        if denom.abs() < 1e-12 {
+            if (dx31 * dy12 - dy31 * dx12).abs() < 1e-12 {
+                let len_sq = dx12 * dx12 + dy12 * dy12;
+                if len_sq >= 1e-12 {
+                    let t3 = (dx31 * dx12 + dy31 * dy12) / len_sq;
+                    let t4 = ((base_lon3 + shift + dx34 - lon1) * dx12
+                        + (lat3 + dy34 - lat1) * dy12)
+                        / len_sq;
+                    let (min_t, max_t) = if t3 < t4 { (t3, t4) } else { (t4, t3) };
+                    let ov_start = min_t.max(0.0);
+                    let ov_end = max_t.min(1.0);
+                    if ov_start <= ov_end {
+                        let t = (ov_start + ov_end) * 0.5;
+                        let lat = lat1 + t * dy12;
+                        let lon = lon1 + t * dx12;
+                        return Some([lat, ((lon + 180.0).rem_euclid(360.0) - 180.0)]);
+                    }
+                }
+            }
+            continue;
+        }
         let t = (dx31 * dy34 - dy31 * dx34) / denom;
         let u = (dx31 * dy12 - dy31 * dx12) / denom;
         if (0.0..=1.0).contains(&t) && (0.0..=1.0).contains(&u) {
