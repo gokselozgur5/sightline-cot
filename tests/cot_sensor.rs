@@ -1,3 +1,4 @@
+use sightline_cot::cot::CotError;
 use sightline_cot::cot_sensor::CotSensor;
 
 #[test]
@@ -14,8 +15,11 @@ fn test_sensor_fov_roundtrip() {
 
 #[test]
 fn test_sensor_rejects_fov_outside_range() {
-    assert!(CotSensor::new(0.0, -0.1, 100.0, 0.0).is_err());
-    assert!(CotSensor::new(0.0, 360.1, 100.0, 0.0).is_err());
-    assert!(CotSensor::new(0.0, 0.0, 100.0, 0.0).is_ok());
-    assert!(CotSensor::new(0.0, 360.0, 100.0, 0.0).is_ok());
+    let err = Err(CotError::CoordinateOutOfBounds("fov in [0.0, 360.0]"));
+    assert_eq!(CotSensor::new(0.0, -0.1, 100.0, 0.0), err);
+    assert_eq!(CotSensor::new(0.0, 360.1, 100.0, 0.0), err);
+    let min_sensor = CotSensor::new(0.0, 0.0, 100.0, 0.0).unwrap();
+    assert_eq!(min_sensor.fov_deg, 0.0);
+    let max_sensor = CotSensor::new(0.0, 360.0, 100.0, 0.0).unwrap();
+    assert_eq!(max_sensor.fov_deg, 360.0);
 }
