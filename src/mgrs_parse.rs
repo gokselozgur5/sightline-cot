@@ -69,7 +69,13 @@ impl ParsedMgrs {
             let p = self.precision;
             format!(
                 "{:02}{}{}{}{:0width$}{:0width$}",
-                self.zone, self.band, self.col, self.row, self.easting, self.northing, width = p
+                self.zone,
+                self.band,
+                self.col,
+                self.row,
+                self.easting,
+                self.northing,
+                width = p
             )
         }
     }
@@ -84,7 +90,13 @@ impl ParsedMgrs {
             let p = self.precision;
             format!(
                 "{:02}{} {}{} {:0width$} {:0width$}",
-                self.zone, self.band, self.col, self.row, self.easting, self.northing, width = p
+                self.zone,
+                self.band,
+                self.col,
+                self.row,
+                self.easting,
+                self.northing,
+                width = p
             )
         }
     }
@@ -222,8 +234,12 @@ fn parse_numeric_digits(digits: &str) -> Result<(u32, u32, usize), MgrsParseErro
         return Ok((0, 0, 0));
     }
     let p = digits.len() / 2;
-    let easting: u32 = digits[..p].parse().map_err(|_| MgrsParseError::InvalidDigits)?;
-    let northing: u32 = digits[p..].parse().map_err(|_| MgrsParseError::InvalidDigits)?;
+    let easting: u32 = digits[..p]
+        .parse()
+        .map_err(|_| MgrsParseError::InvalidDigits)?;
+    let northing: u32 = digits[p..]
+        .parse()
+        .map_err(|_| MgrsParseError::InvalidDigits)?;
     Ok((easting, northing, p))
 }
 
