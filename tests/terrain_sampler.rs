@@ -13,3 +13,11 @@ fn test_terrain_intercept_unconverged_max_iterations() {
         Err(TerrainSamplerError::MaxIterationsReached)
     );
 }
+
+#[test]
+fn test_terrain_ray_overflow_direction() {
+    let ray = TerrainRay::new([0.0, 0.0, 0.0], [1e200, 0.0, 0.0]).unwrap();
+    assert!((ray.direction[0] - 1.0).abs() < 1e-12);
+    assert_eq!(ray.direction[1], 0.0);
+    assert_eq!(ray.direction[2], 0.0);
+}
