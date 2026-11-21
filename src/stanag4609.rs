@@ -172,48 +172,21 @@ pub const MISB_0601_UNIVERSAL_KEY: [u8; 16] = [
     0x06, 0x0E, 0x2B, 0x34, 0x02, 0x0B, 0x01, 0x01, 0x0E, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00,
 ];
 
-fn parse_ber_len(slice: &[u8]) -> Result<(usize, usize), StanagError> {
-    if slice.is_empty() {
-        return Err(StanagError::BufferTooShort);
+fn parse_st0601(packet: &[u8]) -> Result<misb::st0601::Packet<'_>, StanagError> {
+    match misb::st0601::Packet::parse(packet) {
+        Ok((p, _)) => Ok(p),
+        Err(misb::Error::Checksum { .. }) => Err(StanagError::InvalidChecksum),
+        Err(_) => Err(StanagError::BufferTooShort),
     }
-    let first = slice[0];
-    if first < 0x80 {
-        return Ok((first as usize, 1));
-    }
-    let n = (first & 0x7F) as usize;
-    if n == 0 || slice.len() < 1 + n {
-        return Err(StanagError::BufferTooShort);
-    }
-    let mut len = 0usize;
-    for &b in &slice[1..=n] {
-        len = (len << 8) | (b as usize);
-    }
-    Ok((len, 1 + n))
 }
 
-fn scan_for_tag2(payload: &[u8]) -> Result<StanagTimestamp, StanagError> {
-    let mut idx = 0;
-    while idx < payload.len() {
-        let tag = payload[idx];
-        if idx + 1 >= payload.len() {
-            return Err(StanagError::BufferTooShort);
-        }
-        let (len, len_bytes) = parse_ber_len(&payload[idx + 1..])?;
-        let val_start = idx + 1 + len_bytes;
-        if payload.len() < val_start + len {
-            return Err(StanagError::BufferTooShort);
-        }
-        if tag == MISB_TAG_PRECISION_TIME_STAMP {
-            if len != (MISB_LEN_PRECISION_TIME_STAMP as usize) {
-                return Err(StanagError::InvalidKlvLength(len));
-            }
-            let mut val = [0u8; 8];
-            val.copy_from_slice(&payload[val_start..val_start + 8]);
-            return Ok(StanagTimestamp::from_be_bytes(val));
-        }
-        idx = val_start + len;
-    }
-    Err(StanagError::BufferTooShort)
+/// Decode the sensor position (tags 13-15) and frame center (tags 23-25) from
+/// a MISB ST 0601 KLV packet.
+pub fn st0601_positions(
+    packet: &[u8],
+) -> Result<(Option<misb::GeoPoint>, Option<misb::GeoPoint>), StanagError> {
+    let p = parse_st0601(packet)?;
+    Ok((p.sensor_position(), p.frame_center()))
 }
 
 impl StanagTimestamp {
@@ -233,20 +206,16 @@ impl StanagTimestamp {
 
     /// Parse a standalone MISB ST 0601 KLV packet and extract the timestamp.
     pub fn from_klv_packet(packet: &[u8]) -> Result<Self, StanagError> {
-        if packet.len() < 22 || &packet[..16] != &MISB_0601_UNIVERSAL_KEY {
-            return Err(StanagError::BufferTooShort);
+        let p = parse_st0601(packet)?;
+        let raw = p
+            .raw(misb::st0601::Tag::PrecisionTimeStamp)
+            .ok_or(StanagError::BufferTooShort)?;
+        if raw.len() != (MISB_LEN_PRECISION_TIME_STAMP as usize) {
+            return Err(StanagError::InvalidKlvLength(raw.len()));
         }
-        let (body_len, len_bytes) = parse_ber_len(&packet[16..])?;
-        let offset = 16 + len_bytes;
-        if packet.len() < offset + body_len || body_len < 4 {
-            return Err(StanagError::BufferTooShort);
-        }
-        let full_len = offset + body_len;
-        let ck_bytes = [packet[full_len - 2], packet[full_len - 1]];
-        if compute_st0601_checksum(&packet[..full_len - 2]) != u16::from_be_bytes(ck_bytes) {
-            return Err(StanagError::InvalidChecksum);
-        }
-        scan_for_tag2(&packet[offset..full_len - 4])
+        p.timestamp()
+            .map(StanagTimestamp::from_micros)
+            .ok_or(StanagError::BufferTooShort)
     }
 }
 

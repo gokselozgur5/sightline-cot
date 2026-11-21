@@ -88,3 +88,26 @@ fn four_digit_fraction_keeps_its_sub_millisecond_part() {
     let ts = StanagTimestamp::from_iso8601("2026-11-16T08:41:00.1234Z").unwrap();
     assert_eq!(ts.as_micros(), 1_794_818_460_123_400);
 }
+
+#[test]
+fn klv_packet_with_ber_oid_tag_decodes_time_and_positions() {
+    use misb::st0601::{Builder, Tag};
+    let mut b = Builder::new(1_700_000_000_123_456);
+    b.raw(130, &[0xAA, 0xBB]).unwrap();
+    b.float(Tag::SensorLatitude, 41.0).unwrap();
+    b.float(Tag::SensorLongitude, 29.0).unwrap();
+    b.float(Tag::SensorTrueAltitude, 1200.0).unwrap();
+    b.float(Tag::FrameCenterLatitude, 41.01).unwrap();
+    b.float(Tag::FrameCenterLongitude, 29.02).unwrap();
+    let packet = b.finish();
+
+    let ts = StanagTimestamp::from_klv_packet(&packet).unwrap();
+    assert_eq!(ts.as_micros(), 1_700_000_000_123_456);
+
+    let (sensor, center) = sightline_cot::stanag4609::st0601_positions(&packet).unwrap();
+    let sensor = sensor.unwrap();
+    assert!((sensor.lat - 41.0).abs() < 1e-6 && (sensor.lon - 29.0).abs() < 1e-6);
+    assert!((sensor.height.unwrap() - 1200.0).abs() < 1.0);
+    let center = center.unwrap();
+    assert!((center.lat - 41.01).abs() < 1e-6 && (center.lon - 29.02).abs() < 1e-6);
+}

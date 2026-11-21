@@ -11,3 +11,4 @@ repository = "https://github.com/gokselozgur5/sightline-cot"
 crate-type = ["rlib", "cdylib", "staticlib"]
 
 [dependencies]
+misb = "0.2.0"
