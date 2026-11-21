@@ -326,13 +326,25 @@ impl TerrainRay {
         if !origin.iter().all(|v| v.is_finite()) || !direction.iter().all(|v| v.is_finite()) {
             return Err(TerrainSamplerError::NonFiniteInput);
         }
-        let mag_sq =
-            direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2];
-        if mag_sq <= 1e-16 {
+        let max_abs = direction[0]
+            .abs()
+            .max(direction[1].abs())
+            .max(direction[2].abs());
+        if max_abs == 0.0 {
             return Err(TerrainSamplerError::DegenerateRayDirection);
         }
-        let mag = mag_sq.sqrt();
-        let direction = [direction[0] / mag, direction[1] / mag, direction[2] / mag];
+        let scaled = [
+            direction[0] / max_abs,
+            direction[1] / max_abs,
+            direction[2] / max_abs,
+        ];
+        let scaled_mag =
+            (scaled[0] * scaled[0] + scaled[1] * scaled[1] + scaled[2] * scaled[2]).sqrt();
+        let direction = [
+            scaled[0] / scaled_mag,
+            scaled[1] / scaled_mag,
+            scaled[2] / scaled_mag,
+        ];
         Ok(Self { origin, direction })
     }
 
