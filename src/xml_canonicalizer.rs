@@ -954,9 +954,23 @@ mod tests {
 
     #[test]
     fn test_invalid_type_characters() {
+        assert_eq!(CotSchemaValidator::validate_cot_type("a-f-G-U-C"), Ok(()));
         assert!(CotSchemaValidator::validate_cot_type("a-f-G-U-C").is_ok());
+        assert_eq!(CotSchemaValidator::validate_cot_type("a-f-G.1_2"), Ok(()));
         assert!(CotSchemaValidator::validate_cot_type("a-f-G.1_2").is_ok());
+        assert_eq!(
+            CotSchemaValidator::validate_cot_type("bad type with spaces"),
+            Err(CotValidationError::InvalidCotType(
+                "invalid character ' ' in CoT type 'bad type with spaces'".into()
+            ))
+        );
         assert!(CotSchemaValidator::validate_cot_type("bad type with spaces").is_err());
+        assert_eq!(
+            CotSchemaValidator::validate_cot_type("bad$type"),
+            Err(CotValidationError::InvalidCotType(
+                "invalid character '$' in CoT type 'bad$type'".into()
+            ))
+        );
         assert!(CotSchemaValidator::validate_cot_type("bad$type").is_err());
     }
 }
