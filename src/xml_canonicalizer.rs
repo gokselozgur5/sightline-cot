@@ -442,7 +442,10 @@ impl CotSchemaValidator {
             return Err(CotValidationError::NonFiniteNumber("le"));
         }
         if le < 0.0 {
-            return Err(CotValidationError::NegativeValueError { field: "le", value: le });
+            return Err(CotValidationError::NegativeValueError {
+                field: "le",
+                value: le,
+            });
         }
 
         Ok(())
@@ -515,9 +518,9 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
 
     while !rest.is_empty() {
         if rest.starts_with("<!--") {
-            let end_idx = rest.find("-->").ok_or_else(|| {
-                CotValidationError::MalformedXml("unclosed comment <!--".into())
-            })?;
+            let end_idx = rest
+                .find("-->")
+                .ok_or_else(|| CotValidationError::MalformedXml("unclosed comment <!--".into()))?;
             let comment_text = &rest[4..end_idx];
             tokens.push(RawXmlToken::Comment(comment_text.to_string()));
             rest = &rest[end_idx + 3..];
@@ -528,9 +531,9 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
             tokens.push(RawXmlToken::ProcessingInstruction);
             rest = &rest[end_idx + 2..];
         } else if rest.starts_with("<![CDATA[") {
-            let end_idx = rest.find("]]>").ok_or_else(|| {
-                CotValidationError::MalformedXml("unclosed CDATA block".into())
-            })?;
+            let end_idx = rest
+                .find("]]>")
+                .ok_or_else(|| CotValidationError::MalformedXml("unclosed CDATA block".into()))?;
             let cdata_content = &rest[9..end_idx];
             tokens.push(RawXmlToken::Text(cdata_content.to_string()));
             rest = &rest[end_idx + 3..];
@@ -540,9 +543,9 @@ fn tokenize_xml(xml: &str) -> Result<Vec<RawXmlToken>, CotValidationError> {
             })?;
             rest = &rest[end_idx + 1..];
         } else if rest.starts_with("</") {
-            let end_idx = rest.find('>').ok_or_else(|| {
-                CotValidationError::MalformedXml("unclosed end tag </".into())
-            })?;
+            let end_idx = rest
+                .find('>')
+                .ok_or_else(|| CotValidationError::MalformedXml("unclosed end tag </".into()))?;
             let tag_content = rest[2..end_idx].trim();
             if tag_content.is_empty() {
                 return Err(CotValidationError::MalformedXml("empty end tag </>".into()));
@@ -596,21 +599,29 @@ fn find_tag_closing(slice: &str) -> Result<usize, CotValidationError> {
             _ => {}
         }
     }
-    Err(CotValidationError::MalformedXml("unclosed tag < without matching >".into()))
+    Err(CotValidationError::MalformedXml(
+        "unclosed tag < without matching >".into(),
+    ))
 }
 
-fn parse_tag_open_and_attrs(inner: &str) -> Result<(String, Vec<XmlAttribute>), CotValidationError> {
+fn parse_tag_open_and_attrs(
+    inner: &str,
+) -> Result<(String, Vec<XmlAttribute>), CotValidationError> {
     let mut parts = inner.split_whitespace();
-    let name = parts.next().ok_or_else(|| {
-        CotValidationError::MalformedXml("empty tag name".into())
-    })?.to_string();
+    let name = parts
+        .next()
+        .ok_or_else(|| CotValidationError::MalformedXml("empty tag name".into()))?
+        .to_string();
 
     let after_name = inner[name.len()..].trim_start();
     let attributes = parse_attributes_list(after_name, &name)?;
     Ok((name, attributes))
 }
 
-fn parse_attributes_list(mut s: &str, el_name: &str) -> Result<Vec<XmlAttribute>, CotValidationError> {
+fn parse_attributes_list(
+    mut s: &str,
+    el_name: &str,
+) -> Result<Vec<XmlAttribute>, CotValidationError> {
     let mut attrs = Vec::new();
     let mut seen_names = HashSet::new();
 
