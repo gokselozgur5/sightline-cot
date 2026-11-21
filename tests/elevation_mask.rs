@@ -27,11 +27,15 @@ fn test_elevation_mask_validator_full_integration() {
     let obs_pt2 = ObstaclePoint::new(2500.0, 200.0, 0.0).unwrap();
     let profile = ObstacleProfile::new(vec![obs_pt1, obs_pt2]).unwrap();
 
-    let prof_eval = val.validate_target_profile(45.0, 4000.0, 1000.0, &profile, false).unwrap();
+    let prof_eval = val
+        .validate_target_profile(45.0, 4000.0, 1000.0, &profile, false)
+        .unwrap();
     assert!(prof_eval.is_visible());
     assert_eq!(prof_eval.status, MaskingStatus::Clear);
 
-    let masked_eval = val.validate_target_profile(45.0, 4000.0, 400.0, &profile, false).unwrap();
+    let masked_eval = val
+        .validate_target_profile(45.0, 4000.0, 400.0, &profile, false)
+        .unwrap();
     assert!(!masked_eval.is_visible());
     assert_eq!(masked_eval.status, MaskingStatus::Masked);
 }
