@@ -258,6 +258,7 @@ pub struct MilStdSymbol {
     pub function_id: [char; 6],
     pub country_code: [char; 2],
     pub modifier: [char; 2],
+    pub order_of_battle: char,
 }
 
 impl Default for MilStdSymbol {
@@ -270,6 +271,7 @@ impl Default for MilStdSymbol {
             function_id: ['-', '-', '-', '-', '-', '-'],
             country_code: ['-', '-'],
             modifier: ['-', '-'],
+            order_of_battle: '-',
         }
     }
 }
@@ -294,6 +296,7 @@ impl MilStdSymbol {
             function_id: fid,
             modifier: [chars[10], chars[11]],
             country_code: [chars[12], chars[13]],
+            order_of_battle: chars[14],
             ..Default::default()
         })
     }
@@ -350,7 +353,7 @@ impl MilStdSymbol {
         s.push(self.modifier[1]);
         s.push(self.country_code[0]);
         s.push(self.country_code[1]);
-        s.push('-');
+        s.push(self.order_of_battle);
         s
     }
 }
