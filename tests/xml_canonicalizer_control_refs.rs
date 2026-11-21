@@ -7,6 +7,9 @@ fn control_character_references_do_not_become_raw_control_bytes() {
         stale=\"2026-11-17T04:35:00.000Z\">\
         <point lat=\"0.0\" lon=\"0.0\" hae=\"0.0\" ce=\"0.0\" le=\"0.0\"/></event>";
     if let Ok(canon) = canonicalize_cot_xml(xml) {
-        assert!(!canon.contains('\u{1}') && !canon.contains('\u{0}'), "{canon:?}");
+        assert!(
+            !canon.contains('\u{1}') && !canon.contains('\u{0}'),
+            "{canon:?}"
+        );
     }
 }
