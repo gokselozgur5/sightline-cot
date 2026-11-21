@@ -45,4 +45,3 @@ fn parse_cot_sensor_rejects_non_finite_fov_and_range() {
     let xml = r#"<sensor azimuth="10" elevation="-30" fov="inf" range="NaN"/>"#;
     assert!(SensorGimbal::parse_cot_sensor(xml).is_err());
 }
-
