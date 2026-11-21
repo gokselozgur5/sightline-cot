@@ -7,12 +7,30 @@ fn test_circle_creation_and_error_validation() {
     assert_eq!(circle.lon, -118.2437);
     assert_eq!(circle.radius_m, 500.0);
 
-    assert!(matches!(CotCircle::new(95.0, 0.0, 100.0), Err(CotCircleError::InvalidCoordinate(_))));
-    assert!(matches!(CotCircle::new(0.0, -190.0, 100.0), Err(CotCircleError::InvalidCoordinate(_))));
-    assert!(matches!(CotCircle::new(0.0, 0.0, -10.0), Err(CotCircleError::InvalidRadius(_))));
-    assert!(matches!(CotCircle::new(0.0, 0.0, 0.0), Err(CotCircleError::InvalidRadius(_))));
-    assert!(matches!(circle.clone().with_stroke_weight(0.0), Err(CotCircleError::InvalidParameter(_))));
-    assert!(matches!(circle.with_hae(f64::NAN), Err(CotCircleError::InvalidParameter(_))));
+    assert!(matches!(
+        CotCircle::new(95.0, 0.0, 100.0),
+        Err(CotCircleError::InvalidCoordinate(_))
+    ));
+    assert!(matches!(
+        CotCircle::new(0.0, -190.0, 100.0),
+        Err(CotCircleError::InvalidCoordinate(_))
+    ));
+    assert!(matches!(
+        CotCircle::new(0.0, 0.0, -10.0),
+        Err(CotCircleError::InvalidRadius(_))
+    ));
+    assert!(matches!(
+        CotCircle::new(0.0, 0.0, 0.0),
+        Err(CotCircleError::InvalidRadius(_))
+    ));
+    assert!(matches!(
+        circle.clone().with_stroke_weight(0.0),
+        Err(CotCircleError::InvalidParameter(_))
+    ));
+    assert!(matches!(
+        circle.with_hae(f64::NAN),
+        Err(CotCircleError::InvalidParameter(_))
+    ));
 }
 
 #[test]
@@ -41,10 +59,12 @@ fn test_circle_to_polygon_vertices() {
 
 #[test]
 fn test_circle_xml_roundtrip() {
-    let circle = CotCircle::new(37.7749, -122.4194, 750.0).expect("valid circle")
+    let circle = CotCircle::new(37.7749, -122.4194, 750.0)
+        .expect("valid circle")
         .with_callsign("PERIMETER_1")
         .with_stroke_color(-65536)
-        .with_stroke_weight(2.5).expect("weight")
+        .with_stroke_weight(2.5)
+        .expect("weight")
         .with_remarks("Test Circle");
     let xml = circle.to_cot_event_xml("UID-C1", 1700000000000, 1700000060000);
     assert!(xml.contains("major=\"750.00\""));
@@ -57,7 +77,8 @@ fn test_circle_xml_roundtrip() {
 
 #[test]
 fn test_range_rings_generation_and_lookup() {
-    let rings = CotRangeRings::from_interval(34.0, -118.0, 500.0, 3).expect("rings")
+    let rings = CotRangeRings::from_interval(34.0, -118.0, 500.0, 3)
+        .expect("rings")
         .with_callsign_prefix("AIRPORT");
     assert_eq!(rings.radii_m, vec![500.0, 1000.0, 1500.0]);
     assert_eq!(rings.ring_index_for_distance(250.0), Some(0));
