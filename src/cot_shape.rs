@@ -40,7 +40,11 @@ impl CotVertex {
         if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
             return Err(CotShapeError::InvalidCoordinate("longitude in [-180, 180]"));
         }
-        Ok(Self { lat, lon, hae: None })
+        Ok(Self {
+            lat,
+            lon,
+            hae: None,
+        })
     }
 }
 
@@ -58,7 +62,10 @@ impl CotVertex {
     /// Format vertex as XML `<vertex .../>` tag.
     pub fn to_xml(&self) -> String {
         match self.hae {
-            Some(h) => format!("<vertex lat=\"{:.6}\" lon=\"{:.6}\" hae=\"{:.2}\"/>", self.lat, self.lon, h),
+            Some(h) => format!(
+                "<vertex lat=\"{:.6}\" lon=\"{:.6}\" hae=\"{:.2}\"/>",
+                self.lat, self.lon, h
+            ),
             None => format!("<vertex lat=\"{:.6}\" lon=\"{:.6}\"/>", self.lat, self.lon),
         }
     }
@@ -85,17 +92,35 @@ impl CotShape {
     /// Create a new open polyline shape (minimum 2 vertices).
     pub fn new_polyline(vertices: Vec<CotVertex>) -> Result<Self, CotShapeError> {
         if vertices.len() < 2 {
-            return Err(CotShapeError::InsufficientVertices { expected: 2, found: vertices.len() });
+            return Err(CotShapeError::InsufficientVertices {
+                expected: 2,
+                found: vertices.len(),
+            });
         }
-        Ok(Self { shape_type: CotShapeType::Polyline, color: None, fill_color: None, stroke_weight: None, vertices })
+        Ok(Self {
+            shape_type: CotShapeType::Polyline,
+            color: None,
+            fill_color: None,
+            stroke_weight: None,
+            vertices,
+        })
     }
 
     /// Create a new closed polygon shape (minimum 3 vertices).
     pub fn new_polygon(vertices: Vec<CotVertex>) -> Result<Self, CotShapeError> {
         if vertices.len() < 3 {
-            return Err(CotShapeError::InsufficientVertices { expected: 3, found: vertices.len() });
+            return Err(CotShapeError::InsufficientVertices {
+                expected: 3,
+                found: vertices.len(),
+            });
         }
-        Ok(Self { shape_type: CotShapeType::Polygon, color: None, fill_color: None, stroke_weight: None, vertices })
+        Ok(Self {
+            shape_type: CotShapeType::Polygon,
+            color: None,
+            fill_color: None,
+            stroke_weight: None,
+            vertices,
+        })
     }
 }
 
@@ -115,7 +140,9 @@ impl CotShape {
     /// Set stroke line thickness in pixels.
     pub fn with_stroke_weight(mut self, weight: f64) -> Result<Self, CotShapeError> {
         if !weight.is_finite() || weight <= 0.0 {
-            return Err(CotShapeError::InvalidParameter("stroke weight must be positive"));
+            return Err(CotShapeError::InvalidParameter(
+                "stroke weight must be positive",
+            ));
         }
         self.stroke_weight = Some(weight);
         Ok(self)
@@ -130,7 +157,10 @@ impl CotShape {
 impl CotShape {
     /// Format shape as `<shape><polyline ...>...</polyline></shape>` XML snippet.
     pub fn to_xml(&self) -> String {
-        let mut attrs = format!("closed=\"{}\"", if self.is_closed() { "true" } else { "false" });
+        let mut attrs = format!(
+            "closed=\"{}\"",
+            if self.is_closed() { "true" } else { "false" }
+        );
         if let Some(c) = self.color {
             attrs.push_str(&format!(" color=\"{c}\""));
         }
