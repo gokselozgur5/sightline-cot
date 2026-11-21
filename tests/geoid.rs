@@ -4,8 +4,14 @@ use sightline_cot::geoid::{ConstantGeoid, GeoidModel};
 fn test_constant_geoid_separation() {
     let geoid = ConstantGeoid::new(30.0);
     assert_eq!(geoid.undulation(45.0, 10.0), Some(30.0));
-    assert_eq!(geoid.orthometric_to_ellipsoidal(45.0, 10.0, 100.0), Some(130.0));
-    assert_eq!(geoid.ellipsoidal_to_orthometric(45.0, 10.0, 130.0), Some(100.0));
+    assert_eq!(
+        geoid.orthometric_to_ellipsoidal(45.0, 10.0, 100.0),
+        Some(130.0)
+    );
+    assert_eq!(
+        geoid.ellipsoidal_to_orthometric(45.0, 10.0, 130.0),
+        Some(100.0)
+    );
 }
 
 use sightline_cot::geoid::{sample_geoid_bilinear, GeoidGrid};
@@ -58,8 +64,12 @@ fn test_orthometric_ellipsoidal_roundtrip() {
     let grid = GeoidGrid::new_uniform(35.0, 45.0, 0.5, 2, 2, vals).unwrap();
     let (lat, lon) = (35.2, 45.3);
     let orthometric_h = 1250.5;
-    let ellipsoidal_h = grid.orthometric_to_ellipsoidal(lat, lon, orthometric_h).unwrap();
-    let recovered_h = grid.ellipsoidal_to_orthometric(lat, lon, ellipsoidal_h).unwrap();
+    let ellipsoidal_h = grid
+        .orthometric_to_ellipsoidal(lat, lon, orthometric_h)
+        .unwrap();
+    let recovered_h = grid
+        .ellipsoidal_to_orthometric(lat, lon, ellipsoidal_h)
+        .unwrap();
     assert!((recovered_h - orthometric_h).abs() < 1e-9);
 }
 
@@ -79,11 +89,26 @@ use sightline_cot::geoid::GeoidError;
 #[test]
 fn test_grid_validation_errors() {
     let u = vec![None; 4];
-    assert_eq!(GeoidGrid::new_uniform(0.0, 0.0, 0.0, 2, 2, u.clone()), Err(GeoidError::InvalidStep));
-    assert_eq!(GeoidGrid::new_uniform(0.0, 0.0, 1.0, 1, 2, u.clone()), Err(GeoidError::InvalidDimensions));
-    assert_eq!(GeoidGrid::new_uniform(0.0, 0.0, 1.0, 2, 2, vec![None; 3]), Err(GeoidError::DataLengthMismatch));
-    assert_eq!(GeoidGrid::new_uniform(89.5, 0.0, 1.0, 2, 2, u.clone()), Err(GeoidError::InvalidBounds));
-    assert_eq!(GeoidGrid::new_uniform(f64::NAN, 0.0, 1.0, 2, 2, u), Err(GeoidError::NonFiniteCoordinate));
+    assert_eq!(
+        GeoidGrid::new_uniform(0.0, 0.0, 0.0, 2, 2, u.clone()),
+        Err(GeoidError::InvalidStep)
+    );
+    assert_eq!(
+        GeoidGrid::new_uniform(0.0, 0.0, 1.0, 1, 2, u.clone()),
+        Err(GeoidError::InvalidDimensions)
+    );
+    assert_eq!(
+        GeoidGrid::new_uniform(0.0, 0.0, 1.0, 2, 2, vec![None; 3]),
+        Err(GeoidError::DataLengthMismatch)
+    );
+    assert_eq!(
+        GeoidGrid::new_uniform(89.5, 0.0, 1.0, 2, 2, u.clone()),
+        Err(GeoidError::InvalidBounds)
+    );
+    assert_eq!(
+        GeoidGrid::new_uniform(f64::NAN, 0.0, 1.0, 2, 2, u),
+        Err(GeoidError::NonFiniteCoordinate)
+    );
 }
 
 #[test]
