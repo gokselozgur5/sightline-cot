@@ -64,3 +64,15 @@ fn test_to_cot_event_xml_generation() {
     assert!(xml.contains("<contact callsign=\"TEST_CALLSIGN\"/>"));
     assert!(xml.contains("hae=\"15.00\""));
 }
+
+#[test]
+fn test_cot_shape_and_vertex_parse_invalid_style_rejected() {
+    let bad_weight = r#"<shape><polyline strokeWeight="-5.0"><vertex lat="10.0" lon="20.0"/><vertex lat="10.5" lon="20.5"/></polyline></shape>"#;
+    assert!(CotShape::parse(bad_weight).is_err());
+
+    let nan_weight = r#"<shape><polyline strokeWeight="NaN"><vertex lat="10.0" lon="20.0"/><vertex lat="10.5" lon="20.5"/></polyline></shape>"#;
+    assert!(CotShape::parse(nan_weight).is_err());
+
+    assert!(CotVertex::parse(r#"<vertex lat="10.0" lon="20.0" hae="inf"/>"#).is_err());
+    assert!(CotVertex::parse(r#"<vertex lat="10.0" lon="20.0" hae="abc"/>"#).is_err());
+}
