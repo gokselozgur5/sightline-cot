@@ -348,5 +348,14 @@ mod tests {
             .bearing_at_distance(path.total_distance_m() * 0.5)
             .unwrap();
         assert!(b_mid.abs() < 1e-4);
+
+        let wps_east = [Waypoint::new(0.0, 0.0), Waypoint::new(0.0, 10.0)];
+        let path_east = GreatCirclePath::from_waypoints(&wps_east).unwrap();
+        let b0_east = path_east.bearing_at_distance(0.0).unwrap();
+        assert!((b0_east - 90.0).abs() < 1e-4);
+        let b_mid_east = path_east
+            .bearing_at_distance(path_east.total_distance_m() * 0.5)
+            .unwrap();
+        assert!((b_mid_east - 90.0).abs() < 1e-4);
     }
 }
