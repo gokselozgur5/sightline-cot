@@ -200,3 +200,21 @@ pub fn zone_distance_delta(current_zone: u8, target_zone: u8) -> i8 {
 pub fn is_adjacent_zone(zone1: u8, zone2: u8) -> bool {
     zone_distance_delta(zone1, zone2).abs() == 1
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_dlon_rad_large_input_termination() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let res = normalize_dlon_rad(1e20);
+            let _ = tx.send(res);
+        });
+        let res = rx
+            .recv_timeout(std::time::Duration::from_millis(500))
+            .expect("must terminate within 500ms");
+        assert!(res.abs() <= std::f64::consts::PI);
+    }
+}
