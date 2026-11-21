@@ -101,19 +101,19 @@ pub mod geo_crosstrack;
 pub use geo_crosstrack::{
     along_track_distance_m, cross_track_distance_m, cross_track_error, CrossTrackResult,
 };
-pub mod geo_ddm;
-pub mod geo_dms;
-pub mod geo_destination;
-pub mod geo_enu;
 pub mod geo_aer;
+pub mod geo_ddm;
+pub mod geo_destination;
+pub mod geo_dms;
+pub mod geo_enu;
 pub use geo_aer::{
     aer_to_ecef, aer_to_geodetic, aer_to_sez, ecef_to_aer, ecef_to_sez, enu_to_sez,
     geodetic_to_aer, sez_to_aer, sez_to_ecef, sez_to_enu, AerCoord, AerError, SezCoord,
 };
-pub mod geo_frame;
 pub mod geo_ecef;
-pub mod geo_greatcircle;
+pub mod geo_frame;
 pub mod geo_great_circle;
+pub mod geo_greatcircle;
 pub use geo_great_circle::{GreatCircleError, GreatCirclePath, Waypoint};
 pub mod geo_haversine;
 pub use geo_haversine::{
@@ -126,13 +126,13 @@ pub mod geo_intersect;
 pub mod geo_meridian_arc;
 pub mod geo_midpoint;
 pub mod geo_ned;
-pub mod geoid_loader;
 pub mod geo_perimeter;
 pub mod geo_polyline;
 pub mod geo_polyline_nearest;
 pub mod geo_radii;
 pub mod geo_rhumb;
 pub mod geo_simplify;
+pub mod geoid_loader;
 pub use geo_simplify::{simplify_polyline, LocalFrame};
 pub mod cam_distorted_pinhole;
 pub mod geo_sphere;
@@ -142,18 +142,18 @@ pub use tracker_cov_adaptive::{
     compute_adaptive_scale, scale_measurement_variance, AdaptiveCovarianceConfig,
     AdaptiveCovarianceError,
 };
+pub mod utm_forced;
 pub mod utm_mgrs;
 pub mod utm_string;
-pub mod utm_forced;
 pub use utm_forced::{
     is_adjacent_zone, utm_forced_to_wgs84, wgs84_to_utm_forced, zone_distance_delta,
 };
 pub mod geo_unified;
+pub use cam_distorted_pinhole::DistortedPinhole;
 pub use geo_unified::{
     is_polar_latitude, is_utm_latitude, unified_to_wgs84, wgs84_to_unified, GridSystem,
     UnifiedCoord,
 };
-pub use cam_distorted_pinhole::DistortedPinhole;
 pub mod geoid;
 pub use geoid::{
     ellipsoidal_to_orthometric, orthometric_to_ellipsoidal, sample_geoid_bilinear, ConstantGeoid,
@@ -165,14 +165,14 @@ pub mod geohash_neighbors;
 pub use geohash_neighbors::{
     geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
-pub mod geohash;
-pub mod geo_ups;
 pub mod geo_los;
+pub mod geo_ups;
+pub mod geohash;
 pub use geo_los::{
     compute_geo_los, elevation_angle_rad, has_line_of_sight, horizon_distance_m,
     slant_range_geodetic, GeoLosError, GeoPoint3D, LosGeometry,
 };
-pub use geo_unified::{wgs84_to_ups, ups_to_wgs84, UpsCoord};
+pub use geo_unified::{ups_to_wgs84, wgs84_to_ups, UpsCoord};
 pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -235,9 +235,7 @@ pub use xml_canonicalizer::{
     CotValidationError, CotXmlCanonicalizer,
 };
 pub mod spatial_rtree;
-pub use spatial_rtree::{
-    normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree,
-};
+pub use spatial_rtree::{normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree};
 
 pub mod sidc_parser;
 pub use sidc_parser::{
