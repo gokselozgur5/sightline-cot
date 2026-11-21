@@ -317,13 +317,19 @@ pub fn sample_geoid_bilinear(grid: &GeoidGrid, lat_deg: f64, lon_deg: f64) -> Op
 }
 
 pub fn orthometric_to_ellipsoidal<G: GeoidModel + ?Sized>(
-    model: &G, lat_deg: f64, lon_deg: f64, orthometric_m: f64,
+    model: &G,
+    lat_deg: f64,
+    lon_deg: f64,
+    orthometric_m: f64,
 ) -> Option<f64> {
     model.orthometric_to_ellipsoidal(lat_deg, lon_deg, orthometric_m)
 }
 
 pub fn ellipsoidal_to_orthometric<G: GeoidModel + ?Sized>(
-    model: &G, lat_deg: f64, lon_deg: f64, ellipsoidal_m: f64,
+    model: &G,
+    lat_deg: f64,
+    lon_deg: f64,
+    ellipsoidal_m: f64,
 ) -> Option<f64> {
     model.ellipsoidal_to_orthometric(lat_deg, lon_deg, ellipsoidal_m)
 }
