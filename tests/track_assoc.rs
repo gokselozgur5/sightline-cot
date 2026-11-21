@@ -1,6 +1,6 @@
 use sightline_cot::track_assoc::{
-    compute_spatial_matrix_2d, solve_nearest_neighbor,
-    solve_optimal_hungarian, AssocConfig, AssocError, DistanceMatrix,
+    compute_spatial_matrix_2d, solve_nearest_neighbor, solve_optimal_hungarian, AssocConfig,
+    AssocError, DistanceMatrix,
 };
 
 #[test]
