@@ -11,39 +11,34 @@ pub mod camera;
 pub mod classifier;
 pub mod cot;
 pub mod cot_beacon;
-pub use cot_beacon::{
-    CotBeaconError, EmergencyBeacon, EmergencySeverity, EmergencyType,
-};
+pub use cot_beacon::{CotBeaconError, EmergencyBeacon, EmergencySeverity, EmergencyType};
 pub mod cot_detail;
 pub mod cot_sensor;
 pub mod cot_sensor_fov;
 pub use cot_sensor_fov::{
-    compute_ground_footprint, is_target_in_sensor_fov, SensorCone, SensorFootprint,
-    SensorFovError,
+    compute_ground_footprint, is_target_in_sensor_fov, SensorCone, SensorFootprint, SensorFovError,
 };
 pub mod cot_shape;
 pub use cot_shape::{CotShape, CotShapeError, CotShapeType, CotVertex};
 pub mod cot_task;
-pub use cot_task::{
-    CotTaskError, TacticalTask, TaskAction, TaskPoint, TaskPriority, TaskStatus,
-};
+pub use cot_task::{CotTaskError, TacticalTask, TaskAction, TaskPoint, TaskPriority, TaskStatus};
 pub mod cot_circle;
 pub use cot_circle::{CotCircle, CotCircleError, CotRangeRings};
 pub mod sensor_frustum;
 pub use sensor_frustum::{
     compute_frustum_ground_enu, compute_frustum_rays_enu, generate_sensor_footprint,
-    point_in_polygon_enu, polygon_area_enu, polygon_perimeter_enu, FrustumError,
-    FrustumFootprint, PlatformPose, SensorFrustumConfig, SensorGimbal,
+    point_in_polygon_enu, polygon_area_enu, polygon_perimeter_enu, FrustumError, FrustumFootprint,
+    PlatformPose, SensorFrustumConfig, SensorGimbal,
 };
 pub mod dem_bilinear;
 pub mod egm96_geoid;
 pub mod elevation_mask;
+pub use egm96_geoid::{
+    normalize_lon_180, normalize_lon_360, sample_egm96_undulation, Egm96Error, Egm96Geoid,
+};
 pub use elevation_mask::{
     ElevationMaskError, ElevationMaskValidator, MaskSector, MaskingEvaluation, MaskingStatus,
     ObstaclePoint, ObstacleProfile,
-};
-pub use egm96_geoid::{
-    normalize_lon_180, normalize_lon_360, sample_egm96_undulation, Egm96Error, Egm96Geoid,
 };
 pub mod ffi;
 pub mod geo_helmert;
@@ -53,8 +48,8 @@ pub mod geo_vincenty;
 pub mod geo_vincenty_direct;
 pub use geo_vincenty::{
     vincenty_direct, vincenty_direct_ellipsoid, vincenty_geodesic_path,
-    vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid,
-    VincentyDirect, VincentyError, VincentyInverse,
+    vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid, VincentyDirect,
+    VincentyError, VincentyInverse,
 };
 pub mod geofence;
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
@@ -66,32 +61,31 @@ pub mod maidenhead;
 pub mod mgrs;
 pub mod mgrs_decode;
 pub mod mgrs_encode;
-pub mod mgrs_truncate;
 pub mod mgrs_parse;
+pub mod mgrs_truncate;
+pub use mgrs::{
+    format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, mgrs_10figure_to_utm, mgrs_10figure_to_wgs84,
+    parse_mgrs_10figure, utm_to_mgrs_10figure, utm_to_wgs84, wgs84_to_mgrs_10figure, wgs84_to_utm,
+    GridError, Mgrs10Figure, MgrsString, UtmCoord,
+};
 pub use mgrs_parse::{
     parse_mgrs, parse_mgrs_to_utm, parse_mgrs_to_wgs84, MgrsParseError, ParsedMgrs,
 };
-pub use mgrs::{
-    format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, mgrs_10figure_to_utm, mgrs_10figure_to_wgs84,
-    parse_mgrs_10figure, utm_to_mgrs_10figure, utm_to_wgs84, wgs84_to_mgrs_10figure,
-    wgs84_to_utm, GridError, Mgrs10Figure, MgrsString, UtmCoord,
-};
-pub mod proto;
 pub mod mil_std;
+pub mod proto;
 pub mod rhumb_line;
 pub use rhumb_line::{
-    great_circle_distance, interpolate_by_count, interpolate_by_step,
-    rhumb_distance_and_bearing, rhumb_intermediate_fraction, RhumbLineError,
-    RhumbPath, RhumbSegmentComparison, RhumbWaypoint,
+    great_circle_distance, interpolate_by_count, interpolate_by_step, rhumb_distance_and_bearing,
+    rhumb_intermediate_fraction, RhumbLineError, RhumbPath, RhumbSegmentComparison, RhumbWaypoint,
 };
 pub mod sidc;
 pub mod stanag4609;
-pub use stanag4609::{StanagError, StanagTimestamp};
-pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub use mil_std::{
     parse_mil_std, MilStdAffiliation, MilStdDimension, MilStdEchelon, MilStdError, MilStdStatus,
     MilStdSymbol,
 };
+pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
+pub use stanag4609::{StanagError, StanagTimestamp};
 pub mod geo_angle;
 pub mod geo_area;
 pub mod geo_polygon_area;
