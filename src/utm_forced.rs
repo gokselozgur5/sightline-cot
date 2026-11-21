@@ -114,22 +114,46 @@ fn find_footpoint_latitude(m: f64, e2: f64) -> f64 {
     phi
 }
 
-fn unproject_series(d: f64, t1: f64, eta1_2: f64, ep2: f64, phi1: f64, nu1: f64, rho1: f64) -> (f64, f64) {
-    let (d2, d3, d4, d5, d6) = (d * d, d * d * d, d * d * d * d, d * d * d * d * d, d * d * d * d * d * d);
-    let lat = phi1 - (nu1 * phi1.tan() / rho1) * (d2 / 2.0
-        - (5.0 + 3.0 * t1 + 10.0 * eta1_2 - 4.0 * eta1_2 * eta1_2 - 9.0 * ep2) * d4 / 24.0
-        + (61.0 + 90.0 * t1 + 298.0 * eta1_2 + 45.0 * t1 * t1) * d6 / 720.0
-        - (1385.0 + 3633.0 * t1 + 4095.0 * t1 * t1 + 1575.0 * t1 * t1 * t1) * d6 * d2 / 40320.0);
+fn unproject_series(
+    d: f64,
+    t1: f64,
+    eta1_2: f64,
+    ep2: f64,
+    phi1: f64,
+    nu1: f64,
+    rho1: f64,
+) -> (f64, f64) {
+    let (d2, d3, d4, d5, d6) = (
+        d * d,
+        d * d * d,
+        d * d * d * d,
+        d * d * d * d * d,
+        d * d * d * d * d * d,
+    );
+    let lat = phi1
+        - (nu1 * phi1.tan() / rho1)
+            * (d2 / 2.0
+                - (5.0 + 3.0 * t1 + 10.0 * eta1_2 - 4.0 * eta1_2 * eta1_2 - 9.0 * ep2) * d4 / 24.0
+                + (61.0 + 90.0 * t1 + 298.0 * eta1_2 + 45.0 * t1 * t1) * d6 / 720.0
+                - (1385.0 + 3633.0 * t1 + 4095.0 * t1 * t1 + 1575.0 * t1 * t1 * t1) * d6 * d2
+                    / 40320.0);
     let dlon = (d - (1.0 + 2.0 * t1 + eta1_2) * d3 / 6.0
-        + (5.0 - 2.0 * eta1_2 + 28.0 * t1 - 3.0 * eta1_2 * eta1_2 + 8.0 * ep2 + 24.0 * t1 * t1) * d5 / 120.0
-        - (61.0 + 662.0 * t1 + 1320.0 * t1 * t1 + 720.0 * t1 * t1 * t1) * d6 * d / 5040.0) / phi1.cos();
+        + (5.0 - 2.0 * eta1_2 + 28.0 * t1 - 3.0 * eta1_2 * eta1_2 + 8.0 * ep2 + 24.0 * t1 * t1)
+            * d5
+            / 120.0
+        - (61.0 + 662.0 * t1 + 1320.0 * t1 * t1 + 720.0 * t1 * t1 * t1) * d6 * d / 5040.0)
+        / phi1.cos();
     (lat, dlon)
 }
 
 fn utm_unproject_point_forced(coord: &UtmCoord) -> (f64, f64) {
     let e2 = WGS84_F * (2.0 - WGS84_F);
     let ep2 = e2 / (1.0 - e2);
-    let y = if coord.hemisphere == 'S' { coord.northing - FALSE_NORTHING_SOUTH } else { coord.northing };
+    let y = if coord.hemisphere == 'S' {
+        coord.northing - FALSE_NORTHING_SOUTH
+    } else {
+        coord.northing
+    };
     let x = coord.easting - FALSE_EASTING;
     let m = y / UTM_K0;
     let phi1 = find_footpoint_latitude(m, e2);
