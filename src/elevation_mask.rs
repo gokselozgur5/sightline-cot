@@ -28,7 +28,9 @@ impl core::fmt::Display for ElevationMaskError {
             Self::InvalidDistance => write!(f, "distance must be positive and finite"),
             Self::EmptyProfile => write!(f, "obstacle profile cannot be empty"),
             Self::InvalidSectorSpan => write!(f, "azimuth sector span is invalid"),
-            Self::NonMonotonicProfile => write!(f, "obstacle profile distances must strictly increase"),
+            Self::NonMonotonicProfile => {
+                write!(f, "obstacle profile distances must strictly increase")
+            }
         }
     }
 }
@@ -108,7 +110,11 @@ impl MaskSector {
         }
         let start = (start_az % 360.0 + 360.0) % 360.0;
         let end = (end_az % 360.0 + 360.0) % 360.0;
-        Ok(Self { start_azimuth_deg: start, end_azimuth_deg: end, mask_elevation_deg: mask_el })
+        Ok(Self {
+            start_azimuth_deg: start,
+            end_azimuth_deg: end,
+            mask_elevation_deg: mask_el,
+        })
     }
 
     /// Check if an azimuth angle falls within this sector.
@@ -138,7 +144,11 @@ pub struct ObstaclePoint {
 
 impl ObstaclePoint {
     /// Create and validate a radial obstacle sample point.
-    pub fn new(distance_m: f64, elevation_m: f64, height_agl_m: f64) -> Result<Self, ElevationMaskError> {
+    pub fn new(
+        distance_m: f64,
+        elevation_m: f64,
+        height_agl_m: f64,
+    ) -> Result<Self, ElevationMaskError> {
         if !distance_m.is_finite() || !elevation_m.is_finite() || !height_agl_m.is_finite() {
             return Err(ElevationMaskError::NonFiniteValue);
         }
@@ -148,7 +158,11 @@ impl ObstaclePoint {
         if height_agl_m < 0.0 {
             return Err(ElevationMaskError::NonFiniteValue);
         }
-        Ok(Self { distance_m, elevation_m, height_agl_m })
+        Ok(Self {
+            distance_m,
+            elevation_m,
+            height_agl_m,
+        })
     }
 }
 
@@ -274,7 +288,11 @@ impl ElevationMaskValidator {
     }
 
     /// Validate line-of-sight elevation clearance against sector mask.
-    pub fn validate_target_angles(&self, az_deg: f64, el_deg: f64) -> Result<MaskingEvaluation, ElevationMaskError> {
+    pub fn validate_target_angles(
+        &self,
+        az_deg: f64,
+        el_deg: f64,
+    ) -> Result<MaskingEvaluation, ElevationMaskError> {
         if !el_deg.is_finite() {
             return Err(ElevationMaskError::NonFiniteValue);
         }
@@ -322,10 +340,16 @@ impl ElevationMaskValidator {
 
     /// Validate line-of-sight elevation against radial obstacle profile.
     pub fn validate_target_profile(
-        &self, az_deg: f64, dist_m: f64, height_m: f64, profile: &ObstacleProfile, curvature: bool,
+        &self,
+        az_deg: f64,
+        dist_m: f64,
+        height_m: f64,
+        profile: &ObstacleProfile,
+        curvature: bool,
     ) -> Result<MaskingEvaluation, ElevationMaskError> {
         let target_el = self.compute_target_elevation_deg(dist_m, height_m, curvature)?;
-        let prof_mask = profile.compute_mask_angle_up_to_deg(self.observer_height_m, dist_m, curvature)?;
+        let prof_mask =
+            profile.compute_mask_angle_up_to_deg(self.observer_height_m, dist_m, curvature)?;
         let sect_mask = self.get_mask_angle_at_azimuth(az_deg)?;
         let eff_mask = prof_mask.max(sect_mask);
         let margin = target_el - eff_mask;
