@@ -40,12 +40,22 @@ pub trait GeoidModel {
     }
 
     /// Convert orthometric height (H, MSL) to ellipsoidal height (h, HAE): h = H + N.
-    fn orthometric_to_ellipsoidal(&self, lat_deg: f64, lon_deg: f64, orthometric_m: f64) -> Option<f64> {
+    fn orthometric_to_ellipsoidal(
+        &self,
+        lat_deg: f64,
+        lon_deg: f64,
+        orthometric_m: f64,
+    ) -> Option<f64> {
         self.undulation(lat_deg, lon_deg).map(|n| orthometric_m + n)
     }
 
     /// Convert ellipsoidal height (h, HAE) to orthometric height (H, MSL): H = h - N.
-    fn ellipsoidal_to_orthometric(&self, lat_deg: f64, lon_deg: f64, ellipsoidal_m: f64) -> Option<f64> {
+    fn ellipsoidal_to_orthometric(
+        &self,
+        lat_deg: f64,
+        lon_deg: f64,
+        ellipsoidal_m: f64,
+    ) -> Option<f64> {
         self.undulation(lat_deg, lon_deg).map(|n| ellipsoidal_m - n)
     }
 }
@@ -120,7 +130,15 @@ impl GeoidGrid {
 }
 
 impl GeoidGrid {
-    fn validate(lat0: f64, lon0: f64, dlat: f64, dlon: f64, c: usize, r: usize, n: usize) -> Result<(), GeoidError> {
+    fn validate(
+        lat0: f64,
+        lon0: f64,
+        dlat: f64,
+        dlon: f64,
+        c: usize,
+        r: usize,
+        n: usize,
+    ) -> Result<(), GeoidError> {
         Self::validate_coords(lat0, lon0, dlat, dlon)?;
         if c < 2 || r < 2 {
             return Err(GeoidError::InvalidDimensions);
@@ -146,9 +164,23 @@ impl GeoidGrid {
         rows: usize,
         undulations: Vec<Option<f64>>,
     ) -> Result<Self, GeoidError> {
-        Self::validate(min_lat_deg, min_lon_deg, lat_step_deg, lon_step_deg, cols, rows, undulations.len())?;
+        Self::validate(
+            min_lat_deg,
+            min_lon_deg,
+            lat_step_deg,
+            lon_step_deg,
+            cols,
+            rows,
+            undulations.len(),
+        )?;
         Ok(Self {
-            min_lat_deg, min_lon_deg, lat_step_deg, lon_step_deg, cols, rows, undulations,
+            min_lat_deg,
+            min_lon_deg,
+            lat_step_deg,
+            lon_step_deg,
+            cols,
+            rows,
+            undulations,
         })
     }
 }
