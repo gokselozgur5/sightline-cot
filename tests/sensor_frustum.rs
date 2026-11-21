@@ -58,3 +58,20 @@ fn oblique_footprint_is_clipped_at_max_range_and_bounded_by_min_range() {
     let fp_min = generate_sensor_footprint(&platform, &gimbal, &cfg_min, 0.0).unwrap();
     assert!(fp_min.area_sq_m < fp.area_sq_m);
 }
+
+#[test]
+fn test_oblique_footprint_pins_corner_positions_and_orientation() {
+    let platform = PlatformPose::new(0.0, 0.0, 500.0, 0.0, 0.0, 0.0).unwrap();
+    let gimbal = SensorGimbal::new(0.0, -45.0, 0.0).unwrap();
+    let cfg = SensorFrustumConfig::new(30.0, 30.0, 2000.0, 5.0).unwrap();
+    let fp = generate_sensor_footprint(&platform, &gimbal, &cfg, 0.0).unwrap();
+    assert_eq!(fp.vertices_enu.len(), 4);
+    assert!((fp.vertices_enu[0][0] - (-149.4)).abs() < 1.0);
+    assert!((fp.vertices_enu[0][1] - 288.7).abs() < 1.0);
+    assert!((fp.vertices_enu[1][0] - 149.4).abs() < 1.0);
+    assert!((fp.vertices_enu[1][1] - 288.7).abs() < 1.0);
+    assert!((fp.vertices_enu[2][0] - 258.8).abs() < 1.0);
+    assert!((fp.vertices_enu[2][1] - 866.0).abs() < 1.0);
+    assert!((fp.vertices_enu[3][0] - (-258.8)).abs() < 1.0);
+    assert!((fp.vertices_enu[3][1] - 866.0).abs() < 1.0);
+}
