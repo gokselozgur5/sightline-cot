@@ -1,4 +1,4 @@
-use sightline_cot::proto::decode_tak_packet;
+use sightline_cot::proto::{decode_tak_packet, ProtoError};
 
 #[test]
 fn huge_length_prefix_returns_error_without_panic() {
@@ -6,4 +6,5 @@ fn huge_length_prefix_returns_error_without_panic() {
     p.extend_from_slice(&[0xFF; 9]);
     p.push(0x01);
     assert!(decode_tak_packet(&p).is_err());
+    assert_eq!(decode_tak_packet(&p), Err(ProtoError::InvalidFieldNumber));
 }
