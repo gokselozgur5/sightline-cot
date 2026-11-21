@@ -55,7 +55,11 @@ pub fn encode(lat: f64, lon: f64, precision: usize) -> Result<String, GeohashErr
     let (mut bits, mut bit_count, mut is_lon) = (0u8, 0, true);
     let mut out = String::with_capacity(precision);
     while out.len() < precision {
-        let (r, val) = if is_lon { (&mut lon_r, lon) } else { (&mut lat_r, lat) };
+        let (r, val) = if is_lon {
+            (&mut lon_r, lon)
+        } else {
+            (&mut lat_r, lat)
+        };
         let mid = (r[0] + r[1]) * 0.5;
         let bit = u8::from(val >= mid);
         bits = (bits << 1) | bit;
