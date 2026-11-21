@@ -284,23 +284,43 @@ impl MilStd2525DSymbol {
         if !clean.chars().all(|c| c.is_ascii_digit()) {
             return Err(SidcParseError::NonNumeric);
         }
-        let ver: u8 = clean[0..2].parse().map_err(|_| SidcParseError::InvalidStandard)?;
+        let ver: u8 = clean[0..2]
+            .parse()
+            .map_err(|_| SidcParseError::InvalidStandard)?;
         if ver != 10 && ver != 11 && ver != 30 {
             return Err(SidcParseError::InvalidStandard);
         }
-        let context: u8 = clean[2..3].parse().map_err(|_| SidcParseError::NonNumeric)?;
-        let id_val: u8 = clean[3..4].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let context: u8 = clean[2..3]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
+        let id_val: u8 = clean[3..4]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
         let identity = StandardIdentity::from_code(id_val)?;
-        let set_val: u8 = clean[4..6].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let set_val: u8 = clean[4..6]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
         let symbol_set = SymbolSet::from_code(set_val)?;
-        let stat_val: u8 = clean[6..7].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let stat_val: u8 = clean[6..7]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
         let status = SymbolStatus::from_code(stat_val)?;
-        let hq_tf_dummy: u8 = clean[7..8].parse().map_err(|_| SidcParseError::NonNumeric)?;
-        let ech_val: u8 = clean[8..10].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let hq_tf_dummy: u8 = clean[7..8]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
+        let ech_val: u8 = clean[8..10]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
         let echelon = Echelon::from_code(ech_val)?;
-        let entity_code: u32 = clean[10..16].parse().map_err(|_| SidcParseError::NonNumeric)?;
-        let modifier1: u8 = clean[16..18].parse().map_err(|_| SidcParseError::NonNumeric)?;
-        let modifier2: u8 = clean[18..20].parse().map_err(|_| SidcParseError::NonNumeric)?;
+        let entity_code: u32 = clean[10..16]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
+        let modifier1: u8 = clean[16..18]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
+        let modifier2: u8 = clean[18..20]
+            .parse()
+            .map_err(|_| SidcParseError::NonNumeric)?;
 
         Ok(Self {
             version: ver,
