@@ -345,6 +345,13 @@ impl CotRangeRings {
                 ));
             }
         }
+        for w in radii_m.windows(2) {
+            if w[0] >= w[1] {
+                return Err(CotCircleError::InvalidParameter(
+                    "radii_m must be strictly ascending",
+                ));
+            }
+        }
         Ok(Self {
             center_lat,
             center_lon,
