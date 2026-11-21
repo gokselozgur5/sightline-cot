@@ -212,16 +212,16 @@ impl crate::geoid::GeoidModel for Egm96Geoid {
 }
 
 const COARSE_EGM96_SOUTH: [f64; 36] = [
-    -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -10.0, 5.0,
-    12.0, -8.0, -25.0, 10.0, 18.0, 12.0, -5.0, -15.0, -20.0, -18.0, 15.0, 18.0, -40.0, -60.0, 10.0,
-    30.0, 25.0, 18.0, 5.0, -10.0, -20.0, 5.0,
+    -29.53, -29.53, -29.53, -29.53, -29.53, -29.53, -29.53, -29.53, -29.53, -29.53, -29.53, -29.53,
+    15.13, 28.91, 32.55, 8.88, -24.63, -29.65, -46.3, -32.4, -23.65, -11.12, 20.2, 23.54, 21.41,
+    30.21, 14.92, -25.2, -22.6, 31.69, 47.53, -1.44, -10.46, 0.86, 17.79, 3.49,
 ];
 
 const COARSE_EGM96_NORTH: [f64; 48] = [
-    17.0, 2.0, -15.0, -106.0, 15.0, 45.0, 20.0, 10.0, -5.0, -25.0, 15.0, 20.0, -30.0, -15.0, -35.0,
-    -40.0, -20.0, 25.0, 10.0, -15.0, -30.0, -40.0, -10.0, -20.0, 45.0, 30.0, -10.0, -25.0, -15.0,
-    10.0, 15.0, 5.0, -15.0, -30.0, -10.0, 25.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0, 14.0,
-    14.0, 14.0, 14.0, 14.0,
+    17.16, -9.82, -62.75, -63.24, 58.35, 63.32, 21.15, 12.73, -23.15, -4.29, -12.63, 2.16, 35.39,
+    16.21, -15.06, -34.08, 7.02, 19.33, -7.5, -15.84, -42.4, -27.26, -40.79, 30.19, 48.23, 15.99,
+    -3.87, -33.91, -16.61, 16.21, 0.44, 13.46, -15.9, -47.04, 4.82, 63.8, 13.61, 13.61, 13.61,
+    13.61, 13.61, 13.61, 13.61, 13.61, 13.61, 13.61, 13.61, 13.61,
 ];
 
 impl Egm96Geoid {
@@ -293,18 +293,18 @@ mod tests {
     fn test_exact_node_undulation() {
         let grid = Egm96Geoid::coarse_reference_grid();
         let n_south_pole = grid.undulation(-90.0, 0.0).unwrap();
-        assert!((n_south_pole - (-30.0)).abs() < 1e-6);
+        assert!((n_south_pole - (-29.53)).abs() < 1e-6);
         let n_north_pole = grid.undulation(90.0, 180.0).unwrap();
-        assert!((n_north_pole - 14.0).abs() < 1e-6);
+        assert!((n_north_pole - 13.61).abs() < 1e-6);
         let n_ind_ocean = grid.undulation(0.0, 90.0).unwrap();
-        assert!((n_ind_ocean - (-106.0)).abs() < 1e-6);
+        assert!((n_ind_ocean - (-63.24)).abs() < 1e-6);
     }
 
     #[test]
     fn test_bilinear_interpolation_midpoint() {
         let grid = Egm96Geoid::coarse_reference_grid();
         let n_interp = grid.undulation(75.0, 15.0).unwrap();
-        assert!((n_interp - 25.75).abs() < 1e-4);
+        assert!((n_interp - 22.86).abs() < 1e-4);
     }
 
     #[test]
@@ -321,7 +321,7 @@ mod tests {
         let (lat, lon) = (0.0, 90.0);
         let h_ellips = 100.0;
         let h_ortho = grid.ellipsoidal_to_orthometric(lat, lon, h_ellips).unwrap();
-        assert!((h_ortho - 206.0).abs() < 1e-6);
+        assert!((h_ortho - 163.24).abs() < 1e-6);
         let roundtrip = grid.orthometric_to_ellipsoidal(lat, lon, h_ortho).unwrap();
         assert!((roundtrip - h_ellips).abs() < 1e-6);
     }
@@ -331,6 +331,6 @@ mod tests {
         use crate::geoid::GeoidModel;
         let grid = Egm96Geoid::coarse_reference_grid();
         let undulation = GeoidModel::undulation(&grid, 0.0, 90.0);
-        assert_eq!(undulation, Some(-106.0));
+        assert_eq!(undulation, Some(-63.24));
     }
 }
