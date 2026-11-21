@@ -92,8 +92,7 @@ pub fn great_circle_distance(
     let lat2 = p2.lat.to_radians();
     let dlat = lat2 - lat1;
     let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
-    let a = (dlat / 2.0).sin().powi(2)
-        + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
+    let a = (dlat / 2.0).sin().powi(2) + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
     let c = 2.0 * a.sqrt().clamp(0.0, 1.0).asin();
     Ok(radius * c)
 }
@@ -229,7 +228,9 @@ impl RhumbPath {
         if waypoints.len() < 2 {
             return Err(RhumbLineError::InsufficientWaypoints);
         }
-        for wp in &waypoints { wp.validate()?; }
+        for wp in &waypoints {
+            wp.validate()?;
+        }
         let (mut seg_rhumb, mut seg_gc) = (Vec::new(), Vec::new());
         let (mut total_rhumb, mut total_gc) = (0.0, 0.0);
         for w in waypoints.windows(2) {
@@ -241,8 +242,10 @@ impl RhumbPath {
             total_gc += gd;
         }
         Ok(Self {
-            waypoints, segment_rhumb_distances: seg_rhumb,
-            segment_gc_distances: seg_gc, total_rhumb_distance: total_rhumb,
+            waypoints,
+            segment_rhumb_distances: seg_rhumb,
+            segment_gc_distances: seg_gc,
+            total_rhumb_distance: total_rhumb,
             total_gc_distance: total_gc,
         })
     }
@@ -258,7 +261,8 @@ impl RhumbPath {
     pub fn resample_by_step(&self, step_m: f64) -> Result<Vec<RhumbWaypoint>, RhumbLineError> {
         let mut full_path = Vec::new();
         for i in 0..self.segment_count() {
-            let seg_points = interpolate_by_step(&self.waypoints[i], &self.waypoints[i + 1], step_m)?;
+            let seg_points =
+                interpolate_by_step(&self.waypoints[i], &self.waypoints[i + 1], step_m)?;
             if i > 0 {
                 full_path.extend_from_slice(&seg_points[1..]);
             } else {
