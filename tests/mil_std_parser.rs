@@ -47,3 +47,11 @@ fn test_mil_std_errors() {
         Err(MilStdError::InvalidDimension)
     );
 }
+
+#[test]
+fn test_mil_std_2525c_roundtrip_order_of_battle() {
+    let original = "SFGPUCI----K--H";
+    let sym = parse_mil_std(original).expect("parse");
+    let serialized = sym.to_2525c_string();
+    assert_eq!(serialized, original);
+}
