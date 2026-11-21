@@ -75,3 +75,17 @@ fn test_geohash_single_char_and_case() {
     assert_eq!(upper.north, "ezs48");
     assert_eq!(upper.east, "ezs43");
 }
+
+#[test]
+fn north_of_the_northernmost_cell_is_not_a_south_pole_cell() {
+    match geohash_neighbor("zzzzz", GeohashDirection::North) {
+        Ok(cell) => {
+            let (lat, _) = sightline_cot::geohash::decode(&cell).unwrap();
+            assert!(
+                lat > 80.0,
+                "north neighbour {cell} decodes to latitude {lat}"
+            );
+        }
+        Err(_) => {}
+    }
+}
