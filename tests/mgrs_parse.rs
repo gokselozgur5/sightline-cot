@@ -76,8 +76,14 @@ fn test_parse_mgrs_errors() {
     assert_eq!(parse_mgrs("31IEA1234"), Err(MgrsParseError::InvalidBand));
     assert_eq!(parse_mgrs("31N1A1234"), Err(MgrsParseError::InvalidSquare));
     assert_eq!(parse_mgrs("31NEA123"), Err(MgrsParseError::InvalidDigits));
-    assert_eq!(parse_mgrs("31NEA 12 345"), Err(MgrsParseError::InvalidDigits));
-    assert_eq!(parse_mgrs("31NEA123456789012"), Err(MgrsParseError::InvalidDigits));
+    assert_eq!(
+        parse_mgrs("31NEA 12 345"),
+        Err(MgrsParseError::InvalidDigits)
+    );
+    assert_eq!(
+        parse_mgrs("31NEA123456789012"),
+        Err(MgrsParseError::InvalidDigits)
+    );
 }
 
 #[test]
