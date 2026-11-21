@@ -1,17 +1,39 @@
-use sightline_cot::geohash_neighbors::{
-    geohash_neighbor, geohash_neighbors, GeohashDirection,
-};
+use sightline_cot::geohash_neighbors::{geohash_neighbor, geohash_neighbors, GeohashDirection};
 
 #[test]
 fn test_geohash_individual_directions() {
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::North).unwrap(), "ezs48");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::South).unwrap(), "ezs40");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::East).unwrap(), "ezs43");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::West).unwrap(), "ezefr");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::NorthEast).unwrap(), "ezs49");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::NorthWest).unwrap(), "ezefx");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::SouthEast).unwrap(), "ezs41");
-    assert_eq!(geohash_neighbor("ezs42", GeohashDirection::SouthWest).unwrap(), "ezefp");
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::North).unwrap(),
+        "ezs48"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::South).unwrap(),
+        "ezs40"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::East).unwrap(),
+        "ezs43"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::West).unwrap(),
+        "ezefr"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::NorthEast).unwrap(),
+        "ezs49"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::NorthWest).unwrap(),
+        "ezefx"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::SouthEast).unwrap(),
+        "ezs41"
+    );
+    assert_eq!(
+        geohash_neighbor("ezs42", GeohashDirection::SouthWest).unwrap(),
+        "ezefp"
+    );
 }
 
 #[test]
