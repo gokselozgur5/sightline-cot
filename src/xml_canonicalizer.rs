@@ -10,17 +10,38 @@ pub enum CotValidationError {
     EmptyXml,
     MalformedXml(String),
     MissingRequiredElement(&'static str),
-    MissingRequiredAttribute { element: &'static str, attribute: &'static str },
+    MissingRequiredAttribute {
+        element: &'static str,
+        attribute: &'static str,
+    },
     InvalidVersion(String),
     InvalidCotType(String),
-    InvalidTimestamp { attribute: &'static str, value: String },
-    TimestampOrderViolation { earlier: &'static str, later: &'static str },
-    CoordinateOutOfBounds { coordinate: &'static str, value: f64 },
-    NegativeValueError { field: &'static str, value: f64 },
+    InvalidTimestamp {
+        attribute: &'static str,
+        value: String,
+    },
+    TimestampOrderViolation {
+        earlier: &'static str,
+        later: &'static str,
+    },
+    CoordinateOutOfBounds {
+        coordinate: &'static str,
+        value: f64,
+    },
+    NegativeValueError {
+        field: &'static str,
+        value: f64,
+    },
     NonFiniteNumber(&'static str),
-    DuplicateAttribute { element: String, attribute: String },
+    DuplicateAttribute {
+        element: String,
+        attribute: String,
+    },
     UnclosedTag(String),
-    MismatchedClosingTag { expected: String, found: String },
+    MismatchedClosingTag {
+        expected: String,
+        found: String,
+    },
 }
 
 impl fmt::Display for CotValidationError {
@@ -38,7 +59,10 @@ impl fmt::Display for CotValidationError {
                 write!(f, "invalid ISO-8601 timestamp in '{attribute}': '{value}'")
             }
             Self::TimestampOrderViolation { earlier, later } => {
-                write!(f, "timestamp order violation: '{earlier}' must be <= '{later}'")
+                write!(
+                    f,
+                    "timestamp order violation: '{earlier}' must be <= '{later}'"
+                )
             }
             Self::CoordinateOutOfBounds { coordinate, value } => {
                 write!(f, "coordinate out of bounds for '{coordinate}': {value}")
@@ -48,7 +72,10 @@ impl fmt::Display for CotValidationError {
             }
             Self::NonFiniteNumber(field) => write!(f, "non-finite number for '{field}'"),
             Self::DuplicateAttribute { element, attribute } => {
-                write!(f, "duplicate attribute '{attribute}' on element <{element}>")
+                write!(
+                    f,
+                    "duplicate attribute '{attribute}' on element <{element}>"
+                )
             }
             Self::UnclosedTag(tag) => write!(f, "unclosed tag: <{tag}>"),
             Self::MismatchedClosingTag { expected, found } => {
