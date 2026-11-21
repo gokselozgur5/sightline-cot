@@ -498,12 +498,32 @@ mod tests {
 
     #[test]
     fn test_frustum_parameter_validation() {
-        assert!(PlatformPose::new(f64::NAN, 0.0, 100.0, 0.0, 0.0, 0.0).is_err());
-        assert!(PlatformPose::new(95.0, 0.0, 100.0, 0.0, 0.0, 0.0).is_err());
-        assert!(SensorGimbal::new(0.0, -95.0, 0.0).is_err());
-        assert!(SensorFrustumConfig::new(0.0, 45.0, 1000.0, 0.0).is_err());
-        assert!(SensorFrustumConfig::new(190.0, 45.0, 1000.0, 0.0).is_err());
-        assert!(SensorFrustumConfig::new(60.0, 45.0, 100.0, 200.0).is_err());
+        assert_eq!(
+            PlatformPose::new(f64::NAN, 0.0, 100.0, 0.0, 0.0, 0.0),
+            Err(FrustumError::NonFiniteParameter("platform pose"))
+        );
+        assert_eq!(
+            PlatformPose::new(95.0, 0.0, 100.0, 0.0, 0.0, 0.0),
+            Err(FrustumError::InvalidLatitude("latitude out of range"))
+        );
+        assert_eq!(
+            SensorGimbal::new(0.0, -95.0, 0.0),
+            Err(FrustumError::InvalidElevation("elevation [-90, 90]"))
+        );
+        assert_eq!(
+            SensorFrustumConfig::new(0.0, 45.0, 1000.0, 0.0),
+            Err(FrustumError::InvalidFov("horizontal FOV in (0, 180)"))
+        );
+        assert_eq!(
+            SensorFrustumConfig::new(190.0, 45.0, 1000.0, 0.0),
+            Err(FrustumError::InvalidFov("horizontal FOV in (0, 180)"))
+        );
+        assert_eq!(
+            SensorFrustumConfig::new(60.0, 45.0, 100.0, 200.0),
+            Err(FrustumError::InvalidRange(
+                "max_range must be > min_range >= 0"
+            ))
+        );
     }
 
     #[test]
