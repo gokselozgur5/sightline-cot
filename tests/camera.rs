@@ -21,3 +21,15 @@ fn test_ce90_le90_zero_and_nonzero_sigmas() {
     assert!(ce1 > 0.0);
     assert!(le1 > 0.0);
 }
+
+#[test]
+fn test_camera_pose_roll_tait_bryan_displacement() {
+    let pose = CameraPose {
+        roll_rad: 0.1,
+        pitch_rad: 0.0,
+        yaw_rad: 0.0,
+        cam_up_m: 100.0,
+    };
+    let pt = sightline_cot::camera::intersect_ground([0.0, 0.0, 1.0], &pose, 0.0).unwrap();
+    assert!(pt[0].abs() > 9.0);
+}
