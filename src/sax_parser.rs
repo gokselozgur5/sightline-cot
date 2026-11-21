@@ -479,8 +479,14 @@ impl CotSaxParser {
 
         while let Some(ev) = reader.next_event()? {
             match ev {
-                SaxEvent::EmptyElement { name: "event", attributes }
-                | SaxEvent::StartElement { name: "event", attributes } => {
+                SaxEvent::EmptyElement {
+                    name: "event",
+                    attributes,
+                }
+                | SaxEvent::StartElement {
+                    name: "event",
+                    attributes,
+                } => {
                     let version = attributes.get("version").unwrap_or("2.0");
                     let uid = attributes.get("uid").unwrap_or("");
                     let cot_type = attributes.get("type").unwrap_or("");
@@ -610,7 +616,8 @@ impl CotChunkStreamer {
                             self.buffer.drain(..start_idx);
                         }
                         if self.buffer.len() > self.max_event_size {
-                            self.buffer.drain(..self.buffer.len() - (end_pattern.len() - 1));
+                            self.buffer
+                                .drain(..self.buffer.len() - (end_pattern.len() - 1));
                         }
                         break;
                     }
