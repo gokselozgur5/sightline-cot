@@ -125,7 +125,14 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
     let h2_m = (target.hae_m - n2).max(0.0);
     let horiz_m = horizon_distance_m(h1_m, h2_m)?;
     let is_direct_los = ground_range_m <= horiz_m;
-    Ok(LosGeometry { slant_range_m, ground_range_m, elevation_angle_rad, azimuth_rad, horizon_distance_m: horiz_m, is_direct_los })
+    Ok(LosGeometry {
+        slant_range_m,
+        ground_range_m,
+        elevation_angle_rad,
+        azimuth_rad,
+        horizon_distance_m: horiz_m,
+        is_direct_los,
+    })
 }
 
 /// Compute 3D slant range distance between observer and target in meters.
