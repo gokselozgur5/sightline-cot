@@ -113,3 +113,18 @@ fn test_repro_preserve_comments_when_disabled() {
     let canon = CotXmlCanonicalizer::canonicalize_with_options(xml, &opts).expect("canonicalize");
     assert!(canon.contains("<!-- note -->"));
 }
+
+#[test]
+fn test_repro_reject_non_whitespace_text_outside_root() {
+    let xml_before = r#"junk<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>"#;
+    assert!(matches!(
+        validate_cot_xml(xml_before),
+        Err(CotValidationError::MalformedXml(_))
+    ));
+
+    let xml_after = r#"<event version="2.0" uid="U" type="a-f" how="m-g" time="2026-11-17T04:30:00.000Z" start="2026-11-17T04:30:00.000Z" stale="2026-11-17T04:35:00.000Z"><point lat="0.0" lon="0.0" hae="0.0" ce="0.0" le="0.0"/></event>trailing"#;
+    assert!(matches!(
+        validate_cot_xml(xml_after),
+        Err(CotValidationError::MalformedXml(_))
+    ));
+}
