@@ -67,7 +67,7 @@ fn angle_diff(a: f64, b: f64) -> f64 {
     d
 }
 
-fn check_yaw_norm(cam: &Intrinsics, uv: (f64, f64), roll: f64, pitch: f64) {
+fn check_yaw_norm(cam: &Intrinsics, uv: (f64, f64), roll: f64, pitch: f64) -> f64 {
     let ray = cam.pixel_to_ray(uv.0, uv.1).unwrap();
     let p0 = CameraPose {
         roll_rad: roll,
@@ -91,6 +91,7 @@ fn check_yaw_norm(cam: &Intrinsics, uv: (f64, f64), roll: f64, pitch: f64) {
         assert!((rng - b_rng).abs() < 1e-5);
         assert!(angle_diff(pt[0].atan2(pt[1]), b_brg - y).abs() < 1e-5);
     }
+    b_rng
 }
 
 #[test]
@@ -101,8 +102,10 @@ fn test_so3_yaw_sweep_horizontal_norm_invariance() {
         cx: 640.0,
         cy: 360.0,
     };
-    check_yaw_norm(&pinhole, (640.0, 360.0), 0.0, 0.5);
-    check_yaw_norm(&pinhole, (900.0, 200.0), 0.1, 0.6);
+    let r1 = check_yaw_norm(&pinhole, (640.0, 360.0), 0.0, 0.5);
+    assert!((r1 - 100.0 * 0.5_f64.tan()).abs() < 1e-5);
+    let r2 = check_yaw_norm(&pinhole, (900.0, 200.0), 0.1, 0.6);
+    assert!(r2.is_finite() && r2 > 0.0);
 }
 
 #[test]
@@ -115,7 +118,8 @@ fn test_so3_fisheye_yaw_sweep() {
         k1: 0.01,
         k2: -0.001,
     };
-    check_yaw_norm(&fisheye, (750.0, 450.0), -0.05, 0.55);
+    let r = check_yaw_norm(&fisheye, (750.0, 450.0), -0.05, 0.55);
+    assert!(r.is_finite() && r > 0.0);
 }
 
 #[test]
