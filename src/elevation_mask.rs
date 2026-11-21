@@ -376,14 +376,32 @@ mod tests {
 
     #[test]
     fn test_error_and_input_validations() {
-        assert_eq!(MaskSector::new(f64::NAN, 10.0, 5.0), Err(ElevationMaskError::NonFiniteValue));
-        assert_eq!(MaskSector::new(360.5, 10.0, 5.0), Err(ElevationMaskError::InvalidAzimuth));
-        assert_eq!(MaskSector::new(0.0, 10.0, 95.0), Err(ElevationMaskError::InvalidElevation));
-        assert_eq!(ObstaclePoint::new(0.0, 10.0, 0.0), Err(ElevationMaskError::InvalidDistance));
-        assert_eq!(ObstacleProfile::new(vec![]), Err(ElevationMaskError::EmptyProfile));
+        assert_eq!(
+            MaskSector::new(f64::NAN, 10.0, 5.0),
+            Err(ElevationMaskError::NonFiniteValue)
+        );
+        assert_eq!(
+            MaskSector::new(360.5, 10.0, 5.0),
+            Err(ElevationMaskError::InvalidAzimuth)
+        );
+        assert_eq!(
+            MaskSector::new(0.0, 10.0, 95.0),
+            Err(ElevationMaskError::InvalidElevation)
+        );
+        assert_eq!(
+            ObstaclePoint::new(0.0, 10.0, 0.0),
+            Err(ElevationMaskError::InvalidDistance)
+        );
+        assert_eq!(
+            ObstacleProfile::new(vec![]),
+            Err(ElevationMaskError::EmptyProfile)
+        );
         let p1 = ObstaclePoint::new(100.0, 10.0, 0.0).unwrap();
         let p2 = ObstaclePoint::new(50.0, 10.0, 0.0).unwrap();
-        assert_eq!(ObstacleProfile::new(vec![p1, p2]), Err(ElevationMaskError::NonMonotonicProfile));
+        assert_eq!(
+            ObstacleProfile::new(vec![p1, p2]),
+            Err(ElevationMaskError::NonMonotonicProfile)
+        );
     }
 
     #[test]
@@ -415,10 +433,14 @@ mod tests {
         assert!(angle_flat > 0.0);
 
         let val = ElevationMaskValidator::new(10.0, 0.0).unwrap();
-        let res = val.validate_target_profile(90.0, 3000.0, 250.0, &prof, false).unwrap();
+        let res = val
+            .validate_target_profile(90.0, 3000.0, 250.0, &prof, false)
+            .unwrap();
         assert_eq!(res.status, MaskingStatus::Clear);
 
-        let res_blocked = val.validate_target_profile(90.0, 3000.0, 50.0, &prof, false).unwrap();
+        let res_blocked = val
+            .validate_target_profile(90.0, 3000.0, 50.0, &prof, false)
+            .unwrap();
         assert_eq!(res_blocked.status, MaskingStatus::Masked);
     }
 }
