@@ -84,5 +84,5 @@ fn test_geodesic_midpoint_ellipsoid_antimeridian_and_antipodal() {
     assert_eq!(antipodal, Err(MidpointError::AntipodalPoints));
 
     let invalid_frac = geodesic_midpoint_ellipsoid(0.0, 0.0, 10.0, 10.0, 1.5);
-    assert_eq!(invalid_frac, Err(MidpointError::AntipodalPoints));
+    assert_eq!(invalid_frac, Err(MidpointError::InvalidFraction));
 }
