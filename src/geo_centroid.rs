@@ -25,14 +25,7 @@ pub fn planar_centroid(pts: &[[f64; 2]]) -> Option<[f64; 2]> {
 const METERS_PER_DEG: f64 = 111_194.926_6;
 
 fn unwrap_lon(lon: f64, ref_lon: f64) -> f64 {
-    let mut d = lon - ref_lon;
-    while d > 180.0 {
-        d -= 360.0;
-    }
-    while d < -180.0 {
-        d += 360.0;
-    }
-    d
+    (lon - ref_lon + 180.0).rem_euclid(360.0) - 180.0
 }
 
 /// Compute the geodetic centroid `[lat_deg, lon_deg]` of a geographic polygon.
