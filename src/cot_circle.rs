@@ -427,25 +427,33 @@ impl CotRangeRings {
 
     /// Convert into a list of individual CotCircle instances.
     pub fn to_circles(&self) -> Vec<CotCircle> {
-        self.radii_m.iter().enumerate().map(|(i, &r)| {
-            let mut c = CotCircle::new(self.center_lat, self.center_lon, r).expect("valid");
-            c.hae = self.hae;
-            c.stroke_color = self.stroke_color;
-            c.stroke_weight = self.stroke_weight;
-            if let Some(ref pfx) = self.callsign_prefix {
-                c.callsign = Some(format!("{pfx} Ring {}", i + 1));
-            }
-            c
-        }).collect()
+        self.radii_m
+            .iter()
+            .enumerate()
+            .map(|(i, &r)| {
+                let mut c = CotCircle::new(self.center_lat, self.center_lon, r).expect("valid");
+                c.hae = self.hae;
+                c.stroke_color = self.stroke_color;
+                c.stroke_weight = self.stroke_weight;
+                if let Some(ref pfx) = self.callsign_prefix {
+                    c.callsign = Some(format!("{pfx} Ring {}", i + 1));
+                }
+                c
+            })
+            .collect()
     }
 }
 
 impl CotRangeRings {
     /// Generate complete CoT 2.0 XML events for all concentric rings.
     pub fn to_cot_events(&self, base_uid: &str, time_ms: i64, stale_ms: i64) -> Vec<String> {
-        self.to_circles().into_iter().enumerate().map(|(i, circle)| {
-            let ring_uid = format!("{base_uid}-ring-{}", i + 1);
-            circle.to_cot_event_xml(&ring_uid, time_ms, stale_ms)
-        }).collect()
+        self.to_circles()
+            .into_iter()
+            .enumerate()
+            .map(|(i, circle)| {
+                let ring_uid = format!("{base_uid}-ring-{}", i + 1);
+                circle.to_cot_event_xml(&ring_uid, time_ms, stale_ms)
+            })
+            .collect()
     }
 }
