@@ -158,7 +158,7 @@ pub fn compute_spatial_matrix_2d(
     let mut mat = DistanceMatrix::new(tracks.len(), dets.len(), 0.0);
     for (i, t) in tracks.iter().enumerate() {
         for (j, d) in dets.iter().enumerate() {
-            let _ = mat.set(i, j, euclidean_dist_2d(*t, *d));
+            mat.set(i, j, euclidean_dist_2d(*t, *d))?;
         }
     }
     Ok(mat)
@@ -177,7 +177,7 @@ pub fn compute_spatial_matrix_3d(
     let mut mat = DistanceMatrix::new(tracks.len(), dets.len(), 0.0);
     for (i, t) in tracks.iter().enumerate() {
         for (j, d) in dets.iter().enumerate() {
-            let _ = mat.set(i, j, euclidean_dist_3d(*t, *d));
+            mat.set(i, j, euclidean_dist_3d(*t, *d))?;
         }
     }
     Ok(mat)
