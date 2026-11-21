@@ -139,3 +139,11 @@ fn test_crate_root_reexports() {
     let _ = vincenty_intermediate_points(0.0, 0.0, 1.0, 1.0, 1);
     let _ = vincenty_geodesic_path(0.0, 0.0, 1.0, 1.0, 50000.0);
 }
+
+#[test]
+fn test_equatorial_near_180_convergence() {
+    let inv = vincenty_inverse(0.0, 0.0, 0.0, 179.7).expect("equatorial 179.7 deg");
+    assert!((inv.distance_m - 20004112.5).abs() < 1.0);
+    assert!((inv.forward_azimuth_deg - 90.0).abs() < 1e-6);
+    assert!((inv.reverse_azimuth_deg - 270.0).abs() < 1e-6);
+}
