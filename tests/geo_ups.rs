@@ -18,7 +18,6 @@ fn test_north_pole_forward() {
     assert!((ups.northing - 2000000.0).abs() < 1e-4);
 }
 
-
 #[test]
 fn test_south_pole_forward() {
     let ups = wgs84_to_ups(-90.0, 0.0).unwrap();
@@ -44,13 +43,15 @@ use sightline_cot::geo_ups::UpsError;
 fn test_ups_validation_and_errors() {
     assert_eq!(wgs84_to_ups(45.0, 0.0), Err(UpsError::InvalidLatitude));
     assert_eq!(wgs84_to_ups(f64::NAN, 0.0), Err(UpsError::NonFinite));
-    assert_eq!(ups_to_wgs84(UpsCoord::new(f64::NAN, 0.0, UpsHemisphere::North)), Err(UpsError::NonFinite));
+    assert_eq!(
+        ups_to_wgs84(UpsCoord::new(f64::NAN, 0.0, UpsHemisphere::North)),
+        Err(UpsError::NonFinite)
+    );
 }
-
 
 #[test]
 fn test_ups_root_exports() {
-    use sightline_cot::{wgs84_to_ups, ups_to_wgs84};
+    use sightline_cot::{ups_to_wgs84, wgs84_to_ups};
     let ups = wgs84_to_ups(89.0, 10.0).unwrap();
     let (lat, lon) = ups_to_wgs84(ups).unwrap();
     assert!((lat - 89.0).abs() < 1e-5);
