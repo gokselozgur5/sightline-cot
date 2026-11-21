@@ -65,11 +65,11 @@ fn test_geohash_errors() {
 
 #[test]
 fn test_geohash_single_char_and_case() {
-    let neighbors = geohash_neighbors("u").unwrap();
-    assert_eq!(neighbors.north, "h");
-    assert_eq!(neighbors.south, "s");
-    assert_eq!(neighbors.east, "v");
-    assert_eq!(neighbors.west, "g");
+    let neighbors = geohash_neighbors("s").unwrap();
+    assert_eq!(neighbors.north, "u");
+    assert_eq!(neighbors.south, "k");
+    assert_eq!(neighbors.east, "t");
+    assert_eq!(neighbors.west, "e");
 
     let upper = geohash_neighbors("EZS42").unwrap();
     assert_eq!(upper.north, "ezs48");

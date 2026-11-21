@@ -28,6 +28,7 @@ pub struct GeohashNeighbors {
 pub enum GeohashError {
     EmptyString,
     InvalidCharacter(char),
+    AtPole,
 }
 
 impl std::fmt::Display for GeohashError {
@@ -35,6 +36,7 @@ impl std::fmt::Display for GeohashError {
         match self {
             Self::EmptyString => write!(f, "geohash string cannot be empty"),
             Self::InvalidCharacter(c) => write!(f, "invalid geohash character '{c}'"),
+            Self::AtPole => write!(f, "cannot calculate polar neighbor beyond bounds"),
         }
     }
 }
@@ -92,8 +94,15 @@ fn neighbor_cardinal(hash: &str, dir_idx: usize) -> Result<String, GeohashError>
         (BORDERS[dir_idx].0, NEIGHBORS[dir_idx].0)
     };
     let parent = &hash[..hash.len() - 1];
-    let base_parent = if border.contains(&last) && !parent.is_empty() {
-        neighbor_cardinal(parent, dir_idx)?
+    let base_parent = if border.contains(&last) {
+        if parent.is_empty() {
+            if dir_idx <= 1 {
+                return Err(GeohashError::AtPole);
+            }
+            String::new()
+        } else {
+            neighbor_cardinal(parent, dir_idx)?
+        }
     } else {
         parent.to_ascii_lowercase()
     };
