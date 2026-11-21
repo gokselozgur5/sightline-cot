@@ -357,8 +357,17 @@ pub fn compute_frustum_ground_enu(
     let (b_pt, slant_range) = intersect_ray_ground(b_enu, sensor_h, config.max_range_m)?;
     let mut corners_enu = Vec::with_capacity(4);
     for c_ray in corner_rays {
-        let (c_pt, _) =
-            intersect_ray_ground(rotate_vec(&rot, c_ray), sensor_h, config.max_range_m)?;
+        let r_enu = rotate_vec(&rot, c_ray);
+        let c_pt = if r_enu[2] >= -1e-6 {
+            [
+                config.max_range_m * r_enu[0],
+                config.max_range_m * r_enu[1],
+                0.0,
+            ]
+        } else {
+            let t = (-sensor_h / r_enu[2]).clamp(config.min_range_m, config.max_range_m);
+            [t * r_enu[0], t * r_enu[1], 0.0]
+        };
         corners_enu.push(c_pt);
     }
     Ok((b_pt, slant_range, corners_enu))
