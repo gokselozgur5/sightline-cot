@@ -734,7 +734,11 @@ fn parse_xml_to_tree(xml: &str, opts: &CanonicalizeOptions) -> Result<XmlNode, C
                     }
                 }
             }
-            RawXmlToken::StartTag { name, attributes, self_closing } => {
+            RawXmlToken::StartTag {
+                name,
+                attributes,
+                self_closing,
+            } => {
                 if self_closing {
                     let node = XmlNode::Element {
                         name,
@@ -797,7 +801,11 @@ fn serialize_node(
         XmlNode::Text(txt) => {
             out.push_str(&escape_xml_text(txt));
         }
-        XmlNode::Element { name, attributes, children } => {
+        XmlNode::Element {
+            name,
+            attributes,
+            children,
+        } => {
             out.push('<');
             out.push_str(name);
 
@@ -808,13 +816,15 @@ fn serialize_node(
             for attr in attributes {
                 if attr.name == "xmlns" {
                     let prefix = "";
-                    let is_redundant = opts.strip_redundant_namespaces && is_ns_declared(active_ns, prefix, &attr.value);
+                    let is_redundant = opts.strip_redundant_namespaces
+                        && is_ns_declared(active_ns, prefix, &attr.value);
                     if !is_redundant {
                         scope_ns.insert(prefix.to_string(), attr.value.clone());
                         ns_attrs.push(attr);
                     }
                 } else if let Some(pfx) = attr.name.strip_prefix("xmlns:") {
-                    let is_redundant = opts.strip_redundant_namespaces && is_ns_declared(active_ns, pfx, &attr.value);
+                    let is_redundant = opts.strip_redundant_namespaces
+                        && is_ns_declared(active_ns, pfx, &attr.value);
                     if !is_redundant {
                         scope_ns.insert(pfx.to_string(), attr.value.clone());
                         ns_attrs.push(attr);
@@ -886,19 +896,31 @@ mod tests {
     #[test]
     fn test_empty_xml_rejected() {
         assert_eq!(validate_cot_xml(""), Err(CotValidationError::EmptyXml));
-        assert_eq!(validate_cot_xml("   \n\t "), Err(CotValidationError::EmptyXml));
+        assert_eq!(
+            validate_cot_xml("   \n\t "),
+            Err(CotValidationError::EmptyXml)
+        );
     }
 
     #[test]
     fn test_non_event_root_rejected() {
         let xml = "<not_event><point lat=\"0.0\" lon=\"0.0\" hae=\"0.0\" ce=\"0.0\" le=\"0.0\"/></not_event>";
-        assert!(matches!(validate_cot_xml(xml), Err(CotValidationError::MalformedXml(_))));
+        assert!(matches!(
+            validate_cot_xml(xml),
+            Err(CotValidationError::MalformedXml(_))
+        ));
     }
 
     #[test]
     fn test_entity_unescaping_and_escaping() {
-        assert_eq!(unescape_xml_entities("&quot;&apos;&lt;&gt;&amp;&#65;&#x42;"), "\"'<>&AB");
-        assert_eq!(escape_xml_attr_val("\"hello & world\""), "&quot;hello &amp; world&quot;");
+        assert_eq!(
+            unescape_xml_entities("&quot;&apos;&lt;&gt;&amp;&#65;&#x42;"),
+            "\"'<>&AB"
+        );
+        assert_eq!(
+            escape_xml_attr_val("\"hello & world\""),
+            "&quot;hello &amp; world&quot;"
+        );
     }
 
     #[test]
@@ -921,7 +943,8 @@ mod tests {
             ..Default::default()
         };
         let canon = CotXmlCanonicalizer::canonicalize_with_options(xml, &opts).unwrap();
-        assert!(canon.contains("<point ce=\"0.0\" hae=\"0.0\" lat=\"0.0\" le=\"0.0\" lon=\"0.0\"></point>"));
+        assert!(canon
+            .contains("<point ce=\"0.0\" hae=\"0.0\" lat=\"0.0\" le=\"0.0\" lon=\"0.0\"></point>"));
     }
 
     #[test]
