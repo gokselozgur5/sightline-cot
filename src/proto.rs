@@ -18,6 +18,8 @@ pub enum ProtoError {
     BufferTooSmall,
     /// Field number is zero or outside the protobuf range.
     InvalidFieldNumber,
+    /// Point coordinates or uncertainty bounds are invalid or out of bounds.
+    CoordinateOutOfBounds,
 }
 
 /// Standard protobuf wire types.
@@ -363,6 +365,14 @@ impl TakCotEvent {
             let (raw, rem) = skip_wire_field(wire, &buf[tag_len..])?;
             evt.decode_field(num, wire, raw)?;
             buf = rem;
+        }
+        if !(-90.0..=90.0).contains(&evt.lat)
+            || !(-180.0..=180.0).contains(&evt.lon)
+            || !(evt.ce >= 0.0)
+            || !(evt.le >= 0.0)
+            || !evt.hae.is_finite()
+        {
+            return Err(ProtoError::CoordinateOutOfBounds);
         }
         Ok(evt)
     }
