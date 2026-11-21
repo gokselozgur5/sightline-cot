@@ -1,4 +1,5 @@
 //! Tests for MGRS precision truncation.
+use sightline_cot::mgrs::GridError;
 use sightline_cot::mgrs_truncate::{truncate_mgrs, MgrsPrecision};
 
 #[test]
@@ -20,6 +21,18 @@ fn test_truncate_mgrs_success() {
 fn test_truncate_mgrs_invalid() {
     let p = MgrsPrecision::TenKilometers;
     assert!(truncate_mgrs("31NEA1234", p).is_err());
+    assert_eq!(
+        truncate_mgrs("31NEA1234", p).unwrap_err(),
+        GridError::InvalidZone
+    );
     assert!(truncate_mgrs("31NEA1234567890EXTRA", p).is_err());
+    assert_eq!(
+        truncate_mgrs("31NEA1234567890EXTRA", p).unwrap_err(),
+        GridError::InvalidZone
+    );
     assert!(truncate_mgrs("00NEA1234567890", p).is_err());
+    assert_eq!(
+        truncate_mgrs("00NEA1234567890", p).unwrap_err(),
+        GridError::InvalidZone
+    );
 }
