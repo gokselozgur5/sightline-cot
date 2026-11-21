@@ -148,9 +148,6 @@ fn solve_inverse_loop_ellipsoid(
             return Ok((sigma, s_alp, c2_alp, c_2sm, lam_next));
         }
         lambda = lam_next;
-        if lambda.abs() > core::f64::consts::PI {
-            return Err(VincentyError::NoConvergence);
-        }
     }
     Err(VincentyError::NoConvergence)
 }
@@ -215,6 +212,18 @@ pub fn vincenty_inverse_ellipsoid(
             distance_m: 0.0,
             forward_azimuth_deg: 0.0,
             reverse_azimuth_deg: 0.0,
+        });
+    }
+    if lat1.abs() < 1e-12 && lat2.abs() < 1e-12 {
+        if (dlon.abs() - core::f64::consts::PI).abs() < 1e-12 {
+            return Err(VincentyError::NoConvergence);
+        }
+        let fwd = if dlon >= 0.0 { 90.0 } else { 270.0 };
+        let rev = if dlon >= 0.0 { 270.0 } else { 90.0 };
+        return Ok(VincentyInverse {
+            distance_m: ellipsoid.a * dlon.abs(),
+            forward_azimuth_deg: fwd,
+            reverse_azimuth_deg: rev,
         });
     }
     let u1 = ((1.0 - ellipsoid.f) * lat1.to_radians().tan()).atan();
