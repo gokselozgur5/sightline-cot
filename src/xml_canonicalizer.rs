@@ -300,23 +300,29 @@ impl CotSchemaValidator {
             ));
         }
 
-        let time_str = map.get("time").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "time",
-        })?;
-        let time_ms = parse_iso8601_utc(time_str).map_err(|_| CotValidationError::InvalidTimestamp {
-            attribute: "time",
-            value: (*time_str).to_string(),
-        })?;
+        let time_str = map
+            .get("time")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "time",
+            })?;
+        let time_ms =
+            parse_iso8601_utc(time_str).map_err(|_| CotValidationError::InvalidTimestamp {
+                attribute: "time",
+                value: (*time_str).to_string(),
+            })?;
 
-        let start_str = map.get("start").ok_or(CotValidationError::MissingRequiredAttribute {
-            element: "event",
-            attribute: "start",
-        })?;
-        let start_ms = parse_iso8601_utc(start_str).map_err(|_| CotValidationError::InvalidTimestamp {
-            attribute: "start",
-            value: (*start_str).to_string(),
-        })?;
+        let start_str = map
+            .get("start")
+            .ok_or(CotValidationError::MissingRequiredAttribute {
+                element: "event",
+                attribute: "start",
+            })?;
+        let start_ms =
+            parse_iso8601_utc(start_str).map_err(|_| CotValidationError::InvalidTimestamp {
+                attribute: "start",
+                value: (*start_str).to_string(),
+            })?;
 
         let stale_str = map.get("stale").ok_or(CotValidationError::MissingRequiredAttribute {
             element: "event",
