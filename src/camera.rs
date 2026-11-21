@@ -187,7 +187,10 @@ impl Intrinsics {
         if !x.is_finite() || !y.is_finite() {
             return Err(CameraError::InvalidParameters);
         }
-        let norm = (x * x + y * y + 1.0).sqrt();
+        let norm = x.hypot(y).hypot(1.0);
+        if !norm.is_finite() {
+            return Err(CameraError::InvalidParameters);
+        }
         Ok([x / norm, y / norm, 1.0 / norm])
     }
 }
