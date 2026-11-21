@@ -450,6 +450,7 @@ impl TerrainInterceptSolver {
                         let mut low = t_prev;
                         let mut high = t_curr;
                         let mut best_t = high;
+                        let mut converged = false;
                         let mut iters = 0;
 
                         while iters < self.max_iterations {
@@ -461,6 +462,7 @@ impl TerrainInterceptSolver {
                                 let diff = p_mid[2] - mid_elev;
                                 if diff.abs() <= self.tolerance {
                                     best_t = mid;
+                                    converged = true;
                                     break;
                                 }
                                 if diff > 0.0 {
@@ -475,8 +477,13 @@ impl TerrainInterceptSolver {
 
                             if (high - low) < 1e-4 {
                                 best_t = 0.5 * (low + high);
+                                converged = true;
                                 break;
                             }
+                        }
+
+                        if !converged {
+                            return Err(TerrainSamplerError::MaxIterationsReached);
                         }
 
                         let hit_point = ray.point_at(best_t);
