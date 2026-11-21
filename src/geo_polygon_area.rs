@@ -17,7 +17,9 @@ impl core::fmt::Display for GeodesicAreaError {
             Self::NonFiniteCoordinate => write!(f, "coordinate is not finite"),
             Self::LatitudeOutOfRange => write!(f, "latitude must be within [-90, 90] degrees"),
             Self::LongitudeOutOfRange => write!(f, "longitude must be within [-180, 180] degrees"),
-            Self::DegeneratePolygon => write!(f, "polygon is degenerate with zero or undefined area"),
+            Self::DegeneratePolygon => {
+                write!(f, "polygon is degenerate with zero or undefined area")
+            }
         }
     }
 }
@@ -115,7 +117,11 @@ pub fn geodesic_polygon_area(vertices: &[[f64; 2]]) -> Result<f64, GeodesicAreaE
 
 fn great_circle_interp(v1: [f64; 3], v2: [f64; 3], d: f64, sin_d: f64, f: f64) -> (f64, f64) {
     let (a, b) = (((1.0 - f) * d).sin() / sin_d, (f * d).sin() / sin_d);
-    let (vx, vy, vz) = (a * v1[0] + b * v2[0], a * v1[1] + b * v2[1], a * v1[2] + b * v2[2]);
+    let (vx, vy, vz) = (
+        a * v1[0] + b * v2[0],
+        a * v1[1] + b * v2[1],
+        a * v1[2] + b * v2[2],
+    );
     let lat = vz.atan2((vx * vx + vy * vy).sqrt()).to_degrees();
     (vy.atan2(vx), authalic_sin_beta_unchecked(lat))
 }
@@ -127,7 +133,9 @@ fn great_circle_edge_step(p1: [f64; 2], p2: [f64; 2]) -> (f64, f64) {
     );
     let v1 = [r1.0.cos() * r1.1.cos(), r1.0.cos() * r1.1.sin(), r1.0.sin()];
     let v2 = [r2.0.cos() * r2.1.cos(), r2.0.cos() * r2.1.sin(), r2.0.sin()];
-    let d = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]).clamp(-1.0, 1.0).acos();
+    let d = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2])
+        .clamp(-1.0, 1.0)
+        .acos();
     let steps = ((d / 1.0_f64.to_radians()).ceil() as usize).max(1);
     let sin_d = d.sin();
     let (mut prev_lon, mut prev_sb) = (r1.1, authalic_sin_beta_unchecked(p1[0]));
@@ -241,12 +249,7 @@ mod tests {
 
     #[test]
     fn test_equatorial_square_area() {
-        let square = [
-            [0.0, 0.0],
-            [1.0, 0.0],
-            [1.0, 1.0],
-            [0.0, 1.0],
-        ];
+        let square = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
         let area = geodesic_polygon_area(&square).unwrap();
         assert!((area - 1.2308e10).abs() < 5e7);
     }
@@ -267,30 +270,15 @@ mod tests {
 
     #[test]
     fn test_antimeridian_crossing_area() {
-        let poly = [
-            [10.0, 179.0],
-            [10.0, -179.0],
-            [11.0, -179.0],
-            [11.0, 179.0],
-        ];
+        let poly = [[10.0, 179.0], [10.0, -179.0], [11.0, -179.0], [11.0, 179.0]];
         let area = geodesic_polygon_area(&poly).unwrap();
         assert!(area > 2.0e10 && area < 3.0e10);
     }
 
     #[test]
     fn test_polygon_winding_order() {
-        let ccw = [
-            [0.0, 0.0],
-            [1.0, 0.0],
-            [1.0, 1.0],
-            [0.0, 1.0],
-        ];
-        let cw = [
-            [0.0, 0.0],
-            [0.0, 1.0],
-            [1.0, 1.0],
-            [1.0, 0.0],
-        ];
+        let ccw = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
+        let cw = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]];
         assert_eq!(is_counter_clockwise(&ccw), Ok(false));
         assert_eq!(is_counter_clockwise(&cw), Ok(true));
     }
