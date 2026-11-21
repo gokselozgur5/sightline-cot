@@ -11,5 +11,9 @@ fn unterminated_event_does_not_grow_the_buffer_without_bound() {
         fed += chunk.len();
     }
     // 64 MiB arrived without a closing tag; a bounded receiver must have dropped it.
-    assert!(streamer.pending_len() < fed, "pending {} of {fed}", streamer.pending_len());
+    assert!(
+        streamer.pending_len() < fed,
+        "pending {} of {fed}",
+        streamer.pending_len()
+    );
 }
