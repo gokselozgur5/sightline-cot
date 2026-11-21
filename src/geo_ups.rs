@@ -1,1 +1,1 @@
-pub use crate::geo_unified::{UpsCoord, wgs84_to_ups, ups_to_wgs84};
+pub use crate::geo_unified::{ups_to_wgs84, wgs84_to_ups, UpsCoord};
