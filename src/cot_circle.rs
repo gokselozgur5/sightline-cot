@@ -238,24 +238,22 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
 
 impl CotCircle {
     fn parse_point_and_radius(xml: &str) -> Result<(f64, f64, Option<f64>, f64), CotCircleError> {
-        let (lat, lon, hae) = if let Some(p_start) = xml.find("<point") {
-            let p_end = xml[p_start..]
-                .find("/>")
-                .ok_or_else(|| CotCircleError::XmlParseError("unclosed <point".into()))?;
-            let tag = &xml[p_start..p_start + p_end];
-            let lat = extract_attr(tag, "lat")
-                .ok_or(CotCircleError::InvalidCoordinate("missing lat"))?
-                .parse::<f64>()
-                .map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lat"))?;
-            let lon = extract_attr(tag, "lon")
-                .ok_or(CotCircleError::InvalidCoordinate("missing lon"))?
-                .parse::<f64>()
-                .map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lon"))?;
-            let hae = extract_attr(tag, "hae").and_then(|h| h.parse::<f64>().ok());
-            (lat, lon, hae)
-        } else {
-            (0.0, 0.0, None)
-        };
+        let p_start = xml
+            .find("<point")
+            .ok_or_else(|| CotCircleError::XmlParseError("missing <point".into()))?;
+        let p_end = xml[p_start..]
+            .find("/>")
+            .ok_or_else(|| CotCircleError::XmlParseError("unclosed <point".into()))?;
+        let tag = &xml[p_start..p_start + p_end];
+        let lat = extract_attr(tag, "lat")
+            .ok_or(CotCircleError::InvalidCoordinate("missing lat"))?
+            .parse::<f64>()
+            .map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lat"))?;
+        let lon = extract_attr(tag, "lon")
+            .ok_or(CotCircleError::InvalidCoordinate("missing lon"))?
+            .parse::<f64>()
+            .map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lon"))?;
+        let hae = extract_attr(tag, "hae").and_then(|h| h.parse::<f64>().ok());
         let e_start = xml
             .find("<ellipse")
             .ok_or_else(|| CotCircleError::XmlParseError("missing <ellipse".into()))?;
@@ -272,7 +270,7 @@ impl CotCircle {
 }
 
 impl CotCircle {
-    /// Parse a CoT circle from an XML event or detail snippet.
+    /// Parse a CoT circle from an XML event.
     pub fn parse(xml: &str) -> Result<Self, CotCircleError> {
         let (lat, lon, hae, radius) = Self::parse_point_and_radius(xml)?;
         let mut circle = Self::new(lat, lon, radius)?;
