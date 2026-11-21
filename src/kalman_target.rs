@@ -1,5 +1,8 @@
 //! Tactical target velocity vector Kalman prediction filter.
 
+/// Maximum number of trajectory prediction steps allowed in horizon forecast.
+pub const MAX_PREDICT_STEPS: usize = 100_000;
+
 /// Error types for tactical Kalman filtering and state prediction.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum KalmanTargetError {
@@ -596,7 +599,11 @@ impl TacticalTargetFilter {
         {
             return Err(KalmanTargetError::InvalidDeltaTime);
         }
-        let steps = (horizon_sec / step_sec).round() as usize;
+        let steps_f = (horizon_sec / step_sec).round();
+        if !steps_f.is_finite() || steps_f < 1.0 || steps_f > MAX_PREDICT_STEPS as f64 {
+            return Err(KalmanTargetError::InvalidDeltaTime);
+        }
+        let steps = steps_f as usize;
         let mut traj = Vec::with_capacity(steps);
         let mut state = self.current_state.clone();
         let base_ts = self.current_state.timestamp_ms;
