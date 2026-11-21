@@ -35,7 +35,8 @@ fn test_cot_task_full_workflow() {
     assert!(cot_event.contains(r#"uid="route-123""#));
     assert!(cot_event.contains(r#"contact callsign="EAGLE-LEAD""#));
 
-    let parsed = TacticalTask::from_cot_event_xml(&cot_event).expect("parsing cot event should succeed");
+    let parsed =
+        TacticalTask::from_cot_event_xml(&cot_event).expect("parsing cot event should succeed");
     assert_eq!(parsed.name, "PATROL-GRID");
     assert_eq!(parsed.points.len(), 3);
     assert_eq!(parsed.points[1].action, TaskAction::Orbit);
@@ -59,7 +60,10 @@ fn eta_attribute_is_quoted_and_round_trips() {
         .with_remarks("hold");
     let xml = pt.to_xml();
     assert!(xml.contains("eta=\"1700000000000\""), "{xml}");
-    assert_eq!(TaskPoint::parse(&xml).unwrap().eta_ms, Some(1_700_000_000_000));
+    assert_eq!(
+        TaskPoint::parse(&xml).unwrap().eta_ms,
+        Some(1_700_000_000_000)
+    );
 }
 
 #[test]
