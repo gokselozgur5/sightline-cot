@@ -410,6 +410,9 @@ pub struct Mgrs10Figure {
 }
 
 fn decode_100k_col(zone: u8, col: char) -> Result<f64, GridError> {
+    if !col.is_ascii() {
+        return Err(GridError::InvalidLongitude);
+    }
     const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
     let c_idx = COLS
         .iter()
@@ -421,6 +424,9 @@ fn decode_100k_col(zone: u8, col: char) -> Result<f64, GridError> {
 }
 
 fn decode_100k_row(zone: u8, row: char) -> Result<f64, GridError> {
+    if !row.is_ascii() {
+        return Err(GridError::InvalidLatitude);
+    }
     const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
     let r_idx = ROWS
         .iter()
@@ -432,6 +438,9 @@ fn decode_100k_row(zone: u8, row: char) -> Result<f64, GridError> {
 }
 
 fn band_to_approx_northing(band: char) -> Result<(char, f64), GridError> {
+    if !band.is_ascii() {
+        return Err(GridError::InvalidLatitude);
+    }
     const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
     let b_pos = BANDS
         .iter()
