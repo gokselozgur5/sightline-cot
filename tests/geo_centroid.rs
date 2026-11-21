@@ -24,3 +24,17 @@ fn test_degenerate_polygons() {
     assert!(polygon_centroid(&[[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]]).is_none());
     assert!(polygon_centroid(&[[f64::NAN, 0.0], [1.0, 1.0], [0.0, 1.0]]).is_none());
 }
+
+#[test]
+fn test_large_input_termination() {
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let poly = [[0.0, 1e20], [1.0, 1e20], [0.0, 0.0]];
+        let res = polygon_centroid(&poly);
+        let _ = tx.send(res);
+    });
+    let res = rx
+        .recv_timeout(std::time::Duration::from_millis(500))
+        .expect("must terminate within 500ms");
+    assert!(res.is_some());
+}
