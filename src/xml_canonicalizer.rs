@@ -79,7 +79,10 @@ impl fmt::Display for CotValidationError {
             }
             Self::UnclosedTag(tag) => write!(f, "unclosed tag: <{tag}>"),
             Self::MismatchedClosingTag { expected, found } => {
-                write!(f, "mismatched closing tag: expected </{expected}>, found </{found}>")
+                write!(
+                    f,
+                    "mismatched closing tag: expected </{expected}>, found </{found}>"
+                )
             }
         }
     }
@@ -177,7 +180,11 @@ impl CotSchemaValidator {
                         // Non-whitespace text inside elements is acceptable in CoT (e.g. remarks)
                     }
                 }
-                RawXmlToken::StartTag { name, attributes, self_closing } => {
+                RawXmlToken::StartTag {
+                    name,
+                    attributes,
+                    self_closing,
+                } => {
                     let local_name = strip_prefix(&name);
                     if tag_stack.is_empty() {
                         if root_seen {
@@ -211,23 +218,21 @@ impl CotSchemaValidator {
                         tag_stack.push(name);
                     }
                 }
-                RawXmlToken::EndTag { name } => {
-                    match tag_stack.pop() {
-                        Some(expected) => {
-                            if expected != name {
-                                return Err(CotValidationError::MismatchedClosingTag {
-                                    expected,
-                                    found: name,
-                                });
-                            }
-                        }
-                        None => {
-                            return Err(CotValidationError::MalformedXml(format!(
-                                "unexpected closing tag </{name}> without matching open tag"
-                            )));
+                RawXmlToken::EndTag { name } => match tag_stack.pop() {
+                    Some(expected) => {
+                        if expected != name {
+                            return Err(CotValidationError::MismatchedClosingTag {
+                                expected,
+                                found: name,
+                            });
                         }
                     }
-                }
+                    None => {
+                        return Err(CotValidationError::MalformedXml(format!(
+                            "unexpected closing tag </{name}> without matching open tag"
+                        )));
+                    }
+                },
             }
         }
 
