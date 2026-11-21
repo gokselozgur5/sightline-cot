@@ -15,8 +15,14 @@ fn test_planar_area_and_perimeter_square() {
 
 #[test]
 fn test_degenerate_polygons() {
+    assert_eq!(polygon_area(&[[0.0, 0.0], [1.0, 1.0]]), None);
     assert!(polygon_area(&[[0.0, 0.0], [1.0, 1.0]]).is_none());
+    assert_eq!(polygon_perimeter(&[[0.0, 0.0], [1.0, 1.0]]), None);
     assert!(polygon_perimeter(&[[0.0, 0.0], [1.0, 1.0]]).is_none());
+    assert_eq!(
+        polygon_area(&[[f64::NAN, 0.0], [1.0, 1.0], [0.0, 1.0]]),
+        None
+    );
     assert!(polygon_area(&[[f64::NAN, 0.0], [1.0, 1.0], [0.0, 1.0]]).is_none());
 }
 
