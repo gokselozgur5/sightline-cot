@@ -191,7 +191,13 @@ impl CotShape {
 
 impl CotShape {
     /// Render complete standalone CoT 2.0 XML event containing this shape.
-    pub fn to_cot_event_xml(&self, uid: &str, callsign: &str, time_ms: i64, stale_ms: i64) -> String {
+    pub fn to_cot_event_xml(
+        &self,
+        uid: &str,
+        callsign: &str,
+        time_ms: i64,
+        stale_ms: i64,
+    ) -> String {
         let [c_lat, c_lon] = self.centroid();
         let time_str = crate::cot::format_iso8601_utc(time_ms);
         let stale_str = crate::cot::format_iso8601_utc(stale_ms);
@@ -216,10 +222,16 @@ fn extract_attr(tag: &str, attr: &str) -> Option<String> {
 impl CotVertex {
     /// Parse `<vertex lat="..." lon="..." [hae="..."]/>` XML element.
     pub fn parse(xml: &str) -> Result<Self, CotShapeError> {
-        let lat_str = extract_attr(xml, "lat").ok_or(CotShapeError::InvalidCoordinate("missing lat"))?;
-        let lon_str = extract_attr(xml, "lon").ok_or(CotShapeError::InvalidCoordinate("missing lon"))?;
-        let lat = lat_str.parse::<f64>().map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lat"))?;
-        let lon = lon_str.parse::<f64>().map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lon"))?;
+        let lat_str =
+            extract_attr(xml, "lat").ok_or(CotShapeError::InvalidCoordinate("missing lat"))?;
+        let lon_str =
+            extract_attr(xml, "lon").ok_or(CotShapeError::InvalidCoordinate("missing lon"))?;
+        let lat = lat_str
+            .parse::<f64>()
+            .map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lat"))?;
+        let lon = lon_str
+            .parse::<f64>()
+            .map_err(|_| CotShapeError::InvalidCoordinate("non-numeric lon"))?;
         let hae = extract_attr(xml, "hae").and_then(|h| h.parse::<f64>().ok());
         let mut v = Self::new(lat, lon)?;
         v.hae = hae;
@@ -230,24 +242,37 @@ impl CotVertex {
 impl CotShape {
     /// Parse a `<shape>...</shape>` or `<polyline ...>...</polyline>` XML snippet.
     pub fn parse(xml: &str) -> Result<Self, CotShapeError> {
-        let p_start = xml.find("<polyline").ok_or_else(|| CotShapeError::XmlParseError("missing <polyline".into()))?;
-        let header_end = xml[p_start..].find('>').ok_or_else(|| CotShapeError::XmlParseError("unclosed <polyline".into()))?;
+        let p_start = xml
+            .find("<polyline")
+            .ok_or_else(|| CotShapeError::XmlParseError("missing <polyline".into()))?;
+        let header_end = xml[p_start..]
+            .find('>')
+            .ok_or_else(|| CotShapeError::XmlParseError("unclosed <polyline".into()))?;
         let header = &xml[p_start..p_start + header_end];
-        let closed = extract_attr(header, "closed").map(|s| s == "true").unwrap_or(false);
+        let closed = extract_attr(header, "closed")
+            .map(|s| s == "true")
+            .unwrap_or(false);
         let color = extract_attr(header, "color").and_then(|s| s.parse::<i32>().ok());
         let fill_color = extract_attr(header, "fillColor").and_then(|s| s.parse::<i32>().ok());
-        let stroke_weight = extract_attr(header, "strokeWeight").and_then(|s| s.parse::<f64>().ok());
+        let stroke_weight =
+            extract_attr(header, "strokeWeight").and_then(|s| s.parse::<f64>().ok());
 
         let mut vertices = Vec::new();
         let mut rest = &xml[p_start + header_end..];
         while let Some(v_start) = rest.find("<vertex") {
-            let v_end = rest[v_start..].find("/>").ok_or_else(|| CotShapeError::XmlParseError("unclosed <vertex".into()))?;
+            let v_end = rest[v_start..]
+                .find("/>")
+                .ok_or_else(|| CotShapeError::XmlParseError("unclosed <vertex".into()))?;
             let v_xml = &rest[v_start..v_start + v_end + 2];
             vertices.push(CotVertex::parse(v_xml)?);
             rest = &rest[v_start + v_end + 2..];
         }
 
-        let mut shape = if closed { Self::new_polygon(vertices)? } else { Self::new_polyline(vertices)? };
+        let mut shape = if closed {
+            Self::new_polygon(vertices)?
+        } else {
+            Self::new_polyline(vertices)?
+        };
         shape.color = color;
         shape.fill_color = fill_color;
         shape.stroke_weight = stroke_weight;
