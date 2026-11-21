@@ -254,7 +254,11 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
         for j in 0..k {
             let val = if i < n && j < m {
                 let cost = mat.get(i, j).unwrap_or(dummy);
-                if cost <= gate { cost } else { dummy }
+                if cost <= gate {
+                    cost
+                } else {
+                    dummy
+                }
             } else {
                 dummy
             };
@@ -300,7 +304,9 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
                 }
             }
             j0 = j1;
-            if p[j0] == 0 { break; }
+            if p[j0] == 0 {
+                break;
+            }
         }
 
         loop {
@@ -324,7 +330,11 @@ pub fn solve_optimal_hungarian(mat: &DistanceMatrix, gate: f64) -> AssocResult {
                 if cost <= gate {
                     matched_tracks[r] = true;
                     matched_dets[c] = true;
-                    matches.push(AssocMatch { track_idx: r, det_idx: c, cost });
+                    matches.push(AssocMatch {
+                        track_idx: r,
+                        det_idx: c,
+                        cost,
+                    });
                 }
             }
         }
@@ -350,7 +360,10 @@ mod tests {
         assert_eq!(err.to_string(), "invalid association configuration");
         let cfg = AssocConfig::default();
         assert!(cfg.validate().is_ok());
-        let bad = AssocConfig { gate_threshold: -1.0, ..cfg };
+        let bad = AssocConfig {
+            gate_threshold: -1.0,
+            ..cfg
+        };
         assert_eq!(bad.validate(), Err(AssocError::InvalidConfig));
     }
 
@@ -373,7 +386,10 @@ mod tests {
         let mat = DistanceMatrix::from_nested(&nested).unwrap();
         assert_eq!(mat.get(1, 0), Some(3.0));
         let bad = vec![vec![1.0, 2.0], vec![3.0]];
-        assert_eq!(DistanceMatrix::from_nested(&bad), Err(AssocError::DimensionMismatch));
+        assert_eq!(
+            DistanceMatrix::from_nested(&bad),
+            Err(AssocError::DimensionMismatch)
+        );
 
         let t2 = [[0.0, 0.0], [10.0, 10.0]];
         let d2 = [[0.0, 3.0], [10.0, 14.0]];
@@ -412,8 +428,22 @@ mod tests {
         let mat = DistanceMatrix::from_nested(&nested).unwrap();
         let res = solve_optimal_hungarian(&mat, 50.0);
         assert_eq!(res.matches.len(), 2);
-        assert_eq!(res.matches[0], AssocMatch { track_idx: 0, det_idx: 1, cost: 11.0 });
-        assert_eq!(res.matches[1], AssocMatch { track_idx: 1, det_idx: 0, cost: 12.0 });
+        assert_eq!(
+            res.matches[0],
+            AssocMatch {
+                track_idx: 0,
+                det_idx: 1,
+                cost: 11.0
+            }
+        );
+        assert_eq!(
+            res.matches[1],
+            AssocMatch {
+                track_idx: 1,
+                det_idx: 0,
+                cost: 12.0
+            }
+        );
     }
 
     #[test]
