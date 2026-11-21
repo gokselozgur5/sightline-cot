@@ -1,6 +1,6 @@
 use sightline_cot::track_assoc::{
-    compute_spatial_matrix_2d, solve_nearest_neighbor, solve_optimal_hungarian, AssocConfig,
-    AssocError, DistanceMatrix,
+    compute_spatial_matrix_2d, compute_spatial_matrix_3d, solve_nearest_neighbor,
+    solve_optimal_hungarian, AssocConfig, AssocError, DistanceMatrix,
 };
 
 #[test]
@@ -34,4 +34,21 @@ fn test_integration_gating_and_edge_rejection() {
     let valid_dets = [[0.0, 0.0]];
     let err = compute_spatial_matrix_2d(&nan_tracks, &valid_dets);
     assert_eq!(err, Err(AssocError::NonFiniteInput));
+}
+
+#[test]
+fn test_spatial_matrix_overflow_rejected() {
+    let t2 = [[1e308, 0.0]];
+    let d2 = [[-1e308, 0.0]];
+    assert_eq!(
+        compute_spatial_matrix_2d(&t2, &d2),
+        Err(AssocError::NonFiniteInput)
+    );
+
+    let t3 = [[1e308, 0.0, 0.0]];
+    let d3 = [[-1e308, 0.0, 0.0]];
+    assert_eq!(
+        compute_spatial_matrix_3d(&t3, &d3),
+        Err(AssocError::NonFiniteInput)
+    );
 }
