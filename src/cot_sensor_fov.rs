@@ -35,8 +35,17 @@ pub struct SensorCone {
 
 impl SensorCone {
     /// Create and validate a new SensorCone.
-    pub fn new(az_deg: f64, el_deg: f64, fov_deg: f64, range_m: f64) -> Result<Self, SensorFovError> {
-        if !az_deg.is_finite() || !el_deg.is_finite() || !fov_deg.is_finite() || !range_m.is_finite() {
+    pub fn new(
+        az_deg: f64,
+        el_deg: f64,
+        fov_deg: f64,
+        range_m: f64,
+    ) -> Result<Self, SensorFovError> {
+        if !az_deg.is_finite()
+            || !el_deg.is_finite()
+            || !fov_deg.is_finite()
+            || !range_m.is_finite()
+        {
             return Err(SensorFovError::NonFiniteParameter);
         }
         if fov_deg <= 0.0 || fov_deg >= 180.0 {
@@ -49,7 +58,12 @@ impl SensorCone {
             return Err(SensorFovError::InvalidElevation);
         }
         let norm_az = (az_deg % 360.0 + 360.0) % 360.0;
-        Ok(Self { azimuth_deg: norm_az, elevation_deg: el_deg, fov_deg, range_m })
+        Ok(Self {
+            azimuth_deg: norm_az,
+            elevation_deg: el_deg,
+            fov_deg,
+            range_m,
+        })
     }
 }
 
@@ -94,7 +108,11 @@ pub struct SensorFootprint {
 }
 
 fn compute_basis_axes(b: [f64; 3]) -> ([f64; 3], [f64; 3]) {
-    let arb = if b[0].abs() < 0.9 && b[1].abs() < 0.9 { [1.0, 0.0, 0.0] } else { [0.0, 0.0, 1.0] };
+    let arb = if b[0].abs() < 0.9 && b[1].abs() < 0.9 {
+        [1.0, 0.0, 0.0]
+    } else {
+        [0.0, 0.0, 1.0]
+    };
     let cross1 = [
         b[1] * arb[2] - b[2] * arb[1],
         b[2] * arb[0] - b[0] * arb[2],
@@ -119,7 +137,13 @@ fn intersect_ray_ground(ray: [f64; 3], dz_total: f64, ground_alt: f64) -> Option
     }
 }
 
-fn sample_cone_perimeter_rays(b: [f64; 3], u1: [f64; 3], u2: [f64; 3], half_fov: f64, n: usize) -> Vec<[f64; 3]> {
+fn sample_cone_perimeter_rays(
+    b: [f64; 3],
+    u1: [f64; 3],
+    u2: [f64; 3],
+    half_fov: f64,
+    n: usize,
+) -> Vec<[f64; 3]> {
     let (cos_half, sin_half) = (half_fov.cos(), half_fov.sin());
     (0..n).map(|i| {
         let phi = 2.0 * std::f64::consts::PI * (i as f64) / (n as f64);
