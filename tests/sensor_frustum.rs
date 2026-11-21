@@ -45,3 +45,16 @@ fn parse_cot_sensor_rejects_non_finite_fov_and_range() {
     let xml = r#"<sensor azimuth="10" elevation="-30" fov="inf" range="NaN"/>"#;
     assert!(SensorGimbal::parse_cot_sensor(xml).is_err());
 }
+
+#[test]
+fn oblique_footprint_is_clipped_at_max_range_and_bounded_by_min_range() {
+    let platform = PlatformPose::new(0.0, 0.0, 1000.0, 0.0, 0.0, 0.0).unwrap();
+    let gimbal = SensorGimbal::new(0.0, -10.0, 0.0).unwrap();
+    let cfg = SensorFrustumConfig::new(30.0, 30.0, 20_000.0, 10.0).unwrap();
+    let fp = generate_sensor_footprint(&platform, &gimbal, &cfg, 0.0).unwrap();
+    assert_eq!(fp.vertices_enu.len(), 4);
+    assert!((fp.slant_range_m - 5758.77).abs() < 1.0);
+    let cfg_min = SensorFrustumConfig::new(30.0, 30.0, 20_000.0, 3000.0).unwrap();
+    let fp_min = generate_sensor_footprint(&platform, &gimbal, &cfg_min, 0.0).unwrap();
+    assert!(fp_min.area_sq_m < fp.area_sq_m);
+}
