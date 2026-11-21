@@ -48,7 +48,8 @@ impl DemRaster {
         if c < 2 || r < 2 {
             return Err(DemError::InvalidDimensions);
         }
-        if n != c * r {
+        let expected_len = c.checked_mul(r).ok_or(DemError::DataLengthMismatch)?;
+        if n != expected_len {
             return Err(DemError::DataLengthMismatch);
         }
         Ok(())
