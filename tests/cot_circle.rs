@@ -101,3 +101,9 @@ fn test_circle_parse_missing_point_element_errors() {
         "expected XmlParseError for missing point element, got: {res:?}"
     );
 }
+
+#[test]
+fn test_range_rings_rejects_unsorted_radii() {
+    let res = CotRangeRings::new(0.0, 0.0, vec![1000.0, 500.0]);
+    assert!(matches!(res, Err(CotCircleError::InvalidParameter(_))));
+}
