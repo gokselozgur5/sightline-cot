@@ -72,11 +72,16 @@ pub fn segment_distance(p: [f64; 2], a: [f64; 2], b: [f64; 2]) -> f64 {
 fn dp_indices(pts: &[[f64; 2]], start: usize, end: usize, tol: f64, keep: &mut [bool]) {
     let mut stack = vec![(start, end)];
     while let Some((s, e)) = stack.pop() {
-        if e <= s + 1 { continue; }
+        if e <= s + 1 {
+            continue;
+        }
         let (mut max_d, mut max_i) = (0.0, s);
         for i in (s + 1)..e {
             let d = segment_distance(pts[i], pts[s], pts[e]);
-            if d > max_d { max_d = d; max_i = i; }
+            if d > max_d {
+                max_d = d;
+                max_i = i;
+            }
         }
         if max_d > tol {
             keep[max_i] = true;
