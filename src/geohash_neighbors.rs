@@ -51,10 +51,22 @@ const BORDERS: [(&[u8], &[u8]); 4] = [
 ];
 
 const NEIGHBORS: [(&[u8; 32], &[u8; 32]); 4] = [
-    (b"p0r21436x8zb9dcf5h7kjnmqesgutwvy", b"bc01fg45238967deuvhjyznpkmstqrwx"),
-    (b"14365h7k9dcfesgujnmqp0r2twvyx8zb", b"238967debc01fg45kmstqrwxuvhjyznp"),
-    (b"bc01fg45238967deuvhjyznpkmstqrwx", b"p0r21436x8zb9dcf5h7kjnmqesgutwvy"),
-    (b"238967debc01fg45kmstqrwxuvhjyznp", b"14365h7k9dcfesgujnmqp0r2twvyx8zb"),
+    (
+        b"p0r21436x8zb9dcf5h7kjnmqesgutwvy",
+        b"bc01fg45238967deuvhjyznpkmstqrwx",
+    ),
+    (
+        b"14365h7k9dcfesgujnmqp0r2twvyx8zb",
+        b"238967debc01fg45kmstqrwxuvhjyznp",
+    ),
+    (
+        b"bc01fg45238967deuvhjyznpkmstqrwx",
+        b"p0r21436x8zb9dcf5h7kjnmqesgutwvy",
+    ),
+    (
+        b"238967debc01fg45kmstqrwxuvhjyznp",
+        b"14365h7k9dcfesgujnmqp0r2twvyx8zb",
+    ),
 ];
 
 fn validate_geohash(hash: &str) -> Result<(), GeohashError> {
@@ -143,8 +155,3 @@ pub fn geohash_neighbors(hash: &str) -> Result<GeohashNeighbors, GeohashError> {
         north_west,
     })
 }
-
-
-
-
-
