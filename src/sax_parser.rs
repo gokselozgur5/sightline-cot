@@ -443,6 +443,15 @@ impl CotPointView {
             .parse()
             .map_err(|_| SaxError::InvalidNumericValue("le"))?;
 
+        if !(-90.0..=90.0).contains(&lat)
+            || !(-180.0..=180.0).contains(&lon)
+            || !(ce >= 0.0)
+            || !(le >= 0.0)
+            || !hae.is_finite()
+        {
+            return Err(SaxError::InvalidNumericValue("coordinate out of bounds"));
+        }
+
         Ok(Self {
             lat,
             lon,
