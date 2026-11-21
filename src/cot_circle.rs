@@ -331,14 +331,20 @@ impl CotRangeRings {
             return Err(CotCircleError::InvalidCoordinate("latitude in [-90, 90]"));
         }
         if !center_lon.is_finite() || !(-180.0..=180.0).contains(&center_lon) {
-            return Err(CotCircleError::InvalidCoordinate("longitude in [-180, 180]"));
+            return Err(CotCircleError::InvalidCoordinate(
+                "longitude in [-180, 180]",
+            ));
         }
         if radii_m.is_empty() {
-            return Err(CotCircleError::InvalidParameter("radii_m must not be empty"));
+            return Err(CotCircleError::InvalidParameter(
+                "radii_m must not be empty",
+            ));
         }
         for &r in &radii_m {
             if !r.is_finite() || r <= 0.0 {
-                return Err(CotCircleError::InvalidRadius("each radius must be positive"));
+                return Err(CotCircleError::InvalidRadius(
+                    "each radius must be positive",
+                ));
             }
         }
         Ok(Self {
@@ -355,12 +361,21 @@ impl CotRangeRings {
 
 impl CotRangeRings {
     /// Create uniform concentric range rings spaced by step_m.
-    pub fn from_interval(center_lat: f64, center_lon: f64, step_m: f64, count: usize) -> Result<Self, CotCircleError> {
+    pub fn from_interval(
+        center_lat: f64,
+        center_lon: f64,
+        step_m: f64,
+        count: usize,
+    ) -> Result<Self, CotCircleError> {
         if count == 0 {
-            return Err(CotCircleError::InvalidParameter("ring count must be at least 1"));
+            return Err(CotCircleError::InvalidParameter(
+                "ring count must be at least 1",
+            ));
         }
         if !step_m.is_finite() || step_m <= 0.0 {
-            return Err(CotCircleError::InvalidRadius("interval step must be positive"));
+            return Err(CotCircleError::InvalidRadius(
+                "interval step must be positive",
+            ));
         }
         let radii: Vec<f64> = (1..=count).map(|i| i as f64 * step_m).collect();
         Self::new(center_lat, center_lon, radii)
@@ -386,7 +401,9 @@ impl CotRangeRings {
     /// Set stroke line thickness in pixels.
     pub fn with_stroke_weight(mut self, weight: f64) -> Result<Self, CotCircleError> {
         if !weight.is_finite() || weight <= 0.0 {
-            return Err(CotCircleError::InvalidParameter("stroke weight must be positive"));
+            return Err(CotCircleError::InvalidParameter(
+                "stroke weight must be positive",
+            ));
         }
         self.stroke_weight = Some(weight);
         Ok(self)
