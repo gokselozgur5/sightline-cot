@@ -1,4 +1,8 @@
-//! GeoTIFF elevation grid sampler and terrain line-of-sight intercept solver.
+//! Elevation grid sampler and terrain line-of-sight intercept solver.
+//!
+//! Note: Despite the historical naming of [`GeoTiffElevationGrid`], this module
+//! does not provide GeoTIFF file decoding. Grids are in-memory buffers constructed
+//! from caller-supplied slices or converted from DEM structures.
 
 use core::fmt;
 
@@ -68,7 +72,10 @@ pub enum InterpolationMethod {
     NearestNeighbor,
 }
 
-/// Regular 2D GeoTIFF-style elevation grid.
+/// Regular 2D in-memory elevation grid.
+///
+/// Despite the name, this struct does not perform GeoTIFF decoding or file I/O;
+/// it holds an in-memory elevation raster buffer.
 #[derive(Debug, Clone, PartialEq)]
 pub struct GeoTiffElevationGrid {
     /// Minimum X coordinate (e.g. westernmost longitude or easting).
