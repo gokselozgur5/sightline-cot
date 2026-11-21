@@ -367,13 +367,18 @@ pub fn generate_sensor_footprint(
     config: &SensorFrustumConfig,
     ground_alt_hae_m: f64,
 ) -> Result<FrustumFootprint, FrustumError> {
-    let (b_enu, slant, corners_enu) = compute_frustum_ground_enu(platform, gimbal, config, ground_alt_hae_m)?;
-    let (b_lat, b_lon, b_alt) = crate::camera::enu_to_geodetic(
-        b_enu, platform.lat_deg, platform.lon_deg, ground_alt_hae_m,
-    );
+    let (b_enu, slant, corners_enu) =
+        compute_frustum_ground_enu(platform, gimbal, config, ground_alt_hae_m)?;
+    let (b_lat, b_lon, b_alt) =
+        crate::camera::enu_to_geodetic(b_enu, platform.lat_deg, platform.lon_deg, ground_alt_hae_m);
     let mut vertices_geo = Vec::with_capacity(corners_enu.len());
     for c in &corners_enu {
-        let (lat, lon, alt) = crate::camera::enu_to_geodetic(*c, platform.lat_deg, platform.lon_deg, ground_alt_hae_m);
+        let (lat, lon, alt) = crate::camera::enu_to_geodetic(
+            *c,
+            platform.lat_deg,
+            platform.lon_deg,
+            ground_alt_hae_m,
+        );
         vertices_geo.push([lat, lon, alt]);
     }
     let area = polygon_area_enu(&corners_enu);
@@ -388,13 +393,15 @@ pub fn generate_sensor_footprint(
     })
 }
 
-
 impl FrustumFootprint {
     /// Format the ground footprint polygon as a CoT `<shape>` XML element string.
     pub fn to_cot_shape_xml(&self, stroke_color: i32, fill_color: i32) -> String {
         let mut inner = String::new();
         for pt in &self.vertices_geo {
-            inner.push_str(&format!("<vertex lat=\"{:.6}\" lon=\"{:.6}\" hae=\"{:.2}\"/>", pt[0], pt[1], pt[2]));
+            inner.push_str(&format!(
+                "<vertex lat=\"{:.6}\" lon=\"{:.6}\" hae=\"{:.2}\"/>",
+                pt[0], pt[1], pt[2]
+            ));
         }
         format!(
             "<shape><polyline closed=\"true\" color=\"{stroke_color}\" fillColor=\"{fill_color}\">{inner}</polyline></shape>"
@@ -412,10 +419,15 @@ impl SensorGimbal {
     }
 }
 
-
 impl FrustumFootprint {
     /// Render complete standalone CoT 2.0 XML event containing the sensor footprint.
-    pub fn to_cot_event_xml(&self, uid: &str, callsign: &str, time_ms: i64, stale_ms: i64) -> String {
+    pub fn to_cot_event_xml(
+        &self,
+        uid: &str,
+        callsign: &str,
+        time_ms: i64,
+        stale_ms: i64,
+    ) -> String {
         let [c_lat, c_lon, c_alt] = self.centroid_geo();
         let time_str = crate::cot::format_iso8601_utc(time_ms);
         let stale_str = crate::cot::format_iso8601_utc(stale_ms);
@@ -430,7 +442,6 @@ impl FrustumFootprint {
     }
 }
 
-
 fn extract_xml_attr(tag: &str, attr: &str) -> Option<String> {
     let needle = format!(" {attr}=\"");
     let start = tag.find(&needle)? + needle.len();
@@ -441,8 +452,12 @@ fn extract_xml_attr(tag: &str, attr: &str) -> Option<String> {
 impl SensorGimbal {
     /// Parse `<sensor .../>` XML string into SensorGimbal and (fov, range).
     pub fn parse_cot_sensor(xml: &str) -> Result<(Self, f64, f64), FrustumError> {
-        let tag_start = xml.find("<sensor").ok_or_else(|| FrustumError::XmlParseError("missing <sensor".into()))?;
-        let tag_end = xml[tag_start..].find('>').ok_or_else(|| FrustumError::XmlParseError("unclosed <sensor".into()))?;
+        let tag_start = xml
+            .find("<sensor")
+            .ok_or_else(|| FrustumError::XmlParseError("missing <sensor".into()))?;
+        let tag_end = xml[tag_start..]
+            .find('>')
+            .ok_or_else(|| FrustumError::XmlParseError("unclosed <sensor".into()))?;
         let tag = &xml[tag_start..tag_start + tag_end + 1];
         let az = extract_xml_attr(tag, "azimuth").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("azimuth".into()))?;
         let el = extract_xml_attr(tag, "elevation").and_then(|s| s.parse().ok()).ok_or_else(|| FrustumError::XmlParseError("elevation".into()))?;
