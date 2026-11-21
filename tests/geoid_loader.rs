@@ -101,3 +101,19 @@ fn test_parse_malformed_grids() {
         Err(GeoidError::InvalidHeader("abc".into()))
     );
 }
+
+#[test]
+fn test_undulation_at_single_row_or_column() {
+    let col_grid =
+        parse_geoid_ascii("ncols 1 nrows 2 xllcorner 0 yllcorner 0 cellsize 1.0 10.0 20.0")
+            .unwrap();
+    assert_eq!(col_grid.undulation_at(0.5, 0.5), Some(20.0));
+    assert_eq!(col_grid.undulation_at(0.5, 1.5), Some(10.0));
+    assert_eq!(col_grid.undulation_at(0.0, 0.5), Some(20.0));
+    let row_grid =
+        parse_geoid_ascii("ncols 2 nrows 1 xllcorner 0 yllcorner 0 cellsize 1.0 10.0 20.0")
+            .unwrap();
+    assert_eq!(row_grid.undulation_at(0.5, 0.5), Some(10.0));
+    assert_eq!(row_grid.undulation_at(1.5, 0.5), Some(20.0));
+    assert_eq!(row_grid.undulation_at(0.5, 0.0), Some(10.0));
+}
