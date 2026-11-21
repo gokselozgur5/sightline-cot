@@ -43,7 +43,9 @@ impl CotCircle {
             return Err(CotCircleError::InvalidCoordinate("latitude in [-90, 90]"));
         }
         if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
-            return Err(CotCircleError::InvalidCoordinate("longitude in [-180, 180]"));
+            return Err(CotCircleError::InvalidCoordinate(
+                "longitude in [-180, 180]",
+            ));
         }
         if !radius_m.is_finite() || radius_m <= 0.0 {
             return Err(CotCircleError::InvalidRadius("radius must be positive"));
@@ -89,7 +91,9 @@ impl CotCircle {
     /// Set stroke line thickness in pixels.
     pub fn with_stroke_weight(mut self, weight: f64) -> Result<Self, CotCircleError> {
         if !weight.is_finite() || weight <= 0.0 {
-            return Err(CotCircleError::InvalidParameter("stroke weight must be positive"));
+            return Err(CotCircleError::InvalidParameter(
+                "stroke weight must be positive",
+            ));
         }
         self.stroke_weight = Some(weight);
         Ok(self)
@@ -127,7 +131,9 @@ impl CotCircle {
             return Err(CotCircleError::InvalidCoordinate("latitude in [-90, 90]"));
         }
         if !lon.is_finite() || !(-180.0..=180.0).contains(&lon) {
-            return Err(CotCircleError::InvalidCoordinate("longitude in [-180, 180]"));
+            return Err(CotCircleError::InvalidCoordinate(
+                "longitude in [-180, 180]",
+            ));
         }
         let dist = crate::geo_haversine::haversine_distance_m([self.lat, self.lon], [lat, lon]);
         Ok(dist <= self.radius_m)
@@ -138,14 +144,19 @@ impl CotCircle {
     /// Generate an approximation polygon of `num_points` geodetic boundary vertices.
     pub fn to_polygon_vertices(&self, num_points: usize) -> Result<Vec<[f64; 2]>, CotCircleError> {
         if num_points < 3 {
-            return Err(CotCircleError::InvalidParameter("num_points must be at least 3"));
+            return Err(CotCircleError::InvalidParameter(
+                "num_points must be at least 3",
+            ));
         }
         let mut vertices = Vec::with_capacity(num_points);
         let step_deg = 360.0 / num_points as f64;
         for i in 0..num_points {
             let bearing = i as f64 * step_deg;
             let (p_lat, p_lon) = crate::geo_destination::destination_point(
-                self.lat, self.lon, bearing, self.radius_m,
+                self.lat,
+                self.lon,
+                bearing,
+                self.radius_m,
             );
             vertices.push([p_lat, p_lon]);
         }
@@ -168,7 +179,10 @@ impl CotCircle {
     pub fn to_detail_xml(&self) -> String {
         let mut inner = String::new();
         if let Some(ref cs) = self.callsign {
-            inner.push_str(&format!("<contact callsign=\"{}\"/>", crate::cot::escape_xml_attr(cs)));
+            inner.push_str(&format!(
+                "<contact callsign=\"{}\"/>",
+                crate::cot::escape_xml_attr(cs)
+            ));
         }
         if let Some(sc) = self.stroke_color {
             inner.push_str(&format!("<strokeColor value=\"{sc}\"/>"));
@@ -181,7 +195,10 @@ impl CotCircle {
         }
         inner.push_str(&self.to_shape_xml());
         if let Some(ref rem) = self.remarks {
-            inner.push_str(&format!("<remarks>{}</remarks>", crate::cot::escape_xml_attr(rem)));
+            inner.push_str(&format!(
+                "<remarks>{}</remarks>",
+                crate::cot::escape_xml_attr(rem)
+            ));
         }
         format!("<detail>{inner}</detail>")
     }
@@ -222,12 +239,18 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
 impl CotCircle {
     fn parse_point_and_radius(xml: &str) -> Result<(f64, f64, Option<f64>, f64), CotCircleError> {
         let (lat, lon, hae) = if let Some(p_start) = xml.find("<point") {
-            let p_end = xml[p_start..].find("/>").ok_or_else(|| CotCircleError::XmlParseError("unclosed <point".into()))?;
+            let p_end = xml[p_start..]
+                .find("/>")
+                .ok_or_else(|| CotCircleError::XmlParseError("unclosed <point".into()))?;
             let tag = &xml[p_start..p_start + p_end];
-            let lat = extract_attr(tag, "lat").ok_or(CotCircleError::InvalidCoordinate("missing lat"))?
-                .parse::<f64>().map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lat"))?;
-            let lon = extract_attr(tag, "lon").ok_or(CotCircleError::InvalidCoordinate("missing lon"))?
-                .parse::<f64>().map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lon"))?;
+            let lat = extract_attr(tag, "lat")
+                .ok_or(CotCircleError::InvalidCoordinate("missing lat"))?
+                .parse::<f64>()
+                .map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lat"))?;
+            let lon = extract_attr(tag, "lon")
+                .ok_or(CotCircleError::InvalidCoordinate("missing lon"))?
+                .parse::<f64>()
+                .map_err(|_| CotCircleError::InvalidCoordinate("non-numeric lon"))?;
             let hae = extract_attr(tag, "hae").and_then(|h| h.parse::<f64>().ok());
             (lat, lon, hae)
         } else {
