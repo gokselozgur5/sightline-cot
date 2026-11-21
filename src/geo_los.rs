@@ -37,7 +37,11 @@ impl GeoPoint3D {
         if !(-90.0..=90.0).contains(&lat_deg) {
             return Err(GeoLosError::LatitudeOutOfRange);
         }
-        Ok(Self { lat_deg, lon_deg, hae_m })
+        Ok(Self {
+            lat_deg,
+            lon_deg,
+            hae_m,
+        })
     }
 }
 
@@ -72,8 +76,16 @@ pub fn horizon_distance_m(h1_m: f64, h2_m: f64) -> Result<f64, GeoLosError> {
     if !h1_m.is_finite() || !h2_m.is_finite() {
         return Err(GeoLosError::NonFiniteCoordinate);
     }
-    let d1 = if h1_m > 0.0 { (2.0 * WGS84_MEAN_RADIUS_M * h1_m + h1_m * h1_m).sqrt() } else { 0.0 };
-    let d2 = if h2_m > 0.0 { (2.0 * WGS84_MEAN_RADIUS_M * h2_m + h2_m * h2_m).sqrt() } else { 0.0 };
+    let d1 = if h1_m > 0.0 {
+        (2.0 * WGS84_MEAN_RADIUS_M * h1_m + h1_m * h1_m).sqrt()
+    } else {
+        0.0
+    };
+    let d2 = if h2_m > 0.0 {
+        (2.0 * WGS84_MEAN_RADIUS_M * h2_m + h2_m * h2_m).sqrt()
+    } else {
+        0.0
+    };
     Ok(d1 + d2)
 }
 
@@ -83,9 +95,14 @@ use crate::geo_enu::geodetic_to_enu;
 /// Compute line-of-sight slant range, elevation, azimuth and horizon clearance.
 pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeometry, GeoLosError> {
     let enu = geodetic_to_enu(
-        target.lat_deg, target.lon_deg, target.hae_m,
-        obs.lat_deg, obs.lon_deg, obs.hae_m,
-    ).map_err(|_| GeoLosError::NonFiniteCoordinate)?;
+        target.lat_deg,
+        target.lon_deg,
+        target.hae_m,
+        obs.lat_deg,
+        obs.lon_deg,
+        obs.hae_m,
+    )
+    .map_err(|_| GeoLosError::NonFiniteCoordinate)?;
     let (e, n, u) = (enu[0], enu[1], enu[2]);
     let ground_range_m = (e * e + n * n).sqrt();
     let slant_range_m = (ground_range_m * ground_range_m + u * u).sqrt();
@@ -94,10 +111,16 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
     }
     let elevation_angle_rad = u.atan2(ground_range_m);
     let az_raw = e.atan2(n);
-    let azimuth_rad = if az_raw < 0.0 { az_raw + 2.0 * std::f64::consts::PI } else { az_raw };
+    let azimuth_rad = if az_raw < 0.0 {
+        az_raw + 2.0 * std::f64::consts::PI
+    } else {
+        az_raw
+    };
     let geoid = Egm96Geoid::coarse_reference_grid();
     let n1 = geoid.undulation(obs.lat_deg, obs.lon_deg).unwrap_or(0.0);
-    let n2 = geoid.undulation(target.lat_deg, target.lon_deg).unwrap_or(0.0);
+    let n2 = geoid
+        .undulation(target.lat_deg, target.lon_deg)
+        .unwrap_or(0.0);
     let h1_m = (obs.hae_m - n1).max(0.0);
     let h2_m = (target.hae_m - n2).max(0.0);
     let horiz_m = horizon_distance_m(h1_m, h2_m)?;
