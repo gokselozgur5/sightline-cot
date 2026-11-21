@@ -177,7 +177,11 @@ impl GreatCirclePath {
             return Err(GreatCircleError::InvalidDistance);
         }
         let (idx, frac) = self.locate_segment(distance_m);
-        Ok(interpolate_segment(&self.waypoints[idx], &self.waypoints[idx + 1], frac))
+        Ok(interpolate_segment(
+            &self.waypoints[idx],
+            &self.waypoints[idx + 1],
+            frac,
+        ))
     }
 
     /// Interpolate waypoint at a fraction in [0.0, 1.0] of total path length.
@@ -206,7 +210,9 @@ impl GreatCirclePath {
         let (idx, _) = self.locate_segment(distance_m);
         let current_pt = self.interpolate_at_distance(distance_m)?;
         let target_pt = &self.waypoints[idx + 1];
-        if (current_pt.lat - target_pt.lat).abs() < 1e-9 && (current_pt.lon - target_pt.lon).abs() < 1e-9 {
+        if (current_pt.lat - target_pt.lat).abs() < 1e-9
+            && (current_pt.lon - target_pt.lon).abs() < 1e-9
+        {
             if idx + 2 < self.waypoints.len() {
                 return Ok(segment_bearing_deg(&current_pt, &self.waypoints[idx + 2]));
             }
@@ -297,7 +303,9 @@ mod tests {
         assert!((mid.lon - 5.0).abs() < 1e-6);
         let start = path.interpolate_at_distance(0.0).unwrap();
         assert!((start.lon - 0.0).abs() < 1e-9);
-        let end = path.interpolate_at_distance(path.total_distance_m()).unwrap();
+        let end = path
+            .interpolate_at_distance(path.total_distance_m())
+            .unwrap();
         assert!((end.lon - 10.0).abs() < 1e-6);
     }
 
@@ -336,7 +344,9 @@ mod tests {
         let path = GreatCirclePath::from_waypoints(&wps).unwrap();
         let b0 = path.bearing_at_distance(0.0).unwrap();
         assert!(b0.abs() < 1e-4);
-        let b_mid = path.bearing_at_distance(path.total_distance_m() * 0.5).unwrap();
+        let b_mid = path
+            .bearing_at_distance(path.total_distance_m() * 0.5)
+            .unwrap();
         assert!(b_mid.abs() < 1e-4);
     }
 }
