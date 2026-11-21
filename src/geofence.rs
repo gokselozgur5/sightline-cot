@@ -58,6 +58,9 @@ impl Geofence {
         if poly.iter().flatten().any(|c| !c.is_finite()) {
             return Err("polygon coordinates must be finite");
         }
+        if poly.iter().any(|v| !(-90.0..=90.0).contains(&v[0])) {
+            return Err("vertex latitude must be between -90 and 90 degrees");
+        }
         if Self::pole_winding(poly) == 0 && Self::polygon_area2(poly).abs() < 1e-12 {
             return Err("polygon must have non-zero area");
         }
@@ -115,6 +118,9 @@ impl Geofence {
 
 impl Geofence {
     pub fn is_point_inside_polygon(&self, lat: f64, lon: f64) -> bool {
+        if !lat.is_finite() || !lon.is_finite() {
+            return false;
+        }
         let poly = &self.vertices[..self.vertex_count];
         let n = poly.len();
         let crossings = (0..n)
