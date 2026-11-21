@@ -21,3 +21,18 @@ fn test_terrain_ray_overflow_direction() {
     assert_eq!(ray.direction[1], 0.0);
     assert_eq!(ray.direction[2], 0.0);
 }
+
+#[test]
+fn test_terrain_solve_large_max_range_miss_grid() {
+    let grid = GeoTiffElevationGrid::flat(0.0, 0.0, 10.0, 10.0, 2, 2, 100.0).unwrap();
+    let ray = TerrainRay::new([200.0, 200.0, 100.0], [1.0, 0.0, 0.0]).unwrap();
+    let solver = TerrainInterceptSolver::new(10.0, 1e18, 0.05, 64).unwrap();
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(solver.solve(&grid, &ray));
+    });
+    let res = rx
+        .recv_timeout(std::time::Duration::from_millis(500))
+        .expect("solve timed out");
+    assert_eq!(res, Err(TerrainSamplerError::NoIntersection));
+}
