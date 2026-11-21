@@ -79,3 +79,17 @@ fn test_spherical_area_antimeridian_and_planar_limit() {
     let p_sphere = spherical_polygon_perimeter(&poly).unwrap();
     assert!(a_sphere > 0.0 && p_sphere > 0.0);
 }
+
+#[test]
+fn test_geo_area_large_coordinate_termination() {
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let poly = [[0.0, 1e20], [0.0, 0.0], [1.0, 0.0]];
+        let res = polygon_area(&poly);
+        let _ = tx.send(res);
+    });
+    let res = rx
+        .recv_timeout(std::time::Duration::from_millis(500))
+        .expect("must terminate within 500ms");
+    assert!(res.is_some());
+}
