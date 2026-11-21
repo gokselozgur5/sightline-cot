@@ -256,11 +256,17 @@ impl CotCircle {
         } else {
             (0.0, 0.0, None)
         };
-        let e_start = xml.find("<ellipse").ok_or_else(|| CotCircleError::XmlParseError("missing <ellipse".into()))?;
-        let e_end = xml[e_start..].find("/>").ok_or_else(|| CotCircleError::XmlParseError("unclosed <ellipse".into()))?;
+        let e_start = xml
+            .find("<ellipse")
+            .ok_or_else(|| CotCircleError::XmlParseError("missing <ellipse".into()))?;
+        let e_end = xml[e_start..]
+            .find("/>")
+            .ok_or_else(|| CotCircleError::XmlParseError("unclosed <ellipse".into()))?;
         let el_tag = &xml[e_start..e_start + e_end];
-        let major = extract_attr(el_tag, "major").ok_or(CotCircleError::InvalidRadius("missing major radius"))?
-            .parse::<f64>().map_err(|_| CotCircleError::InvalidRadius("non-numeric major radius"))?;
+        let major = extract_attr(el_tag, "major")
+            .ok_or(CotCircleError::InvalidRadius("missing major radius"))?
+            .parse::<f64>()
+            .map_err(|_| CotCircleError::InvalidRadius("non-numeric major radius"))?;
         Ok((lat, lon, hae, major))
     }
 }
@@ -271,19 +277,33 @@ impl CotCircle {
         let (lat, lon, hae, radius) = Self::parse_point_and_radius(xml)?;
         let mut circle = Self::new(lat, lon, radius)?;
         circle.hae = hae;
-        if let Some(c) = xml.find("<contact").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
-            circle.callsign = extract_attr(c, "callsign").map(|s| crate::cot::unescape_xml_attr(&s));
+        if let Some(c) = xml
+            .find("<contact")
+            .and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j]))
+        {
+            circle.callsign =
+                extract_attr(c, "callsign").map(|s| crate::cot::unescape_xml_attr(&s));
         }
-        if let Some(s) = xml.find("<strokeColor").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+        if let Some(s) = xml
+            .find("<strokeColor")
+            .and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j]))
+        {
             circle.stroke_color = extract_attr(s, "value").and_then(|v| v.parse().ok());
         }
-        if let Some(w) = xml.find("<strokeWeight").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+        if let Some(w) = xml
+            .find("<strokeWeight")
+            .and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j]))
+        {
             circle.stroke_weight = extract_attr(w, "value").and_then(|v| v.parse().ok());
         }
-        if let Some(f) = xml.find("<fillColor").and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j])) {
+        if let Some(f) = xml
+            .find("<fillColor")
+            .and_then(|i| xml[i..].find("/>").map(|j| &xml[i..i + j]))
+        {
             circle.fill_color = extract_attr(f, "value").and_then(|v| v.parse().ok());
         }
-        circle.remarks = extract_tag_content(xml, "remarks").map(|s| crate::cot::unescape_xml_attr(s));
+        circle.remarks =
+            extract_tag_content(xml, "remarks").map(|s| crate::cot::unescape_xml_attr(s));
         Ok(circle)
     }
 }
@@ -302,7 +322,11 @@ pub struct CotRangeRings {
 
 impl CotRangeRings {
     /// Create concentric range rings from explicit list of radii in meters.
-    pub fn new(center_lat: f64, center_lon: f64, radii_m: Vec<f64>) -> Result<Self, CotCircleError> {
+    pub fn new(
+        center_lat: f64,
+        center_lon: f64,
+        radii_m: Vec<f64>,
+    ) -> Result<Self, CotCircleError> {
         if !center_lat.is_finite() || !(-90.0..=90.0).contains(&center_lat) {
             return Err(CotCircleError::InvalidCoordinate("latitude in [-90, 90]"));
         }
