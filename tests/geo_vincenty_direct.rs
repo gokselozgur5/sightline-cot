@@ -18,10 +18,22 @@ use sightline_cot::geo_vincenty_direct::VincentyError;
 
 #[test]
 fn test_vincenty_direct_validation_errors() {
-    assert_eq!(vincenty_direct(95.0, 0.0, 0.0, 100.0), Err(VincentyError::InvalidLatitude));
-    assert_eq!(vincenty_direct(0.0, 185.0, 0.0, 100.0), Err(VincentyError::InvalidLongitude));
-    assert_eq!(vincenty_direct(0.0, 0.0, 0.0, -10.0), Err(VincentyError::NegativeDistance));
-    assert_eq!(vincenty_direct(0.0, 0.0, f64::NAN, 10.0), Err(VincentyError::NonFiniteInput));
+    assert_eq!(
+        vincenty_direct(95.0, 0.0, 0.0, 100.0),
+        Err(VincentyError::InvalidLatitude)
+    );
+    assert_eq!(
+        vincenty_direct(0.0, 185.0, 0.0, 100.0),
+        Err(VincentyError::InvalidLongitude)
+    );
+    assert_eq!(
+        vincenty_direct(0.0, 0.0, 0.0, -10.0),
+        Err(VincentyError::NegativeDistance)
+    );
+    assert_eq!(
+        vincenty_direct(0.0, 0.0, f64::NAN, 10.0),
+        Err(VincentyError::NonFiniteInput)
+    );
 }
 
 #[test]
