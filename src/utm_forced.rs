@@ -39,12 +39,18 @@ fn compute_en_terms(lat: f64, dlon: f64, nu: f64, m: f64, ep2: f64) -> (f64, f64
     let (t, eta2) = (lat.tan() * lat.tan(), ep2 * cos_lat * cos_lat);
     let (p, p2) = (dlon * cos_lat, (dlon * cos_lat).powi(2));
     let (p3, p4, p5, p6, p7) = (p * p2, p2 * p2, p * p2 * p2, p2 * p2 * p2, p * p2 * p2 * p2);
-    let e = FALSE_EASTING + UTM_K0 * nu * (p + (1.0 - t + eta2) * p3 / 6.0
-        + (5.0 - 18.0 * t + t * t + 72.0 * eta2 - 58.0 * ep2) * p5 / 120.0
-        + (61.0 - 479.0 * t + 179.0 * t * t - t * t * t) * p7 / 5040.0);
-    let n = UTM_K0 * (m + nu * lat.tan() * (p2 / 2.0
-        + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0
-        + (61.0 - 58.0 * t + t * t + 600.0 * eta2 - 330.0 * ep2) * p6 / 720.0));
+    let e = FALSE_EASTING
+        + UTM_K0
+            * nu
+            * (p + (1.0 - t + eta2) * p3 / 6.0
+                + (5.0 - 18.0 * t + t * t + 72.0 * eta2 - 58.0 * ep2) * p5 / 120.0
+                + (61.0 - 479.0 * t + 179.0 * t * t - t * t * t) * p7 / 5040.0);
+    let n = UTM_K0
+        * (m + nu
+            * lat.tan()
+            * (p2 / 2.0
+                + (5.0 - t + 9.0 * eta2 + 4.0 * eta2 * eta2) * p4 / 24.0
+                + (61.0 - 58.0 * t + t * t + 600.0 * eta2 - 330.0 * ep2) * p6 / 720.0));
     (e, n)
 }
 
@@ -58,7 +64,11 @@ fn utm_project_point_forced(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) ->
     let nu = WGS84_A / (1.0 - e2 * sin_lat * sin_lat).sqrt();
     let m = meridian_arc(lat, e2);
     let (east, north_val) = compute_en_terms(lat, dlon, nu, m, ep2);
-    let north = if hemi == 'S' { FALSE_NORTHING_SOUTH + north_val } else { north_val };
+    let north = if hemi == 'S' {
+        FALSE_NORTHING_SOUTH + north_val
+    } else {
+        north_val
+    };
     (east, north)
 }
 
