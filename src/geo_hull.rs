@@ -60,19 +60,27 @@ fn scan_half<'a>(iter: impl Iterator<Item = &'a LocalPoint>) -> Vec<LocalPoint> 
 }
 
 /// Computes the 2D convex hull of geodetic points in a local tangent frame.
+///
+/// Non-finite coordinate pairs are rejected and omitted from the resulting hull.
 pub fn convex_hull(points: &[[f64; 2]]) -> Vec<[f64; 2]> {
-    if points.len() <= 2 {
-        return points.to_vec();
+    let finite_points: Vec<[f64; 2]> = points
+        .iter()
+        .filter(|p| p[0].is_finite() && p[1].is_finite())
+        .copied()
+        .collect();
+
+    if finite_points.len() <= 2 {
+        return finite_points;
     }
-    let mut pts = LocalPoint::project_all(points);
+    let mut pts = LocalPoint::project_all(&finite_points);
     pts.sort_by(|a, b| a.x.total_cmp(&b.x).then_with(|| a.y.total_cmp(&b.y)));
     pts.dedup_by(|a, b| (a.x - b.x).hypot(a.y - b.y) < 1e-6);
     if pts.len() <= 2 {
-        return pts.iter().map(|p| points[p.idx]).collect();
+        return pts.iter().map(|p| finite_points[p.idx]).collect();
     }
     let (mut lower, mut upper) = (scan_half(pts.iter()), scan_half(pts.iter().rev()));
     lower.pop();
     upper.pop();
     lower.extend(upper);
-    lower.iter().map(|p| points[p.idx]).collect()
+    lower.iter().map(|p| finite_points[p.idx]).collect()
 }
