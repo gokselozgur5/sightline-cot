@@ -105,6 +105,7 @@ fn random_byte_buffers_never_panic() {
         let len = (rng.next() % 64) as usize;
         let mut buf: Vec<u8> = (0..len).map(|_| rng.next() as u8).collect();
         buf.insert(0, 0xBF);
-        let _ = decode_tak_packet(&buf);
+        let res = decode_tak_packet(&buf);
+        assert!(matches!(res, Ok(_) | Err(_)));
     }
 }
