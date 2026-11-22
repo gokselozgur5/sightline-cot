@@ -71,3 +71,12 @@ fn test_unified_out_of_bounds() {
         Err(GridError::InvalidLongitude)
     );
 }
+
+#[test]
+fn test_unified_ups_dma_reference_values() {
+    let north = wgs84_to_unified(85.0, 0.0).expect("ups north 85");
+    assert_eq!(north.grid_system(), GridSystem::Ups);
+    assert_eq!(north.hemisphere(), 'N');
+    assert!((north.easting() - 2_000_000.0).abs() < 1e-4);
+    assert!((north.northing() - 1_444_542.61).abs() < 1.0);
+}
