@@ -382,13 +382,19 @@ fn mixed_cov(
 impl ImmFilter {
     /// Predict all sub-filters forward by dt.
     pub fn predict(&mut self, dt: f64) {
+        if !dt.is_finite() || dt <= 0.0 {
+            return;
+        }
         self.filters[MODEL_CV].predict_cv(dt, self.config.cv_proc_noise);
         self.filters[MODEL_CA].predict_ca(dt, self.config.ca_proc_noise);
-        self.filters[MODEL_CT].predict_ct(
-            dt,
-            self.config.turn_rate_rad_s,
-            self.config.ct_proc_noise,
-        );
+        let ca = &self.filters[MODEL_CA];
+        let cross = ca.state[3] * ca.accel[1] - ca.state[4] * ca.accel[0];
+        let omega = if cross.abs() > 1e-3 {
+            self.config.turn_rate_rad_s.abs().copysign(cross)
+        } else {
+            self.config.turn_rate_rad_s
+        };
+        self.filters[MODEL_CT].predict_ct(dt, omega, self.config.ct_proc_noise);
     }
 }
 
@@ -412,6 +418,9 @@ impl ImmFilter {
 impl ImmFilter {
     /// Step full IMM cycle: mix -> predict -> update.
     pub fn step(&mut self, dt: f64, z: [f64; 3]) -> [f64; 6] {
+        if !dt.is_finite() || dt <= 0.0 {
+            return self.fused_state();
+        }
         self.mix();
         self.predict(dt);
         self.update(z);
