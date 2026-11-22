@@ -273,33 +273,34 @@ fn utm_unproject_point(coord: &UtmCoord) -> (f64, f64) {
 /// assert_eq!(lat_to_mgrs_band(84.0).unwrap(), 'X');
 /// assert!(lat_to_mgrs_band(85.0).is_err());
 /// ```
+pub(crate) const MGRS_COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
+pub(crate) const MGRS_ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
+pub(crate) const MGRS_BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
+
 pub fn lat_to_mgrs_band(lat_deg: f64) -> Result<char, GridError> {
     if !(-80.0..=84.0).contains(&lat_deg) {
         return Err(GridError::InvalidLatitude);
     }
-    const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
     let idx = if lat_deg >= 80.0 {
         19
     } else {
         ((lat_deg + 80.0) / 8.0).floor() as usize
     };
-    Ok(BANDS[idx.min(BANDS.len() - 1)] as char)
+    Ok(MGRS_BANDS[idx.min(MGRS_BANDS.len() - 1)] as char)
 }
 
-fn mgrs_100k_col_letter(zone: u8, easting: f64) -> char {
+pub(crate) fn mgrs_100k_col_letter(zone: u8, easting: f64) -> char {
     const SET_ORIGIN: [usize; 3] = [0, 8, 16];
     let set_idx = ((zone - 1) % 3) as usize;
     let base_idx = SET_ORIGIN[set_idx];
     let col_idx = ((easting / 100000.0).floor() as usize).saturating_sub(1);
-    const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
-    COLS[(base_idx + col_idx) % COLS.len()] as char
+    MGRS_COLS[(base_idx + col_idx) % MGRS_COLS.len()] as char
 }
 
-fn mgrs_100k_row_letter(zone: u8, northing: f64) -> char {
+pub(crate) fn mgrs_100k_row_letter(zone: u8, northing: f64) -> char {
     let row_offset = if (zone % 2) == 1 { 0 } else { 5 };
     let row_idx = ((northing / 100000.0).floor() as usize) % 20;
-    const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
-    ROWS[(row_offset + row_idx) % ROWS.len()] as char
+    MGRS_ROWS[(row_offset + row_idx) % MGRS_ROWS.len()] as char
 }
 
 /// Fixed stack buffer for zero-alloc MGRS string representation.
@@ -413,8 +414,7 @@ fn decode_100k_col(zone: u8, col: char) -> Result<f64, GridError> {
     if !col.is_ascii() {
         return Err(GridError::InvalidLongitude);
     }
-    const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
-    let c_idx = COLS
+    let c_idx = MGRS_COLS
         .iter()
         .position(|&c| c == col as u8)
         .ok_or(GridError::InvalidLongitude)?;
@@ -427,8 +427,7 @@ fn decode_100k_row(zone: u8, row: char) -> Result<f64, GridError> {
     if !row.is_ascii() {
         return Err(GridError::InvalidLatitude);
     }
-    const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
-    let r_idx = ROWS
+    let r_idx = MGRS_ROWS
         .iter()
         .position(|&r| r == row as u8)
         .ok_or(GridError::InvalidLatitude)?;
@@ -441,8 +440,7 @@ fn band_to_approx_northing(band: char) -> Result<(char, f64), GridError> {
     if !band.is_ascii() {
         return Err(GridError::InvalidLatitude);
     }
-    const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
-    let b_pos = BANDS
+    let b_pos = MGRS_BANDS
         .iter()
         .position(|&b| b == band as u8)
         .ok_or(GridError::InvalidLatitude)?;
