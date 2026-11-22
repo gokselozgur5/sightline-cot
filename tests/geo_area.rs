@@ -84,6 +84,8 @@ fn test_spherical_area_antimeridian_and_planar_limit() {
     let a_sphere = spherical_polygon_area(&poly).unwrap();
     let p_sphere = spherical_polygon_perimeter(&poly).unwrap();
     assert!(a_sphere > 0.0 && p_sphere > 0.0);
+    let expected_area = 24_729_946_633.9;
+    assert!((a_sphere - expected_area).abs() < 1.0);
 }
 
 #[test]
