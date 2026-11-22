@@ -293,6 +293,26 @@ impl SymbolStatus {
     pub fn code(&self) -> u8 {
         *self as u8
     }
+
+    pub fn from_char(c: char) -> Result<Self, SidcParseError> {
+        match c {
+            '0' | 'P' => Ok(Self::Present),
+            '1' | 'A' => Ok(Self::Planned),
+            '2' => Ok(Self::PresentFullyCapable),
+            '3' => Ok(Self::PresentDamaged),
+            '4' => Ok(Self::PresentDestroyed),
+            '5' => Ok(Self::PresentFullToCapacity),
+            _ => Err(SidcParseError::InvalidStatus),
+        }
+    }
+
+    pub fn to_char(&self) -> char {
+        match self {
+            Self::Present => 'P',
+            Self::Planned => 'A',
+            _ => 'P',
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
