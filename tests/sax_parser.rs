@@ -95,3 +95,19 @@ fn proto_event_with_nan_latitude_is_rejected() {
     encode_tak_packet(&evt, &mut packet).unwrap();
     assert!(decode_tak_packet(&packet).is_err());
 }
+
+#[test]
+fn test_cot_chunk_streamer_bytes_and_whole_tag_matching() {
+    let mut streamer = CotChunkStreamer::new();
+    let noise = b"<eventlog><entry>noise</entry></eventlog>";
+    assert!(streamer.feed(noise).is_empty());
+
+    let split_utf8 = "<event uid=\"u1\"><detail name=\"café\"/></event>".as_bytes();
+    let mid = split_utf8.len() - 20;
+    let r1 = streamer.feed(&split_utf8[..mid]);
+    let r2 = streamer.feed(&split_utf8[mid..]);
+    let mut all = r1;
+    all.extend(r2);
+    assert_eq!(all.len(), 1);
+    assert!(all[0].contains("café"));
+}
