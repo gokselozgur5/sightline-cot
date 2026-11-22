@@ -36,3 +36,14 @@ fn test_integration_equatorial_sampling() {
         assert!((wp.lon - (i as f64)).abs() < 1e-6);
     }
 }
+
+#[test]
+fn test_great_circle_reference_distance_and_bearing() {
+    let jfk = Waypoint::new(40.6413, -73.7781);
+    let lhr = Waypoint::new(51.4700, -0.4543);
+    let path = GreatCirclePath::from_waypoints(&[jfk, lhr]).expect("build path");
+    let expected_dist = 5_540_018.97;
+    assert!((path.total_distance_m() - expected_dist).abs() < 1.0);
+    let initial_bearing = path.bearing_at_distance(0.0).unwrap();
+    assert!((initial_bearing - 51.3525).abs() < 1e-4);
+}
