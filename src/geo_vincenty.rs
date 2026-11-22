@@ -214,6 +214,24 @@ pub fn vincenty_inverse_ellipsoid(
             reverse_azimuth_deg: 0.0,
         });
     }
+    let pole_pair = (lat1.abs() >= 90.0 - 1e-12 && lat2.abs() >= 90.0 - 1e-12 && lat1 * lat2 < 0.0)
+        || ((lat1 + lat2).abs() < 1e-12
+            && (dlon.abs() - core::f64::consts::PI).abs() < 1e-12
+            && lat1.abs() > 1e-6);
+    if pole_pair {
+        let (a, _) = vincenty_ab_ellipsoid(1.0, ellipsoid.a, ellipsoid.b);
+        let dist = ellipsoid.b * a * core::f64::consts::PI;
+        let (fwd, rev) = if lat1 > 0.0 {
+            (180.0, 0.0)
+        } else {
+            (0.0, 180.0)
+        };
+        return Ok(VincentyInverse {
+            distance_m: dist,
+            forward_azimuth_deg: fwd,
+            reverse_azimuth_deg: rev,
+        });
+    }
     if lat1.abs() < 1e-12 && lat2.abs() < 1e-12 {
         if (dlon.abs() - core::f64::consts::PI).abs() < 1e-12 {
             return Err(VincentyError::NoConvergence);
