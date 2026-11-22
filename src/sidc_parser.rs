@@ -229,6 +229,41 @@ impl SymbolSet {
             _ => Err(SidcParseError::InvalidSymbolSet),
         }
     }
+
+    pub fn to_2525d_code(&self) -> &'static str {
+        match self {
+            Self::Air => "01",
+            Self::AirMissile => "02",
+            Self::Space => "05",
+            Self::LandUnit => "10",
+            Self::LandCivilian => "11",
+            Self::LandEquipment => "15",
+            Self::LandInstallation => "20",
+            Self::SeaSurface => "30",
+            Self::Subsurface => "35",
+            Self::Activity => "40",
+            Self::Cyberspace => "60",
+            Self::Unknown => "00",
+        }
+    }
+
+    pub fn from_2525d_code(code: &str) -> Result<Self, SidcParseError> {
+        match code {
+            "00" => Ok(Self::Unknown),
+            "01" => Ok(Self::Air),
+            "02" => Ok(Self::AirMissile),
+            "05" => Ok(Self::Space),
+            "10" => Ok(Self::LandUnit),
+            "11" => Ok(Self::LandCivilian),
+            "15" => Ok(Self::LandEquipment),
+            "20" => Ok(Self::LandInstallation),
+            "30" => Ok(Self::SeaSurface),
+            "35" => Ok(Self::Subsurface),
+            "40" => Ok(Self::Activity),
+            "60" => Ok(Self::Cyberspace),
+            _ => Err(SidcParseError::InvalidSymbolSet),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
