@@ -162,6 +162,13 @@ pub enum SymbolSet {
 }
 
 impl SymbolSet {
+    #[allow(non_upper_case_globals)]
+    pub const Land: SymbolSet = SymbolSet::LandUnit;
+    #[allow(non_upper_case_globals)]
+    pub const Surface: SymbolSet = SymbolSet::SeaSurface;
+}
+
+impl SymbolSet {
     pub fn from_code(val: u8) -> Result<Self, SidcParseError> {
         match val {
             0 => Ok(Self::Unknown),
