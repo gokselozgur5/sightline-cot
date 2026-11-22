@@ -21,6 +21,8 @@ impl core::fmt::Display for SidcError {
     }
 }
 
+impl std::error::Error for SidcError {}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SidcAffiliation {
     Pending,
