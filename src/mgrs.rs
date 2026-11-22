@@ -144,7 +144,7 @@ fn utm_project_point(lat_deg: f64, lon_deg: f64, zone: u8, hemi: char) -> (f64, 
     (east, north)
 }
 
-fn meridian_arc(phi: f64, e2: f64) -> f64 {
+pub(crate) fn meridian_arc(phi: f64, e2: f64) -> f64 {
     let e4 = e2 * e2;
     let e6 = e4 * e2;
     let a0 = 1.0 - e2 / 4.0 - 3.0 * e4 / 64.0 - 5.0 * e6 / 256.0;

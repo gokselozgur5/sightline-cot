@@ -1,6 +1,6 @@
 //! UTM projection forced into a chosen zone across boundaries.
 
-use crate::mgrs::{GridError, UtmCoord};
+use crate::mgrs::{meridian_arc, GridError, UtmCoord};
 
 const WGS84_A: f64 = 6378137.0;
 const WGS84_F: f64 = 1.0 / 298.257223563;
@@ -16,16 +16,6 @@ pub fn zone_central_meridian_rad(zone: u8) -> f64 {
 
 fn normalize_dlon_rad(dlon: f64) -> f64 {
     (dlon + std::f64::consts::PI).rem_euclid(2.0 * std::f64::consts::PI) - std::f64::consts::PI
-}
-
-fn meridian_arc(phi: f64, e2: f64) -> f64 {
-    let e4 = e2 * e2;
-    let e6 = e4 * e2;
-    let a0 = 1.0 - e2 / 4.0 - 3.0 * e4 / 64.0 - 5.0 * e6 / 256.0;
-    let a2 = 3.0 * e2 / 8.0 + 3.0 * e4 / 32.0 + 45.0 * e6 / 1024.0;
-    let a4 = 15.0 * e4 / 256.0 + 45.0 * e6 / 1024.0;
-    let a6 = 35.0 * e6 / 3072.0;
-    WGS84_A * (a0 * phi - a2 * (2.0 * phi).sin() + a4 * (4.0 * phi).sin() - a6 * (6.0 * phi).sin())
 }
 
 fn compute_en_terms(lat: f64, dlon: f64, nu: f64, m: f64, ep2: f64) -> (f64, f64) {
