@@ -703,17 +703,11 @@ impl DemGrid {
         if !self.contains_en(e_m, n_m) {
             return None;
         }
-        let u = ((e_m - self.origin_e_m) / self.cell_step_m).max(0.0);
-        let v = ((n_m - self.origin_n_m) / self.cell_step_m).max(0.0);
-        let c0 = (u.floor() as usize).min(self.cols - 2);
-        let r0 = (v.floor() as usize).min(self.rows - 2);
-        let s = u - c0 as f64;
-        let t = v - r0 as f64;
-        let z00 = self.elevations[r0 * self.cols + c0];
-        let z10 = self.elevations[r0 * self.cols + c0 + 1];
-        let z01 = self.elevations[(r0 + 1) * self.cols + c0];
-        let z11 = self.elevations[(r0 + 1) * self.cols + c0 + 1];
-        Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
+        let u = (e_m - self.origin_e_m) / self.cell_step_m;
+        let v = (n_m - self.origin_n_m) / self.cell_step_m;
+        crate::dem_bilinear::sample_bilinear_cells(u, v, self.cols, self.rows, false, |c, r| {
+            (c < self.cols && r < self.rows).then(|| self.elevations[r * self.cols + c])
+        })
     }
 
     fn bisect_dem(
