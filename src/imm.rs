@@ -326,32 +326,53 @@ impl ImmFilter {
         }
         let old = self.filters.clone();
         for j in 0..NUM_MODELS {
-            let mut st = [0.0; 6];
+            let mut m9 = [0.0; 9];
             for i in 0..NUM_MODELS {
+                let acc = if j == MODEL_CA && i != MODEL_CA {
+                    old[MODEL_CA].accel.map(|v| 0.95 * v)
+                } else {
+                    old[i].accel
+                };
                 for k in 0..6 {
-                    st[k] += mu[i][j] * old[i].state[k];
+                    m9[k] += mu[i][j] * old[i].state[k];
+                }
+                for k in 0..3 {
+                    m9[k + 6] += mu[i][j] * acc[k];
                 }
             }
-            self.filters[j].state = st;
-            self.filters[j].cov = mixed_cov(&old, &mu, j, &st);
+            self.filters[j].state.copy_from_slice(&m9[..6]);
+            self.filters[j].accel.copy_from_slice(&m9[6..]);
+            self.filters[j].set_cov9(mixed_cov(&old, &mu, j, &m9));
         }
     }
 }
 
-/// Mixed covariance for model j, including the spread-of-means term.
+/// Mixed 9x9 covariance for model j, including the spread-of-means term.
 fn mixed_cov(
     old: &[SubFilter; NUM_MODELS],
     mu: &[[f64; NUM_MODELS]; NUM_MODELS],
     j: usize,
-    mean: &[f64; 6],
-) -> [[f64; 6]; 6] {
-    let mut cov = [[0.0; 6]; 6];
+    mean: &[f64; 9],
+) -> [[f64; 9]; 9] {
+    let mut cov = [[0.0; 9]; 9];
     for i in 0..NUM_MODELS {
-        for r in 0..6 {
-            let dr = old[i].state[r] - mean[r];
-            for c in 0..6 {
-                let dc = old[i].state[c] - mean[c];
-                cov[r][c] += mu[i][j] * (old[i].cov[r][c] + dr * dc);
+        let mut p = old[i].cov9();
+        let acc = if j == MODEL_CA && i != MODEL_CA {
+            for r in 0..3 {
+                for c in 0..3 {
+                    p[r + 6][c + 6] = old[MODEL_CA].cov_aa[r][c];
+                }
+            }
+            old[MODEL_CA].accel.map(|v| 0.95 * v)
+        } else {
+            old[i].accel
+        };
+        let x: [f64; 9] =
+            core::array::from_fn(|k| if k < 6 { old[i].state[k] } else { acc[k - 6] });
+        for r in 0..9 {
+            let dr = x[r] - mean[r];
+            for c in 0..9 {
+                cov[r][c] += mu[i][j] * (p[r][c] + dr * (x[c] - mean[c]));
             }
         }
     }
