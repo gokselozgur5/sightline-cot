@@ -28,12 +28,16 @@ extern "C" {
 typedef struct SightlineEngine SightlineEngine;
 
 typedef struct {
+    /* fx, fy, cx, cy: focal lengths and principal point.
+     * k1, k2: distortion coefficients (used only when is_fisheye == 1).
+     * is_fisheye: 0 for pinhole (k1/k2 ignored), 1 for equidistant fisheye. */
     double fx, fy, cx, cy, k1, k2;
     int32_t is_fisheye;
     /* roll_rad: roll about optical axis (rad).
      * pitch_rad: pitch elevation angle (rad).
      * yaw_rad: counter-clockwise rotation about ENU Up axis (rad; 0 = East, +pi/2 = North).
-     * Note: unlike platform heading/azimuth (clockwise from North), yaw_rad is CCW from East. */
+     * Note: unlike platform heading/azimuth (clockwise from North), yaw_rad is CCW from East.
+     * cam_up_m must be strictly greater than ground_up_m to permit ray-ground intersection. */
     double roll_rad, pitch_rad, yaw_rad, cam_up_m, ground_up_m;
     double pixel_sigma_px, attitude_sigma_rad;
     double ref_lat_deg, ref_lon_deg, ref_hae_m;
