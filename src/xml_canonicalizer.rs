@@ -170,7 +170,6 @@ impl CotSchemaValidator {
         let mut tag_stack: Vec<String> = Vec::new();
         let mut root_seen = false;
         let mut point_seen = false;
-        let mut event_attrs: Option<Vec<XmlAttribute>> = None;
 
         for token in tokens {
             match token {
@@ -204,7 +203,6 @@ impl CotSchemaValidator {
                         }
                         root_seen = true;
                         Self::validate_event_attributes(&attributes)?;
-                        event_attrs = Some(attributes.clone());
                     } else if local_name == "point" {
                         let parent = tag_stack.last().map(|s| strip_prefix(s)).unwrap_or("");
                         if parent == "event" {
@@ -252,7 +250,6 @@ impl CotSchemaValidator {
             return Err(CotValidationError::MissingRequiredElement("point"));
         }
 
-        let _ = event_attrs;
         Ok(())
     }
 
