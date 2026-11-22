@@ -14,6 +14,9 @@ pub fn validate_transition_row(
     row: &[f64; NUM_MODELS],
     tol: f64,
 ) -> Result<(), TransitionUpdateError> {
+    if !tol.is_finite() {
+        return Err(TransitionUpdateError::NonFinite);
+    }
     for &p in row.iter() {
         if !p.is_finite() {
             return Err(TransitionUpdateError::NonFinite);
