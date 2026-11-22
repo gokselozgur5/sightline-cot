@@ -66,6 +66,7 @@ impl SubFilter {
         for i in 0..3 {
             self.state[i] += self.state[i + 3] * dt;
         }
+        (self.accel, self.cov_pa, self.cov_aa) = ([0.0; 3], [[0.0; 3]; 6], [[0.0; 3]; 3]);
         let mut f = [[0.0; 6]; 6];
         for i in 0..6 {
             f[i][i] = 1.0;
@@ -189,6 +190,7 @@ impl SubFilter {
         let (s, c) = (omega * dt).sin_cos();
         self.state[3] = c * vx - s * vy;
         self.state[4] = s * vx + c * vy;
+        (self.accel, self.cov_pa, self.cov_aa) = ([0.0; 3], [[0.0; 3]; 6], [[0.0; 3]; 3]);
         let mut f = [[0.0; 6]; 6];
         for i in 0..6 {
             f[i][i] = 1.0;
@@ -207,13 +209,20 @@ impl SubFilter {
     /// Scalar Kalman update of the full state from position axis `i`,
     /// given innovation `y` and innovation variance `s`.
     pub fn update_axis(&mut self, i: usize, y: f64, s: f64) {
-        let col: [f64; 6] = core::array::from_fn(|k| self.cov[k][i]);
+        let mut p = self.cov9();
+        let col: [f64; 9] = core::array::from_fn(|k| p[k][i]);
         for a in 0..6 {
             self.state[a] += col[a] / s * y;
-            for b in 0..6 {
-                self.cov[a][b] -= col[a] * col[b] / s;
+        }
+        for a in 0..3 {
+            self.accel[a] += col[a + 6] / s * y;
+        }
+        for a in 0..9 {
+            for b in 0..9 {
+                p[a][b] -= col[a] * col[b] / s;
             }
         }
+        self.set_cov9(p);
     }
 }
 
