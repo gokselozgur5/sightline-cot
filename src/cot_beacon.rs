@@ -229,14 +229,10 @@ fn escape_xml(s: &str) -> String {
     out
 }
 
-fn format_iso8601(epoch_ms: i64) -> String {
-    crate::cot::format_iso8601_utc(epoch_ms)
-}
-
 impl EmergencyBeacon {
     pub fn to_cot_xml(&self) -> String {
-        let time_str = format_iso8601(self.time_ms);
-        let stale_str = format_iso8601(self.time_ms + self.stale_sec * 1000);
+        let time_str = crate::cot::format_iso8601_utc(self.time_ms);
+        let stale_str = crate::cot::format_iso8601_utc(self.time_ms + self.stale_sec * 1000);
         let cot_type = self.emergency_type.default_cot_type();
         let desc = self
             .details
