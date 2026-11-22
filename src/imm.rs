@@ -32,25 +32,30 @@ impl Default for ImmConfig {
     }
 }
 
-/// Single 6-DoF kinematic Kalman sub-filter.
+/// Single kinematic Kalman sub-filter with 3D position, velocity, and acceleration.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SubFilter {
     pub state: [f64; 6],
     pub cov: [[f64; 6]; 6],
+    pub accel: [f64; 3],
+    pub cov_pa: [[f64; 3]; 6],
+    pub cov_aa: [[f64; 3]; 3],
 }
 
 impl SubFilter {
     pub fn new(init_pos: [f64; 3], pos_var: f64, vel_var: f64) -> Self {
-        let mut cov = [[0.0; 6]; 6];
-        cov[0][0] = pos_var;
-        cov[1][1] = pos_var;
-        cov[2][2] = pos_var;
-        cov[3][3] = vel_var;
-        cov[4][4] = vel_var;
-        cov[5][5] = vel_var;
+        let (mut cov, mut cov_aa) = ([[0.0; 6]; 6], [[0.0; 3]; 3]);
+        for i in 0..3 {
+            cov[i][i] = pos_var;
+            cov[i + 3][i + 3] = vel_var;
+            cov_aa[i][i] = 10.0 * vel_var;
+        }
         Self {
             state: [init_pos[0], init_pos[1], init_pos[2], 0.0, 0.0, 0.0],
             cov,
+            accel: [0.0; 3],
+            cov_pa: [[0.0; 3]; 6],
+            cov_aa,
         }
     }
 }
@@ -62,7 +67,9 @@ impl SubFilter {
             self.state[i] += self.state[i + 3] * dt;
         }
         let mut f = [[0.0; 6]; 6];
-        for i in 0..6 { f[i][i] = 1.0; }
+        for i in 0..6 {
+            f[i][i] = 1.0;
+        }
         (f[0][3], f[1][4], f[2][5]) = (dt, dt, dt);
         self.cov = propagate_cov(&f, &self.cov);
         let dt2 = dt * dt;
@@ -82,7 +89,9 @@ impl SubFilter {
             self.state[i] += self.state[i + 3] * dt;
         }
         let mut f = [[0.0; 6]; 6];
-        for i in 0..6 { f[i][i] = 1.0; }
+        for i in 0..6 {
+            f[i][i] = 1.0;
+        }
         (f[0][3], f[1][4], f[2][5]) = (dt, dt, dt);
         self.cov = propagate_cov(&f, &self.cov);
         let dt2 = dt * dt;
