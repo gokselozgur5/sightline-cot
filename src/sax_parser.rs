@@ -560,7 +560,7 @@ pub const DEFAULT_MAX_EVENT_SIZE: usize = 1024 * 1024;
 /// Buffer-based chunk streaming receiver for fragmented CoT data streams.
 #[derive(Debug)]
 pub struct CotChunkStreamer {
-    buffer: String,
+    buffer: Vec<u8>,
     max_event_size: usize,
 }
 
@@ -579,23 +579,49 @@ impl CotChunkStreamer {
     /// Create a new chunk streamer with a custom maximum event size.
     pub fn with_max_event_size(max_event_size: usize) -> Self {
         Self {
-            buffer: String::new(),
+            buffer: Vec::new(),
             max_event_size,
         }
     }
 
-    /// Feed an incoming chunk of XML bytes/characters into the streamer.
+    /// Feed an incoming chunk of XML bytes into the streamer.
     ///
     /// Returns extracted complete CoT XML event strings.
-    pub fn feed(&mut self, chunk: &str) -> Vec<String> {
-        self.buffer.push_str(chunk);
+    pub fn feed<B: AsRef<[u8]>>(&mut self, chunk: B) -> Vec<String> {
+        self.buffer.extend_from_slice(chunk.as_ref());
         let mut completed = Vec::new();
 
         loop {
-            let start_idx = match self.buffer.find("<event") {
-                Some(idx) => idx,
+            let start_info = {
+                let mut found = None;
+                let mut i = 0;
+                while i < self.buffer.len() {
+                    let sub = &self.buffer[i..];
+                    if let Some(pos) = sub.windows(6).position(|w| w == b"<event") {
+                        let idx = i + pos;
+                        let after = idx + 6;
+                        if after < self.buffer.len() {
+                            let b = self.buffer[after];
+                            if b.is_ascii_whitespace() || b == b'/' || b == b'>' {
+                                found = Some((idx, false));
+                                break;
+                            }
+                            i = idx + 1;
+                        } else {
+                            found = Some((idx, true));
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                found
+            };
+
+            let (start_idx, partial) = match start_info {
+                Some((idx, partial)) => (idx, partial),
                 None => {
-                    let prefixes = ["<event", "<even", "<eve", "<ev", "<e", "<"];
+                    let prefixes: [&[u8]; 6] = [b"<event", b"<even", b"<eve", b"<ev", b"<e", b"<"];
                     let mut keep = 0;
                     for p in prefixes {
                         if self.buffer.ends_with(p) {
@@ -613,28 +639,42 @@ impl CotChunkStreamer {
                 }
             };
 
-            let end_pattern = "</event>";
-            let end_idx = match self.buffer[start_idx..].find('>') {
-                Some(rel) if self.buffer[start_idx..start_idx + rel].ends_with('/') => {
+            if partial {
+                if start_idx > 0 {
+                    self.buffer.drain(..start_idx);
+                }
+                break;
+            }
+
+            let end_pattern = b"</event>";
+            let end_idx = match self.buffer[start_idx..].iter().position(|&b| b == b'>') {
+                Some(rel) if self.buffer[start_idx..start_idx + rel].ends_with(b"/") => {
                     start_idx + rel + 1
                 }
-                _ => match self.buffer[start_idx..].find(end_pattern) {
-                    Some(rel) => start_idx + rel + end_pattern.len(),
-                    None => {
-                        if start_idx > 0 {
-                            self.buffer.drain(..start_idx);
+                _ => {
+                    let slice = &self.buffer[start_idx..];
+                    match slice
+                        .windows(end_pattern.len())
+                        .position(|w| w == end_pattern)
+                    {
+                        Some(rel) => start_idx + rel + end_pattern.len(),
+                        None => {
+                            if start_idx > 0 {
+                                self.buffer.drain(..start_idx);
+                            }
+                            if self.buffer.len() > self.max_event_size {
+                                self.buffer
+                                    .drain(..self.buffer.len() - (end_pattern.len() - 1));
+                            }
+                            break;
                         }
-                        if self.buffer.len() > self.max_event_size {
-                            self.buffer
-                                .drain(..self.buffer.len() - (end_pattern.len() - 1));
-                        }
-                        break;
                     }
-                },
+                }
             };
 
-            let event_xml = self.buffer[start_idx..end_idx].to_string();
-            completed.push(event_xml);
+            if let Ok(event_xml) = std::str::from_utf8(&self.buffer[start_idx..end_idx]) {
+                completed.push(event_xml.to_string());
+            }
             self.buffer.drain(..end_idx);
         }
 
