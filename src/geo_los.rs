@@ -69,9 +69,11 @@ impl LosGeometry {
     }
 }
 
-pub const WGS84_MEAN_RADIUS_M: f64 = 6_371_000.0;
+pub use crate::los::WGS84_EARTH_RADIUS_M as WGS84_MEAN_RADIUS_M;
 
 /// Compute geometric horizon line-of-sight limit distance between two heights above ground.
+///
+/// Uses geometric propagation (k = 0) with standard spherical earth radius WGS84_MEAN_RADIUS_M.
 pub fn horizon_distance_m(h1_m: f64, h2_m: f64) -> Result<f64, GeoLosError> {
     if !h1_m.is_finite() || !h2_m.is_finite() {
         return Err(GeoLosError::NonFiniteCoordinate);
