@@ -12,6 +12,10 @@ fn test_flinders_peak_to_buninyong() {
         "distance diff {} >= 1mm",
         (inv.distance_m - 54972.271).abs()
     );
+    let expected_fwd = 306.0 + 52.0 / 60.0 + 5.37 / 3600.0;
+    let expected_rev = 127.0 + 10.0 / 60.0 + 25.07 / 3600.0;
+    assert!((inv.forward_azimuth_deg - expected_fwd).abs() < 1e-4);
+    assert!((inv.reverse_azimuth_deg - expected_rev).abs() < 1e-4);
 }
 
 #[test]
