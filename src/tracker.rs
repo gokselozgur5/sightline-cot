@@ -368,6 +368,7 @@ pub struct MultiTargetTracker {
     pub min_hits: usize,
     pub max_age: usize,
     pub q_acc: f64,
+    pub assoc_config: crate::track_assoc::AssocConfig,
 }
 
 impl Default for MultiTargetTracker {
@@ -379,12 +380,28 @@ impl Default for MultiTargetTracker {
 impl MultiTargetTracker {
     /// Create a new MultiTargetTracker with tracking parameters.
     pub fn new(min_hits: usize, max_age: usize, q_acc: f64) -> Self {
+        Self::with_assoc_config(
+            min_hits,
+            max_age,
+            q_acc,
+            crate::track_assoc::AssocConfig::default(),
+        )
+    }
+
+    /// Create a new MultiTargetTracker with tracking parameters and association configuration.
+    pub fn with_assoc_config(
+        min_hits: usize,
+        max_age: usize,
+        q_acc: f64,
+        assoc_config: crate::track_assoc::AssocConfig,
+    ) -> Self {
         Self {
             next_id: 1,
             tracks: Vec::new(),
             min_hits,
             max_age,
             q_acc,
+            assoc_config,
         }
     }
 }
@@ -411,56 +428,24 @@ impl MultiTargetTracker {
 }
 
 impl MultiTargetTracker {
-    #[allow(dead_code)]
-    fn find_best_detection(
-        trk: &Track,
-        detections: &[Detection],
-        matched_dets: &[bool],
-    ) -> Option<(usize, f64)> {
-        let mut best: Option<(usize, f64)> = None;
-        for (d_idx, det) in detections.iter().enumerate() {
-            if matched_dets[d_idx] {
-                continue;
-            }
-            if let Some(cost) = Self::score_candidate(trk, det) {
-                if best.is_none() || cost < best.unwrap().1 {
-                    best = Some((d_idx, cost));
-                }
-            }
-        }
-        best
-    }
-}
-
-impl MultiTargetTracker {
     /// Associate detections with existing tracks using gated minimum cost.
     fn associate(&self, detections: &[Detection]) -> (Vec<(usize, usize)>, Vec<usize>, Vec<usize>) {
-        let mut candidates = Vec::new();
+        let mut mat =
+            crate::track_assoc::DistanceMatrix::new(self.tracks.len(), detections.len(), 1e9);
         for (t_idx, trk) in self.tracks.iter().enumerate() {
             for (d_idx, det) in detections.iter().enumerate() {
                 if let Some(cost) = Self::score_candidate(trk, det) {
-                    candidates.push((cost, t_idx, d_idx));
+                    let _ = mat.set(t_idx, d_idx, cost);
                 }
             }
         }
-        candidates.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
-        let mut matches = Vec::new();
-        let mut matched_tracks = vec![false; self.tracks.len()];
-        let mut matched_dets = vec![false; detections.len()];
-        for (_, t_idx, d_idx) in candidates {
-            if !matched_tracks[t_idx] && !matched_dets[d_idx] {
-                matches.push((t_idx, d_idx));
-                matched_tracks[t_idx] = true;
-                matched_dets[d_idx] = true;
-            }
-        }
-        let unmatched_tracks = (0..self.tracks.len())
-            .filter(|&i| !matched_tracks[i])
+        let res = crate::track_assoc::solve_nearest_neighbor(&mat, 5.991 + 2.0);
+        let matches = res
+            .matches
+            .into_iter()
+            .map(|m| (m.track_idx, m.det_idx))
             .collect();
-        let unmatched_dets = (0..detections.len())
-            .filter(|&i| !matched_dets[i])
-            .collect();
-        (matches, unmatched_tracks, unmatched_dets)
+        (matches, res.unmatched_tracks, res.unmatched_dets)
     }
 }
 
