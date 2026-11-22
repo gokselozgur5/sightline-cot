@@ -46,3 +46,18 @@ fn test_pinhole_unproject_squared_norm_overflow() {
     let norm = (ray[0] * ray[0] + ray[1] * ray[1] + ray[2] * ray[2]).sqrt();
     assert!((norm - 1.0).abs() < 1e-12);
 }
+
+#[test]
+fn test_dem_grid_bilinear_interpolation_contract() {
+    let elevations = vec![
+        10.0, 20.0,
+        30.0, 40.0,
+    ];
+    let grid = sightline_cot::camera::DemGrid::new(0.0, 0.0, 10.0, 2, 2, elevations).unwrap();
+    assert_eq!(grid.elevation_at(0.0, 0.0), Some(10.0));
+    assert_eq!(grid.elevation_at(10.0, 0.0), Some(20.0));
+    assert_eq!(grid.elevation_at(0.0, 10.0), Some(30.0));
+    assert_eq!(grid.elevation_at(10.0, 10.0), Some(40.0));
+    let mid = grid.elevation_at(5.0, 5.0).unwrap();
+    assert!((mid - 25.0).abs() < 1e-9);
+}
