@@ -43,6 +43,12 @@ impl Default for AssocConfig {
 }
 
 impl AssocConfig {
+    /// Compute combined association cost from spatial distance, bounding box IoU, and embedding cosine distance.
+    pub fn compute_cost(&self, spatial_dist: f64, iou: f64, cosine_dist: f64) -> f64 {
+        self.spatial_weight * spatial_dist
+            + self.iou_weight * (1.0 - iou).max(0.0)
+            + self.cosine_weight * cosine_dist
+    }
     pub fn validate(&self) -> Result<(), AssocError> {
         if !self.gate_threshold.is_finite()
             || !self.spatial_weight.is_finite()
