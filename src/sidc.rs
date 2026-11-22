@@ -60,8 +60,6 @@ pub struct TacticalSymbol {
     pub version: SidcVersion,
     pub affiliation: SidcAffiliation,
     pub domain: SidcDomain,
-    pub entity_code: u32,
-    pub modifier: u8,
 }
 
 impl Default for TacticalSymbol {
@@ -70,8 +68,6 @@ impl Default for TacticalSymbol {
             version: SidcVersion::MilStd2525D,
             affiliation: SidcAffiliation::Unknown,
             domain: SidcDomain::Land,
-            entity_code: 120100,
-            modifier: 0,
         }
     }
 }
@@ -279,8 +275,6 @@ impl TacticalSymbol {
             version: SidcVersion::MilStd2525D,
             affiliation: aff,
             domain: dom,
-            entity_code: 0,
-            modifier: 0,
         })
     }
 }
@@ -294,8 +288,6 @@ impl TacticalSymbol {
             version: SidcVersion::Legacy2525C,
             affiliation: aff,
             domain: dom,
-            entity_code: 0,
-            modifier: 0,
         })
     }
 }
@@ -328,8 +320,6 @@ impl TacticalSymbol {
             version: SidcVersion::MilStd2525D,
             affiliation: aff,
             domain: dom,
-            entity_code: 0,
-            modifier: 0,
         }
     }
 }
@@ -362,8 +352,6 @@ mod tests {
             version: SidcVersion::MilStd2525D,
             affiliation: SidcAffiliation::Friend,
             domain: SidcDomain::Air,
-            entity_code: 0,
-            modifier: 0,
         };
         let buf = sym.to_2525d();
         assert_eq!(buf.len(), 30);
@@ -383,8 +371,6 @@ mod tests_c {
             version: SidcVersion::Legacy2525C,
             affiliation: SidcAffiliation::Hostile,
             domain: SidcDomain::Surface,
-            entity_code: 0,
-            modifier: 0,
         };
         let buf = sym.to_2525c();
         assert_eq!(buf.len(), 15);
