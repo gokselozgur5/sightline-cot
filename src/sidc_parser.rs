@@ -382,6 +382,15 @@ impl Echelon {
     pub fn code(&self) -> u8 {
         *self as u8
     }
+
+    pub fn to_2525d_code(&self) -> String {
+        format!("{:02}", self.code())
+    }
+
+    pub fn from_2525d_code(code: &str) -> Result<Self, SidcParseError> {
+        let val: u8 = code.parse().map_err(|_| SidcParseError::InvalidEchelon)?;
+        Self::from_code(val)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
