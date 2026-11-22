@@ -151,3 +151,23 @@ fn test_equatorial_near_180_convergence() {
     assert!((inv.forward_azimuth_deg - 90.0).abs() < 1e-6);
     assert!((inv.reverse_azimuth_deg - 270.0).abs() < 1e-6);
 }
+
+#[test]
+fn test_pole_to_pole_and_antimeridian_coincident() {
+    let same = vincenty_inverse(0.0, -180.0, 0.0, 180.0).expect("coincident antimeridian");
+    assert_eq!(same.distance_m, 0.0);
+
+    let pole_pair = vincenty_inverse(90.0, 0.0, -90.0, 0.0).expect("pole-to-pole pair");
+    assert!(
+        (pole_pair.distance_m - 20003931.46).abs() < 0.01,
+        "got {}",
+        pole_pair.distance_m
+    );
+
+    let near_polar = vincenty_inverse(-89.999, 10.0, 89.999, -170.0).expect("near-polar pair");
+    assert!(
+        (near_polar.distance_m - 20003931.46).abs() < 0.01,
+        "got {}",
+        near_polar.distance_m
+    );
+}
