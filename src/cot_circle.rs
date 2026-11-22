@@ -222,10 +222,7 @@ impl CotCircle {
 }
 
 fn extract_attr(tag: &str, attr: &str) -> Option<String> {
-    let needle = format!("{attr}=\"");
-    let start = tag.find(&needle)? + needle.len();
-    let end = tag[start..].find('"')?;
-    Some(tag[start..start + end].to_string())
+    crate::cot::find_attr_in_tag(tag, attr).map(|s| s.to_string())
 }
 
 fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
