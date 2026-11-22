@@ -234,19 +234,11 @@ impl GeoTiffElevationGrid {
         if !self.contains(x, y) {
             return None;
         }
-        let u = ((x - self.origin_x) / self.step_x).max(0.0);
-        let v = ((y - self.origin_y) / self.step_y).max(0.0);
-        let col0 = (u.floor() as usize).min(self.cols - 2);
-        let row0 = (v.floor() as usize).min(self.rows - 2);
-        let s = (u - col0 as f64).clamp(0.0, 1.0);
-        let t = (v - row0 as f64).clamp(0.0, 1.0);
-
-        let z00 = self.get_node(col0, row0)?;
-        let z10 = self.get_node(col0 + 1, row0)?;
-        let z01 = self.get_node(col0, row0 + 1)?;
-        let z11 = self.get_node(col0 + 1, row0 + 1)?;
-
-        Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
+        let u = (x - self.origin_x) / self.step_x;
+        let v = (y - self.origin_y) / self.step_y;
+        crate::dem_bilinear::sample_bilinear_cells(u, v, self.cols, self.rows, false, |c, r| {
+            self.get_node(c, r)
+        })
     }
 
     /// Sample elevation using specified interpolation method.
