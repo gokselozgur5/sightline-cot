@@ -74,9 +74,12 @@ pub use mgrs_parse::{
 pub mod mil_std;
 pub mod proto;
 pub mod rhumb_line;
+pub use rhumb_line as geo_rhumb;
 pub use rhumb_line::{
-    great_circle_distance, interpolate_by_count, interpolate_by_step, rhumb_distance_and_bearing,
-    rhumb_intermediate_fraction, RhumbLineError, RhumbPath, RhumbSegmentComparison, RhumbWaypoint,
+    great_circle_distance, interpolate_by_count, interpolate_by_step, rhumb_bearing,
+    rhumb_destination, rhumb_destination_radius, rhumb_distance, rhumb_distance_and_bearing,
+    rhumb_distance_radius, rhumb_intermediate, rhumb_intermediate_fraction, RhumbLineError,
+    RhumbPath, RhumbSegmentComparison, RhumbWaypoint,
 };
 pub mod sidc;
 pub mod stanag4609;
@@ -131,7 +134,6 @@ pub mod geo_perimeter;
 pub mod geo_polyline;
 pub mod geo_polyline_nearest;
 pub mod geo_radii;
-pub mod geo_rhumb;
 pub mod geo_simplify;
 pub mod geoid_loader;
 pub use geo_simplify::{simplify_polyline, LocalFrame};
