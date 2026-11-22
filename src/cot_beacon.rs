@@ -214,20 +214,6 @@ impl EmergencyBeacon {
     }
 }
 
-fn escape_xml(s: &str) -> String {
-    let mut out = String::with_capacity(s.len() + 8);
-    for c in s.chars() {
-        match c {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            '\'' => out.push_str("&apos;"),
-            _ => out.push(c),
-        }
-    }
-    out
-}
 
 impl EmergencyBeacon {
     pub fn to_cot_xml(&self) -> String {
@@ -240,7 +226,7 @@ impl EmergencyBeacon {
             .unwrap_or(self.emergency_type.as_str());
         format!(
             "<event version=\"2.0\" uid=\"{uid}\" type=\"{cot_type}\" how=\"m-g\" time=\"{time_str}\" start=\"{time_str}\" stale=\"{stale_str}\"><point lat=\"{lat:.7}\" lon=\"{lon:.7}\" hae=\"{hae:.2}\" ce=\"{ce:.2}\" le=\"{le:.2}\"/><detail><contact callsign=\"{callsign}\"/><emergency cancel=\"{cancel}\" type=\"{etype}\">{desc}</emergency></detail></event>",
-            uid = escape_xml(&self.uid),
+            uid = crate::cot::escape_xml_attr(&self.uid),
             cot_type = cot_type,
             time_str = time_str,
             stale_str = stale_str,
@@ -249,10 +235,10 @@ impl EmergencyBeacon {
             hae = self.hae_m,
             ce = self.ce_m,
             le = self.le_m,
-            callsign = escape_xml(&self.callsign),
+            callsign = crate::cot::escape_xml_attr(&self.callsign),
             cancel = self.cancel,
-            etype = escape_xml(self.emergency_type.as_str()),
-            desc = escape_xml(desc),
+            etype = crate::cot::escape_xml_attr(self.emergency_type.as_str()),
+            desc = crate::cot::escape_xml_attr(desc),
         )
     }
 }
