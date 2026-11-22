@@ -3,6 +3,9 @@
 /// Default mean Earth radius in meters (WGS84 spherical approximation).
 pub use crate::geo_greatcircle::EARTH_RADIUS_M;
 
+/// WGS84 mean spherical Earth radius alias in meters.
+pub const WGS84_EARTH_RADIUS: f64 = EARTH_RADIUS_M;
+
 /// Maximum number of samples allowed along an interpolated path.
 pub const MAX_SAMPLE_COUNT: usize = 100_000;
 
@@ -58,6 +61,64 @@ fn unwrap_lon_diff_rad(lon1_deg: f64, lon2_deg: f64) -> f64 {
     diff.to_radians()
 }
 
+/// Computes the rhumb line distance between two `[lat, lon]` points on a custom sphere radius.
+pub fn rhumb_distance_radius(p1: [f64; 2], p2: [f64; 2], radius: f64) -> f64 {
+    let (lat1, lat2) = (p1[0].to_radians(), p2[0].to_radians());
+    let dlat = lat2 - lat1;
+    let dlon = unwrap_lon_diff_rad(p1[1], p2[1]);
+    let dpsi = mercator_project(lat2) - mercator_project(lat1);
+    let q = if dpsi.abs() < 1e-12 {
+        lat1.cos()
+    } else {
+        dlat / dpsi
+    };
+    radius * (dlat * dlat + q * q * dlon * dlon).sqrt()
+}
+
+/// Computes the rhumb line distance between two `[lat, lon]` points on WGS84 mean radius.
+pub fn rhumb_distance(p1: [f64; 2], p2: [f64; 2]) -> f64 {
+    rhumb_distance_radius(p1, p2, EARTH_RADIUS_M)
+}
+
+/// Computes the constant rhumb line bearing in degrees in `[0, 360)`.
+pub fn rhumb_bearing(p1: [f64; 2], p2: [f64; 2]) -> f64 {
+    let (lat1, lat2) = (p1[0].to_radians(), p2[0].to_radians());
+    let dlon = unwrap_lon_diff_rad(p1[1], p2[1]);
+    let dpsi = mercator_project(lat2) - mercator_project(lat1);
+    dlon.atan2(dpsi).to_degrees().rem_euclid(360.0)
+}
+
+/// Computes the destination `[lat, lon]` along a rhumb line on a custom sphere radius.
+pub fn rhumb_destination_radius(
+    start: [f64; 2],
+    bearing_deg: f64,
+    distance_m: f64,
+    radius: f64,
+) -> [f64; 2] {
+    let (lat1, lon1) = (start[0].to_radians(), start[1].to_radians());
+    let theta = bearing_deg.to_radians();
+    let delta = distance_m / radius;
+    let lat2 = (lat1 + delta * theta.cos()).clamp(-FRAC_PI_2, FRAC_PI_2);
+    let dpsi = mercator_project(lat2) - mercator_project(lat1);
+    let q = if dpsi.abs() < 1e-12 {
+        lat1.cos()
+    } else {
+        (lat2 - lat1) / dpsi
+    };
+    let dlon = if q.abs() < 1e-12 {
+        0.0
+    } else {
+        (delta * theta.sin()) / q
+    };
+    let lon2 = ((lon1 + dlon).to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    [lat2.to_degrees(), lon2]
+}
+
+/// Computes the destination `[lat, lon]` along a rhumb line on WGS84 mean radius.
+pub fn rhumb_destination(start: [f64; 2], bearing_deg: f64, distance_m: f64) -> [f64; 2] {
+    rhumb_destination_radius(start, bearing_deg, distance_m, EARTH_RADIUS_M)
+}
+
 /// Computes rhumb line distance (meters) and constant bearing (degrees).
 pub fn rhumb_distance_and_bearing(
     p1: &RhumbWaypoint,
@@ -66,18 +127,8 @@ pub fn rhumb_distance_and_bearing(
 ) -> Result<(f64, f64), RhumbLineError> {
     p1.validate()?;
     p2.validate()?;
-    let (lat1, lat2) = (p1.lat.to_radians(), p2.lat.to_radians());
-    let dlat = lat2 - lat1;
-    let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
-    let dpsi = mercator_project(lat2) - mercator_project(lat1);
-    let q = if dpsi.abs() < 1e-12 {
-        lat1.cos()
-    } else {
-        dlat / dpsi
-    };
-    let distance = radius * (dlat * dlat + q * q * dlon * dlon).sqrt();
-    let bearing = dlon.atan2(dpsi).to_degrees().rem_euclid(360.0);
-    Ok((distance, bearing))
+    let (a, b) = ([p1.lat, p1.lon], [p2.lat, p2.lon]);
+    Ok((rhumb_distance_radius(a, b, radius), rhumb_bearing(a, b)))
 }
 
 /// Computes great-circle distance between two waypoints using haversine formula.
@@ -115,6 +166,32 @@ impl RhumbSegmentComparison {
     }
 }
 
+fn rhumb_interp_raw(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2] {
+    let (lat1, lat2) = (p1[0].to_radians(), p2[0].to_radians());
+    let dlat = lat2 - lat1;
+    let dlon = unwrap_lon_diff_rad(p1[1], p2[1]);
+    let lat_f = lat1 + f * dlat;
+    let dpsi = mercator_project(lat2) - mercator_project(lat1);
+    let dlon_f = if dpsi.abs() < 1e-12 {
+        f * dlon
+    } else {
+        (mercator_project(lat_f) - mercator_project(lat1)) * (dlon / dpsi)
+    };
+    let lon_f = (p1[1] + dlon_f.to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
+    [lat_f.to_degrees(), lon_f]
+}
+
+/// Computes an intermediate `[lat, lon]` along a rhumb line clamped to `[0, 1]`.
+pub fn rhumb_intermediate(p1: [f64; 2], p2: [f64; 2], f: f64) -> [f64; 2] {
+    if f <= 0.0 {
+        return p1;
+    }
+    if f >= 1.0 {
+        return p2;
+    }
+    rhumb_interp_raw(p1, p2, f)
+}
+
 /// Computes an intermediate waypoint along a rhumb line at fraction f in [0, 1].
 pub fn rhumb_intermediate_fraction(
     p1: &RhumbWaypoint,
@@ -126,19 +203,8 @@ pub fn rhumb_intermediate_fraction(
     if !f.is_finite() || !(0.0..=1.0).contains(&f) {
         return Err(RhumbLineError::InvalidParameter);
     }
-    let lat1 = p1.lat.to_radians();
-    let lat2 = p2.lat.to_radians();
-    let dlat = lat2 - lat1;
-    let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
-    let lat_f = lat1 + f * dlat;
-    let dpsi = mercator_project(lat2) - mercator_project(lat1);
-    let dlon_f = if dpsi.abs() < 1e-12 {
-        f * dlon
-    } else {
-        (mercator_project(lat_f) - mercator_project(lat1)) * (dlon / dpsi)
-    };
-    let lon_f = (p1.lon + dlon_f.to_degrees() + 180.0).rem_euclid(360.0) - 180.0;
-    Ok(RhumbWaypoint::new(lat_f.to_degrees(), lon_f))
+    let [lat, lon] = rhumb_interp_raw([p1.lat, p1.lon], [p2.lat, p2.lon], f);
+    Ok(RhumbWaypoint::new(lat, lon))
 }
 
 /// Interpolates intermediate waypoints along a rhumb line by count.
