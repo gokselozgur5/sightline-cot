@@ -116,6 +116,7 @@ pub use geo_aer::{
 };
 pub mod geo_ecef;
 pub mod geo_frame;
+pub use geo_frame::{GeoFrameError, LocalFrame};
 pub mod geo_great_circle;
 pub mod geo_greatcircle;
 pub use geo_great_circle::{GreatCircleError, GreatCirclePath, Waypoint};
@@ -136,7 +137,7 @@ pub mod geo_polyline_nearest;
 pub mod geo_radii;
 pub mod geo_simplify;
 pub mod geoid_loader;
-pub use geo_simplify::{simplify_polyline, LocalFrame};
+pub use geo_simplify::{simplify_polyline, simplify_polyline_in_frame, PlanarFrame};
 pub mod cam_distorted_pinhole;
 pub mod geo_sphere;
 pub mod tracker;
