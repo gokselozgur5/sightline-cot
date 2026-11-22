@@ -35,3 +35,22 @@ fn apply_then_invert_round_trips() {
         }
     }
 }
+
+#[test]
+fn epsg_guidance_note_7_2_position_vector_example() {
+    let p_src = [3_657_660.66, 255_768.55, 5_201_382.11];
+    let h = HelmertParams {
+        translation_m: [0.0, 0.0, 4.5],
+        rotation_arcsec: [0.0, 0.0, 0.554],
+        scale_ppm: 0.219,
+    };
+    let target = h.apply(p_src);
+    let expected = [3_657_660.78, 255_778.43, 5_201_387.75];
+    for i in 0..3 {
+        assert!(
+            (target[i] - expected[i]).abs() < 0.01,
+            "axis {i} diff {} >= 1cm",
+            (target[i] - expected[i]).abs()
+        );
+    }
+}
