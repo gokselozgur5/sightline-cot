@@ -29,7 +29,7 @@ fn test_parallel_segments_no_intersect() {
     let p2 = [0.0, 1.0];
     let p3 = [1.0, 0.0];
     let p4 = [1.0, 1.0];
-    assert!(segments_intersect(p1, p2, p3, p4).is_none());
+    assert_eq!(segments_intersect(p1, p2, p3, p4), None);
 }
 
 use sightline_cot::geo_intersect::find_self_intersections;
@@ -55,7 +55,7 @@ fn test_closed_square_no_self_intersection() {
 #[test]
 fn test_antipodal_antimeridian_no_intersection() {
     let a = segments_intersect([0.0, 0.0], [10.0, 0.0], [5.0, -165.0], [5.0, 175.0]);
-    assert!(a.is_none());
+    assert_eq!(a, None);
 }
 
 #[test]
