@@ -127,3 +127,13 @@ fn test_trait_dispatch() {
         Some(50.0)
     );
 }
+
+#[test]
+fn test_geoid_loader_ascii_grid_interop() {
+    let ascii = "ncols 2\nnrows 2\nxllcorner 0.0\nyllcorner 0.0\ncellsize 1.0\n10.0 20.0\n30.0 40.0\n";
+    let grid = sightline_cot::geoid_loader::parse_geoid_ascii(ascii).unwrap();
+    let ortho = sightline_cot::ellipsoidal_to_orthometric(&grid, 1.0, 1.0, 125.0);
+    assert_eq!(ortho, Some(100.0));
+    let ellips = sightline_cot::orthometric_to_ellipsoidal(&grid, 1.0, 1.0, 100.0);
+    assert_eq!(ellips, Some(125.0));
+}
