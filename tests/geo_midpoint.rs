@@ -42,8 +42,9 @@ fn test_geodesic_midpoint_errors() {
 fn test_geodesic_midpoint_ellipsoid_failing_repro() {
     use sightline_cot::geo_midpoint::geodesic_midpoint_ellipsoid;
 
-    let res = geodesic_midpoint_ellipsoid(0.0, 10.0, 0.0, 20.0, 0.5);
-    assert!(res.is_ok());
+    let (lat, lon) = geodesic_midpoint_ellipsoid(0.0, 10.0, 0.0, 20.0, 0.5).unwrap();
+    assert!(lat.abs() < 1e-6);
+    assert!((lon - 15.0).abs() < 1e-6);
 }
 
 #[test]
