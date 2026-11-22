@@ -44,7 +44,7 @@ pub const WGS84_A: f64 = 6_378_137.0;
 pub const WGS84_F: f64 = 1.0 / 298.257_223_563;
 pub const WGS84_B: f64 = 6_356_752.314_245_179;
 
-fn validate_point(lat_deg: f64, lon_deg: f64) -> Result<(), VincentyError> {
+pub(crate) fn validate_point(lat_deg: f64, lon_deg: f64) -> Result<(), VincentyError> {
     if !lat_deg.is_finite() || !lon_deg.is_finite() {
         return Err(VincentyError::NonFiniteInput);
     }
@@ -60,29 +60,23 @@ fn validate_point(lat_deg: f64, lon_deg: f64) -> Result<(), VincentyError> {
 use crate::ellipsoid::Ellipsoid;
 pub use crate::geo_vincenty_direct::vincenty_direct_ellipsoid;
 
-fn vincenty_ab_ellipsoid(cos2_alpha: f64, a_semi: f64, b_semi: f64) -> (f64, f64) {
+pub(crate) fn vincenty_ab_ellipsoid(cos2_alpha: f64, a_semi: f64, b_semi: f64) -> (f64, f64) {
     let u2 = cos2_alpha * (a_semi * a_semi - b_semi * b_semi) / (b_semi * b_semi);
     let a = 1.0 + u2 / 16384.0 * (4096.0 + u2 * (-768.0 + u2 * (320.0 - 175.0 * u2)));
     let b = u2 / 1024.0 * (256.0 + u2 * (-128.0 + u2 * (74.0 - 47.0 * u2)));
     (a, b)
 }
 
-fn vincenty_ab(cos2_alpha: f64) -> (f64, f64) {
-    let u2 = cos2_alpha * (WGS84_A * WGS84_A - WGS84_B * WGS84_B) / (WGS84_B * WGS84_B);
-    let a = 1.0 + u2 / 16384.0 * (4096.0 + u2 * (-768.0 + u2 * (320.0 - 175.0 * u2)));
-    let b = u2 / 1024.0 * (256.0 + u2 * (-128.0 + u2 * (74.0 - 47.0 * u2)));
-    (a, b)
-}
-
-fn vincenty_c_ellipsoid(cos2_alpha: f64, f: f64) -> f64 {
+pub(crate) fn vincenty_c_ellipsoid(cos2_alpha: f64, f: f64) -> f64 {
     f / 16.0 * cos2_alpha * (4.0 + f * (4.0 - 3.0 * cos2_alpha))
 }
 
-fn vincenty_c(cos2_alpha: f64) -> f64 {
-    WGS84_F / 16.0 * cos2_alpha * (4.0 + WGS84_F * (4.0 - 3.0 * cos2_alpha))
-}
-
-fn vincenty_delta_sigma(b: f64, sin_sigma: f64, cos_sigma: f64, cos_2sigma_m: f64) -> f64 {
+pub(crate) fn vincenty_delta_sigma(
+    b: f64,
+    sin_sigma: f64,
+    cos_sigma: f64,
+    cos_2sigma_m: f64,
+) -> f64 {
     let cos2_2sigma_m = cos_2sigma_m * cos_2sigma_m;
     b * sin_sigma
         * (cos_2sigma_m
@@ -268,56 +262,6 @@ pub fn vincenty_inverse(
     vincenty_inverse_ellipsoid(lat1, lon1, lat2, lon2, &Ellipsoid::WGS84)
 }
 
-fn solve_direct_sigma(b: f64, s: f64, a: f64, sigma1: f64) -> (f64, f64, f64) {
-    let mut sigma = s / (WGS84_B * a);
-    let mut cos_2sigma_m = 0.0;
-    for _ in 0..200 {
-        let two_sigma_m = 2.0 * sigma1 + sigma;
-        cos_2sigma_m = two_sigma_m.cos();
-        let delta_sigma = vincenty_delta_sigma(b, sigma.sin(), sigma.cos(), cos_2sigma_m);
-        let sigma_next = s / (WGS84_B * a) + delta_sigma;
-        if (sigma_next - sigma).abs() < 1e-12 {
-            return (sigma_next, two_sigma_m, cos_2sigma_m);
-        }
-        sigma = sigma_next;
-    }
-    (sigma, 2.0 * sigma1 + sigma, cos_2sigma_m)
-}
-
-fn direct_omega(c: f64, s_alp: f64, sig: f64, s_s: f64, c_s: f64, c_2sm: f64) -> f64 {
-    let t = c_2sm + c * c_s * (-1.0 + 2.0 * c_2sm * c_2sm);
-    (1.0 - c) * WGS84_F * s_alp * (sig + c * s_s * t)
-}
-
-#[allow(clippy::too_many_arguments)]
-fn compute_direct_coords(
-    lon1: f64,
-    s_u1: f64,
-    c_u1: f64,
-    s_alp: f64,
-    c2_alp: f64,
-    alp1: f64,
-    sig: f64,
-    c_2sm: f64,
-) -> VincentyDirect {
-    let (s_s, c_s) = (sig.sin(), sig.cos());
-    let x = s_u1 * s_s - c_u1 * c_s * alp1.cos();
-    let num = s_u1 * c_s + c_u1 * s_s * alp1.cos();
-    let den = (1.0 - WGS84_F) * (s_alp * s_alp + x * x).sqrt();
-    let lat2 = num.atan2(den).to_degrees();
-    let lam = (s_s * alp1.sin()).atan2(c_u1 * c_s - s_u1 * s_s * alp1.cos());
-    let lon2 = (lon1
-        + (lam - direct_omega(vincenty_c(c2_alp), s_alp, sig, s_s, c_s, c_2sm)).to_degrees()
-        + 180.0)
-        .rem_euclid(360.0)
-        - 180.0;
-    VincentyDirect {
-        lat_deg: lat2,
-        lon_deg: lon2,
-        reverse_azimuth_deg: wrap_azimuth(s_alp.atan2(-x).to_degrees() + 180.0),
-    }
-}
-
 /// Computes destination coordinates and reverse azimuth on WGS84.
 pub fn vincenty_direct(
     lat1: f64,
@@ -325,25 +269,7 @@ pub fn vincenty_direct(
     bearing1_deg: f64,
     distance_m: f64,
 ) -> Result<VincentyDirect, VincentyError> {
-    validate_point(lat1, lon1)?;
-    if !bearing1_deg.is_finite() || !distance_m.is_finite() {
-        return Err(VincentyError::NonFiniteInput);
-    }
-    if distance_m < 0.0 {
-        return Err(VincentyError::NegativeDistance);
-    }
-    let alp1 = bearing1_deg.to_radians();
-    let tan_u1 = (1.0 - WGS84_F) * lat1.to_radians().tan();
-    let cos_u1 = 1.0 / (1.0 + tan_u1 * tan_u1).sqrt();
-    let sin_u1 = tan_u1 * cos_u1;
-    let sig1 = tan_u1.atan2(alp1.cos());
-    let sin_alp = cos_u1 * alp1.sin();
-    let cos2_alp = 1.0 - sin_alp * sin_alp;
-    let (a, b) = vincenty_ab(cos2_alp);
-    let (sig, _, cos_2sm) = solve_direct_sigma(b, distance_m, a, sig1);
-    Ok(compute_direct_coords(
-        lon1, sin_u1, cos_u1, sin_alp, cos2_alp, alp1, sig, cos_2sm,
-    ))
+    vincenty_direct_ellipsoid(lat1, lon1, bearing1_deg, distance_m, &Ellipsoid::WGS84)
 }
 
 /// Computes intermediate coordinates along the geodesic arc between two points.
