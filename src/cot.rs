@@ -299,7 +299,7 @@ fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
     Some(&xml[start..=end])
 }
 
-fn find_attr_in_tag<'a>(tag_str: &'a str, attr: &str) -> Option<&'a str> {
+pub(crate) fn find_attr_in_tag<'a>(tag_str: &'a str, attr: &str) -> Option<&'a str> {
     let raw = tag_str.trim_start_matches(|c: char| c == '<' || !c.is_ascii_whitespace());
     crate::sax_parser::SaxAttributes::new(raw).get(attr)
 }
