@@ -1,7 +1,9 @@
-//! Zero-allocation TAK Protocol Version 1 (Protobuf CoT) binary wire codec.
+//! TAK Protocol Version 1 (Protobuf CoT) binary wire codec.
 //!
 //! Provides dependency-free protobuf varint decoding, field parsing,
 //! and bidirectional translation to/from CotEvent.
+
+use std::fmt;
 
 /// Magic byte identifying TAK Protocol Version 1 wire frames.
 pub const TAK_PROTO_MAGIC: u8 = 0xBF;
@@ -21,6 +23,24 @@ pub enum ProtoError {
     /// Point coordinates or uncertainty bounds are invalid or out of bounds.
     CoordinateOutOfBounds,
 }
+
+impl fmt::Display for ProtoError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidMagic => write!(f, "invalid TAK protocol magic header"),
+            Self::UnexpectedEof => write!(f, "unexpected end of protobuf stream"),
+            Self::MalformedVarint => write!(f, "malformed varint in protobuf stream"),
+            Self::InvalidUtf8 => write!(f, "invalid UTF-8 in string field"),
+            Self::UnsupportedWireType(w) => write!(f, "unsupported wire type: {w}"),
+            Self::MissingField(name) => write!(f, "missing required field: {name}"),
+            Self::BufferTooSmall => write!(f, "destination buffer too small"),
+            Self::InvalidFieldNumber => write!(f, "invalid protobuf field number"),
+            Self::CoordinateOutOfBounds => write!(f, "coordinate value out of bounds"),
+        }
+    }
+}
+
+impl std::error::Error for ProtoError {}
 
 /// Standard protobuf wire types.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
