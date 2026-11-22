@@ -96,6 +96,12 @@ impl GeoidGrid {
     }
 }
 
+impl crate::geoid::GeoidModel for GeoidGrid {
+    fn undulation(&self, lat_deg: f64, lon_deg: f64) -> Option<f64> {
+        self.undulation_at(lon_deg, lat_deg)
+    }
+}
+
 #[derive(Default)]
 struct AsciiHeader {
     cols: Option<usize>,
