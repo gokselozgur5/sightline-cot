@@ -328,6 +328,9 @@ impl ImmFilter {
 impl ImmFilter {
     /// Step full IMM cycle: mix -> predict -> update.
     pub fn step(&mut self, dt: f64, z: [f64; 3]) -> [f64; 6] {
+        if !dt.is_finite() || dt <= 0.0 {
+            return self.fused_state();
+        }
         self.mix();
         self.predict(dt);
         self.update(z);
