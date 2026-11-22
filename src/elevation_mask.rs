@@ -1,5 +1,7 @@
 //! Tactical line-of-sight terrain elevation masking angle validator.
 
+use crate::los::earth_curvature_drop;
+
 /// Errors occurring during elevation mask validation and calculations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ElevationMaskError {
@@ -207,13 +209,12 @@ impl ObstacleProfile {
             return Err(ElevationMaskError::NonFiniteValue);
         }
         let mut max_angle_rad = -std::f64::consts::FRAC_PI_2;
-        let r_eff = (4.0 / 3.0) * 6_371_000.0;
         for pt in &self.points {
             if pt.distance_m > max_dist_m {
                 break;
             }
             let drop_m = if include_earth_curvature {
-                (pt.distance_m * pt.distance_m) / (2.0 * r_eff)
+                earth_curvature_drop(pt.distance_m)
             } else {
                 0.0
             };
@@ -331,7 +332,7 @@ impl ElevationMaskValidator {
             return Err(ElevationMaskError::InvalidDistance);
         }
         let drop_m = if curvature {
-            (dist_m * dist_m) / (2.0 * ((4.0 / 3.0) * 6_371_000.0))
+            earth_curvature_drop(dist_m)
         } else {
             0.0
         };
