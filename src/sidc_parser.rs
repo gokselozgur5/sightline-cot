@@ -84,6 +84,35 @@ impl StandardIdentity {
             _ => Self::Unknown,
         }
     }
+
+    pub fn to_2525c_char(&self) -> char {
+        match self {
+            Self::Pending => 'P',
+            Self::Unknown => 'U',
+            Self::AssumedFriend => 'A',
+            Self::Friend => 'F',
+            Self::Neutral => 'N',
+            Self::Suspect => 'S',
+            Self::Hostile => 'H',
+            Self::Joker => 'J',
+            Self::Faker => 'K',
+        }
+    }
+
+    pub fn from_2525c_char(c: char) -> Result<Self, SidcParseError> {
+        match c {
+            'P' => Ok(Self::Pending),
+            'U' => Ok(Self::Unknown),
+            'A' => Ok(Self::AssumedFriend),
+            'F' => Ok(Self::Friend),
+            'N' => Ok(Self::Neutral),
+            'S' => Ok(Self::Suspect),
+            'H' => Ok(Self::Hostile),
+            'J' => Ok(Self::Joker),
+            'K' => Ok(Self::Faker),
+            _ => Err(SidcParseError::InvalidAffiliation),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
