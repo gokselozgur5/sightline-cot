@@ -39,6 +39,8 @@ pub enum StandardIdentity {
     Neutral = 4,
     Suspect = 5,
     Hostile = 6,
+    Joker = 8,
+    Faker = 9,
 }
 
 impl StandardIdentity {
@@ -51,6 +53,8 @@ impl StandardIdentity {
             4 => Ok(Self::Neutral),
             5 => Ok(Self::Suspect),
             6 => Ok(Self::Hostile),
+            8 => Ok(Self::Joker),
+            9 => Ok(Self::Faker),
             _ => Err(SidcParseError::InvalidAffiliation),
         }
     }
@@ -61,7 +65,7 @@ impl StandardIdentity {
     pub fn cot_char(&self) -> char {
         match self {
             Self::Friend | Self::AssumedFriend => 'f',
-            Self::Hostile => 'h',
+            Self::Hostile | Self::Joker | Self::Faker => 'h',
             Self::Neutral => 'n',
             Self::Suspect => 's',
             Self::Pending => 'p',
