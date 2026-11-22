@@ -96,10 +96,11 @@ pub use geo_polygon_area::{
 pub mod geo_bbox;
 pub mod geo_centroid;
 pub mod geo_compass;
-pub mod geo_cross_track;
 pub mod geo_crosstrack;
+pub use geo_crosstrack as geo_cross_track;
 pub use geo_crosstrack::{
-    along_track_distance_m, cross_track_distance_m, cross_track_error, CrossTrackResult,
+    along_track_distance_m, cross_track_distance, cross_track_distance_m, cross_track_error,
+    CrossTrackResult,
 };
 pub mod geo_aer;
 pub mod geo_ddm;
