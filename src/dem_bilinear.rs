@@ -110,6 +110,54 @@ impl DemRaster {
     }
 }
 
+/// Bilinear interpolation across four cell nodes.
+#[inline]
+pub fn bilinear_interpolate_4(z00: f64, z10: f64, z01: f64, z11: f64, s: f64, t: f64) -> f64 {
+    (1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11
+}
+
+/// Bilinear grid sampler over continuous cell coordinates (u, v).
+pub fn sample_bilinear_cells<F: Fn(usize, usize) -> Option<f64>>(
+    u: f64,
+    v: f64,
+    cols: usize,
+    rows: usize,
+    wrap_x: bool,
+    read: F,
+) -> Option<f64> {
+    if cols < 2 || rows < 2 {
+        return None;
+    }
+    let (u_pos, v_pos) = (u.max(0.0), v.max(0.0));
+    let (c0, c1, s) = if wrap_x {
+        let (c0, s) = (
+            (u_pos.floor() as usize) % cols,
+            (u_pos - u_pos.floor()).clamp(0.0, 1.0),
+        );
+        (c0, (c0 + 1) % cols, s)
+    } else {
+        let c0 = (u_pos.floor() as usize).min(cols - 2);
+        (c0, c0 + 1, (u_pos - c0 as f64).clamp(0.0, 1.0))
+    };
+    let (r0, r1, t) = {
+        let r0 = (v_pos.floor() as usize).min(rows - 2);
+        (r0, r1_clamp(r0, rows), (v_pos - r0 as f64).clamp(0.0, 1.0))
+    };
+    Some(bilinear_interpolate_4(
+        read(c0, r0)?,
+        read(c1, r0)?,
+        read(c0, r1)?,
+        read(c1, r1)?,
+        s,
+        t,
+    ))
+}
+
+#[inline]
+fn r1_clamp(r0: usize, rows: usize) -> usize {
+    (r0 + 1).min(rows - 1)
+}
+
 impl DemRaster {
     /// Bilinear elevation sample at continuous coordinates (e_m, n_m).
     pub fn sample(&self, e_m: f64, n_m: f64) -> Option<f64> {
