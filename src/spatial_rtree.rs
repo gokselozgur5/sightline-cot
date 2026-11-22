@@ -5,27 +5,15 @@ pub const EARTH_RADIUS_M: f64 = 6_371_008.8;
 
 /// Normalizes a longitude coordinate into the standard [-180.0, 180.0) range.
 pub fn normalize_lon(lon: f64) -> f64 {
-    if !lon.is_finite() {
-        return f64::NAN;
-    }
-    let r = (lon + 180.0).rem_euclid(360.0) - 180.0;
-    if r >= 180.0 {
-        -180.0
-    } else {
-        r
-    }
+    crate::egm96_geoid::normalize_lon_180(lon)
 }
 
 /// Great-circle distance between two geodetic coordinates in meters.
 pub fn haversine_distance_m(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
-    let d_lat = (lat2 - lat1).to_radians();
-    let d_lon = (normalize_lon(lon2) - normalize_lon(lon1)).to_radians();
-    let lat1_r = lat1.to_radians();
-    let lat2_r = lat2.to_radians();
-
-    let a = (d_lat * 0.5).sin().powi(2) + lat1_r.cos() * lat2_r.cos() * (d_lon * 0.5).sin().powi(2);
-    let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
-    EARTH_RADIUS_M * c
+    crate::geo_haversine::haversine_distance_m(
+        [lat1, normalize_lon(lon1)],
+        [lat2, normalize_lon(lon2)],
+    )
 }
 
 /// 2D axis-aligned geodetic spatial bounding box.
