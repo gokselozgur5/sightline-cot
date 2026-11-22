@@ -7,6 +7,13 @@ pub enum GeohashError {
     EmptyHash,
     LatitudeOutOfRange,
     LongitudeOutOfRange,
+    AtPole,
+}
+
+#[allow(non_upper_case_globals)]
+impl GeohashError {
+    #[deprecated(note = "use EmptyHash")]
+    pub const EmptyString: Self = Self::EmptyHash;
 }
 
 impl std::fmt::Display for GeohashError {
@@ -17,6 +24,7 @@ impl std::fmt::Display for GeohashError {
             Self::EmptyHash => write!(f, "geohash string cannot be empty"),
             Self::LatitudeOutOfRange => write!(f, "latitude must be within [-90.0, 90.0]"),
             Self::LongitudeOutOfRange => write!(f, "longitude must be within [-180.0, 180.0]"),
+            Self::AtPole => write!(f, "cannot calculate polar neighbor beyond bounds"),
         }
     }
 }
