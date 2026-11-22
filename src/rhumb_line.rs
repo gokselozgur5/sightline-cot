@@ -1,7 +1,7 @@
 //! Rhumb line (loxodrome) navigation solver and waypoint interpolator.
 
 /// Default mean Earth radius in meters (WGS84 spherical approximation).
-pub const EARTH_RADIUS_M: f64 = 6_371_008.8;
+pub use crate::geo_greatcircle::EARTH_RADIUS_M;
 
 /// Maximum number of samples allowed along an interpolated path.
 pub const MAX_SAMPLE_COUNT: usize = 100_000;
@@ -88,13 +88,8 @@ pub fn great_circle_distance(
 ) -> Result<f64, RhumbLineError> {
     p1.validate()?;
     p2.validate()?;
-    let lat1 = p1.lat.to_radians();
-    let lat2 = p2.lat.to_radians();
-    let dlat = lat2 - lat1;
-    let dlon = unwrap_lon_diff_rad(p1.lon, p2.lon);
-    let a = (dlat / 2.0).sin().powi(2) + lat1.cos() * lat2.cos() * (dlon / 2.0).sin().powi(2);
-    let c = 2.0 * a.sqrt().clamp(0.0, 1.0).asin();
-    Ok(radius * c)
+    let d = crate::geo_greatcircle::haversine_distance(p1.lat, p1.lon, p2.lat, p2.lon);
+    Ok(d * (radius / crate::geo_greatcircle::EARTH_RADIUS_M))
 }
 
 /// Comparison between rhumb line and great-circle navigation along a segment.
