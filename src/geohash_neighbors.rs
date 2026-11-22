@@ -24,24 +24,7 @@ pub struct GeohashNeighbors {
     pub north_west: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GeohashError {
-    EmptyString,
-    InvalidCharacter(char),
-    AtPole,
-}
-
-impl std::fmt::Display for GeohashError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::EmptyString => write!(f, "geohash string cannot be empty"),
-            Self::InvalidCharacter(c) => write!(f, "invalid geohash character '{c}'"),
-            Self::AtPole => write!(f, "cannot calculate polar neighbor beyond bounds"),
-        }
-    }
-}
-
-impl std::error::Error for GeohashError {}
+pub use crate::geohash::GeohashError;
 
 const BASE32: &[u8; 32] = b"0123456789bcdefghjkmnpqrstuvwxyz";
 
@@ -73,7 +56,7 @@ const NEIGHBORS: [(&[u8; 32], &[u8; 32]); 4] = [
 
 fn validate_geohash(hash: &str) -> Result<(), GeohashError> {
     if hash.is_empty() {
-        return Err(GeohashError::EmptyString);
+        return Err(GeohashError::EmptyHash);
     }
     for b in hash.bytes() {
         let lower = b.to_ascii_lowercase();
