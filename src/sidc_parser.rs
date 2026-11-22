@@ -113,6 +113,35 @@ impl StandardIdentity {
             _ => Err(SidcParseError::InvalidAffiliation),
         }
     }
+
+    pub fn to_2525d_code(&self) -> &'static str {
+        match self {
+            Self::Pending => "00",
+            Self::Unknown => "01",
+            Self::AssumedFriend => "02",
+            Self::Friend => "03",
+            Self::Neutral => "04",
+            Self::Suspect => "05",
+            Self::Hostile => "06",
+            Self::Joker => "08",
+            Self::Faker => "09",
+        }
+    }
+
+    pub fn from_2525d_code(code: &str) -> Result<Self, SidcParseError> {
+        match code {
+            "00" => Ok(Self::Pending),
+            "01" => Ok(Self::Unknown),
+            "02" => Ok(Self::AssumedFriend),
+            "03" => Ok(Self::Friend),
+            "04" => Ok(Self::Neutral),
+            "05" => Ok(Self::Suspect),
+            "06" => Ok(Self::Hostile),
+            "08" => Ok(Self::Joker),
+            "09" => Ok(Self::Faker),
+            _ => Err(SidcParseError::InvalidAffiliation),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
