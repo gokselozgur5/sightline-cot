@@ -1,9 +1,11 @@
 //! WGS84 Geodetic to ECEF and ECEF to Geodetic coordinate conversions.
 
-pub const WGS84_A: f64 = 6_378_137.0;
-pub const WGS84_F: f64 = 1.0 / 298.257_223_563;
-pub const WGS84_B: f64 = WGS84_A * (1.0 - WGS84_F);
-pub const WGS84_E2: f64 = 2.0 * WGS84_F - WGS84_F * WGS84_F;
+use crate::ellipsoid::Ellipsoid;
+
+pub const WGS84_A: f64 = Ellipsoid::WGS84.a;
+pub const WGS84_F: f64 = Ellipsoid::WGS84.f;
+pub const WGS84_B: f64 = Ellipsoid::WGS84.b;
+pub const WGS84_E2: f64 = Ellipsoid::WGS84.f * (2.0 - Ellipsoid::WGS84.f);
 pub const WGS84_E_PRIME2: f64 = (WGS84_A * WGS84_A - WGS84_B * WGS84_B) / (WGS84_B * WGS84_B);
 
 /// Convert geodetic coordinates to WGS84 ECEF coordinates in meters.
@@ -27,7 +29,15 @@ pub fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
     let (s_th, c_th) = (theta.sin(), theta.cos());
     let num = z + WGS84_E_PRIME2 * WGS84_B * s_th * s_th * s_th;
     let den = p - WGS84_E2 * WGS84_A * c_th * c_th * c_th;
-    let lat_rad = num.atan2(den);
+    let raw_lat = num.atan2(den);
+    let half_pi = core::f64::consts::FRAC_PI_2;
+    let lat_rad = if raw_lat > half_pi {
+        core::f64::consts::PI - raw_lat
+    } else if raw_lat < -half_pi {
+        -core::f64::consts::PI - raw_lat
+    } else {
+        raw_lat
+    };
     let s_lat = lat_rad.sin();
     let n = WGS84_A / (1.0 - WGS84_E2 * s_lat * s_lat).sqrt();
     let hae_m = if p > 1e-6 {
