@@ -55,3 +55,8 @@ pub fn cross_track_error(start: [f64; 2], end: [f64; 2], point: [f64; 2]) -> Cro
         along_track_m: along_track_distance_m(start, end, point),
     }
 }
+
+/// Signed cross-track distance in metres from tuple `(lat, lon)` coordinates.
+pub fn cross_track_distance(start: (f64, f64), end: (f64, f64), point: (f64, f64)) -> f64 {
+    cross_track_distance_m([start.0, start.1], [end.0, end.1], [point.0, point.1])
+}
