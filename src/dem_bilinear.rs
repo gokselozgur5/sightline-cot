@@ -125,7 +125,7 @@ pub fn sample_bilinear_cells<F: Fn(usize, usize) -> Option<f64>>(
     wrap_x: bool,
     read: F,
 ) -> Option<f64> {
-    if cols < 2 || rows < 2 {
+    if cols == 0 || rows == 0 {
         return None;
     }
     let (u_pos, v_pos) = (u.max(0.0), v.max(0.0));
@@ -136,12 +136,28 @@ pub fn sample_bilinear_cells<F: Fn(usize, usize) -> Option<f64>>(
         );
         (c0, (c0 + 1) % cols, s)
     } else {
-        let c0 = (u_pos.floor() as usize).min(cols - 2);
-        (c0, c0 + 1, (u_pos - c0 as f64).clamp(0.0, 1.0))
+        let c0 = (u_pos.floor() as usize).min(cols.saturating_sub(2));
+        (
+            c0,
+            (c0 + 1).min(cols - 1),
+            if cols > 1 {
+                (u_pos - c0 as f64).clamp(0.0, 1.0)
+            } else {
+                0.0
+            },
+        )
     };
     let (r0, r1, t) = {
-        let r0 = (v_pos.floor() as usize).min(rows - 2);
-        (r0, r1_clamp(r0, rows), (v_pos - r0 as f64).clamp(0.0, 1.0))
+        let r0 = (v_pos.floor() as usize).min(rows.saturating_sub(2));
+        (
+            r0,
+            (r0 + 1).min(rows - 1),
+            if rows > 1 {
+                (v_pos - r0 as f64).clamp(0.0, 1.0)
+            } else {
+                0.0
+            },
+        )
     };
     Some(bilinear_interpolate_4(
         read(c0, r0)?,
@@ -151,11 +167,6 @@ pub fn sample_bilinear_cells<F: Fn(usize, usize) -> Option<f64>>(
         s,
         t,
     ))
-}
-
-#[inline]
-fn r1_clamp(r0: usize, rows: usize) -> usize {
-    (r0 + 1).min(rows - 1)
 }
 
 impl DemRaster {
