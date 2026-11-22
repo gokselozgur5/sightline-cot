@@ -12,6 +12,8 @@ fn test_vincenty_direct_flinders_peak() {
     let res = vincenty_direct(lat1, lon1, alpha1, s).expect("direct solve");
     assert!((res.lat_deg - expected_lat).abs() < 1e-6);
     assert!((res.lon_deg - expected_lon).abs() < 1e-6);
+    let expected_rev = 127.0 + 10.0 / 60.0 + 25.07 / 3600.0;
+    assert!((res.reverse_azimuth_deg - expected_rev).abs() < 1e-4);
 }
 
 use sightline_cot::geo_vincenty_direct::VincentyError;
