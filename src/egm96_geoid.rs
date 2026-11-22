@@ -157,19 +157,10 @@ impl Egm96Geoid {
         let norm_lon = normalize_lon_360(lon_deg);
         let u = norm_lon / self.lon_step_deg;
         let v = (lat_deg - self.min_lat_deg) / self.lat_step_deg;
-        let c0 = (u.floor() as usize) % self.cols;
-        let c1 = (c0 + 1) % self.cols;
-        let r0 = (v.floor() as usize).min(self.rows - 2);
-        let r1 = r0 + 1;
-        let s = (u - (u.floor())).clamp(0.0, 1.0);
-        let t = (v - r0 as f64).clamp(0.0, 1.0);
-        let z00 = self.get_node(c0, r0);
-        let z10 = self.get_node(c1, r0);
-        let z01 = self.get_node(c0, r1);
-        let z11 = self.get_node(c1, r1);
-        let top = (1.0 - s) * z00 + s * z10;
-        let bottom = (1.0 - s) * z01 + s * z11;
-        Ok((1.0 - t) * top + t * bottom)
+        crate::dem_bilinear::sample_bilinear_cells(u, v, self.cols, self.rows, true, |c, r| {
+            Some(self.get_node(c, r))
+        })
+        .ok_or(Egm96Error::NonFiniteCoordinate)
     }
 }
 
