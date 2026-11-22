@@ -55,3 +55,15 @@ fn test_ecef_point_to_geodetic() {
     assert!((lon - 139.6503).abs() < 1e-7);
     assert!((hae - 40.0).abs() < 1e-3);
 }
+
+#[test]
+fn latitude_stays_in_range_near_the_earth_centre() {
+    for p in [
+        [0.0, 0.0, 0.0],
+        [1000.0, 0.0, 1000.0],
+        [10_000.0, 5_000.0, -20_000.0],
+    ] {
+        let (lat, _, _) = ecef_to_geodetic(p[0], p[1], p[2]);
+        assert!((-90.0..=90.0).contains(&lat), "latitude {lat} for {p:?}");
+    }
+}
