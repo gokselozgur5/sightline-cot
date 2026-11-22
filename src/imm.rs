@@ -104,27 +104,30 @@ impl SubFilter {
     }
 }
 
-/// Propagates a covariance through a linear transition: F P F^T.
-pub fn propagate_cov(f: &[[f64; 6]; 6], p: &[[f64; 6]; 6]) -> [[f64; 6]; 6] {
-    let mut fp = [[0.0; 6]; 6];
-    let mut out = [[0.0; 6]; 6];
-    for i in 0..6 {
-        for j in 0..6 {
-            fp[i][j] = (0..6).map(|k| f[i][k] * p[k][j]).sum();
+fn propagate_cov_n<const N: usize>(f: &[[f64; N]; N], p: &[[f64; N]; N]) -> [[f64; N]; N] {
+    let (mut fp, mut out) = ([[0.0; N]; N], [[0.0; N]; N]);
+    for i in 0..N {
+        for j in 0..N {
+            fp[i][j] = (0..N).map(|k| f[i][k] * p[k][j]).sum();
         }
     }
-    for i in 0..6 {
-        for j in 0..6 {
-            out[i][j] = (0..6).map(|k| fp[i][k] * f[j][k]).sum();
+    for i in 0..N {
+        for j in 0..N {
+            out[i][j] = (0..N).map(|k| fp[i][k] * f[j][k]).sum();
         }
     }
-    for i in 0..6 {
+    for i in 0..N {
         for j in 0..i {
             let m = 0.5 * (out[i][j] + out[j][i]);
             (out[i][j], out[j][i]) = (m, m);
         }
     }
     out
+}
+
+/// Propagates a covariance through a linear transition: F P F^T.
+pub fn propagate_cov(f: &[[f64; 6]; 6], p: &[[f64; 6]; 6]) -> [[f64; 6]; 6] {
+    propagate_cov_n(f, p)
 }
 
 impl SubFilter {
