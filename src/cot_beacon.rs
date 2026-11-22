@@ -244,10 +244,7 @@ impl EmergencyBeacon {
 }
 
 fn extract_attr<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
-    let key = format!(" {name}=\"");
-    let start = tag.find(&key)? + key.len();
-    let end = tag[start..].find('\"')? + start;
-    Some(&tag[start..end])
+    crate::cot::find_attr_in_tag(tag, name)
 }
 
 fn extract_tag_content<'a>(xml: &'a str, tag: &str) -> Option<&'a str> {
@@ -284,7 +281,10 @@ impl EmergencyBeacon {
         let pt = extract_tag(xml, "point").unwrap_or("");
         let uid = extract_attr(xml, "uid").ok_or(CotBeaconError::MissingField("uid"))?;
         let (lat, lon) = parse_point_coords(pt)?;
-        let callsign = extract_attr(xml, "callsign").unwrap_or("UNKNOWN");
+        let contact_tag = extract_tag(xml, "contact").unwrap_or("");
+        let callsign = extract_attr(contact_tag, "callsign")
+            .or_else(|| extract_attr(xml, "callsign"))
+            .unwrap_or("UNKNOWN");
         let cancel = extract_attr(xml, "cancel")
             .map(|c| c == "true")
             .unwrap_or(false);
