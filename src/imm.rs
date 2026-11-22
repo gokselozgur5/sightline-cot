@@ -273,10 +273,11 @@ impl ImmFilter {
     /// Returns true if every row of the transition matrix is a valid
     /// probability distribution within the given tolerance.
     pub fn trans_mat_is_valid(&self, tol: f64) -> bool {
-        self.trans_mat.iter().all(|row| {
-            row.iter().all(|p| p.is_finite() && *p >= 0.0 && *p <= 1.0)
-                && (row.iter().sum::<f64>() - 1.0).abs() <= tol
-        })
+        tol.is_finite()
+            && self.trans_mat.iter().all(|row| {
+                row.iter().all(|p| p.is_finite() && *p >= 0.0 && *p <= 1.0)
+                    && (row.iter().sum::<f64>() - 1.0).abs() <= tol
+            })
     }
 }
 
