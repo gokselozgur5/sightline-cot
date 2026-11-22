@@ -1,4 +1,4 @@
-use sightline_cot::{simplify_polyline, LocalFrame};
+use sightline_cot::{simplify_polyline, PlanarFrame};
 
 #[test]
 fn test_endpoints_kept_and_collinear_removed() {
@@ -17,7 +17,7 @@ fn test_endpoints_kept_and_collinear_removed() {
 
 #[test]
 fn test_spike_survives_tolerance() {
-    let frame = LocalFrame::new(45.0, 10.0);
+    let frame = PlanarFrame::new(45.0, 10.0);
     let start = frame.unproject([0.0, 0.0]);
     let spike = frame.unproject([500.0, 100.0]);
     let end = frame.unproject([1000.0, 0.0]);
@@ -45,7 +45,7 @@ fn test_edge_cases() {
 
 #[test]
 fn test_local_frame_roundtrip() {
-    let frame = LocalFrame::new(37.5, -122.2);
+    let frame = PlanarFrame::new(37.5, -122.2);
     let pt = [37.55, -122.15];
     let xy = frame.project(pt);
     let back = frame.unproject(xy);

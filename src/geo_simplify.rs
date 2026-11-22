@@ -3,17 +3,17 @@
 const WGS84_A: f64 = 6_378_137.0;
 const WGS84_E2: f64 = 0.006_694_379_990_141_316_5;
 
-/// Local tangent frame with reference latitude and longitude.
+/// Planar tangent-scale frame with reference latitude and longitude for 2D simplification.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct LocalFrame {
+pub struct PlanarFrame {
     pub origin_lat: f64,
     pub origin_lon: f64,
     pub m_lat: f64,
     pub m_lon: f64,
 }
 
-impl LocalFrame {
-    /// Create a local frame at the given origin.
+impl PlanarFrame {
+    /// Create a planar tangent-scale frame at the given origin.
     pub fn new(origin_lat: f64, origin_lon: f64) -> Self {
         let p = origin_lat.to_radians();
         let s = p.sin();
@@ -30,8 +30,8 @@ impl LocalFrame {
     }
 }
 
-impl LocalFrame {
-    /// Project [lat, lon] to [east_m, north_m] in the local frame.
+impl PlanarFrame {
+    /// Project [lat, lon] to [east_m, north_m] in the planar frame.
     pub fn project(&self, pt: [f64; 2]) -> [f64; 2] {
         let d_lat = pt[0] - self.origin_lat;
         let d_lon = (pt[1] - self.origin_lon + 540.0).rem_euclid(360.0) - 180.0;
@@ -91,10 +91,10 @@ fn dp_indices(pts: &[[f64; 2]], start: usize, end: usize, tol: f64, keep: &mut [
     }
 }
 
-/// Simplify a polyline within a specific local frame.
+/// Simplify a polyline within a specific planar frame.
 pub fn simplify_polyline_in_frame(
     points: &[[f64; 2]],
-    frame: &LocalFrame,
+    frame: &PlanarFrame,
     tolerance_m: f64,
 ) -> Vec<[f64; 2]> {
     let n = points.len();
@@ -114,11 +114,11 @@ pub fn simplify_polyline_in_frame(
         .collect()
 }
 
-/// Simplify a polyline using a local frame anchored at its start.
+/// Simplify a polyline using a planar frame anchored at its start.
 pub fn simplify_polyline(points: &[[f64; 2]], tolerance_m: f64) -> Vec<[f64; 2]> {
     if points.is_empty() {
         return Vec::new();
     }
-    let frame = LocalFrame::new(points[0][0], points[0][1]);
+    let frame = PlanarFrame::new(points[0][0], points[0][1]);
     simplify_polyline_in_frame(points, &frame, tolerance_m)
 }
