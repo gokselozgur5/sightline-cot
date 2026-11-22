@@ -146,6 +146,7 @@ fn cfg_valid(c: &SightlineCameraCfg) -> bool {
         && signs
         && c.fx > 0.0
         && c.fy > 0.0
+        && c.cam_up_m > c.ground_up_m
         && c.min_hits > 0
         && (c.is_fisheye == 0 || c.is_fisheye == 1)
 }
@@ -349,6 +350,19 @@ fn to_cot(t: &SightlineTrackC) -> CotEvent {
     }
 }
 
+fn track_valid(t: &SightlineTrackC) -> bool {
+    let f = [
+        t.lat_deg,
+        t.lon_deg,
+        t.hae_m,
+        t.ce90_m,
+        t.le90_m,
+        t.course_deg,
+        t.speed_mps,
+    ];
+    f.iter().all(|x| x.is_finite())
+}
+
 /// # Safety
 /// `t` must be valid; `buf` must be writable for `cap` bytes.
 #[no_mangle]
@@ -362,7 +376,7 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         if t.is_null() || buf.is_null() {
             return SIGHTLINE_ERR_NULL;
         }
-        if !t.is_aligned() {
+        if !t.is_aligned() || !track_valid(&*t) {
             return SIGHTLINE_ERR_INVALID;
         }
         let mut ev = to_cot(&*t);
