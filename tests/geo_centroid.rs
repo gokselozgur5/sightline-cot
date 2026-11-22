@@ -21,8 +21,17 @@ fn test_symmetric_rectangle_and_winding() {
 #[test]
 fn test_degenerate_polygons() {
     assert!(polygon_centroid(&[[0.0, 0.0], [1.0, 1.0]]).is_none());
+    assert_eq!(polygon_centroid(&[[0.0, 0.0], [1.0, 1.0]]), None);
     assert!(polygon_centroid(&[[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]]).is_none());
+    assert_eq!(
+        polygon_centroid(&[[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]]),
+        None
+    );
     assert!(polygon_centroid(&[[f64::NAN, 0.0], [1.0, 1.0], [0.0, 1.0]]).is_none());
+    assert_eq!(
+        polygon_centroid(&[[f64::NAN, 0.0], [1.0, 1.0], [0.0, 1.0]]),
+        None
+    );
 }
 
 #[test]
