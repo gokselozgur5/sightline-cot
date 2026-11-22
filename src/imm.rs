@@ -131,6 +131,36 @@ pub fn propagate_cov(f: &[[f64; 6]; 6], p: &[[f64; 6]; 6]) -> [[f64; 6]; 6] {
 }
 
 impl SubFilter {
+    /// Assembles the full 9x9 position-velocity-acceleration covariance matrix.
+    pub fn cov9(&self) -> [[f64; 9]; 9] {
+        core::array::from_fn(|r| {
+            core::array::from_fn(|c| match (r < 6, c < 6) {
+                (true, true) => self.cov[r][c],
+                (true, false) => self.cov_pa[r][c - 6],
+                (false, true) => self.cov_pa[c][r - 6],
+                (false, false) => self.cov_aa[r - 6][c - 6],
+            })
+        })
+    }
+    /// Stores a symmetrized 9x9 covariance matrix into the sub-filter blocks.
+    pub fn set_cov9(&mut self, p: [[f64; 9]; 9]) {
+        for r in 0..6 {
+            for c in 0..6 {
+                self.cov[r][c] = 0.5 * (p[r][c] + p[c][r]);
+            }
+            for c in 0..3 {
+                self.cov_pa[r][c] = 0.5 * (p[r][c + 6] + p[c + 6][r]);
+            }
+        }
+        for r in 0..3 {
+            for c in 0..3 {
+                self.cov_aa[r][c] = 0.5 * (p[r + 6][c + 6] + p[c + 6][r + 6]);
+            }
+        }
+    }
+}
+
+impl SubFilter {
     /// Coordinated turn state prediction.
     pub fn predict_ct(&mut self, dt: f64, omega: f64, q: f64) {
         let (sin_w, cos_w) = if omega.abs() > 1e-4 {
