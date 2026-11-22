@@ -17,13 +17,31 @@ pub struct LosResult {
 }
 
 pub const WGS84_EARTH_RADIUS_M: f64 = 6_371_000.0;
+pub const STANDARD_REFRACTION_K: f64 = 0.0;
 
-pub fn earth_curvature_drop(distance_m: f64) -> f64 {
+/// Compute effective earth radius given physical radius and atmospheric refraction coefficient k.
+#[inline]
+pub fn effective_earth_radius_m(radius_m: f64, refraction_k: f64) -> f64 {
+    if (1.0 - refraction_k).abs() < 1e-12 {
+        radius_m
+    } else {
+        radius_m / (1.0 - refraction_k)
+    }
+}
+
+/// Compute earth curvature drop with atmospheric refraction coefficient k.
+pub fn earth_curvature_drop_with_refraction(distance_m: f64, refraction_k: f64) -> f64 {
     if distance_m <= 0.0 {
         0.0
     } else {
-        distance_m * distance_m / (2.0 * WGS84_EARTH_RADIUS_M)
+        let r_eff = effective_earth_radius_m(WGS84_EARTH_RADIUS_M, refraction_k);
+        (distance_m * distance_m) / (2.0 * r_eff)
     }
+}
+
+/// Compute earth curvature drop assuming standard geometric propagation (k = 0).
+pub fn earth_curvature_drop(distance_m: f64) -> f64 {
+    earth_curvature_drop_with_refraction(distance_m, STANDARD_REFRACTION_K)
 }
 
 fn sample_point(obs: Position3D, target: Position3D, frac: f64) -> (f64, f64, f64) {
