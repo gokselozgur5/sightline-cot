@@ -1,6 +1,6 @@
 //! MGRS string parser and conversion to WGS84 and UTM.
 
-use crate::mgrs::{utm_to_wgs84, GridError, UtmCoord};
+use crate::mgrs::{utm_to_wgs84, GridError, UtmCoord, MGRS_BANDS, MGRS_COLS, MGRS_ROWS};
 
 /// Error conditions encountered during MGRS string parsing.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -115,11 +115,8 @@ impl core::str::FromStr for ParsedMgrs {
     }
 }
 
-const COLS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
-const ROWS: &[u8] = b"ABCDEFGHJKLMNPQRSTUV";
-
 fn decode_100k_col(zone: u8, col: u8) -> Result<f64, MgrsParseError> {
-    let c_idx = COLS
+    let c_idx = MGRS_COLS
         .iter()
         .position(|&c| c == col)
         .ok_or(MgrsParseError::InvalidSquare)?;
@@ -129,7 +126,7 @@ fn decode_100k_col(zone: u8, col: u8) -> Result<f64, MgrsParseError> {
 }
 
 fn decode_100k_row(zone: u8, row: u8) -> Result<f64, MgrsParseError> {
-    let r_idx = ROWS
+    let r_idx = MGRS_ROWS
         .iter()
         .position(|&r| r == row)
         .ok_or(MgrsParseError::InvalidSquare)?;
@@ -138,10 +135,8 @@ fn decode_100k_row(zone: u8, row: u8) -> Result<f64, MgrsParseError> {
     Ok(row_idx as f64 * 100_000.0)
 }
 
-const BANDS: &[u8] = b"CDEFGHJKLMNPQRSTUVWX";
-
 fn band_approx_northing(band: char) -> Result<(char, f64), MgrsParseError> {
-    let b_pos = BANDS
+    let b_pos = MGRS_BANDS
         .iter()
         .position(|&b| b == band as u8)
         .ok_or(MgrsParseError::InvalidBand)?;
@@ -220,10 +215,10 @@ fn parse_prefix(prefix: &str) -> Result<(u8, char, char, char), MgrsParseError> 
     let band = chars.next().ok_or(MgrsParseError::InvalidBand)?;
     let col = chars.next().ok_or(MgrsParseError::InvalidSquare)?;
     let row = chars.next().ok_or(MgrsParseError::InvalidSquare)?;
-    if !BANDS.contains(&(band as u8)) {
+    if !MGRS_BANDS.contains(&(band as u8)) {
         return Err(MgrsParseError::InvalidBand);
     }
-    if !COLS.contains(&(col as u8)) || !ROWS.contains(&(row as u8)) {
+    if !MGRS_COLS.contains(&(col as u8)) || !MGRS_ROWS.contains(&(row as u8)) {
         return Err(MgrsParseError::InvalidSquare);
     }
     Ok((zone, band, col, row))
