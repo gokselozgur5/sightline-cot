@@ -83,24 +83,36 @@ impl SubFilter {
 }
 
 impl SubFilter {
-    /// Constant acceleration state prediction.
+    /// Constant acceleration state prediction with continuous white-noise jerk Q.
     pub fn predict_ca(&mut self, dt: f64, q: f64) {
-        for i in 0..3 {
-            self.state[i] += self.state[i + 3] * dt;
-        }
-        let mut f = [[0.0; 6]; 6];
-        for i in 0..6 {
-            f[i][i] = 1.0;
-        }
-        (f[0][3], f[1][4], f[2][5]) = (dt, dt, dt);
-        self.cov = propagate_cov(&f, &self.cov);
         let dt2 = dt * dt;
         for i in 0..3 {
-            self.cov[i][i] += 0.5 * dt2 * dt2 * q;
-            self.cov[i + 3][i + 3] += dt2 * q;
-            self.cov[i][i + 3] += 0.5 * dt2 * dt * q;
-            self.cov[i + 3][i] = self.cov[i][i + 3];
+            self.state[i] += self.state[i + 3] * dt + 0.5 * self.accel[i] * dt2;
+            self.state[i + 3] += self.accel[i] * dt;
         }
+        let mut f = [[0.0; 9]; 9];
+        for i in 0..9 {
+            f[i][i] = 1.0;
+        }
+        for i in 0..3 {
+            f[i][i + 3] = dt;
+            f[i][i + 6] = 0.5 * dt2;
+            f[i + 3][i + 6] = dt;
+        }
+        let mut p = propagate_cov_n(&f, &self.cov9());
+        let (dt3, dt4, dt5) = (dt2 * dt, dt2 * dt2, dt2 * dt2 * dt);
+        for i in 0..3 {
+            p[i][i] += (dt5 / 20.0) * q;
+            p[i][i + 3] += (dt4 / 8.0) * q;
+            p[i + 3][i] = p[i][i + 3];
+            p[i][i + 6] += (dt3 / 6.0) * q;
+            p[i + 6][i] = p[i][i + 6];
+            p[i + 3][i + 3] += (dt3 / 3.0) * q;
+            p[i + 3][i + 6] += (dt2 / 2.0) * q;
+            p[i + 6][i + 3] = p[i + 3][i + 6];
+            p[i + 6][i + 6] += dt * q;
+        }
+        self.set_cov9(p);
     }
 }
 
