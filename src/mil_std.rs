@@ -382,6 +382,8 @@ impl MilStdSymbol {
             MilStdAffiliation::Friend | MilStdAffiliation::AssumedFriend => "f",
             MilStdAffiliation::Hostile | MilStdAffiliation::Joker | MilStdAffiliation::Faker => "h",
             MilStdAffiliation::Neutral => "n",
+            MilStdAffiliation::Suspect => "s",
+            MilStdAffiliation::Pending => "p",
             _ => "u",
         };
         let dim = match self.dimension {
