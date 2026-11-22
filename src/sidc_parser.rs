@@ -206,6 +206,29 @@ impl SymbolSet {
             _ => Self::LandUnit,
         }
     }
+
+    pub fn to_2525c_char(&self) -> char {
+        match self {
+            Self::Air | Self::AirMissile => 'A',
+            Self::Space => 'P',
+            Self::SeaSurface => 'S',
+            Self::Subsurface => 'U',
+            Self::Activity | Self::Cyberspace => 'X',
+            _ => 'G',
+        }
+    }
+
+    pub fn from_2525c_char(c: char) -> Result<Self, SidcParseError> {
+        match c {
+            'G' => Ok(Self::LandUnit),
+            'A' => Ok(Self::Air),
+            'S' => Ok(Self::SeaSurface),
+            'U' => Ok(Self::Subsurface),
+            'P' => Ok(Self::Space),
+            'X' => Ok(Self::Activity),
+            _ => Err(SidcParseError::InvalidSymbolSet),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
