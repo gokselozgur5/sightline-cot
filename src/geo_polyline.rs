@@ -1,6 +1,6 @@
 //! Geodetic polyline length and fixed-spacing resampling.
 
-pub const WGS84_EARTH_RADIUS: f64 = 6_371_008.8;
+pub use crate::geo_greatcircle::EARTH_RADIUS_M as WGS84_EARTH_RADIUS;
 
 /// Haversine distance in metres on a sphere of given radius.
 pub fn haversine_distance_radius(p1: [f64; 2], p2: [f64; 2], radius: f64) -> f64 {
@@ -12,7 +12,7 @@ pub fn haversine_distance_radius(p1: [f64; 2], p2: [f64; 2], radius: f64) -> f64
 
 /// Haversine distance in metres using WGS84 mean earth radius.
 pub fn haversine_distance(p1: [f64; 2], p2: [f64; 2]) -> f64 {
-    haversine_distance_radius(p1, p2, WGS84_EARTH_RADIUS)
+    crate::geo_greatcircle::haversine_distance(p1[0], p1[1], p2[0], p2[1])
 }
 
 /// Great-circle intermediate point between `p1` and `p2` at fraction `f` in [0, 1].
