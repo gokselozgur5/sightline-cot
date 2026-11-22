@@ -342,7 +342,15 @@ impl Track {
     /// Perform Joseph-form stabilized covariance and state update.
     #[allow(clippy::needless_range_loop)]
     pub fn update(&mut self, det: &Detection) -> Result<(), TrackerError> {
-        let r_var = (det.ce90_m / 2.146).powi(2).max(1e-6);
+        let mut r_var = (det.ce90_m / 2.146).powi(2).max(1e-6);
+        if let Some(d2) = self.mahalanobis_d2(det) {
+            let cov_cfg = crate::tracker_cov_adaptive::AdaptiveCovarianceConfig::default();
+            if let Ok(scaled) =
+                crate::tracker_cov_adaptive::scale_measurement_variance(r_var, d2, &cov_cfg)
+            {
+                r_var = scaled;
+            }
+        }
         let (s, det_s) = self.compute_s_matrix(r_var);
         let s_inv = Self::invert_s(s, det_s).ok_or(TrackerError::NonFiniteInput)?;
         let k = self.compute_kalman_gain(s_inv);
