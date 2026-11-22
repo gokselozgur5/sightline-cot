@@ -402,23 +402,7 @@ pub fn estimate_covariance_ce_le(
     Ok((ce90, le90))
 }
 
-const WGS84_A: f64 = 6378137.0;
-const WGS84_F: f64 = 1.0 / 298.257223563;
-const WGS84_B: f64 = WGS84_A * (1.0 - WGS84_F);
-const WGS84_E2: f64 = 2.0 * WGS84_F - WGS84_F * WGS84_F;
-const WGS84_E_PRIME2: f64 = (WGS84_A * WGS84_A - WGS84_B * WGS84_B) / (WGS84_B * WGS84_B);
-
-fn geodetic_to_ecef(lat_deg: f64, lon_deg: f64, hae_m: f64) -> [f64; 3] {
-    let lat_rad = lat_deg.to_radians();
-    let lon_rad = lon_deg.to_radians();
-    let (s_lat, c_lat) = (lat_rad.sin(), lat_rad.cos());
-    let (s_lon, c_lon) = (lon_rad.sin(), lon_rad.cos());
-    let n = WGS84_A / (1.0 - WGS84_E2 * s_lat * s_lat).sqrt();
-    let x = (n + hae_m) * c_lat * c_lon;
-    let y = (n + hae_m) * c_lat * s_lon;
-    let z = (n * (1.0 - WGS84_E2) + hae_m) * s_lat;
-    [x, y, z]
-}
+use crate::geo_ecef::{ecef_to_geodetic, geodetic_to_ecef};
 
 fn enu_to_ecef(enu_m: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f64; 3] {
     let ref_ecef = geodetic_to_ecef(ref_lat, ref_lon, ref_hae);
@@ -429,24 +413,6 @@ fn enu_to_ecef(enu_m: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f6
     let dy = c_lon * e - s_lat * s_lon * n + c_lat * s_lon * u;
     let dz = c_lat * n + s_lat * u;
     [ref_ecef[0] + dx, ref_ecef[1] + dy, ref_ecef[2] + dz]
-}
-
-fn ecef_to_geodetic(x: f64, y: f64, z: f64) -> (f64, f64, f64) {
-    let p = (x * x + y * y).sqrt();
-    let lon_rad = y.atan2(x);
-    let theta = (z * WGS84_A).atan2(p * WGS84_B);
-    let (s_th, c_th) = (theta.sin(), theta.cos());
-    let num = z + WGS84_E_PRIME2 * WGS84_B * s_th * s_th * s_th;
-    let den = p - WGS84_E2 * WGS84_A * c_th * c_th * c_th;
-    let lat_rad = num.atan2(den);
-    let s_lat = lat_rad.sin();
-    let n = WGS84_A / (1.0 - WGS84_E2 * s_lat * s_lat).sqrt();
-    let hae_m = if p > 1e-6 {
-        p / lat_rad.cos() - n
-    } else {
-        z.abs() - WGS84_B
-    };
-    (lat_rad.to_degrees(), lon_rad.to_degrees(), hae_m)
 }
 
 /// Convert local ENU offset from reference WGS84 origin to Geodetic (lat, lon, hae).
