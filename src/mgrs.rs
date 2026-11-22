@@ -497,7 +497,7 @@ pub fn utm_to_mgrs_10figure(utm: &UtmCoord, band: char) -> Result<Mgrs10Figure, 
     })
 }
 
-/// Convert a 10-figure MGRS coordinate back into a UTM coordinate.
+/// Convert a 10-figure MGRS coordinate back into a UTM coordinate centered in the 1-meter cell.
 pub fn mgrs_10figure_to_utm(mgrs: &Mgrs10Figure) -> Result<UtmCoord, GridError> {
     if !(1..=60).contains(&mgrs.zone) {
         return Err(GridError::InvalidZone);
@@ -519,8 +519,8 @@ pub fn mgrs_10figure_to_utm(mgrs: &Mgrs10Figure) -> Result<UtmCoord, GridError> 
     Ok(UtmCoord {
         zone: mgrs.zone,
         hemisphere: hemi,
-        easting: col_e + mgrs.easting as f64,
-        northing: best_n,
+        easting: col_e + mgrs.easting as f64 + 0.5,
+        northing: best_n + 0.5,
     })
 }
 
@@ -589,6 +589,9 @@ impl Mgrs10Figure {
 }
 
 fn clean_mgrs_bytes(s: &str, out: &mut [u8; 32]) -> Result<usize, GridError> {
+    if !s.is_ascii() {
+        return Err(GridError::InvalidLatitude);
+    }
     let mut len = 0;
     for &b in s.as_bytes() {
         if !b.is_ascii_whitespace() {
@@ -770,8 +773,8 @@ mod tests {
         let utm = fig.to_utm().unwrap();
         assert_eq!(utm.zone, 31);
         assert_eq!(utm.hemisphere, 'N');
-        assert_eq!(utm.easting as u32, 512345);
-        assert_eq!(utm.northing as u32, 67890);
+        assert_eq!(utm.easting, 512345.5);
+        assert_eq!(utm.northing, 67890.5);
     }
 
     #[test]
