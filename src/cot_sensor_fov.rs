@@ -8,6 +8,7 @@ pub enum SensorFovError {
     InvalidRange,
     InvalidElevation,
     RayDoesNotIntersectGround,
+    SensorAtOrBelowGround,
 }
 
 impl core::fmt::Display for SensorFovError {
@@ -18,6 +19,9 @@ impl core::fmt::Display for SensorFovError {
             Self::InvalidRange => write!(f, "range must be strictly positive"),
             Self::InvalidElevation => write!(f, "elevation must be in [-90.0, 90.0] degrees"),
             Self::RayDoesNotIntersectGround => write!(f, "sensor ray does not intersect ground"),
+            Self::SensorAtOrBelowGround => {
+                write!(f, "sensor altitude must be strictly above ground altitude")
+            }
         }
     }
 }
@@ -164,8 +168,11 @@ pub fn compute_ground_footprint(
     ground_alt_m: f64,
     num_points: usize,
 ) -> Result<SensorFootprint, SensorFovError> {
-    if !sensor_alt_m.is_finite() || !ground_alt_m.is_finite() || sensor_alt_m <= ground_alt_m {
+    if !sensor_alt_m.is_finite() || !ground_alt_m.is_finite() {
         return Err(SensorFovError::NonFiniteParameter);
+    }
+    if sensor_alt_m <= ground_alt_m {
+        return Err(SensorFovError::SensorAtOrBelowGround);
     }
     let dz = ground_alt_m - sensor_alt_m;
     let b = cone.boresight_vector();
