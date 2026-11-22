@@ -152,14 +152,8 @@ fn solve_inverse_loop_ellipsoid(
     Err(VincentyError::NoConvergence)
 }
 
-fn wrap_to_pi(mut rad: f64) -> f64 {
-    while rad > core::f64::consts::PI {
-        rad -= 2.0 * core::f64::consts::PI;
-    }
-    while rad < -core::f64::consts::PI {
-        rad += 2.0 * core::f64::consts::PI;
-    }
-    rad
+fn wrap_to_pi(rad: f64) -> f64 {
+    (rad + core::f64::consts::PI).rem_euclid(2.0 * core::f64::consts::PI) - core::f64::consts::PI
 }
 
 fn wrap_azimuth(deg: f64) -> f64 {
