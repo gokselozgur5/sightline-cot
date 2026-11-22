@@ -1,13 +1,19 @@
 //! Geoid undulation models and height conversions.
 
-/// Error conditions in geoid grid configuration and evaluation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Error conditions in geoid grid configuration, evaluation, and ASCII parsing.
+#[derive(Debug, Clone, PartialEq)]
 pub enum GeoidError {
     InvalidDimensions,
     InvalidStep,
     InvalidBounds,
     NonFiniteCoordinate,
     DataLengthMismatch,
+    EmptyInput,
+    InvalidHeader(String),
+    MissingHeader(&'static str),
+    InvalidCellSize(f64),
+    InvalidDataValue(String),
+    DataCountMismatch { expected: usize, found: usize },
 }
 
 impl std::fmt::Display for GeoidError {
@@ -18,6 +24,14 @@ impl std::fmt::Display for GeoidError {
             Self::InvalidBounds => write!(f, "grid bounds must lie within valid geodetic range"),
             Self::NonFiniteCoordinate => write!(f, "coordinates must be finite"),
             Self::DataLengthMismatch => write!(f, "undulation count must match cols * rows"),
+            Self::EmptyInput => write!(f, "empty ascii grid input"),
+            Self::InvalidHeader(m) => write!(f, "invalid ascii header: {m}"),
+            Self::MissingHeader(h) => write!(f, "missing required header: {h}"),
+            Self::InvalidCellSize(s) => write!(f, "invalid cell size: {s}"),
+            Self::InvalidDataValue(v) => write!(f, "invalid float token: {v}"),
+            Self::DataCountMismatch { expected, found } => {
+                write!(f, "expected {expected} values, found {found}")
+            }
         }
     }
 }
