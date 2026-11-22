@@ -117,28 +117,12 @@ impl GeoidGrid {
         if self.cols == 1 && self.rows == 1 {
             return self.get(0, 0);
         }
-        let u = ((lon - self.xllcorner) / self.cellsize - 0.5).max(0.0);
-        let v_norm = ((lat - self.yllcorner) / self.cellsize - 0.5).max(0.0);
-        let v_top = (self.rows.saturating_sub(1) as f64 - v_norm).max(0.0);
-        let c0 = (u.floor() as usize).min(self.cols.saturating_sub(2));
-        let r0 = (v_top.floor() as usize).min(self.rows.saturating_sub(2));
-        let c1 = (c0 + 1).min(self.cols - 1);
-        let r1 = (r0 + 1).min(self.rows - 1);
-        let (s, t) = (
-            if self.cols > 1 {
-                (u - c0 as f64).clamp(0.0, 1.0)
-            } else {
-                0.0
-            },
-            if self.rows > 1 {
-                (v_top - r0 as f64).clamp(0.0, 1.0)
-            } else {
-                0.0
-            },
-        );
-        let (z00, z10) = (self.get(c0, r0)?, self.get(c1, r0)?);
-        let (z01, z11) = (self.get(c0, r1)?, self.get(c1, r1)?);
-        Some((1.0 - s) * (1.0 - t) * z00 + s * (1.0 - t) * z10 + (1.0 - s) * t * z01 + s * t * z11)
+        let u = (lon - self.xllcorner) / self.cellsize - 0.5;
+        let v_norm = (lat - self.yllcorner) / self.cellsize - 0.5;
+        let v_top = self.rows.saturating_sub(1) as f64 - v_norm;
+        crate::dem_bilinear::sample_bilinear_cells(u, v_top, self.cols, self.rows, false, |c, r| {
+            self.get(c, r)
+        })
     }
 }
 
