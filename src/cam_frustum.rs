@@ -1,33 +1,8 @@
 //! Camera frustum bounding volume generation in local ENU and geodetic frames.
 
-use crate::camera::CameraError;
-
-/// Error returned when camera frustum bounding volume computation fails.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FrustumError {
-    InvalidParameters,
-    Camera(CameraError),
-}
-
-impl std::fmt::Display for FrustumError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InvalidParameters => write!(f, "invalid frustum parameters"),
-            Self::Camera(err) => write!(f, "camera error: {err}"),
-        }
-    }
-}
-
-impl std::error::Error for FrustumError {}
-
-impl From<CameraError> for FrustumError {
-    fn from(err: CameraError) -> Self {
-        Self::Camera(err)
-    }
-}
-
-use crate::camera::{CameraPose, Intrinsics};
+use crate::camera::{enu_to_geodetic, CameraPose, Intrinsics};
 use crate::geo_bbox::GeoBbox;
+pub use crate::sensor_frustum::FrustumError;
 
 /// Axis-aligned bounding box in 3D ENU frame [min_east, min_north, min_up] to [max_east, max_north, max_up].
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -96,8 +71,6 @@ pub struct CameraFrustum {
     pub geo_bbox: GeoBbox,
 }
 
-use crate::camera::enu_to_geodetic;
-
 fn check_inputs(w: f64, h: f64, n: f64, f: f64, lat: f64, lon: f64, hae: f64) -> bool {
     w.is_finite()
         && w > 0.0
@@ -123,9 +96,11 @@ fn compute_cam_corners(
     let px = [[0.0, 0.0], [w, 0.0], [w, h], [0.0, h]];
     let mut corners = [[0.0; 3]; 8];
     for (i, p) in px.iter().enumerate() {
-        let ray = cam.pixel_to_ray(p[0], p[1])?;
+        let ray = cam
+            .pixel_to_ray(p[0], p[1])
+            .map_err(|_| FrustumError::DegenerateFrustum)?;
         if ray[2] <= 0.0 {
-            return Err(FrustumError::InvalidParameters);
+            return Err(FrustumError::DegenerateFrustum);
         }
         let (s_near, s_far) = (near_m / ray[2], far_m / ray[2]);
         corners[i] = [ray[0] * s_near, ray[1] * s_near, near_m];
@@ -167,13 +142,13 @@ impl CameraFrustum {
         ref_hae: f64,
     ) -> Result<Self, FrustumError> {
         if !check_inputs(w, h, near_m, far_m, ref_lat, ref_lon, ref_hae) {
-            return Err(FrustumError::InvalidParameters);
+            return Err(FrustumError::NonFiniteParameter("camera frustum"));
         }
         let corners_cam = compute_cam_corners(cam, w, h, near_m, far_m)?;
         let (corners_enu, geo_pts) =
             transform_frustum_corners(pose, &corners_cam, ref_lat, ref_lon, ref_hae);
-        let enu_bbox = EnuBbox::from_points(&corners_enu).ok_or(FrustumError::InvalidParameters)?;
-        let geo_bbox = GeoBbox::from_points(&geo_pts).ok_or(FrustumError::InvalidParameters)?;
+        let enu_bbox = EnuBbox::from_points(&corners_enu).ok_or(FrustumError::DegenerateFrustum)?;
+        let geo_bbox = GeoBbox::from_points(&geo_pts).ok_or(FrustumError::DegenerateFrustum)?;
         Ok(Self {
             corners_cam,
             corners_enu,
