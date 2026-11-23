@@ -298,7 +298,7 @@ impl CotCircle {
             circle.fill_color = extract_attr(f, "value").and_then(|v| v.parse().ok());
         }
         circle.remarks =
-            extract_tag_content(xml, "remarks").map(|s| crate::cot::unescape_xml_attr(s));
+            extract_tag_content(xml, "remarks").map(crate::cot::unescape_xml_attr);
         Ok(circle)
     }
 }

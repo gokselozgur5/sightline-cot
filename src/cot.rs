@@ -250,11 +250,11 @@ pub fn parse_iso8601_utc(s: &str) -> Result<i64, CotError> {
     let total_secs = days
         .checked_mul(86400)
         .and_then(|s| s.checked_add(sec_offset))
-        .ok_or_else(|| CotError::CoordinateOutOfBounds("timestamp out of bounds"))?;
+        .ok_or(CotError::CoordinateOutOfBounds("timestamp out of bounds"))?;
     total_secs
         .checked_mul(1000)
         .and_then(|ms_total| ms_total.checked_add(ms as i64))
-        .ok_or_else(|| CotError::CoordinateOutOfBounds("timestamp out of bounds"))
+        .ok_or(CotError::CoordinateOutOfBounds("timestamp out of bounds"))
 }
 #[cfg(test)]
 mod tests_ts_digits {
