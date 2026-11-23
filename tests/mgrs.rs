@@ -1,6 +1,6 @@
 //! Contract tests for MGRS decoding and projection consistency.
 
-use sightline_cot::mgrs::{parse_mgrs_10figure, Mgrs10Figure};
+use sightline_cot::mgrs::parse_mgrs_10figure;
 use sightline_cot::mgrs_decode::{decode_mgrs, decode_mgrs_utm};
 use sightline_cot::mgrs_parse::{parse_mgrs_to_utm, parse_mgrs_to_wgs84};
 
