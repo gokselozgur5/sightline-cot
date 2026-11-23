@@ -51,7 +51,7 @@ fn test_error_handling_on_invalid_sidc() {
         Err(SidcParseError::InvalidStandard)
     );
     assert_eq!(
-        parse_sidc2525d("10091000000000000000"),
+        parse_sidc2525d("10071000000000000000"),
         Err(SidcParseError::InvalidAffiliation)
     );
     assert_eq!(
