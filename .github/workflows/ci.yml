@@ -76,6 +76,6 @@ jobs:
           }
           EOF
           cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline_cot -lpthread -ldl -lm -o test
-          ./test
+          LD_LIBRARY_PATH=target/release ./test
 
 
