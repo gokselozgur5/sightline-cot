@@ -214,7 +214,6 @@ impl EmergencyBeacon {
     }
 }
 
-
 impl EmergencyBeacon {
     pub fn to_cot_xml(&self) -> String {
         let time_str = crate::cot::format_iso8601_utc(self.time_ms);

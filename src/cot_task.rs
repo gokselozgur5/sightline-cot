@@ -379,7 +379,10 @@ impl TacticalTask {
         }
         let mut total = 0.0;
         for w in self.points.windows(2) {
-            total += crate::geo_haversine::haversine_distance_m([w[0].lat, w[0].lon], [w[1].lat, w[1].lon]);
+            total += crate::geo_haversine::haversine_distance_m(
+                [w[0].lat, w[0].lon],
+                [w[1].lat, w[1].lon],
+            );
         }
         total
     }
@@ -395,7 +398,10 @@ impl TacticalTask {
         }
         let mut total_duration = 0.0;
         for w in self.points.windows(2) {
-            let dist = crate::geo_haversine::haversine_distance_m([w[0].lat, w[0].lon], [w[1].lat, w[1].lon]);
+            let dist = crate::geo_haversine::haversine_distance_m(
+                [w[0].lat, w[0].lon],
+                [w[1].lat, w[1].lon],
+            );
             let spd = w[1].speed_mps.unwrap_or(default_speed_mps);
             if spd > 0.0 {
                 total_duration += dist / spd;
@@ -484,7 +490,6 @@ impl TacticalTask {
         Self::parse_task_xml(xml)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
