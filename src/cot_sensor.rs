@@ -70,5 +70,6 @@ fn extract_sensor_tag(xml: &str) -> Result<&str, CotError> {
 
 fn parse_attr(tag: &str, attr: &'static str) -> Result<f64, CotError> {
     let val = crate::cot::find_attr_in_tag(tag, attr).ok_or(CotError::MissingAttribute(attr))?;
-    val.parse::<f64>().map_err(|_| CotError::InvalidNumber(attr))
+    val.parse::<f64>()
+        .map_err(|_| CotError::InvalidNumber(attr))
 }

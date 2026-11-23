@@ -404,7 +404,14 @@ mod tests_stale_order {
             .to_string()
     }
 }
-fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, crs: f64, spd: f64) -> Result<(), CotError> {
+fn validate_cot_bounds(
+    lat: f64,
+    lon: f64,
+    ce: f64,
+    le: f64,
+    crs: f64,
+    spd: f64,
+) -> Result<(), CotError> {
     if !(-90.0..=90.0).contains(&lat) {
         return Err(CotError::CoordinateOutOfBounds(
             "lat must be in [-90.0, 90.0]",
@@ -419,7 +426,9 @@ fn validate_cot_bounds(lat: f64, lon: f64, ce: f64, le: f64, crs: f64, spd: f64)
         return Err(CotError::CoordinateOutOfBounds("ce and le must be >= 0.0"));
     }
     if !(0.0..360.0).contains(&crs) {
-        return Err(CotError::CoordinateOutOfBounds("course must be in [0.0, 360.0)"));
+        return Err(CotError::CoordinateOutOfBounds(
+            "course must be in [0.0, 360.0)",
+        ));
     }
     if spd < 0.0 {
         return Err(CotError::CoordinateOutOfBounds("speed must be >= 0.0"));
