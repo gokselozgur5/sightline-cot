@@ -233,7 +233,7 @@ impl StanagTimestamp {
 
     /// Parse a standalone MISB ST 0601 KLV packet and extract the timestamp.
     pub fn from_klv_packet(packet: &[u8]) -> Result<Self, StanagError> {
-        if packet.len() < 22 || &packet[..16] != &MISB_0601_UNIVERSAL_KEY {
+        if packet.len() < 22 || packet[..16] != MISB_0601_UNIVERSAL_KEY {
             return Err(StanagError::BufferTooShort);
         }
         let (body_len, len_bytes) = parse_ber_len(&packet[16..])?;

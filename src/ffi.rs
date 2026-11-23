@@ -171,7 +171,7 @@ pub unsafe extern "C" fn sightline_engine_new(
     cfg: *const SightlineCameraCfg,
 ) -> *mut SightlineEngine {
     let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        if cfg.is_null() || !cfg.is_aligned() {
+        if cfg.is_null() || !pointer_is_aligned(cfg) {
             return std::ptr::null_mut();
         }
         match build_engine(&*cfg) {
@@ -278,11 +278,16 @@ fn engine_step(
 
 type StepArgs = (*mut SightlineEngine, *const SightlineDetectionC, usize);
 
+#[inline]
+fn pointer_is_aligned<T>(p: *const T) -> bool {
+    (p as usize) % std::mem::align_of::<T>() == 0
+}
+
 fn layout_ok<T>(p: *const T, n: usize) -> bool {
     let fits = n
         .checked_mul(std::mem::size_of::<T>())
         .is_some_and(|b| b <= isize::MAX as usize);
-    fits && p.is_aligned()
+    fits && pointer_is_aligned(p)
 }
 
 unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *mut usize)) -> i32 {
@@ -290,7 +295,7 @@ unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *
     if e.is_null() || out_n.is_null() || (n > 0 && dets.is_null()) || (cap > 0 && out.is_null()) {
         return SIGHTLINE_ERR_NULL;
     }
-    if !layout_ok(dets, n) || !layout_ok(out, cap) || !out_n.is_aligned() {
+    if !layout_ok(dets, n) || !layout_ok(out, cap) || !pointer_is_aligned(out_n) {
         return SIGHTLINE_ERR_INVALID;
     }
     let ds: &[SightlineDetectionC] = if n == 0 {
@@ -376,7 +381,7 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         if t.is_null() || buf.is_null() {
             return SIGHTLINE_ERR_NULL;
         }
-        if !t.is_aligned() || !track_valid(&*t) {
+        if !pointer_is_aligned(t) || !track_valid(&*t) {
             return SIGHTLINE_ERR_INVALID;
         }
         let mut ev = to_cot(&*t);

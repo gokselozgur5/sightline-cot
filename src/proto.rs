@@ -389,8 +389,10 @@ impl TakCotEvent {
         }
         if !(-90.0..=90.0).contains(&evt.lat)
             || !(-180.0..=180.0).contains(&evt.lon)
-            || !(evt.ce >= 0.0)
-            || !(evt.le >= 0.0)
+            || evt.ce.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+                && evt.ce.partial_cmp(&0.0) != Some(std::cmp::Ordering::Equal)
+            || evt.le.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+                && evt.le.partial_cmp(&0.0) != Some(std::cmp::Ordering::Equal)
             || !evt.hae.is_finite()
         {
             return Err(ProtoError::CoordinateOutOfBounds);

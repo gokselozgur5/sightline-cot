@@ -175,12 +175,10 @@ impl CotSchemaValidator {
             match token {
                 RawXmlToken::Comment(_) | RawXmlToken::ProcessingInstruction => {}
                 RawXmlToken::Text(text) => {
-                    if text.chars().any(|c| !c.is_whitespace()) {
-                        if tag_stack.is_empty() {
-                            return Err(CotValidationError::MalformedXml(
-                                "non-whitespace text outside root element".into(),
-                            ));
-                        }
+                    if text.chars().any(|c| !c.is_whitespace()) && tag_stack.is_empty() {
+                        return Err(CotValidationError::MalformedXml(
+                            "non-whitespace text outside root element".into(),
+                        ));
                         // Non-whitespace text inside elements is acceptable in CoT (e.g. remarks)
                     }
                 }
