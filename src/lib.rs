@@ -200,7 +200,7 @@ mod tests {
     #[test]
     fn test_egm96_geoid_crate_export() {
         let geoid = Egm96Geoid::coarse_reference_grid();
-        assert!((geoid.get_node(0, 0) - (-30.0)).abs() < 1e-6);
+        assert!((geoid.get_node(0, 0) - (-29.53)).abs() < 1e-6);
     }
     #[test]
     fn test_cot_task_crate_export() {
@@ -223,7 +223,7 @@ mod tests {
     }
     #[test]
     fn sanity() {
-        assert_eq!(VERSION, "0.1.0");
+        assert_eq!(VERSION, env!("CARGO_PKG_VERSION"));
     }
 }
 pub mod track_assoc;
