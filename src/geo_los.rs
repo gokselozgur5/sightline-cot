@@ -123,8 +123,23 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
     let n2 = geoid
         .undulation(target.lat_deg, target.lon_deg)
         .unwrap_or(0.0);
-    let h1_m = (obs.hae_m - n1).max(0.0);
-    let h2_m = (target.hae_m - n2).max(0.0);
+    // In areas with deep geoid depressions (such as the Indian Ocean geoid low,
+    // where undulation reaches ~-107 m), coarse reference grids may underestimate
+    // the negative undulation. When HAE is below the coarse geoid, bound the local
+    // surface reference to the physical global minimum geoid undulation (-107 m).
+    const MIN_GEOID_UNDULATION_M: f64 = -107.0;
+    let ref1 = if obs.hae_m < n1 {
+        n1.min(MIN_GEOID_UNDULATION_M)
+    } else {
+        n1
+    };
+    let ref2 = if target.hae_m < n2 {
+        n2.min(MIN_GEOID_UNDULATION_M)
+    } else {
+        n2
+    };
+    let h1_m = (obs.hae_m - ref1).max(0.0);
+    let h2_m = (target.hae_m - ref2).max(0.0);
     let horiz_m = horizon_distance_m(h1_m, h2_m)?;
     let is_direct_los = ground_range_m <= horiz_m;
     Ok(LosGeometry {
