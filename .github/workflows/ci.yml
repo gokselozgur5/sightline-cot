@@ -31,22 +31,45 @@ jobs:
         run: rustup toolchain install stable && rustup default stable
       - name: Run tests
         run: cargo test --all-targets
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust
-        run: rustup toolchain install stable && rustup default stable
-      - name: Run tests
-        run: cargo test --all-targets
       - name: Build static library
         run: cargo build --release
       - name: Compile and run C test
         run: |
           cat <<EOF > test.c
+          #include <assert.h>
+          #include <stdio.h>
+          #include <string.h>
           #include "include/sightline.h"
-          int main() { return 0; }
+          int main(void) {
+              SightlineCameraCfg cfg = {
+                  .fx = 1000.0, .fy = 1000.0, .cx = 960.0, .cy = 540.0,
+                  .k1 = 0.0, .k2 = 0.0, .is_fisheye = 0,
+                  .roll_rad = 0.0, .pitch_rad = 0.0, .yaw_rad = 0.0,
+                  .cam_up_m = 600.0, .ground_up_m = 0.0,
+                  .pixel_sigma_px = 1.0, .attitude_sigma_rad = 0.001,
+                  .ref_lat_deg = 37.7749, .ref_lon_deg = -122.4194, .ref_hae_m = 100.0,
+                  .min_hits = 1, .max_age = 5, .q_acc = 1.0
+              };
+              SightlineEngine *eng = sightline_engine_new(&cfg);
+              assert(eng != NULL);
+              SightlineDetectionC det = {
+                  .u = 960.0, .v = 540.0, .x1 = 950.0, .y1 = 530.0, .x2 = 970.0, .y2 = 550.0,
+                  .embedding = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+              };
+              SightlineTrackC tracks[4];
+              size_t out_n = 0;
+              int32_t step_res = sightline_engine_step(eng, 0.033, &det, 1, tracks, 4, &out_n);
+              assert(step_res == SIGHTLINE_OK);
+              assert(out_n >= 1);
+              char xml_buf[2048];
+              int32_t xml_res = sightline_track_to_cot_xml(&tracks[0], 1700000000000LL, xml_buf, sizeof(xml_buf));
+              assert(xml_res == SIGHTLINE_OK);
+              assert(strstr(xml_buf, "<event") != NULL);
+              sightline_engine_free(eng);
+              return 0;
+          }
           EOF
-          cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline -o test
+          cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline_cot -o test
           ./test
+
 
