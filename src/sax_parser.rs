@@ -445,10 +445,10 @@ impl CotPointView {
 
         if !(-90.0..=90.0).contains(&lat)
             || !(-180.0..=180.0).contains(&lon)
-            || ce.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
-                && ce.partial_cmp(&0.0) != Some(std::cmp::Ordering::Equal)
-            || le.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
-                && le.partial_cmp(&0.0) != Some(std::cmp::Ordering::Equal)
+            || ce.is_nan()
+            || ce < 0.0
+            || le.is_nan()
+            || le < 0.0
             || !hae.is_finite()
         {
             return Err(SaxError::InvalidNumericValue("coordinate out of bounds"));
