@@ -58,4 +58,3 @@ fn predict_horizon_rejects_excessive_or_zero_step_counts() {
     assert!(filter.predict_horizon(0.4, 1.0).is_err());
     assert!(filter.predict_horizon(200_000.0, 1.0).is_err());
 }
-

@@ -6,7 +6,11 @@ fn predict_cv_propagates_cross_axis_covariance() {
     f.cov[0][4] = 0.5;
     f.cov[4][0] = 0.5;
     f.predict_cv(2.0, 0.0);
-    assert!((f.cov[0][1] - 1.0).abs() < 1e-12, "cov[0][1] = {}", f.cov[0][1]);
+    assert!(
+        (f.cov[0][1] - 1.0).abs() < 1e-12,
+        "cov[0][1] = {}",
+        f.cov[0][1]
+    );
 }
 
 #[test]
