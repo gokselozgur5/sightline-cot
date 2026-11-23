@@ -125,15 +125,15 @@ pub fn compute_geo_los(obs: &GeoPoint3D, target: &GeoPoint3D) -> Result<LosGeome
         .unwrap_or(0.0);
     // In areas with deep geoid depressions (such as the Indian Ocean geoid low,
     // where undulation reaches ~-107 m), coarse reference grids may underestimate
-    // the negative undulation. When HAE is below the coarse geoid, bound the local
-    // surface reference to the physical global minimum geoid undulation (-107 m).
+    // the negative undulation. When HAE is below a negative coarse geoid, bound the
+    // local surface reference to the physical global minimum geoid undulation (-107 m).
     const MIN_GEOID_UNDULATION_M: f64 = -107.0;
-    let ref1 = if obs.hae_m < n1 {
+    let ref1 = if n1 < 0.0 && obs.hae_m < n1 {
         n1.min(MIN_GEOID_UNDULATION_M)
     } else {
         n1
     };
-    let ref2 = if target.hae_m < n2 {
+    let ref2 = if n2 < 0.0 && target.hae_m < n2 {
         n2.min(MIN_GEOID_UNDULATION_M)
     } else {
         n2
