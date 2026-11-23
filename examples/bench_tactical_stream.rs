@@ -1,6 +1,6 @@
 //! End-to-End Tactical Mission Benchmark for Sightline CoT.
-//! Simulates 10,000 frames through DEM ray intersection, Re-ID tracking,
-//! MIL-STD classification, and CoT broadcast.
+//! Simulates 10,000 frames through camera ground ranging, Re-ID tracking,
+//! and CoT event generation.
 
 use std::time::Instant;
 
@@ -192,6 +192,27 @@ fn track_to_cot(track: &Track, frame_idx: usize, le_m: f64, cot_type: &str) -> C
     }
 }
 
+fn cot_type_for_track(track: &Track, obs: &[Observation]) -> &'static str {
+    obs.iter()
+        .max_by(|a, b| {
+            let dot_a = a
+                .emb
+                .iter()
+                .zip(track.embedding.iter())
+                .map(|(x, y)| x * y)
+                .sum::<f32>();
+            let dot_b = b
+                .emb
+                .iter()
+                .zip(track.embedding.iter())
+                .map(|(x, y)| x * y)
+                .sum::<f32>();
+            dot_a.total_cmp(&dot_b)
+        })
+        .map(|o| o.cot_type)
+        .unwrap_or("a-f-G-E-V")
+}
+
 fn process_frame(
     frame_idx: usize,
     obs: &[Observation],
@@ -203,13 +224,9 @@ fn process_frame(
     let le_m = dets.iter().map(|d| d.le90_m).fold(0.0, f64::max);
     tracker.step(DT_S, &dets).expect("tracker step failed");
     let mut bytes = 0;
-    for (i, trk) in tracker.tracks.iter().enumerate() {
+    for trk in tracker.tracks.iter() {
         if trk.status == TrackStatus::Confirmed {
-            let cot_type = if i < obs.len() {
-                obs[i].cot_type
-            } else {
-                "a-f-G-E-V"
-            };
+            let cot_type = cot_type_for_track(trk, obs);
             bytes += track_to_cot(trk, frame_idx, le_m, cot_type).to_xml().len();
         }
     }

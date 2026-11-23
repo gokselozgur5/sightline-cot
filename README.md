@@ -89,7 +89,7 @@ Timings vary between runs. The example also prints 3 confirmed tracks and a fina
 
 ## Tactical Mission Benchmark & Metrics
 
-Deterministic 10,000-frame tactical stream benchmark running through DEM elevation modeling, multi-target tracking, and CoT broadcast. Measured with `cargo run --release --example bench_tactical_stream` on macOS arm64.
+Deterministic 10,000-frame tactical stream benchmark running through camera ground intersection, multi-target tracking, and CoT event generation. Measured with `cargo run --release --example bench_tactical_stream` on macOS arm64.
 
 | Metric | Measured Value |
 |---|---|
@@ -97,7 +97,6 @@ Deterministic 10,000-frame tactical stream benchmark running through DEM elevati
 | Total CoT output | ~9.0 MB |
 | Latency p50 | 4.54 us |
 | Latency p99 | 6.38 us |
-
 | Latency Max | 35.29 us |
 | Latency Mean | 4.61 us |
 | Throughput | >216,000 fps |
