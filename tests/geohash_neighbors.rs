@@ -52,7 +52,7 @@ fn test_geohash_neighbors_ezs42() {
 #[test]
 fn test_geohash_errors() {
     use sightline_cot::geohash_neighbors::GeohashError;
-    assert_eq!(geohash_neighbors(""), Err(GeohashError::EmptyString));
+    assert_eq!(geohash_neighbors(""), Err(GeohashError::EmptyHash));
     assert_eq!(
         geohash_neighbors("ezs4a"),
         Err(GeohashError::InvalidCharacter('a'))
@@ -78,14 +78,11 @@ fn test_geohash_single_char_and_case() {
 
 #[test]
 fn north_of_the_northernmost_cell_is_not_a_south_pole_cell() {
-    match geohash_neighbor("zzzzz", GeohashDirection::North) {
-        Ok(cell) => {
-            let (lat, _) = sightline_cot::geohash::decode(&cell).unwrap();
-            assert!(
-                lat > 80.0,
-                "north neighbour {cell} decodes to latitude {lat}"
-            );
-        }
-        Err(_) => {}
+    if let Ok(cell) = geohash_neighbor("zzzzz", GeohashDirection::North) {
+        let (lat, _) = sightline_cot::geohash::decode(&cell).unwrap();
+        assert!(
+            lat > 80.0,
+            "north neighbour {cell} decodes to latitude {lat}"
+        );
     }
 }

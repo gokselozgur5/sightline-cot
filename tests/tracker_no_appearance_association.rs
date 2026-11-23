@@ -18,7 +18,7 @@ fn stationary_detection_without_bbox_or_embedding_stays_one_track() {
     };
     let mut tracker = MultiTargetTracker::new(3, 5, 1.0);
     for _ in 0..4 {
-        tracker.step(0.033, &[det.clone()]).unwrap();
+        tracker.step(0.033, std::slice::from_ref(&det)).unwrap();
     }
     assert_eq!(tracker.tracks.len(), 1, "one target must be one track");
     assert_eq!(tracker.tracks[0].status, TrackStatus::Confirmed);

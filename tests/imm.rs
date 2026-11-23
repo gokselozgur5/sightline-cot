@@ -43,7 +43,7 @@ fn imm_ca_tracks_quadratic_and_handles_mirrored_turn() {
     assert!(imm.probs[MODEL_CA] > imm.probs[MODEL_CV] && (imm.fused_state()[3] - 60.0).abs() < 3.0);
     let mut turn = ImmFilter::new([0.0; 3], ImmConfig::default());
     for k in 1..=30 {
-        let wt = 0.5235987756_f64 * k as f64 * 0.1;
+        let wt = std::f64::consts::FRAC_PI_6 * k as f64 * 0.1;
         turn.step(0.1, [wt.sin() * 50.0, -(1.0 - wt.cos()) * 50.0, 0.0]);
     }
     assert!(turn.is_maneuvering() && turn.probs[MODEL_CT] > turn.probs[MODEL_CV]);
