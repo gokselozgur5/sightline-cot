@@ -16,9 +16,13 @@ fn circle_entities_round_trip() {
         .unwrap()
         .with_callsign("R&D")
         .with_remarks("a < b");
-    let p = CotCircle::parse(&c.to_detail_xml()).unwrap();
+    let xml = c.to_cot_event_xml("C-1", 1_700_000_000_000, 1_700_000_060_000);
+    let p = CotCircle::parse(&xml).unwrap();
     assert_eq!(p.callsign.as_deref(), Some("R&D"));
     assert_eq!(p.remarks.as_deref(), Some("a < b"));
+    assert!((p.lat - 10.0).abs() < 1e-6);
+    assert!((p.lon - 20.0).abs() < 1e-6);
+    assert!((p.radius_m - 500.0).abs() < 1e-6);
 }
 
 #[test]
