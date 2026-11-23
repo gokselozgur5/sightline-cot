@@ -75,7 +75,7 @@ jobs:
               return 0;
           }
           EOF
-          cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline_cot -o test
+          cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline_cot -lpthread -ldl -lm -o test
           ./test
 
 
