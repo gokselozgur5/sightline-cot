@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@toolchain
+        uses: dtolnay/rust-toolchain@1.100.0
         with:
           components: rustfmt
       - name: Cargo fmt check
@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@toolchain
+        uses: dtolnay/rust-toolchain@1.100.0
         with:
           components: clippy
       - name: Cargo clippy
@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@toolchain
+        uses: dtolnay/rust-toolchain@1.100.0
       - name: Run tests
         run: cargo test --all-targets
       - name: Build static library
