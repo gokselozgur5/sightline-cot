@@ -49,10 +49,7 @@ fn test_pinhole_unproject_squared_norm_overflow() {
 
 #[test]
 fn test_dem_grid_bilinear_interpolation_contract() {
-    let elevations = vec![
-        10.0, 20.0,
-        30.0, 40.0,
-    ];
+    let elevations = vec![10.0, 20.0, 30.0, 40.0];
     let grid = sightline_cot::camera::DemGrid::new(0.0, 0.0, 10.0, 2, 2, elevations).unwrap();
     assert_eq!(grid.elevation_at(0.0, 0.0), Some(10.0));
     assert_eq!(grid.elevation_at(10.0, 0.0), Some(20.0));
