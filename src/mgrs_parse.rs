@@ -193,7 +193,7 @@ fn split_compact(s: &str) -> Result<(String, String), MgrsParseError> {
     }
     let prefix = &s[..zone_len + 3];
     let digits = &s[zone_len + 3..];
-    if !digits.chars().all(|c| c.is_ascii_digit()) || digits.len() % 2 != 0 || digits.len() > 10 {
+    if !digits.chars().all(|c| c.is_ascii_digit()) || digits.len() & 1 != 0 || digits.len() > 10 {
         return Err(MgrsParseError::InvalidDigits);
     }
     Ok((prefix.to_string(), digits.to_string()))
