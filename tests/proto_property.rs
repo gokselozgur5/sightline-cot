@@ -69,8 +69,8 @@ fn gen_event(rng: &mut Rng) -> TakCotEvent {
         lat: gen_coord(rng, 90.0),
         lon: gen_coord(rng, 180.0),
         hae: gen_coord(rng, 10_000.0),
-        ce: gen_coord(rng, 50.0),
-        le: gen_coord(rng, 50.0),
+        ce: gen_coord(rng, 50.0).abs(),
+        le: gen_coord(rng, 50.0).abs(),
     }
 }
 
