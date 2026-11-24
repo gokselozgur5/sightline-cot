@@ -124,4 +124,59 @@ fn test_error_cases_and_sentinels() {
     );
 }
 
+#[test]
+fn test_to_camera_pose_nadir_and_rays() {
+    let mut frame = Misb0601Frame {
+        sensor_true_alt_m: Some(1500.0),
+        platform_heading_deg: Some(0.0),
+        sensor_rel_az_deg: Some(0.0),
+        sensor_rel_el_deg: Some(-90.0),
+        ..Default::default()
+    };
+
+    let pose = frame.to_camera_pose(500.0).unwrap();
+    assert_eq!(pose.cam_up_m, 1000.0);
+    let ray_nadir = pose.transform_ray([0.0, 0.0, 1.0]);
+    assert!((ray_nadir[0] - 0.0).abs() < 1e-9);
+    assert!((ray_nadir[1] - 0.0).abs() < 1e-9);
+    assert!((ray_nadir[2] - (-1.0)).abs() < 1e-9);
+
+    frame.sensor_rel_el_deg = Some(-45.0);
+    let pose_north = frame.to_camera_pose(500.0).unwrap();
+    let ray_north = pose_north.transform_ray([0.0, 0.0, 1.0]);
+    assert!((ray_north[0] - 0.0).abs() < 1e-9);
+    assert!(ray_north[1] > 0.707);
+    assert!(ray_north[2] < -0.707);
+
+    frame.platform_heading_deg = Some(90.0);
+    let pose_east = frame.to_camera_pose(500.0).unwrap();
+    let ray_east = pose_east.transform_ray([0.0, 0.0, 1.0]);
+    assert!(ray_east[0] > 0.707);
+    assert!((ray_east[1] - 0.0).abs() < 1e-9);
+    assert!(ray_east[2] < -0.707);
+
+    frame.platform_heading_deg = Some(180.0);
+    let pose_south = frame.to_camera_pose(500.0).unwrap();
+    let ray_south = pose_south.transform_ray([0.0, 0.0, 1.0]);
+    assert!((ray_south[0] - 0.0).abs() < 1e-9);
+    assert!(ray_south[1] < -0.707);
+    assert!(ray_south[2] < -0.707);
+
+    frame.platform_heading_deg = Some(270.0);
+    let pose_west = frame.to_camera_pose(500.0).unwrap();
+    let ray_west = pose_west.transform_ray([0.0, 0.0, 1.0]);
+    assert!(ray_west[0] < -0.707);
+    assert!((ray_west[1] - 0.0).abs() < 1e-9);
+    assert!(ray_west[2] < -0.707);
+
+    frame.platform_heading_deg = Some(90.0);
+    frame.sensor_rel_az_deg = Some(90.0);
+    let pose_slew = frame.to_camera_pose(500.0).unwrap();
+    let ray_slew = pose_slew.transform_ray([0.0, 0.0, 1.0]);
+    assert!((ray_slew[0] - 0.0).abs() < 1e-9);
+    assert!(ray_slew[1] < -0.707);
+    assert!(ray_slew[2] < -0.707);
+}
+
+
 
