@@ -223,3 +223,119 @@ required-features = ["geodesy"]
 name = "geo_midpoint"
 required-features = ["geodesy"]
 
+[[test]]
+name = "geo_molodensky"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_ned"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_perimeter"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_polygon_area"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_polyline"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_polyline_nearest"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_radii"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_rhumb"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_simplify"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_sphere"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_velocity"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_vincenty"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_vincenty_direct"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geodesic_area_long_edges"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geodesic_area_north_pole"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geoid"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geoid_ascii_cell_registration"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geoid_ascii_oversized_header"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geoid_loader"
+required-features = ["geodesy"]
+
+[[test]]
+name = "great_circle_bearing_at_end"
+required-features = ["geodesy"]
+
+[[test]]
+name = "midpoint_error_mapping"
+required-features = ["geodesy"]
+
+[[test]]
+name = "perimeter_consistency"
+required-features = ["geodesy"]
+
+[[test]]
+name = "planar_polygon_antimeridian"
+required-features = ["geodesy"]
+
+[[test]]
+name = "polygon_winding_order"
+required-features = ["geodesy"]
+
+[[test]]
+name = "rhumb_line"
+required-features = ["geodesy"]
+
+[[test]]
+name = "rhumb_step_bounds"
+required-features = ["geodesy"]
+
+[[test]]
+name = "short_distance_resolution"
+required-features = ["geodesy"]
+
+[[test]]
+name = "vincenty_antimeridian_coincident"
+required-features = ["geodesy"]
+
+[[test]]
+name = "vincenty_reverse_azimuth_reference"
+required-features = ["geodesy"]
+
