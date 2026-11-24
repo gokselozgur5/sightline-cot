@@ -254,4 +254,53 @@ fn test_to_camera_pose_nadir_and_rays() {
     assert!((ray_slew[0] - 0.0).abs() < 1e-9);
     assert!(ray_slew[1] < -0.707);
     assert!(ray_slew[2] < -0.707);
+
+    // Pitched platform: heading = 0, platform_pitch_deg = +15.0, rel_az = 0, rel_el = -90.0
+    // Nadir-in-body camera tilts backward toward South!
+    let mut frame_pitched = Misb0601Frame {
+        sensor_true_alt_m: Some(1500.0),
+        platform_heading_deg: Some(0.0),
+        platform_pitch_deg: Some(15.0),
+        platform_roll_deg: Some(0.0),
+        sensor_rel_az_deg: Some(0.0),
+        sensor_rel_el_deg: Some(-90.0),
+        sensor_rel_roll_deg: Some(0.0),
+        ..Default::default()
+    };
+    let pose_pitched = frame_pitched.to_camera_pose(500.0).unwrap();
+    let ray_pitched = pose_pitched.transform_ray([0.0, 0.0, 1.0]);
+    let expected_pitch_rad = 15.0f64.to_radians();
+    assert!((ray_pitched[0] - 0.0).abs() < 1e-6);
+    assert!((ray_pitched[1] - (-expected_pitch_rad.sin())).abs() < 1e-6);
+    assert!((ray_pitched[2] - (-expected_pitch_rad.cos())).abs() < 1e-6);
+
+    // Rolled platform: heading = 0, platform_pitch_deg = 0.0, platform_roll_deg = +20.0 (right-wing-down)
+    // rel_az = 0, rel_el = -90.0 -> tilts left toward West!
+    let frame_rolled = Misb0601Frame {
+        sensor_true_alt_m: Some(1500.0),
+        platform_heading_deg: Some(0.0),
+        platform_pitch_deg: Some(0.0),
+        platform_roll_deg: Some(20.0),
+        sensor_rel_az_deg: Some(0.0),
+        sensor_rel_el_deg: Some(-90.0),
+        sensor_rel_roll_deg: Some(0.0),
+        ..Default::default()
+    };
+    let pose_rolled = frame_rolled.to_camera_pose(500.0).unwrap();
+    let ray_rolled = pose_rolled.transform_ray([0.0, 0.0, 1.0]);
+    let expected_roll_rad = 20.0f64.to_radians();
+    assert!((ray_rolled[0] - (-expected_roll_rad.sin())).abs() < 1e-6);
+    assert!((ray_rolled[1] - 0.0).abs() < 1e-6);
+    assert!((ray_rolled[2] - (-expected_roll_rad.cos())).abs() < 1e-6);
+
+    // Rejection of non-finite angles or alt
+    assert_eq!(
+        frame.to_camera_pose(f64::NAN),
+        Err(MisbError::OutOfRange("non-finite input"))
+    );
+    frame_pitched.platform_pitch_deg = Some(f64::INFINITY);
+    assert_eq!(
+        frame_pitched.to_camera_pose(500.0),
+        Err(MisbError::OutOfRange("non-finite input"))
+    );
 }
