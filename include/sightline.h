@@ -56,10 +56,16 @@ typedef struct {
     uint32_t status;
 } SightlineTrackC;
 
+typedef struct {
+    double roll_rad, pitch_rad, yaw_rad, cam_up_m;
+    double ref_lat_deg, ref_lon_deg, ref_hae_m;
+} SightlinePoseC;
+
 /* Layout guards (C99): size mismatch yields a negative array size. */
 typedef char sightline_assert_cfg[(sizeof(SightlineCameraCfg) == 152) ? 1 : -1];
 typedef char sightline_assert_det[(sizeof(SightlineDetectionC) == 80) ? 1 : -1];
 typedef char sightline_assert_trk[(sizeof(SightlineTrackC) == 72) ? 1 : -1];
+typedef char sightline_assert_pos[(sizeof(SightlinePoseC) == 56) ? 1 : -1];
 
 SightlineEngine *sightline_engine_new(const SightlineCameraCfg *cfg);
 void sightline_engine_free(SightlineEngine *e);
