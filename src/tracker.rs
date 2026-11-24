@@ -110,6 +110,7 @@ pub struct Track {
     pub x: [f64; 4],
     pub p: [[f64; 4]; 4],
     pub hae_m: f64,
+    pub le90_m: f64,
     pub bbox: BoundingBox,
     pub embedding: [f32; 8],
     pub hits: usize,
@@ -162,7 +163,7 @@ impl Track {
             lon_deg,
             hae_m: self.hae_m,
             ce_m: ce,
-            le_m: 10.0,
+            le_m: self.le90_m,
             course_deg: self.course_deg(),
             speed_mps: self.speed_mps(),
         }
@@ -181,6 +182,7 @@ impl Track {
             x: [det.east_m, det.north_m, 0.0, 0.0],
             p,
             hae_m: det.hae_m,
+            le90_m: det.le90_m,
             bbox: det.bbox,
             embedding: normalize_embedding(&det.embedding),
             hits: 1,
@@ -360,6 +362,7 @@ impl Track {
         }
         self.apply_joseph_update(k, r_var);
         self.hae_m = 0.8 * self.hae_m + 0.2 * det.hae_m;
+        self.le90_m = 0.8 * self.le90_m + 0.2 * det.le90_m;
         self.bbox = det.bbox;
         self.embedding = normalize_embedding(&det.embedding);
         self.hits += 1;
