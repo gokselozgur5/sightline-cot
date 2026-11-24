@@ -31,8 +31,10 @@ pub use sensor_frustum::{
     PlatformPose, SensorFrustumConfig, SensorGimbal,
 };
 pub mod dem_bilinear;
+#[cfg(feature = "geodesy")]
 pub mod egm96_geoid;
 pub mod elevation_mask;
+#[cfg(feature = "geodesy")]
 pub use egm96_geoid::{
     normalize_lon_180, normalize_lon_360, sample_egm96_undulation, Egm96Error, Egm96Geoid,
 };
@@ -41,11 +43,17 @@ pub use elevation_mask::{
     ObstaclePoint, ObstacleProfile,
 };
 pub mod ffi;
+#[cfg(feature = "geodesy")]
 pub mod geo_helmert;
+#[cfg(feature = "geodesy")]
 pub mod geo_molodensky;
+#[cfg(feature = "geodesy")]
 pub mod geo_velocity;
+#[cfg(feature = "geodesy")]
 pub mod geo_vincenty;
+#[cfg(feature = "geodesy")]
 pub mod geo_vincenty_direct;
+#[cfg(feature = "geodesy")]
 pub use geo_vincenty::{
     vincenty_direct, vincenty_direct_ellipsoid, vincenty_geodesic_path,
     vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid, VincentyDirect,
@@ -81,8 +89,11 @@ pub use mgrs_parse::{
 };
 pub mod mil_std;
 pub mod proto;
+#[cfg(feature = "geodesy")]
 pub mod rhumb_line;
+#[cfg(feature = "geodesy")]
 pub use rhumb_line as geo_rhumb;
+#[cfg(feature = "geodesy")]
 pub use rhumb_line::{
     great_circle_distance, interpolate_by_count, interpolate_by_step, rhumb_bearing,
     rhumb_destination, rhumb_destination_radius, rhumb_distance, rhumb_distance_and_bearing,
@@ -97,56 +108,93 @@ pub use mil_std::{
 };
 pub use sidc::{SidcAffiliation, SidcDomain, TacticalSymbol};
 pub use stanag4609::{StanagError, StanagTimestamp};
+#[cfg(feature = "geodesy")]
 pub mod geo_angle;
+#[cfg(feature = "geodesy")]
 pub mod geo_area;
+#[cfg(feature = "geodesy")]
 pub mod geo_polygon_area;
+#[cfg(feature = "geodesy")]
 pub use geo_polygon_area::{
     compute_cot_polygon_geometry, geodesic_polygon_area, is_counter_clockwise,
     polygon_geodesic_perimeter, GeodesicAreaError, GeodesicPolygonArea,
 };
+#[cfg(feature = "geodesy")]
 pub mod geo_bbox;
+#[cfg(feature = "geodesy")]
 pub mod geo_centroid;
+#[cfg(feature = "geodesy")]
 pub mod geo_compass;
+#[cfg(feature = "geodesy")]
 pub mod geo_crosstrack;
+#[cfg(feature = "geodesy")]
 pub use geo_crosstrack as geo_cross_track;
+#[cfg(feature = "geodesy")]
 pub use geo_crosstrack::{
     along_track_distance_m, cross_track_distance, cross_track_distance_m, cross_track_error,
     CrossTrackResult,
 };
+#[cfg(feature = "geodesy")]
 pub mod geo_aer;
+#[cfg(feature = "geodesy")]
 pub mod geo_ddm;
+#[cfg(feature = "geodesy")]
 pub mod geo_destination;
+#[cfg(feature = "geodesy")]
 pub mod geo_dms;
+#[cfg(feature = "geodesy")]
 pub mod geo_enu;
+#[cfg(feature = "geodesy")]
 pub use geo_aer::{
     aer_to_ecef, aer_to_geodetic, aer_to_sez, ecef_to_aer, ecef_to_sez, enu_to_sez,
     geodetic_to_aer, sez_to_aer, sez_to_ecef, sez_to_enu, AerCoord, AerError, SezCoord,
 };
 pub mod geo_ecef;
+#[cfg(feature = "geodesy")]
 pub mod geo_frame;
+#[cfg(feature = "geodesy")]
 pub use geo_frame::{GeoFrameError, LocalFrame};
+#[cfg(feature = "geodesy")]
 pub mod geo_great_circle;
+#[cfg(feature = "geodesy")]
 pub mod geo_greatcircle;
+#[cfg(feature = "geodesy")]
 pub use geo_great_circle::{GreatCircleError, GreatCirclePath, Waypoint};
+#[cfg(feature = "geodesy")]
 pub mod geo_haversine;
+#[cfg(feature = "geodesy")]
 pub use geo_haversine::{
     archav, hav, haversine_bearing_deg, haversine_bearing_rad, haversine_distance_m,
     haversine_distance_with_radius,
 };
+#[cfg(feature = "geodesy")]
 pub mod geo_hull;
+#[cfg(feature = "geodesy")]
 pub mod geo_interp;
+#[cfg(feature = "geodesy")]
 pub mod geo_intersect;
+#[cfg(feature = "geodesy")]
 pub mod geo_meridian_arc;
+#[cfg(feature = "geodesy")]
 pub mod geo_midpoint;
+#[cfg(feature = "geodesy")]
 pub mod geo_ned;
+#[cfg(feature = "geodesy")]
 pub mod geo_perimeter;
+#[cfg(feature = "geodesy")]
 pub mod geo_polyline;
+#[cfg(feature = "geodesy")]
 pub mod geo_polyline_nearest;
+#[cfg(feature = "geodesy")]
 pub mod geo_radii;
+#[cfg(feature = "geodesy")]
 pub mod geo_simplify;
+#[cfg(feature = "geodesy")]
 pub mod geoid_loader;
+#[cfg(feature = "geodesy")]
 pub use geo_simplify::{simplify_polyline, simplify_polyline_in_frame, PlanarFrame};
 pub mod cam_distorted_pinhole;
+#[cfg(feature = "geodesy")]
 pub mod geo_sphere;
 pub mod tracker;
 pub mod tracker_cov_adaptive;
@@ -172,7 +220,9 @@ pub use geo_unified::{
     is_polar_latitude, is_utm_latitude, unified_to_wgs84, wgs84_to_unified, GridSystem,
     UnifiedCoord,
 };
+#[cfg(feature = "geodesy")]
 pub mod geoid;
+#[cfg(feature = "geodesy")]
 pub use geoid::{
     ellipsoidal_to_orthometric, orthometric_to_ellipsoidal, sample_geoid_bilinear, ConstantGeoid,
     Geoid, GeoidBilinearGrid, GeoidError, GeoidGrid, GeoidModel,
@@ -185,11 +235,13 @@ pub mod geohash_neighbors;
 pub use geohash_neighbors::{
     geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
+#[cfg(feature = "geodesy")]
 pub mod geo_los;
 #[cfg(feature = "grid")]
 pub mod geo_ups;
 #[cfg(feature = "grid")]
 pub mod geohash;
+#[cfg(feature = "geodesy")]
 pub use geo_los::{
     compute_geo_los, elevation_angle_rad, has_line_of_sight, horizon_distance_m,
     slant_range_geodetic, GeoLosError, GeoPoint3D, LosGeometry,
@@ -206,6 +258,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg(feature = "geodesy")]
     fn test_geo_los_crate_export() {
         let obs = GeoPoint3D::new(0.0, 0.0, 0.0).unwrap();
         let tgt = GeoPoint3D::new(0.0, 0.0, 100.0).unwrap();
@@ -218,6 +271,7 @@ mod tests {
         assert!(cone.contains_relative_point([0.0, 100.0, -100.0]));
     }
     #[test]
+    #[cfg(feature = "geodesy")]
     fn test_egm96_geoid_crate_export() {
         let geoid = Egm96Geoid::coarse_reference_grid();
         assert!((geoid.get_node(0, 0) - (-29.53)).abs() < 1e-6);
