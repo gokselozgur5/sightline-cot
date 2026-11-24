@@ -426,6 +426,46 @@ pub fn enu_to_geodetic(
     ecef_to_geodetic(ecef[0], ecef[1], ecef[2])
 }
 
+fn ecef_to_enu(p_ecef: [f64; 3], ref_lat: f64, ref_lon: f64, ref_hae: f64) -> [f64; 3] {
+    let ref_ecef = geodetic_to_ecef(ref_lat, ref_lon, ref_hae);
+    let (s_lat, c_lat) = (ref_lat.to_radians().sin(), ref_lat.to_radians().cos());
+    let (s_lon, c_lon) = (ref_lon.to_radians().sin(), ref_lon.to_radians().cos());
+    let (dx, dy, dz) = (
+        p_ecef[0] - ref_ecef[0],
+        p_ecef[1] - ref_ecef[1],
+        p_ecef[2] - ref_ecef[2],
+    );
+    let e = -s_lon * dx + c_lon * dy;
+    let n = -s_lat * c_lon * dx - s_lat * s_lon * dy + c_lat * dz;
+    let u = c_lat * c_lon * dx + c_lat * s_lon * dy + s_lat * dz;
+    [e, n, u]
+}
+
+/// Convert Geodetic coordinates (lat, lon, hae) to local ENU offset from reference origin.
+pub fn geodetic_to_enu(
+    lat_deg: f64,
+    lon_deg: f64,
+    hae_m: f64,
+    ref_lat_deg: f64,
+    ref_lon_deg: f64,
+    ref_hae_m: f64,
+) -> Result<[f64; 3], CameraError> {
+    if !lat_deg.is_finite()
+        || !lon_deg.is_finite()
+        || !hae_m.is_finite()
+        || !ref_lat_deg.is_finite()
+        || !ref_lon_deg.is_finite()
+        || !ref_hae_m.is_finite()
+    {
+        return Err(CameraError::InvalidParameters);
+    }
+    if !(-90.0..=90.0).contains(&lat_deg) || !(-90.0..=90.0).contains(&ref_lat_deg) {
+        return Err(CameraError::InvalidParameters);
+    }
+    let p_ecef = geodetic_to_ecef(lat_deg, lon_deg, hae_m);
+    Ok(ecef_to_enu(p_ecef, ref_lat_deg, ref_lon_deg, ref_hae_m))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -710,16 +750,17 @@ impl DemGrid {
         })
     }
 
-    fn bisect_dem(
+    fn bisect_dem_at_offset(
         &self,
         r: [f64; 3],
         p: &CameraPose,
+        offset_en: [f64; 2],
         mut a: f64,
         mut b: f64,
     ) -> Result<[f64; 3], CameraError> {
         for _ in 0..64 {
             let tm = 0.5 * (a + b);
-            let (e, n) = (tm * r[0], tm * r[1]);
+            let (e, n) = (offset_en[0] + tm * r[0], offset_en[1] + tm * r[1]);
             let h = self
                 .elevation_at(e, n)
                 .ok_or(CameraError::RayAboveHorizon)?;
@@ -736,12 +777,18 @@ impl DemGrid {
         Err(CameraError::RayAboveHorizon)
     }
 
-    fn march_dem(&self, r: [f64; 3], p: &CameraPose, mi: usize) -> Result<[f64; 3], CameraError> {
+    fn march_dem_at_offset(
+        &self,
+        r: [f64; 3],
+        p: &CameraPose,
+        offset_en: [f64; 2],
+        mi: usize,
+    ) -> Result<[f64; 3], CameraError> {
         let (t_end, mut a, mut prev) = (-p.cam_up_m / r[2], 0.0, 0.0);
         let (step, mut b) = (t_end / (mi.max(1) as f64), t_end);
         for i in 1..=mi {
             let tc = (i as f64 * step).min(t_end);
-            let (e, n) = (tc * r[0], tc * r[1]);
+            let (e, n) = (offset_en[0] + tc * r[0], offset_en[1] + tc * r[1]);
             let h = self
                 .elevation_at(e, n)
                 .ok_or(CameraError::RayAboveHorizon)?;
@@ -756,7 +803,22 @@ impl DemGrid {
             }
             prev = tc;
         }
-        self.bisect_dem(r, p, a, b)
+        self.bisect_dem_at_offset(r, p, offset_en, a, b)
+    }
+
+    /// Intersect camera ray with DEM surface with horizontal origin offset via bounded iterative step.
+    pub fn intersect_dem_at_offset(
+        &self,
+        ray_cam: [f64; 3],
+        pose: &CameraPose,
+        offset_en: [f64; 2],
+        max_iters: usize,
+    ) -> Result<[f64; 3], CameraError> {
+        let ray_enu = pose.transform_ray(ray_cam);
+        if ray_enu[2] >= -1e-6 {
+            return Err(CameraError::RayAboveHorizon);
+        }
+        self.march_dem_at_offset(ray_enu, pose, offset_en, max_iters)
     }
 
     /// Intersect camera ray with DEM surface via bounded iterative step.
@@ -766,11 +828,7 @@ impl DemGrid {
         pose: &CameraPose,
         max_iters: usize,
     ) -> Result<[f64; 3], CameraError> {
-        let ray_enu = pose.transform_ray(ray_cam);
-        if ray_enu[2] >= -1e-6 {
-            return Err(CameraError::RayAboveHorizon);
-        }
-        self.march_dem(ray_enu, pose, max_iters)
+        self.intersect_dem_at_offset(ray_cam, pose, [0.0, 0.0], max_iters)
     }
 }
 
