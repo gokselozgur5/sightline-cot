@@ -69,7 +69,8 @@ impl LosGeometry {
     }
 }
 
-pub use crate::los::WGS84_EARTH_RADIUS_M as WGS84_MEAN_RADIUS_M;
+/// Standard mean earth radius in meters for line-of-sight calculations.
+pub const WGS84_MEAN_RADIUS_M: f64 = 6_371_000.0;
 
 /// Compute geometric horizon line-of-sight limit distance between two heights above ground.
 ///
