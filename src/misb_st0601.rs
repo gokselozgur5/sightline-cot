@@ -268,6 +268,64 @@ fn encode_width_16(width_m: f64) -> [u8; 2] {
     val.to_be_bytes()
 }
 
+impl Misb0601Frame {
+    /// Decode UAS Datalink Local Set from raw TLV payload bytes (excluding 16-byte key and length).
+    pub fn decode_local_set(payload: &[u8]) -> Result<Self, MisbError> {
+        let mut frame = Self::default();
+        let mut idx = 0;
+        while idx < payload.len() {
+            let (tag, tag_len) = decode_ber_oid_tag(&payload[idx..])?;
+            idx += tag_len;
+            if idx >= payload.len() {
+                return Err(MisbError::BufferTooShort);
+            }
+            let (len, len_len) = decode_ber_length(&payload[idx..])?;
+            idx += len_len;
+            if payload.len() < idx + len {
+                return Err(MisbError::BufferTooShort);
+            }
+            let val = &payload[idx..idx + len];
+            idx += len;
+
+            frame.parse_tag(tag, val)?;
+        }
+        Ok(frame)
+    }
+
+    fn parse_tag(&mut self, tag: u64, val: &[u8]) -> Result<(), MisbError> {
+        match tag {
+            1 => {}
+            2 => {
+                if val.len() != 8 {
+                    return Err(MisbError::BufferTooShort);
+                }
+                let mut b = [0u8; 8];
+                b.copy_from_slice(val);
+                self.timestamp_micros = Some(u64::from_be_bytes(b));
+            }
+            5 => self.platform_heading_deg = Some(decode_u16_angle_360(val)?),
+            6 => self.platform_pitch_deg = Some(decode_i16_angle(val, 20.0)?),
+            7 => self.platform_roll_deg = Some(decode_i16_angle(val, 50.0)?),
+            13 => self.sensor_lat_deg = Some(decode_i32_angle(val, 90.0)?),
+            14 => self.sensor_lon_deg = Some(decode_i32_angle(val, 180.0)?),
+            15 => self.sensor_true_alt_m = Some(decode_alt_16(val)?),
+            16 => self.sensor_hfov_deg = Some(decode_u16_angle_360(val)?),
+            17 => self.sensor_vfov_deg = Some(decode_u16_angle_360(val)?),
+            18 => self.sensor_rel_az_deg = Some(decode_u16_angle_360(val)?),
+            19 => self.sensor_rel_el_deg = Some(decode_i32_angle(val, 180.0)?),
+            20 => self.sensor_rel_roll_deg = Some(decode_u16_angle_360(val)?),
+            21 => self.slant_range_m = Some(decode_range_32(val)?),
+            22 => self.target_width_m = Some(decode_width_16(val)?),
+            23 => self.frame_center_lat_deg = Some(decode_i32_angle(val, 90.0)?),
+            24 => self.frame_center_lon_deg = Some(decode_i32_angle(val, 180.0)?),
+            25 => self.frame_center_elev_m = Some(decode_alt_16(val)?),
+            _ => {}
+        }
+        Ok(())
+    }
+}
+
+
 
 
 
