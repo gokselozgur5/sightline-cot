@@ -465,22 +465,90 @@ pub fn encode_st0601_packet(frame: &Misb0601Frame) -> Vec<u8> {
     packet
 }
 
+#[allow(clippy::needless_range_loop)]
+fn mat3_mult(a: [[f64; 3]; 3], b: [[f64; 3]; 3]) -> [[f64; 3]; 3] {
+    let mut out = [[0.0; 3]; 3];
+    for i in 0..3 {
+        for j in 0..3 {
+            for k in 0..3 {
+                out[i][j] += a[i][k] * b[k][j];
+            }
+        }
+    }
+    out
+}
+
+fn rot_z(rad: f64) -> [[f64; 3]; 3] {
+    let (s, c) = (rad.sin(), rad.cos());
+    [[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]]
+}
+
+fn rot_y(rad: f64) -> [[f64; 3]; 3] {
+    let (s, c) = (rad.sin(), rad.cos());
+    [[c, 0.0, s], [0.0, 1.0, 0.0], [-s, 0.0, c]]
+}
+
+fn rot_x(rad: f64) -> [[f64; 3]; 3] {
+    let (s, c) = (rad.sin(), rad.cos());
+    [[1.0, 0.0, 0.0], [0.0, c, -s], [0.0, s, c]]
+}
+
 impl Misb0601Frame {
     /// Convert decoded MISB ST 0601 attitude and position to `crate::camera::CameraPose`.
     pub fn to_camera_pose(&self, ref_hae_m: f64) -> Result<crate::camera::CameraPose, MisbError> {
         let alt = self.sensor_true_alt_m.ok_or(MisbError::MissingTag(15))?;
-        let cam_up_m = alt - ref_hae_m;
-
+        if !ref_hae_m.is_finite() || !alt.is_finite() {
+            return Err(MisbError::OutOfRange("non-finite input"));
+        }
         let hdg = self.platform_heading_deg.unwrap_or(0.0);
+        let pitch = self.platform_pitch_deg.unwrap_or(0.0);
+        let roll = self.platform_roll_deg.unwrap_or(0.0);
         let rel_az = self.sensor_rel_az_deg.unwrap_or(0.0);
-        let az_true = (hdg + rel_az).rem_euclid(360.0);
-        let yaw_rad = -az_true.to_radians();
-
         let rel_el = self.sensor_rel_el_deg.unwrap_or(-90.0);
-        let pitch_rad = (90.0 + rel_el).to_radians();
-
         let rel_roll = self.sensor_rel_roll_deg.unwrap_or(0.0);
-        let roll_rad = rel_roll.to_radians();
+
+        let angles = [hdg, pitch, roll, rel_az, rel_el, rel_roll];
+        if !angles.iter().all(|a| a.is_finite()) {
+            return Err(MisbError::OutOfRange("non-finite input"));
+        }
+
+        let cam_up_m = alt - ref_hae_m;
+        let r_ned_platform = mat3_mult(
+            mat3_mult(rot_z(hdg.to_radians()), rot_y(-pitch.to_radians())),
+            rot_x(roll.to_radians()),
+        );
+
+        let r_cam_to_gimbal = [
+            [0.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ];
+        let r_gimbal_body = mat3_mult(
+            mat3_mult(
+                mat3_mult(rot_z(rel_az.to_radians()), rot_y(rel_el.to_radians())),
+                rot_x(rel_roll.to_radians()),
+            ),
+            r_cam_to_gimbal,
+        );
+
+        let r_cam_ned = mat3_mult(r_ned_platform, r_gimbal_body);
+        let c_ned_to_enu = [
+            [0.0, 1.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0, -1.0],
+        ];
+        let r_cam_enu = mat3_mult(c_ned_to_enu, r_cam_ned);
+
+        let r_base_t = [
+            [1.0, 0.0, 0.0],
+            [0.0, -1.0, 0.0],
+            [0.0, 0.0, -1.0],
+        ];
+        let m = mat3_mult(r_cam_enu, r_base_t);
+
+        let pitch_rad = m[2][1].clamp(-1.0, 1.0).asin();
+        let yaw_rad = (-m[0][1]).atan2(m[1][1]);
+        let roll_rad = (-m[2][0]).atan2(m[2][2]);
 
         Ok(crate::camera::CameraPose {
             roll_rad,
