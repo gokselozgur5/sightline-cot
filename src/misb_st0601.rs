@@ -175,12 +175,22 @@ pub struct Misb0601Frame {
     pub frame_center_elev_m: Option<f64>,
 }
 
-fn decode_u16_angle_360(bytes: &[u8]) -> Result<f64, MisbError> {
+fn decode_u16_angle(bytes: &[u8], max_deg: f64) -> Result<f64, MisbError> {
     if bytes.len() != 2 {
         return Err(MisbError::BufferTooShort);
     }
     let val = u16::from_be_bytes([bytes[0], bytes[1]]);
-    Ok((val as f64) * 360.0 / 65535.0)
+    Ok((val as f64) * max_deg / 65535.0)
+}
+
+fn encode_u16_angle(deg: f64, max_deg: f64) -> [u8; 2] {
+    let clamped = deg.clamp(0.0, max_deg);
+    let val = ((clamped / max_deg) * 65535.0).round() as u16;
+    val.to_be_bytes()
+}
+
+fn decode_u16_angle_360(bytes: &[u8]) -> Result<f64, MisbError> {
+    decode_u16_angle(bytes, 360.0)
 }
 
 fn encode_u16_angle_360(deg: f64) -> [u8; 2] {
@@ -321,8 +331,8 @@ impl Misb0601Frame {
             13 => self.sensor_lat_deg = Some(decode_i32_angle(val, 90.0)?),
             14 => self.sensor_lon_deg = Some(decode_i32_angle(val, 180.0)?),
             15 => self.sensor_true_alt_m = Some(decode_alt_16(val)?),
-            16 => self.sensor_hfov_deg = Some(decode_u16_angle_360(val)?),
-            17 => self.sensor_vfov_deg = Some(decode_u16_angle_360(val)?),
+            16 => self.sensor_hfov_deg = Some(decode_u16_angle(val, 180.0)?),
+            17 => self.sensor_vfov_deg = Some(decode_u16_angle(val, 180.0)?),
             18 => self.sensor_rel_az_deg = Some(decode_u16_angle_360(val)?),
             19 => self.sensor_rel_el_deg = Some(decode_i32_angle(val, 180.0)?),
             20 => self.sensor_rel_roll_deg = Some(decode_u16_angle_360(val)?),
@@ -388,10 +398,10 @@ impl Misb0601Frame {
             encode_tlv(15, &encode_alt_16(v), &mut out);
         }
         if let Some(v) = self.sensor_hfov_deg {
-            encode_tlv(16, &encode_u16_angle_360(v), &mut out);
+            encode_tlv(16, &encode_u16_angle(v, 180.0), &mut out);
         }
         if let Some(v) = self.sensor_vfov_deg {
-            encode_tlv(17, &encode_u16_angle_360(v), &mut out);
+            encode_tlv(17, &encode_u16_angle(v, 180.0), &mut out);
         }
         if let Some(v) = self.sensor_rel_az_deg {
             encode_tlv(18, &encode_u16_angle_360(v), &mut out);
