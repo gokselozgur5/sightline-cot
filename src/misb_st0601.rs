@@ -426,6 +426,33 @@ pub fn encode_st0601_packet(frame: &Misb0601Frame) -> Vec<u8> {
     packet
 }
 
+impl Misb0601Frame {
+    /// Convert decoded MISB ST 0601 attitude and position to `crate::camera::CameraPose`.
+    pub fn to_camera_pose(&self, ref_hae_m: f64) -> Result<crate::camera::CameraPose, MisbError> {
+        let alt = self.sensor_true_alt_m.ok_or(MisbError::MissingTag(15))?;
+        let cam_up_m = alt - ref_hae_m;
+
+        let hdg = self.platform_heading_deg.unwrap_or(0.0);
+        let rel_az = self.sensor_rel_az_deg.unwrap_or(0.0);
+        let az_true = (hdg + rel_az).rem_euclid(360.0);
+        let yaw_rad = -az_true.to_radians();
+
+        let rel_el = self.sensor_rel_el_deg.unwrap_or(-90.0);
+        let pitch_rad = (90.0 + rel_el).to_radians();
+
+        let rel_roll = self.sensor_rel_roll_deg.unwrap_or(0.0);
+        let roll_rad = rel_roll.to_radians();
+
+        Ok(crate::camera::CameraPose {
+            roll_rad,
+            pitch_rad,
+            yaw_rad,
+            cam_up_m,
+        })
+    }
+}
+
+
 
 
 
