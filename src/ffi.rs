@@ -400,8 +400,15 @@ fn pose_valid(
     {
         return None;
     }
-    let [de, dn, du] =
-        geodetic_to_enu(p.ref_lat_deg, p.ref_lon_deg, p.ref_hae_m, ref_origin.0, ref_origin.1, ref_origin.2).ok()?;
+    let [de, dn, du] = geodetic_to_enu(
+        p.ref_lat_deg,
+        p.ref_lon_deg,
+        p.ref_hae_m,
+        ref_origin.0,
+        ref_origin.1,
+        ref_origin.2,
+    )
+    .ok()?;
     let cam_up_eff = p.cam_up_m + du;
     if !cam_up_eff.is_finite() || (!dem && cam_up_eff <= ground_up_m) {
         return None;
