@@ -19,10 +19,7 @@ fn test_ber_length_short_and_long() {
 fn test_ber_length_invalid() {
     assert_eq!(decode_ber_length(&[]), Err(MisbError::BufferTooShort));
     assert_eq!(decode_ber_length(&[0x80]), Err(MisbError::InvalidBerLength));
-    assert_eq!(
-        decode_ber_length(&[0x85]),
-        Err(MisbError::BufferTooShort)
-    );
+    assert_eq!(decode_ber_length(&[0x85]), Err(MisbError::BufferTooShort));
 }
 
 #[test]
@@ -177,6 +174,3 @@ fn test_to_camera_pose_nadir_and_rays() {
     assert!(ray_slew[1] < -0.707);
     assert!(ray_slew[2] < -0.707);
 }
-
-
-
