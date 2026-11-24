@@ -447,3 +447,111 @@ required-features = ["experimental"]
 name = "imm_mixing_a"
 required-features = ["experimental"]
 
+[[test]]
+name = "imm_mixing_b"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_numerics"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_transition"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_transition_update"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_underflow"
+required-features = ["experimental"]
+
+[[test]]
+name = "kalman_target"
+required-features = ["experimental"]
+
+[[test]]
+name = "los"
+required-features = ["experimental"]
+
+[[test]]
+name = "los_ground"
+required-features = ["experimental"]
+
+[[test]]
+name = "los_symmetry"
+required-features = ["experimental"]
+
+[[test]]
+name = "los_terrain"
+required-features = ["experimental"]
+
+[[test]]
+name = "los_terrain_curvature"
+required-features = ["experimental"]
+
+[[test]]
+name = "los_terrain_edges"
+required-features = ["experimental"]
+
+[[test]]
+name = "los_terrain_monotonic"
+required-features = ["experimental"]
+
+[[test]]
+name = "mask_profile_beyond_target"
+required-features = ["experimental"]
+
+[[test]]
+name = "mask_sector_full_circle"
+required-features = ["experimental"]
+
+[[test]]
+name = "pipeline_geofence_cot"
+required-features = ["experimental"]
+
+[[test]]
+name = "pipeline_los_track"
+required-features = ["experimental"]
+
+[[test]]
+name = "sensor_frustum"
+required-features = ["experimental"]
+
+[[test]]
+name = "sidc"
+required-features = ["experimental"]
+
+[[test]]
+name = "sidc_parser"
+required-features = ["experimental"]
+
+[[test]]
+name = "sidc_parser_symbol_sets"
+required-features = ["experimental"]
+
+[[test]]
+name = "spatial_rtree_antimeridian_envelope"
+required-features = ["experimental"]
+
+[[test]]
+name = "spatial_rtree_normalize_lon_terminates"
+required-features = ["experimental"]
+
+[[test]]
+name = "terrain_ray_origin_below_surface"
+required-features = ["experimental"]
+
+[[test]]
+name = "terrain_sampler"
+required-features = ["experimental"]
+
+[[test]]
+name = "test_terrain_sampler"
+required-features = ["experimental"]
+
+[[test]]
+name = "tracker"
+required-features = ["experimental"]
+
