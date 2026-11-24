@@ -91,3 +91,98 @@ fn test_engine_step_pose_and_dem() {
         sightline_engine_free(eng);
     }
 }
+
+#[test]
+fn test_airborne_moving_origin_track_consistency() {
+    let mut cfg = base_cfg();
+    cfg.ref_lat_deg = 37.7700;
+    cfg.ref_lon_deg = -122.4200;
+    cfg.ref_hae_m = 100.0;
+    cfg.cam_up_m = 500.0;
+    cfg.ground_up_m = 0.0;
+
+    unsafe {
+        let eng = sightline_engine_new(&cfg);
+        assert!(!eng.is_null());
+        let mut tracks = [SightlineTrackC::default(); 4];
+        let mut out_n = 0usize;
+        let det = sample_det();
+
+        // Step 1: Nadir detection at ref origin
+        let pose1 = SightlinePoseC {
+            roll_rad: 0.0,
+            pitch_rad: 0.0,
+            yaw_rad: 0.0,
+            cam_up_m: 500.0,
+            ref_lat_deg: 37.7700,
+            ref_lon_deg: -122.4200,
+            ref_hae_m: 100.0,
+        };
+        let rc1 = sightline_engine_step_pose(
+            eng,
+            0.033,
+            &pose1,
+            &det,
+            1,
+            tracks.as_mut_ptr(),
+            4,
+            &mut out_n,
+        );
+        assert_eq!(rc1, SIGHTLINE_OK);
+        assert_eq!(out_n, 1);
+        let id1 = tracks[0].id;
+        assert!((tracks[0].lat_deg - 37.7700).abs() < 1e-4);
+        assert!((tracks[0].lon_deg - (-122.4200)).abs() < 1e-4);
+        assert!((tracks[0].hae_m - 100.0).abs() < 0.5);
+
+        // Step 2: Aircraft flies ~100m North (approx +0.0009 deg) and +20m up
+        // With dets = NULL, n = 0 (coasting): Track must stay at (37.7700, -122.4200, 100.0) < 0.5m
+        let pose2 = SightlinePoseC {
+            roll_rad: 0.0,
+            pitch_rad: 0.0,
+            yaw_rad: 0.0,
+            cam_up_m: 500.0,
+            ref_lat_deg: 37.7709,
+            ref_lon_deg: -122.4200,
+            ref_hae_m: 120.0,
+        };
+        let rc2 = sightline_engine_step_pose(
+            eng,
+            0.033,
+            &pose2,
+            std::ptr::null(),
+            0,
+            tracks.as_mut_ptr(),
+            4,
+            &mut out_n,
+        );
+        assert_eq!(rc2, SIGHTLINE_OK);
+        assert_eq!(out_n, 1);
+        assert_eq!(tracks[0].id, id1);
+        assert!(
+            (tracks[0].lat_deg - 37.7700).abs() < 1e-5,
+            "Track teleported in latitude: {}",
+            tracks[0].lat_deg
+        );
+        assert!(
+            (tracks[0].hae_m - 100.0).abs() < 0.5,
+            "Track teleported in HAE: {}",
+            tracks[0].hae_m
+        );
+
+        // Step 3: Failed step must NOT mutate pose or camera offset
+        let rc_fail = sightline_engine_step_pose(
+            eng,
+            -1.0, // invalid dt_s
+            &pose2,
+            std::ptr::null(),
+            0,
+            tracks.as_mut_ptr(),
+            4,
+            &mut out_n,
+        );
+        assert_eq!(rc_fail, SIGHTLINE_ERR_INVALID);
+
+        sightline_engine_free(eng);
+    }
+}
