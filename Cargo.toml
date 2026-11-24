@@ -339,3 +339,111 @@ required-features = ["geodesy"]
 name = "vincenty_reverse_azimuth_reference"
 required-features = ["geodesy"]
 
+[[test]]
+name = "cam_frustum_repro"
+required-features = ["experimental"]
+
+[[test]]
+name = "cam_project"
+required-features = ["experimental"]
+
+[[test]]
+name = "cam_project_fisheye_limit"
+required-features = ["experimental"]
+
+[[test]]
+name = "cam_slant_range"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_beacon"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_beacon_calendar"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_beacon_parse"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_beacon_point_round_trip"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_centroid_antimeridian"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_detail_entity_round_trip"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_detail_sensor"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_detail_xml"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_sensor"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_sensor_bounds"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_shape"
+required-features = ["experimental"]
+
+[[test]]
+name = "cot_task"
+required-features = ["experimental"]
+
+[[test]]
+name = "elevation_mask"
+required-features = ["experimental"]
+
+[[test]]
+name = "geofence_antimeridian"
+required-features = ["experimental"]
+
+[[test]]
+name = "geofence_edges"
+required-features = ["experimental"]
+
+[[test]]
+name = "geofence_hysteresis_altitude"
+required-features = ["experimental"]
+
+[[test]]
+name = "geofence_pole"
+required-features = ["experimental"]
+
+[[test]]
+name = "geofence_wide"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_cross_axis_covariance"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_ct_covariance"
+required-features = ["experimental"]
+
+[[test]]
+name = "imm_mixing_a"
+required-features = ["experimental"]
+
