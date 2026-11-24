@@ -1,7 +1,7 @@
 //! C-ABI surface for embedding the Sightline engine.
 
 use crate::camera::{enu_to_geodetic, estimate_covariance_ce_le, intersect_ground};
-use crate::camera::{CameraPose, Intrinsics};
+use crate::camera::{CameraPose, DemGrid, Intrinsics};
 use crate::cot::CotEvent;
 use crate::tracker::{BoundingBox, Detection, MultiTargetTracker, Track};
 use std::os::raw::c_char;
@@ -101,6 +101,7 @@ pub struct SightlineEngine {
     cam: Intrinsics,
     pose: CameraPose,
     cfg: SightlineCameraCfg,
+    dem: Option<DemGrid>,
     tracker: MultiTargetTracker,
 }
 
@@ -174,6 +175,7 @@ fn build_engine(c: &SightlineCameraCfg) -> Option<SightlineEngine> {
         cam: make_intrinsics(c),
         pose: make_pose(c),
         cfg: *c,
+        dem: None,
         tracker,
     })
 }
@@ -210,17 +212,21 @@ fn locate(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<[f64; 3], i3
         .cam
         .pixel_to_ray(d.u, d.v)
         .map_err(|_| SIGHTLINE_ERR_CAMERA)?;
-    intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m).map_err(|_| SIGHTLINE_ERR_CAMERA)
+    if let Some(ref dem) = eng.dem {
+        dem.intersect_dem(ray, &eng.pose, 64).map_err(|_| SIGHTLINE_ERR_CAMERA)
+    } else {
+        intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m).map_err(|_| SIGHTLINE_ERR_CAMERA)
+    }
 }
 
-fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<(f64, f64), i32> {
+fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC, ground_hae: f64) -> Result<(f64, f64), i32> {
     let c = &eng.cfg;
     estimate_covariance_ce_le(
         &eng.cam,
         &eng.pose,
         d.u,
         d.v,
-        c.ground_up_m,
+        ground_hae,
         c.pixel_sigma_px,
         c.attitude_sigma_rad,
     )
@@ -229,7 +235,8 @@ fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<(f64, f6
 
 fn to_detection(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<Detection, i32> {
     let p = locate(eng, d)?;
-    let (ce, le) = covariance(eng, d)?;
+    let ground_hae = if eng.dem.is_some() { p[2] } else { eng.cfg.ground_up_m };
+    let (ce, le) = covariance(eng, d, ground_hae)?;
     let bbox = BoundingBox {
         x1: d.x1,
         y1: d.y1,
@@ -239,7 +246,7 @@ fn to_detection(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<Detect
     Ok(Detection {
         east_m: p[0],
         north_m: p[1],
-        hae_m: eng.cfg.ground_up_m,
+        hae_m: ground_hae,
         ce90_m: ce,
         le90_m: le,
         bbox,
@@ -347,6 +354,70 @@ pub unsafe extern "C" fn sightline_engine_step(
     out_n: *mut usize,
 ) -> i32 {
     guard(|| step_impl((e, dets, n), dt_s, (out, cap, out_n)))
+}
+
+fn pose_valid(p: &SightlinePoseC, dem: bool, ground_up_m: f64) -> bool {
+    let f = [
+        p.roll_rad,
+        p.pitch_rad,
+        p.yaw_rad,
+        p.cam_up_m,
+        p.ref_lat_deg,
+        p.ref_lon_deg,
+        p.ref_hae_m,
+    ];
+    if !f.iter().all(|x| x.is_finite()) {
+        return false;
+    }
+    if p.ref_lat_deg.abs() > 90.0 || p.ref_lon_deg.abs() > 180.0 {
+        return false;
+    }
+    if !dem && p.cam_up_m <= ground_up_m {
+        return false;
+    }
+    true
+}
+
+/// # Safety
+/// Pointers must be null (with zero length) or valid for the stated lengths.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_engine_step_pose(
+    e: *mut SightlineEngine,
+    dt_s: f64,
+    pose: *const SightlinePoseC,
+    dets: *const SightlineDetectionC,
+    n: usize,
+    out: *mut SightlineTrackC,
+    cap: usize,
+    out_n: *mut usize,
+) -> i32 {
+    guard(|| {
+        if e.is_null() || pose.is_null() {
+            return SIGHTLINE_ERR_NULL;
+        }
+        if !pointer_is_aligned(pose) {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        let p = &*pose;
+        let eng = &mut *e;
+        if !pose_valid(p, eng.dem.is_some(), eng.cfg.ground_up_m) {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        eng.pose = CameraPose {
+            roll_rad: p.roll_rad,
+            pitch_rad: p.pitch_rad,
+            yaw_rad: p.yaw_rad,
+            cam_up_m: p.cam_up_m,
+        };
+        eng.cfg.roll_rad = p.roll_rad;
+        eng.cfg.pitch_rad = p.pitch_rad;
+        eng.cfg.yaw_rad = p.yaw_rad;
+        eng.cfg.cam_up_m = p.cam_up_m;
+        eng.cfg.ref_lat_deg = p.ref_lat_deg;
+        eng.cfg.ref_lon_deg = p.ref_lon_deg;
+        eng.cfg.ref_hae_m = p.ref_hae_m;
+        step_impl((e, dets, n), dt_s, (out, cap, out_n))
+    })
 }
 
 const STALE_OFFSET_MS: i64 = 30_000;
