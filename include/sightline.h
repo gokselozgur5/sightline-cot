@@ -87,6 +87,12 @@ int32_t sightline_engine_clear_dem(SightlineEngine *e);
 /* The event stale time is time_ms plus 30000 ms (saturating). */
 int32_t sightline_track_to_cot_xml(const SightlineTrackC *t, int64_t time_ms,
                                    char *buf, size_t cap);
+int32_t sightline_track_to_cot_xml_typed(const SightlineTrackC *t, int64_t time_ms,
+                                         const char *cot_type, char *buf, size_t cap);
+const char *sightline_cot_type_from_class(uint32_t affiliation, uint32_t category);
+int32_t sightline_track_to_tak_proto(const SightlineTrackC *t, int64_t time_ms,
+                                     const char *cot_type, uint8_t *buf,
+                                     size_t cap, size_t *out_len);
 
 #ifdef __cplusplus
 }
