@@ -199,6 +199,28 @@ fn encode_i16_angle(deg: f64, max_deg: f64) -> [u8; 2] {
     val.to_be_bytes()
 }
 
+fn decode_i32_angle(bytes: &[u8], max_deg: f64) -> Result<f64, MisbError> {
+    if bytes.len() != 4 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = i32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+    if val == i32::MIN {
+        return Err(MisbError::OutOfRange("sentinel or out of range i32"));
+    }
+    let deg = (val as f64) * max_deg / 2147483647.0;
+    if !(-max_deg..=max_deg).contains(&deg) {
+        return Err(MisbError::OutOfRange("angle out of range"));
+    }
+    Ok(deg)
+}
+
+fn encode_i32_angle(deg: f64, max_deg: f64) -> [u8; 4] {
+    let clamped = deg.clamp(-max_deg, max_deg);
+    let val = ((clamped / max_deg) * 2147483647.0).round() as i32;
+    val.to_be_bytes()
+}
+
+
 
 
 
