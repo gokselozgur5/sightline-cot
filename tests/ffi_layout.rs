@@ -20,6 +20,12 @@ fn track_layout_is_stable() {
 }
 
 #[test]
+fn pose_layout_is_stable() {
+    assert_eq!(size_of::<SightlinePoseC>(), 56);
+    assert_eq!(align_of::<SightlinePoseC>(), 8);
+}
+
+#[test]
 fn field_offsets_match_the_c_header() {
     let c = std::mem::MaybeUninit::<SightlineCameraCfg>::uninit();
     let base = c.as_ptr();

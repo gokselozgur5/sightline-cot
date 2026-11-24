@@ -23,9 +23,23 @@ pub const SIGHTLINE_STATUS_DELETED: u32 = 3;
 const _: () = assert!(std::mem::size_of::<SightlineCameraCfg>() == 152);
 const _: () = assert!(std::mem::size_of::<SightlineDetectionC>() == 80);
 const _: () = assert!(std::mem::size_of::<SightlineTrackC>() == 72);
+const _: () = assert!(std::mem::size_of::<SightlinePoseC>() == 56);
 
 fn guard<F: FnOnce() -> i32>(f: F) -> i32 {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)).unwrap_or(SIGHTLINE_ERR_PANIC)
+}
+
+/// Dynamic 6-DOF camera pose and geodetic reference for airborne platforms.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct SightlinePoseC {
+    pub roll_rad: f64,
+    pub pitch_rad: f64,
+    pub yaw_rad: f64,
+    pub cam_up_m: f64,
+    pub ref_lat_deg: f64,
+    pub ref_lon_deg: f64,
+    pub ref_hae_m: f64,
 }
 
 /// Camera, pose, geodetic origin and tracker parameters.
