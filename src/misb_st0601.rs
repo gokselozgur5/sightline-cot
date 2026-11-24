@@ -125,4 +125,44 @@ pub fn encode_ber_oid_tag(tag: u64, out: &mut Vec<u8>) {
     }
 }
 
+/// Decoded MISB ST 0601 UAS Datalink Local Set frame.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct Misb0601Frame {
+    /// Tag 2: Precision Time Stamp (microseconds since Unix epoch).
+    pub timestamp_micros: Option<u64>,
+    /// Tag 5: Platform Heading Angle (0..360 degrees).
+    pub platform_heading_deg: Option<f64>,
+    /// Tag 6: Platform Pitch Angle (-20..+20 degrees).
+    pub platform_pitch_deg: Option<f64>,
+    /// Tag 7: Platform Roll Angle (-50..+50 degrees).
+    pub platform_roll_deg: Option<f64>,
+    /// Tag 13: Sensor Latitude (-90..+90 degrees).
+    pub sensor_lat_deg: Option<f64>,
+    /// Tag 14: Sensor Longitude (-180..+180 degrees).
+    pub sensor_lon_deg: Option<f64>,
+    /// Tag 15: Sensor True Altitude (-900..+19000 meters).
+    pub sensor_true_alt_m: Option<f64>,
+    /// Tag 16: Sensor Horizontal Field of View (0..180 degrees).
+    pub sensor_hfov_deg: Option<f64>,
+    /// Tag 17: Sensor Vertical Field of View (0..180 degrees).
+    pub sensor_vfov_deg: Option<f64>,
+    /// Tag 18: Sensor Relative Azimuth Angle (0..360 degrees).
+    pub sensor_rel_az_deg: Option<f64>,
+    /// Tag 19: Sensor Relative Elevation Angle (-180..+180 degrees).
+    pub sensor_rel_el_deg: Option<f64>,
+    /// Tag 20: Sensor Relative Roll Angle (0..360 degrees).
+    pub sensor_rel_roll_deg: Option<f64>,
+    /// Tag 21: Slant Range (0..5,000,000 meters).
+    pub slant_range_m: Option<f64>,
+    /// Tag 22: Target Width (0..10,000 meters).
+    pub target_width_m: Option<f64>,
+    /// Tag 23: Frame Center Latitude (-90..+90 degrees).
+    pub frame_center_lat_deg: Option<f64>,
+    /// Tag 24: Frame Center Longitude (-180..+180 degrees).
+    pub frame_center_lon_deg: Option<f64>,
+    /// Tag 25: Frame Center Elevation (-900..+19000 meters).
+    pub frame_center_elev_m: Option<f64>,
+}
+
+
 
