@@ -71,6 +71,26 @@ jobs:
               int32_t xml_res = sightline_track_to_cot_xml(&tracks[0], 1700000000000LL, xml_buf, sizeof(xml_buf));
               assert(xml_res == SIGHTLINE_OK);
               assert(strstr(xml_buf, "<event") != NULL);
+
+              SightlinePoseC pose = {
+                  .roll_rad = 0.05, .pitch_rad = -0.1, .yaw_rad = 1.57, .cam_up_m = 800.0,
+                  .ref_lat_deg = 37.7800, .ref_lon_deg = -122.4200, .ref_hae_m = 120.0
+              };
+              assert(sightline_engine_step_pose(eng, 0.033, &pose, &det, 1, tracks, 4, &out_n) == SIGHTLINE_OK);
+
+              double elevs[9] = {50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0};
+              assert(sightline_engine_set_dem(eng, -100.0, -100.0, 100.0, 3, 3, elevs) == SIGHTLINE_OK);
+              assert(sightline_engine_clear_dem(eng) == SIGHTLINE_OK);
+
+              const char *cot_type = sightline_cot_type_from_class(1, 0);
+              assert(cot_type != NULL && strcmp(cot_type, "a-h-G-E-V") == 0);
+              assert(sightline_track_to_cot_xml_typed(&tracks[0], 1700000000000LL, cot_type, xml_buf, sizeof(xml_buf)) == SIGHTLINE_OK);
+
+              uint8_t proto_buf[1024];
+              size_t proto_len = 0;
+              assert(sightline_track_to_tak_proto(&tracks[0], 1700000000000LL, cot_type, proto_buf, sizeof(proto_buf), &proto_len) == SIGHTLINE_OK);
+              assert(proto_len > 0 && proto_buf[0] == 0xBF);
+
               sightline_engine_free(eng);
               return 0;
           }
