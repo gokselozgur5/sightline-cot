@@ -83,3 +83,45 @@ fn test_round_trip_all_tags() {
     assert!((parsed.frame_center_elev_m.unwrap() - 50.0).abs() < 1.0);
 }
 
+#[test]
+fn test_error_cases_and_sentinels() {
+    let frame = Misb0601Frame {
+        timestamp_micros: Some(1_000_000),
+        ..Default::default()
+    };
+    let mut packet = encode_st0601_packet(&frame);
+
+    let mut bad_key = packet.clone();
+    bad_key[0] = 0xFF;
+    assert_eq!(
+        parse_st0601_packet(&bad_key),
+        Err(MisbError::InvalidUniversalKey)
+    );
+
+    let mut bad_ck = packet.clone();
+    let last = bad_ck.len() - 1;
+    bad_ck[last] ^= 0xFF;
+    assert_eq!(
+        parse_st0601_packet(&bad_ck),
+        Err(MisbError::InvalidChecksum)
+    );
+
+    assert_eq!(
+        parse_st0601_packet(&packet[..20]),
+        Err(MisbError::BufferTooShort)
+    );
+
+    let sentinel_pitch_tlv = [0x06, 0x02, 0x80, 0x00];
+    assert_eq!(
+        Misb0601Frame::decode_local_set(&sentinel_pitch_tlv),
+        Err(MisbError::OutOfRange("sentinel or out of range i16"))
+    );
+
+    let sentinel_lat_tlv = [0x0D, 0x04, 0x80, 0x00, 0x00, 0x00];
+    assert_eq!(
+        Misb0601Frame::decode_local_set(&sentinel_lat_tlv),
+        Err(MisbError::OutOfRange("sentinel or out of range i32"))
+    );
+}
+
+
