@@ -80,6 +80,10 @@ int32_t sightline_engine_step_pose(SightlineEngine *e, double dt_s,
                                    const SightlinePoseC *pose,
                                    const SightlineDetectionC *dets, size_t n,
                                    SightlineTrackC *out, size_t cap, size_t *out_n);
+int32_t sightline_engine_set_dem(SightlineEngine *e, double origin_east_m,
+                                 double origin_north_m, double cell_size_m,
+                                 size_t rows, size_t cols, const double *elevations);
+int32_t sightline_engine_clear_dem(SightlineEngine *e);
 /* The event stale time is time_ms plus 30000 ms (saturating). */
 int32_t sightline_track_to_cot_xml(const SightlineTrackC *t, int64_t time_ms,
                                    char *buf, size_t cap);

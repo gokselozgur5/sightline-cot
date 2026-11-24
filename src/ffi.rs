@@ -420,6 +420,53 @@ pub unsafe extern "C" fn sightline_engine_step_pose(
     })
 }
 
+/// # Safety
+/// Pointers must be null (with zero length) or valid for the stated lengths.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_engine_set_dem(
+    e: *mut SightlineEngine,
+    origin_east_m: f64,
+    origin_north_m: f64,
+    cell_size_m: f64,
+    rows: usize,
+    cols: usize,
+    elevations: *const f64,
+) -> i32 {
+    guard(|| {
+        if e.is_null() || (rows > 0 && cols > 0 && elevations.is_null()) {
+            return SIGHTLINE_ERR_NULL;
+        }
+        let total = match rows.checked_mul(cols) {
+            Some(n) => n,
+            None => return SIGHTLINE_ERR_INVALID,
+        };
+        if !layout_ok(elevations, total) {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        let elevs = std::slice::from_raw_parts(elevations, total).to_vec();
+        match DemGrid::new(origin_east_m, origin_north_m, cell_size_m, cols, rows, elevs) {
+            Ok(grid) => {
+                (*e).dem = Some(grid);
+                SIGHTLINE_OK
+            }
+            Err(_) => SIGHTLINE_ERR_INVALID,
+        }
+    })
+}
+
+/// # Safety
+/// `e` must be null or valid.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_engine_clear_dem(e: *mut SightlineEngine) -> i32 {
+    guard(|| {
+        if e.is_null() {
+            return SIGHTLINE_ERR_NULL;
+        }
+        (*e).dem = None;
+        SIGHTLINE_OK
+    })
+}
+
 const STALE_OFFSET_MS: i64 = 30_000;
 
 fn to_cot(t: &SightlineTrackC) -> CotEvent {
