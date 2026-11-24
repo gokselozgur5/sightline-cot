@@ -134,6 +134,18 @@ fn test_error_cases_and_sentinels() {
         Misb0601Frame::decode_local_set(&sentinel_lat_tlv),
         Err(MisbError::OutOfRange("sentinel or out of range i32"))
     );
+
+    // Missing Tag 1 (0x01, 0x02) at packet end before checksum
+    let mut missing_tag1 = packet.clone();
+    let n = missing_tag1.len();
+    missing_tag1[n - 4] = 0x02; // replace Tag 1 with Tag 2
+    // recompute checksum so checksum check itself passes
+    let new_ck = sightline_cot::stanag4609::compute_st0601_checksum(&missing_tag1[..n - 2]);
+    missing_tag1[n - 2..].copy_from_slice(&new_ck.to_be_bytes());
+    assert_eq!(
+        parse_st0601_packet(&missing_tag1),
+        Err(MisbError::MissingTag(1))
+    );
 }
 
 #[test]
