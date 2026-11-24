@@ -351,6 +351,9 @@ pub fn parse_st0601_packet(packet: &[u8]) -> Result<Misb0601Frame, MisbError> {
     if packet.len() < full_len || body_len < 4 {
         return Err(MisbError::BufferTooShort);
     }
+    if packet[full_len - 4..full_len - 2] != [0x01, 0x02] {
+        return Err(MisbError::MissingTag(1));
+    }
     let expected_ck = crate::stanag4609::compute_st0601_checksum(&packet[..full_len - 2]);
     let packet_ck = u16::from_be_bytes([packet[full_len - 2], packet[full_len - 1]]);
     if expected_ck != packet_ck {
