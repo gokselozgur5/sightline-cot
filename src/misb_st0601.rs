@@ -164,5 +164,41 @@ pub struct Misb0601Frame {
     pub frame_center_elev_m: Option<f64>,
 }
 
+fn decode_u16_angle_360(bytes: &[u8]) -> Result<f64, MisbError> {
+    if bytes.len() != 2 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = u16::from_be_bytes([bytes[0], bytes[1]]);
+    Ok((val as f64) * 360.0 / 65535.0)
+}
+
+fn encode_u16_angle_360(deg: f64) -> [u8; 2] {
+    let clamped = deg.rem_euclid(360.0);
+    let val = ((clamped / 360.0) * 65535.0).round() as u16;
+    val.to_be_bytes()
+}
+
+fn decode_i16_angle(bytes: &[u8], max_deg: f64) -> Result<f64, MisbError> {
+    if bytes.len() != 2 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = i16::from_be_bytes([bytes[0], bytes[1]]);
+    if val == i16::MIN {
+        return Err(MisbError::OutOfRange("sentinel or out of range i16"));
+    }
+    let deg = (val as f64) * max_deg / 32767.0;
+    if !(-max_deg..=max_deg).contains(&deg) {
+        return Err(MisbError::OutOfRange("angle out of range"));
+    }
+    Ok(deg)
+}
+
+fn encode_i16_angle(deg: f64, max_deg: f64) -> [u8; 2] {
+    let clamped = deg.clamp(-max_deg, max_deg);
+    let val = ((clamped / max_deg) * 32767.0).round() as i16;
+    val.to_be_bytes()
+}
+
+
 
 
