@@ -71,8 +71,12 @@ fn test_repro_tracker_assoc_config_wiring() {
         cosine_weight: 5.0,
     };
     let mut tracker_tight = MultiTargetTracker::with_assoc_config(1, 5, 0.5, tight_cfg);
-    tracker_tight.step(1.0, &[det_init.clone()]).unwrap();
-    tracker_tight.step(1.0, &[det_match.clone()]).unwrap();
+    tracker_tight
+        .step(1.0, std::slice::from_ref(&det_init))
+        .unwrap();
+    tracker_tight
+        .step(1.0, std::slice::from_ref(&det_match))
+        .unwrap();
     assert_eq!(
         tracker_tight.tracks.len(),
         2,

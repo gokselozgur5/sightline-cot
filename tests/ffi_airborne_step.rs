@@ -69,7 +69,7 @@ fn test_engine_step_pose_and_dem() {
         assert_eq!(out_n, 1);
         assert!(tracks[0].le90_m > 0.0 && tracks[0].le90_m != SIGHTLINE_UNKNOWN_ERROR_M);
 
-        let elevs = vec![50.0; 9];
+        let elevs = [50.0; 9];
         let rc_dem = sightline_engine_set_dem(eng, -100.0, -100.0, 100.0, 3, 3, elevs.as_ptr());
         assert_eq!(rc_dem, SIGHTLINE_OK);
 
