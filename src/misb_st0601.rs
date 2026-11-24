@@ -77,3 +77,52 @@ pub fn encode_ber_length(len: usize, out: &mut Vec<u8>) {
     }
 }
 
+/// Decode a BER-OID tag identifier (e.g. 1-byte, or multi-byte MSB=1 continuation).
+/// Returns `(tag_number, bytes_consumed)`.
+pub fn decode_ber_oid_tag(bytes: &[u8]) -> Result<(u64, usize), MisbError> {
+    if bytes.is_empty() {
+        return Err(MisbError::BufferTooShort);
+    }
+    let mut tag: u64 = 0;
+    let mut consumed = 0;
+    for &b in bytes {
+        consumed += 1;
+        if consumed > 10 {
+            return Err(MisbError::InvalidBerOidTag);
+        }
+        tag = tag
+            .checked_shl(7)
+            .ok_or(MisbError::InvalidBerOidTag)?
+            .checked_add((b & 0x7F) as u64)
+            .ok_or(MisbError::InvalidBerOidTag)?;
+        if (b & 0x80) == 0 {
+            return Ok((tag, consumed));
+        }
+    }
+    Err(MisbError::BufferTooShort)
+}
+
+/// Encode a tag identifier into BER-OID format.
+pub fn encode_ber_oid_tag(tag: u64, out: &mut Vec<u8>) {
+    if tag < 0x80 {
+        out.push(tag as u8);
+    } else {
+        let mut buf = [0u8; 10];
+        let mut n = 0;
+        let mut val = tag;
+        while val > 0 {
+            buf[n] = (val & 0x7F) as u8;
+            val >>= 7;
+            n += 1;
+        }
+        for i in (0..n).rev() {
+            let mut b = buf[i];
+            if i > 0 {
+                b |= 0x80;
+            }
+            out.push(b);
+        }
+    }
+}
+
+
