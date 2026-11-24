@@ -26,7 +26,9 @@ impl core::fmt::Display for MisbError {
             Self::InvalidUniversalKey => write!(f, "invalid MISB ST 0601 16-byte universal key"),
             Self::InvalidChecksum => write!(f, "invalid MISB ST 0601 BCC-16 checksum"),
             Self::MissingTag(tag) => write!(f, "required MISB ST 0601 tag {tag} is missing"),
-            Self::OutOfRange(msg) => write!(f, "MISB ST 0601 field out of range or sentinel: {msg}"),
+            Self::OutOfRange(msg) => {
+                write!(f, "MISB ST 0601 field out of range or sentinel: {msg}")
+            }
         }
     }
 }
@@ -451,14 +453,3 @@ impl Misb0601Frame {
         })
     }
 }
-
-
-
-
-
-
-
-
-
-
-
