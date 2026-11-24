@@ -86,7 +86,7 @@ fn test_error_cases_and_sentinels() {
         timestamp_micros: Some(1_000_000),
         ..Default::default()
     };
-    let mut packet = encode_st0601_packet(&frame);
+    let packet = encode_st0601_packet(&frame);
 
     let mut bad_key = packet.clone();
     bad_key[0] = 0xFF;
