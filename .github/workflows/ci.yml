@@ -101,5 +101,99 @@ jobs:
           EOF
           cc -std=c99 -Wall -Wextra -pedantic test.c -Ltarget/release -lsightline_cot -lpthread -ldl -lm -o test
           LD_LIBRARY_PATH=target/release ./test
+      - name: Compile and run C++17 smoke test
+        run: |
+          cat <<EOF > test_cpp.cpp
+          #include <cassert>
+          #include <cstring>
+          #include <iostream>
+          #include "include/sightline.h"
+
+          int main() {
+              SightlineCameraCfg cfg = {
+                  1000.0, 1000.0, 960.0, 540.0,
+                  0.0, 0.0, 0,
+                  0.0, 0.0, 0.0,
+                  600.0, 0.0,
+                  1.0, 0.001,
+                  37.7749, -122.4194, 100.0,
+                  1, 5, 1.0
+              };
+              SightlineEngine *eng = sightline_engine_new(&cfg);
+              assert(eng != nullptr);
+
+              SightlineDetectionC det = {
+                  960.0, 540.0, 950.0, 530.0, 970.0, 550.0,
+                  {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+              };
+              SightlineTrackC tracks[4];
+              size_t out_n = 0;
+
+              SightlinePoseC pose = {
+                  0.05, -0.1, 1.57, 800.0,
+                  37.7800, -122.4200, 120.0
+              };
+              int32_t step_res = sightline_engine_step_pose(eng, 0.033, &pose, &det, 1, tracks, 4, &out_n);
+              assert(step_res == SIGHTLINE_OK);
+              assert(out_n >= 1);
+
+              const char *cot_type = sightline_cot_type_from_class(1, 0);
+              assert(cot_type != nullptr && std::strcmp(cot_type, "a-h-G-E-V") == 0);
+
+              uint8_t proto_buf[1024];
+              size_t proto_len = 0;
+              int32_t proto_res = sightline_track_to_tak_proto(&tracks[0], 1700000000000LL, cot_type, proto_buf, sizeof(proto_buf), &proto_len);
+              assert(proto_res == SIGHTLINE_OK);
+              assert(proto_len > 0 && proto_buf[0] == 0xBF);
+
+              sightline_engine_free(eng);
+              return 0;
+          }
+          EOF
+          g++ -std=c++17 -Wall -Wextra test_cpp.cpp -Ltarget/release -lsightline_cot -lpthread -ldl -lm -o test_cpp
+          LD_LIBRARY_PATH=target/release ./test_cpp
+      - name: Run Python3 ctypes smoke test
+        run: |
+          python3 -c '
+          import ctypes
+
+          lib = ctypes.CDLL("target/release/libsightline_cot.so")
+
+          lib.sightline_cot_type_from_class.argtypes = [ctypes.c_uint8, ctypes.c_uint8]
+          lib.sightline_cot_type_from_class.restype = ctypes.c_char_p
+
+          cot_type = lib.sightline_cot_type_from_class(1, 0)
+          assert cot_type == b"a-h-G-E-V", f"Unexpected cot_type: {cot_type}"
+
+          class CameraCfg(ctypes.Structure):
+              _fields_ = [
+                  ("fx", ctypes.c_double), ("fy", ctypes.c_double), ("cx", ctypes.c_double), ("cy", ctypes.c_double),
+                  ("k1", ctypes.c_double), ("k2", ctypes.c_double), ("is_fisheye", ctypes.c_int32),
+                  ("roll_rad", ctypes.c_double), ("pitch_rad", ctypes.c_double), ("yaw_rad", ctypes.c_double),
+                  ("cam_up_m", ctypes.c_double), ("ground_up_m", ctypes.c_double),
+                  ("pixel_sigma_px", ctypes.c_double), ("attitude_sigma_rad", ctypes.c_double),
+                  ("ref_lat_deg", ctypes.c_double), ("ref_lon_deg", ctypes.c_double), ("ref_hae_m", ctypes.c_double),
+                  ("min_hits", ctypes.c_uint32), ("max_age", ctypes.c_uint32), ("q_acc", ctypes.c_double)
+              ]
+
+          lib.sightline_engine_new.argtypes = [ctypes.POINTER(CameraCfg)]
+          lib.sightline_engine_new.restype = ctypes.c_void_p
+          lib.sightline_engine_free.argtypes = [ctypes.c_void_p]
+          lib.sightline_engine_free.restype = None
+
+          cfg = CameraCfg(
+              1000.0, 1000.0, 960.0, 540.0,
+              0.0, 0.0, 0,
+              0.0, 0.0, 0.0,
+              600.0, 0.0,
+              1.0, 0.001,
+              37.7749, -122.4194, 100.0,
+              1, 5, 1.0
+          )
+
+          eng = lib.sightline_engine_new(ctypes.byref(cfg))
+          assert eng is not None
+          lib.sightline_engine_free(eng)
+          '
 
 
