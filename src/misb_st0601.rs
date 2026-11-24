@@ -199,6 +199,20 @@ fn encode_u16_angle_360(deg: f64) -> [u8; 2] {
     val.to_be_bytes()
 }
 
+fn decode_u32_angle_360(bytes: &[u8]) -> Result<f64, MisbError> {
+    if bytes.len() != 4 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+    Ok((val as f64) * 360.0 / 4294967295.0)
+}
+
+fn encode_u32_angle_360(deg: f64) -> [u8; 4] {
+    let clamped = deg.rem_euclid(360.0);
+    let val = ((clamped / 360.0) * 4294967295.0).round() as u32;
+    val.to_be_bytes()
+}
+
 fn decode_i16_angle(bytes: &[u8], max_deg: f64) -> Result<f64, MisbError> {
     if bytes.len() != 2 {
         return Err(MisbError::BufferTooShort);
@@ -333,9 +347,9 @@ impl Misb0601Frame {
             15 => self.sensor_true_alt_m = Some(decode_alt_16(val)?),
             16 => self.sensor_hfov_deg = Some(decode_u16_angle(val, 180.0)?),
             17 => self.sensor_vfov_deg = Some(decode_u16_angle(val, 180.0)?),
-            18 => self.sensor_rel_az_deg = Some(decode_u16_angle_360(val)?),
+            18 => self.sensor_rel_az_deg = Some(decode_u32_angle_360(val)?),
             19 => self.sensor_rel_el_deg = Some(decode_i32_angle(val, 180.0)?),
-            20 => self.sensor_rel_roll_deg = Some(decode_u16_angle_360(val)?),
+            20 => self.sensor_rel_roll_deg = Some(decode_u32_angle_360(val)?),
             21 => self.slant_range_m = Some(decode_range_32(val)?),
             22 => self.target_width_m = Some(decode_width_16(val)?),
             23 => self.frame_center_lat_deg = Some(decode_i32_angle(val, 90.0)?),
@@ -404,13 +418,13 @@ impl Misb0601Frame {
             encode_tlv(17, &encode_u16_angle(v, 180.0), &mut out);
         }
         if let Some(v) = self.sensor_rel_az_deg {
-            encode_tlv(18, &encode_u16_angle_360(v), &mut out);
+            encode_tlv(18, &encode_u32_angle_360(v), &mut out);
         }
         if let Some(v) = self.sensor_rel_el_deg {
             encode_tlv(19, &encode_i32_angle(v, 180.0), &mut out);
         }
         if let Some(v) = self.sensor_rel_roll_deg {
-            encode_tlv(20, &encode_u16_angle_360(v), &mut out);
+            encode_tlv(20, &encode_u32_angle_360(v), &mut out);
         }
         if let Some(v) = self.slant_range_m {
             encode_tlv(21, &encode_range_32(v), &mut out);
