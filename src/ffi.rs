@@ -250,7 +250,7 @@ fn to_track_c(eng: &SightlineEngine, t: &Track) -> SightlineTrackC {
         lon_deg: lon,
         hae_m: hae,
         ce90_m: ce,
-        le90_m: SIGHTLINE_UNKNOWN_ERROR_M,
+        le90_m: t.le90_m,
         course_deg: course,
         speed_mps: speed,
         status: t.status as u32,
@@ -550,7 +550,7 @@ mod tests {
             assert_eq!((rc, n, out[0].id), (SIGHTLINE_OK, 1, 1));
             assert!((out[0].lat_deg - 37.0).abs() < 0.01 && (out[0].lon_deg + 122.0).abs() < 0.01);
             assert!(out[0].ce90_m > 0.0 && out[0].ce90_m.is_finite());
-            assert_eq!(out[0].le90_m, SIGHTLINE_UNKNOWN_ERROR_M);
+            assert!(out[0].le90_m > 0.0 && out[0].le90_m.is_finite() && out[0].le90_m != SIGHTLINE_UNKNOWN_ERROR_M);
             sightline_engine_free(e);
         }
     }
