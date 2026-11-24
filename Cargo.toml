@@ -11,3 +11,11 @@ repository = "https://github.com/gokselozgur5/sightline-cot"
 crate-type = ["rlib", "cdylib", "staticlib"]
 
 [dependencies]
+
+[features]
+default = []
+geodesy = []
+grid = ["geodesy"]
+xml-tools = []
+experimental = ["geodesy"]
+full = ["geodesy", "grid", "xml-tools", "experimental"]
