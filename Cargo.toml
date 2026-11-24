@@ -555,3 +555,19 @@ required-features = ["experimental"]
 name = "tracker"
 required-features = ["experimental"]
 
+[[test]]
+name = "cot_circle"
+required-features = ["experimental", "geodesy"]
+
+[[test]]
+name = "latitude_range_validation"
+required-features = ["experimental", "grid"]
+
+[[test]]
+name = "spatial_rtree_nearest_exact"
+required-features = ["experimental", "geodesy"]
+
+[[example]]
+name = "bench_mgrs_convert"
+required-features = ["grid"]
+
