@@ -57,17 +57,25 @@ pub mod imm;
 pub mod imm_transition;
 pub mod los;
 pub mod los_ground;
+#[cfg(feature = "grid")]
 pub mod maidenhead;
+#[cfg(feature = "grid")]
 pub mod mgrs;
+#[cfg(feature = "grid")]
 pub mod mgrs_decode;
+#[cfg(feature = "grid")]
 pub mod mgrs_encode;
+#[cfg(feature = "grid")]
 pub mod mgrs_parse;
+#[cfg(feature = "grid")]
 pub mod mgrs_truncate;
+#[cfg(feature = "grid")]
 pub use mgrs::{
     format_mgrs, lat_to_mgrs_band, lon_to_utm_zone, mgrs_10figure_to_utm, mgrs_10figure_to_wgs84,
     parse_mgrs_10figure, utm_to_mgrs_10figure, utm_to_wgs84, wgs84_to_mgrs_10figure, wgs84_to_utm,
     GridError, Mgrs10Figure, MgrsString, UtmCoord,
 };
+#[cfg(feature = "grid")]
 pub use mgrs_parse::{
     parse_mgrs, parse_mgrs_to_utm, parse_mgrs_to_wgs84, MgrsParseError, ParsedMgrs,
 };
@@ -146,14 +154,20 @@ pub use tracker_cov_adaptive::{
     compute_adaptive_scale, scale_measurement_variance, AdaptiveCovarianceConfig,
     AdaptiveCovarianceError,
 };
+#[cfg(feature = "grid")]
 pub mod utm_forced;
+#[cfg(feature = "grid")]
 pub mod utm_mgrs;
+#[cfg(feature = "grid")]
 pub mod utm_string;
+#[cfg(feature = "grid")]
 pub use utm_forced::{
     is_adjacent_zone, utm_forced_to_wgs84, wgs84_to_utm_forced, zone_distance_delta,
 };
+#[cfg(feature = "grid")]
 pub mod geo_unified;
 pub use cam_distorted_pinhole::DistortedPinhole;
+#[cfg(feature = "grid")]
 pub use geo_unified::{
     is_polar_latitude, is_utm_latitude, unified_to_wgs84, wgs84_to_unified, GridSystem,
     UnifiedCoord,
@@ -165,18 +179,24 @@ pub use geoid::{
 };
 pub mod ellipsoid;
 pub use ellipsoid::{Ellipsoid, GRS80, WGS72, WGS84};
+#[cfg(feature = "grid")]
 pub mod geohash_neighbors;
+#[cfg(feature = "grid")]
 pub use geohash_neighbors::{
     geohash_neighbor, geohash_neighbors, GeohashDirection, GeohashNeighbors,
 };
 pub mod geo_los;
+#[cfg(feature = "grid")]
 pub mod geo_ups;
+#[cfg(feature = "grid")]
 pub mod geohash;
 pub use geo_los::{
     compute_geo_los, elevation_angle_rad, has_line_of_sight, horizon_distance_m,
     slant_range_geodetic, GeoLosError, GeoPoint3D, LosGeometry,
 };
+#[cfg(feature = "grid")]
 pub use geo_unified::{ups_to_wgs84, wgs84_to_ups, UpsCoord};
+#[cfg(feature = "grid")]
 pub use geohash::{decode_geohash, encode_geohash, GeohashError};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -233,7 +253,9 @@ pub use track_assoc::{
     AssocResult, DistanceMatrix,
 };
 
+#[cfg(feature = "xml-tools")]
 pub mod xml_canonicalizer;
+#[cfg(feature = "xml-tools")]
 pub use xml_canonicalizer::{
     canonicalize_cot_xml, validate_cot_xml, CanonicalizeOptions, CotSchemaValidator,
     CotValidationError, CotXmlCanonicalizer,
