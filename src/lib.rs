@@ -1,30 +1,48 @@
 //! Sightline CoT core library
 
+#[cfg(feature = "experimental")]
 pub mod cam_project;
+#[cfg(feature = "experimental")]
 pub mod cam_slant_range;
+#[cfg(feature = "experimental")]
 pub use cam_slant_range::{
     compute_slant_range_and_grazing, slant_range_for_pixel, slant_range_from_pose_and_ground,
     SlantRangeGeometry,
 };
+#[cfg(feature = "experimental")]
 pub mod cam_frustum;
 pub mod camera;
 pub mod classifier;
 pub mod cot;
+#[cfg(feature = "experimental")]
 pub mod cot_beacon;
+#[cfg(feature = "experimental")]
 pub use cot_beacon::{CotBeaconError, EmergencyBeacon, EmergencySeverity, EmergencyType};
+#[cfg(feature = "experimental")]
 pub mod cot_detail;
+#[cfg(feature = "experimental")]
 pub mod cot_sensor;
+#[cfg(feature = "experimental")]
 pub mod cot_sensor_fov;
+#[cfg(feature = "experimental")]
 pub use cot_sensor_fov::{
     compute_ground_footprint, is_target_in_sensor_fov, SensorCone, SensorFootprint, SensorFovError,
 };
+#[cfg(feature = "experimental")]
 pub mod cot_shape;
+#[cfg(feature = "experimental")]
 pub use cot_shape::{CotShape, CotShapeError, CotShapeType, CotVertex};
+#[cfg(feature = "experimental")]
 pub mod cot_task;
+#[cfg(feature = "experimental")]
 pub use cot_task::{CotTaskError, TacticalTask, TaskAction, TaskPoint, TaskPriority, TaskStatus};
+#[cfg(feature = "experimental")]
 pub mod cot_circle;
+#[cfg(feature = "experimental")]
 pub use cot_circle::{CotCircle, CotCircleError, CotRangeRings};
+#[cfg(feature = "experimental")]
 pub mod sensor_frustum;
+#[cfg(feature = "experimental")]
 pub use sensor_frustum::{
     compute_frustum_ground_enu, compute_frustum_rays_enu, generate_sensor_footprint,
     point_in_polygon_enu, polygon_area_enu, polygon_perimeter_enu, FrustumError, FrustumFootprint,
@@ -33,11 +51,13 @@ pub use sensor_frustum::{
 pub mod dem_bilinear;
 #[cfg(feature = "geodesy")]
 pub mod egm96_geoid;
+#[cfg(feature = "experimental")]
 pub mod elevation_mask;
 #[cfg(feature = "geodesy")]
 pub use egm96_geoid::{
     normalize_lon_180, normalize_lon_360, sample_egm96_undulation, Egm96Error, Egm96Geoid,
 };
+#[cfg(feature = "experimental")]
 pub use elevation_mask::{
     ElevationMaskError, ElevationMaskValidator, MaskSector, MaskingEvaluation, MaskingStatus,
     ObstaclePoint, ObstacleProfile,
@@ -59,11 +79,17 @@ pub use geo_vincenty::{
     vincenty_intermediate_points, vincenty_inverse, vincenty_inverse_ellipsoid, VincentyDirect,
     VincentyError, VincentyInverse,
 };
+#[cfg(feature = "experimental")]
 pub mod geofence;
+#[cfg(feature = "experimental")]
 pub use geofence::{Geofence, GeofenceBreach, GeofenceState};
+#[cfg(feature = "experimental")]
 pub mod imm;
+#[cfg(feature = "experimental")]
 pub mod imm_transition;
+#[cfg(feature = "experimental")]
 pub mod los;
+#[cfg(feature = "experimental")]
 pub mod los_ground;
 #[cfg(feature = "grid")]
 pub mod maidenhead;
@@ -193,6 +219,7 @@ pub mod geo_simplify;
 pub mod geoid_loader;
 #[cfg(feature = "geodesy")]
 pub use geo_simplify::{simplify_polyline, simplify_polyline_in_frame, PlanarFrame};
+#[cfg(feature = "experimental")]
 pub mod cam_distorted_pinhole;
 #[cfg(feature = "geodesy")]
 pub mod geo_sphere;
@@ -214,6 +241,7 @@ pub use utm_forced::{
 };
 #[cfg(feature = "grid")]
 pub mod geo_unified;
+#[cfg(feature = "experimental")]
 pub use cam_distorted_pinhole::DistortedPinhole;
 #[cfg(feature = "grid")]
 pub use geo_unified::{
@@ -266,6 +294,7 @@ mod tests {
         assert!((geom.slant_range_m - 100.0).abs() < 1e-3);
     }
     #[test]
+    #[cfg(feature = "experimental")]
     fn test_cot_sensor_fov_crate_export() {
         let cone = SensorCone::new(0.0, -45.0, 30.0, 1000.0).unwrap();
         assert!(cone.contains_relative_point([0.0, 100.0, -100.0]));
@@ -277,11 +306,13 @@ mod tests {
         assert!((geoid.get_node(0, 0) - (-29.53)).abs() < 1e-6);
     }
     #[test]
+    #[cfg(feature = "experimental")]
     fn test_cot_task_crate_export() {
         let task = TacticalTask::new("EXPORT-TEST");
         assert_eq!(task.name, "EXPORT-TEST");
     }
     #[test]
+    #[cfg(feature = "experimental")]
     fn test_sensor_frustum_crate_export() {
         let p = PlatformPose::new(0.0, 0.0, 500.0, 0.0, 0.0, 0.0).unwrap();
         let g = SensorGimbal::new(0.0, -90.0, 0.0).unwrap();
@@ -290,6 +321,7 @@ mod tests {
         assert_eq!(fp.vertices_enu.len(), 4);
     }
     #[test]
+    #[cfg(feature = "experimental")]
     fn test_spatial_rtree_crate_export() {
         let mut tree = crate::SpatialRTree::new();
         tree.insert(crate::SpatialEnvelope::from_point(0.0, 0.0), 42);
@@ -314,22 +346,30 @@ pub use xml_canonicalizer::{
     canonicalize_cot_xml, validate_cot_xml, CanonicalizeOptions, CotSchemaValidator,
     CotValidationError, CotXmlCanonicalizer,
 };
+#[cfg(feature = "experimental")]
 pub mod spatial_rtree;
+#[cfg(feature = "experimental")]
 pub use spatial_rtree::{normalize_lon, RTreeEntry, SpatialEnvelope, SpatialRTree};
 
+#[cfg(feature = "experimental")]
 pub mod sidc_parser;
+#[cfg(feature = "experimental")]
 pub use sidc_parser::{
     cot_type_to_sidc20, generate_sidc2525d, parse_sidc2525d, sidc20_to_cot_type, Echelon,
     MilStd2525DSymbol, SidcParseError, StandardIdentity, SymbolSet, SymbolStatus,
 };
 
+#[cfg(feature = "experimental")]
 pub mod terrain_sampler;
+#[cfg(feature = "experimental")]
 pub use terrain_sampler::{
     cot_target_from_intercept, GeoTiffElevationGrid, InterpolationMethod, TerrainIntercept,
     TerrainInterceptSolver, TerrainRay, TerrainSamplerError,
 };
 
+#[cfg(feature = "experimental")]
 pub mod kalman_target;
+#[cfg(feature = "experimental")]
 pub use kalman_target::{
     KalmanTargetError, KinematicState, TacticalTargetFilter, TargetFilterConfig,
 };
