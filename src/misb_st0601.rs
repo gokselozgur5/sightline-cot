@@ -325,6 +325,29 @@ impl Misb0601Frame {
     }
 }
 
+/// Parse a standalone MISB ST 0601 KLV packet with 16-byte key and BCC-16 checksum.
+pub fn parse_st0601_packet(packet: &[u8]) -> Result<Misb0601Frame, MisbError> {
+    if packet.len() < 22 {
+        return Err(MisbError::BufferTooShort);
+    }
+    if packet[..16] != MISB_0601_UNIVERSAL_KEY {
+        return Err(MisbError::InvalidUniversalKey);
+    }
+    let (body_len, len_bytes) = decode_ber_length(&packet[16..])?;
+    let offset = 16 + len_bytes;
+    if packet.len() < offset + body_len || body_len < 4 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let full_len = offset + body_len;
+    let expected_ck = crate::stanag4609::compute_st0601_checksum(&packet[..full_len - 2]);
+    let packet_ck = u16::from_be_bytes([packet[full_len - 2], packet[full_len - 1]]);
+    if expected_ck != packet_ck {
+        return Err(MisbError::InvalidChecksum);
+    }
+    Misb0601Frame::decode_local_set(&packet[offset..full_len - 4])
+}
+
+
 
 
 
