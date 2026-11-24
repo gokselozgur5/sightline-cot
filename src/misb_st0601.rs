@@ -516,7 +516,7 @@ impl Misb0601Frame {
 
         let cam_up_m = alt - ref_hae_m;
         let r_ned_platform = mat3_mult(
-            mat3_mult(rot_z(hdg.to_radians()), rot_y(-pitch.to_radians())),
+            mat3_mult(rot_z(hdg.to_radians()), rot_y(pitch.to_radians())),
             rot_x(roll.to_radians()),
         );
 
@@ -537,8 +537,11 @@ impl Misb0601Frame {
         let m = mat3_mult(r_cam_enu, r_base_t);
 
         let pitch_rad = m[2][1].clamp(-1.0, 1.0).asin();
-        let yaw_rad = (-m[0][1]).atan2(m[1][1]);
-        let roll_rad = (-m[2][0]).atan2(m[2][2]);
+        let (roll_rad, yaw_rad) = if m[2][1].abs() > 0.999_999 {
+            (0.0, m[1][0].atan2(m[0][0]))
+        } else {
+            ((-m[2][0]).atan2(m[2][2]), (-m[0][1]).atan2(m[1][1]))
+        };
 
         Ok(crate::camera::CameraPose {
             roll_rad,
