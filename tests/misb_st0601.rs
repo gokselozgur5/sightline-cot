@@ -1,6 +1,21 @@
 use sightline_cot::misb_st0601::*;
 
 #[test]
+fn test_repro_overflow_and_ber_guards() {
+    // Crafted BER length with huge byte count that would wrap
+    let crafted_len = [0x88, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
+    assert_eq!(decode_ber_length(&crafted_len), Err(MisbError::InvalidBerLength));
+
+    // Leading 0x80 in BER-OID tag is non-minimal
+    let non_minimal_oid = [0x80, 0x01];
+    assert_eq!(decode_ber_oid_tag(&non_minimal_oid), Err(MisbError::InvalidBerOidTag));
+
+    // Shift overflow in BER-OID tag
+    let huge_oid = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F];
+    assert_eq!(decode_ber_oid_tag(&huge_oid), Err(MisbError::InvalidBerOidTag));
+}
+
+#[test]
 fn test_ber_length_short_and_long() {
     let mut buf = Vec::new();
     encode_ber_length(10, &mut buf);
