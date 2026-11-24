@@ -159,11 +159,14 @@ jobs:
 
           lib = ctypes.CDLL("target/release/libsightline_cot.so")
 
-          lib.sightline_cot_type_from_class.argtypes = [ctypes.c_uint8, ctypes.c_uint8]
+          lib.sightline_cot_type_from_class.argtypes = [ctypes.c_uint32, ctypes.c_uint32]
           lib.sightline_cot_type_from_class.restype = ctypes.c_char_p
 
           cot_type = lib.sightline_cot_type_from_class(1, 0)
           assert cot_type == b"a-h-G-E-V", f"Unexpected cot_type: {cot_type}"
+
+          cot_type_unknown = lib.sightline_cot_type_from_class(256, 0)
+          assert cot_type_unknown == b"a-u-G", f"Unexpected cot_type_unknown: {cot_type_unknown}"
 
           class CameraCfg(ctypes.Structure):
               _fields_ = [
