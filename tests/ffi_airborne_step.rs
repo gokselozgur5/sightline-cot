@@ -186,3 +186,82 @@ fn test_airborne_moving_origin_track_consistency() {
         sightline_engine_free(eng);
     }
 }
+
+#[test]
+fn test_airborne_stationary_ground_target_low_velocity() {
+    let mut cfg = base_cfg();
+    cfg.ref_lat_deg = 37.7700;
+    cfg.ref_lon_deg = -122.4200;
+    cfg.ref_hae_m = 100.0;
+    cfg.cam_up_m = 500.0;
+    cfg.ground_up_m = 0.0;
+
+    unsafe {
+        let eng = sightline_engine_new(&cfg);
+        assert!(!eng.is_null());
+        let mut tracks = [SightlineTrackC::default(); 4];
+        let mut out_n = 0usize;
+
+        // Frame 1: Nadir det at origin
+        let pose1 = SightlinePoseC {
+            roll_rad: 0.0,
+            pitch_rad: 0.0,
+            yaw_rad: 0.0,
+            cam_up_m: 500.0,
+            ref_lat_deg: 37.7700,
+            ref_lon_deg: -122.4200,
+            ref_hae_m: 100.0,
+        };
+        let det1 = sample_det(); // nadir u=cx, v=cy -> (0,0) ground
+        let rc1 = sightline_engine_step_pose(
+            eng,
+            0.1,
+            &pose1,
+            &det1,
+            1,
+            tracks.as_mut_ptr(),
+            4,
+            &mut out_n,
+        );
+        assert_eq!(rc1, SIGHTLINE_OK);
+        assert_eq!(out_n, 1);
+        let id1 = tracks[0].id;
+
+        // Aircraft moves 10m North (dlat ~ 10m / 111132m ~ 9.0e-5 deg).
+        // Since aircraft moved 10m North, target is at North=0m, so camera hit is North=-10m.
+        // v - cy = 20 => v = 560.0.
+        let dlat_10m = 10.0 / 111132.954;
+        let pose2 = SightlinePoseC {
+            roll_rad: 0.0,
+            pitch_rad: 0.0,
+            yaw_rad: 0.0,
+            cam_up_m: 500.0,
+            ref_lat_deg: 37.7700 + dlat_10m,
+            ref_lon_deg: -122.4200,
+            ref_hae_m: 100.0,
+        };
+        let mut det2 = sample_det();
+        det2.v = 560.0;
+
+        let rc2 = sightline_engine_step_pose(
+            eng,
+            0.1,
+            &pose2,
+            &det2,
+            1,
+            tracks.as_mut_ptr(),
+            4,
+            &mut out_n,
+        );
+        assert_eq!(rc2, SIGHTLINE_OK);
+        assert_eq!(out_n, 1);
+        assert_eq!(tracks[0].id, id1);
+        assert!(
+            tracks[0].speed_mps < 1.0,
+            "False aircraft velocity injected into stationary target: {} m/s",
+            tracks[0].speed_mps
+        );
+
+        sightline_engine_free(eng);
+    }
+}
