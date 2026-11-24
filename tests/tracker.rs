@@ -38,7 +38,12 @@ fn test_repro_tracker_assoc_config_wiring() {
         hae_m: 0.0,
         ce90_m: 1.5,
         le90_m: 1.0,
-        bbox: BoundingBox { x1: 0.0, y1: 0.0, x2: 10.0, y2: 10.0 },
+        bbox: BoundingBox {
+            x1: 0.0,
+            y1: 0.0,
+            x2: 10.0,
+            y2: 10.0,
+        },
         embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     };
 
@@ -48,7 +53,12 @@ fn test_repro_tracker_assoc_config_wiring() {
         hae_m: 0.0,
         ce90_m: 1.5,
         le90_m: 1.0,
-        bbox: BoundingBox { x1: 0.0, y1: 0.0, x2: 10.0, y2: 10.0 },
+        bbox: BoundingBox {
+            x1: 0.0,
+            y1: 0.0,
+            x2: 10.0,
+            y2: 10.0,
+        },
         embedding: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     };
 
@@ -63,7 +73,9 @@ fn test_repro_tracker_assoc_config_wiring() {
     let mut tracker_tight = MultiTargetTracker::with_assoc_config(1, 5, 0.5, tight_cfg);
     tracker_tight.step(1.0, &[det_init.clone()]).unwrap();
     tracker_tight.step(1.0, &[det_match.clone()]).unwrap();
-    assert_eq!(tracker_tight.tracks.len(), 2, "Tight gate_threshold must reject association");
+    assert_eq!(
+        tracker_tight.tracks.len(),
+        2,
+        "Tight gate_threshold must reject association"
+    );
 }
-
-

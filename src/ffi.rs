@@ -215,13 +215,18 @@ fn locate(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<[f64; 3], i3
         .pixel_to_ray(d.u, d.v)
         .map_err(|_| SIGHTLINE_ERR_CAMERA)?;
     if let Some(ref dem) = eng.dem {
-        dem.intersect_dem(ray, &eng.pose, 64).map_err(|_| SIGHTLINE_ERR_CAMERA)
+        dem.intersect_dem(ray, &eng.pose, 64)
+            .map_err(|_| SIGHTLINE_ERR_CAMERA)
     } else {
         intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m).map_err(|_| SIGHTLINE_ERR_CAMERA)
     }
 }
 
-fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC, ground_hae: f64) -> Result<(f64, f64), i32> {
+fn covariance(
+    eng: &SightlineEngine,
+    d: &SightlineDetectionC,
+    ground_hae: f64,
+) -> Result<(f64, f64), i32> {
     let c = &eng.cfg;
     estimate_covariance_ce_le(
         &eng.cam,
@@ -237,7 +242,11 @@ fn covariance(eng: &SightlineEngine, d: &SightlineDetectionC, ground_hae: f64) -
 
 fn to_detection(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<Detection, i32> {
     let p = locate(eng, d)?;
-    let ground_hae = if eng.dem.is_some() { p[2] } else { eng.cfg.ground_up_m };
+    let ground_hae = if eng.dem.is_some() {
+        p[2]
+    } else {
+        eng.cfg.ground_up_m
+    };
     let (ce, le) = covariance(eng, d, ground_hae)?;
     let bbox = BoundingBox {
         x1: d.x1,
@@ -446,7 +455,14 @@ pub unsafe extern "C" fn sightline_engine_set_dem(
             return SIGHTLINE_ERR_INVALID;
         }
         let elevs = std::slice::from_raw_parts(elevations, total).to_vec();
-        match DemGrid::new(origin_east_m, origin_north_m, cell_size_m, cols, rows, elevs) {
+        match DemGrid::new(
+            origin_east_m,
+            origin_north_m,
+            cell_size_m,
+            cols,
+            rows,
+            elevs,
+        ) {
             Ok(grid) => {
                 (*e).dem = Some(grid);
                 SIGHTLINE_OK
@@ -801,7 +817,11 @@ mod tests {
             assert_eq!((rc, n, out[0].id), (SIGHTLINE_OK, 1, 1));
             assert!((out[0].lat_deg - 37.0).abs() < 0.01 && (out[0].lon_deg + 122.0).abs() < 0.01);
             assert!(out[0].ce90_m > 0.0 && out[0].ce90_m.is_finite());
-            assert!(out[0].le90_m > 0.0 && out[0].le90_m.is_finite() && out[0].le90_m != SIGHTLINE_UNKNOWN_ERROR_M);
+            assert!(
+                out[0].le90_m > 0.0
+                    && out[0].le90_m.is_finite()
+                    && out[0].le90_m != SIGHTLINE_UNKNOWN_ERROR_M
+            );
             sightline_engine_free(e);
         }
     }
