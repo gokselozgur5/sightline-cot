@@ -1,6 +1,8 @@
 //! C-ABI surface for embedding the Sightline engine.
 
-use crate::camera::{enu_to_geodetic, estimate_covariance_ce_le, intersect_ground};
+use crate::camera::{
+    enu_to_geodetic, estimate_covariance_ce_le, geodetic_to_enu, intersect_ground,
+};
 use crate::camera::{CameraPose, DemGrid, Intrinsics};
 use crate::classifier::{MilStdClassifier, TacticalAffiliation, TargetCategory};
 use crate::cot::CotEvent;
@@ -102,6 +104,7 @@ pub struct SightlineTrackC {
 pub struct SightlineEngine {
     cam: Intrinsics,
     pose: CameraPose,
+    cam_offset_enu: [f64; 2],
     cfg: SightlineCameraCfg,
     dem: Option<DemGrid>,
     tracker: MultiTargetTracker,
@@ -176,6 +179,7 @@ fn build_engine(c: &SightlineCameraCfg) -> Option<SightlineEngine> {
     Some(SightlineEngine {
         cam: make_intrinsics(c),
         pose: make_pose(c),
+        cam_offset_enu: [0.0, 0.0],
         cfg: *c,
         dem: None,
         tracker,
@@ -215,10 +219,16 @@ fn locate(eng: &SightlineEngine, d: &SightlineDetectionC) -> Result<[f64; 3], i3
         .pixel_to_ray(d.u, d.v)
         .map_err(|_| SIGHTLINE_ERR_CAMERA)?;
     if let Some(ref dem) = eng.dem {
-        dem.intersect_dem(ray, &eng.pose, 64)
+        dem.intersect_dem_at_offset(ray, &eng.pose, eng.cam_offset_enu, 64)
             .map_err(|_| SIGHTLINE_ERR_CAMERA)
     } else {
-        intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m).map_err(|_| SIGHTLINE_ERR_CAMERA)
+        let local_hit = intersect_ground(ray, &eng.pose, eng.cfg.ground_up_m)
+            .map_err(|_| SIGHTLINE_ERR_CAMERA)?;
+        Ok([
+            eng.cam_offset_enu[0] + local_hit[0],
+            eng.cam_offset_enu[1] + local_hit[1],
+            local_hit[2],
+        ])
     }
 }
 
@@ -327,7 +337,11 @@ unsafe fn step_impl(a: StepArgs, dt_s: f64, out: (*mut SightlineTrackC, usize, *
     if e.is_null() || out_n.is_null() || (n > 0 && dets.is_null()) || (cap > 0 && out.is_null()) {
         return SIGHTLINE_ERR_NULL;
     }
-    if !layout_ok(dets, n) || !layout_ok(out, cap) || !pointer_is_aligned(out_n) {
+    if !pointer_is_aligned(e)
+        || !layout_ok(dets, n)
+        || !layout_ok(out, cap)
+        || !pointer_is_aligned(out_n)
+    {
         return SIGHTLINE_ERR_INVALID;
     }
     let ds: &[SightlineDetectionC] = if n == 0 {
@@ -367,7 +381,12 @@ pub unsafe extern "C" fn sightline_engine_step(
     guard(|| step_impl((e, dets, n), dt_s, (out, cap, out_n)))
 }
 
-fn pose_valid(p: &SightlinePoseC, dem: bool, ground_up_m: f64) -> bool {
+fn pose_valid(
+    p: &SightlinePoseC,
+    dem: bool,
+    ground_up_m: f64,
+    ref_origin: (f64, f64, f64),
+) -> Option<(CameraPose, [f64; 2])> {
     let f = [
         p.roll_rad,
         p.pitch_rad,
@@ -377,16 +396,25 @@ fn pose_valid(p: &SightlinePoseC, dem: bool, ground_up_m: f64) -> bool {
         p.ref_lon_deg,
         p.ref_hae_m,
     ];
-    if !f.iter().all(|x| x.is_finite()) {
-        return false;
+    if !f.iter().all(|x| x.is_finite()) || p.ref_lat_deg.abs() > 90.0 || p.ref_lon_deg.abs() > 180.0
+    {
+        return None;
     }
-    if p.ref_lat_deg.abs() > 90.0 || p.ref_lon_deg.abs() > 180.0 {
-        return false;
+    let [de, dn, du] =
+        geodetic_to_enu(p.ref_lat_deg, p.ref_lon_deg, p.ref_hae_m, ref_origin.0, ref_origin.1, ref_origin.2).ok()?;
+    let cam_up_eff = p.cam_up_m + du;
+    if !cam_up_eff.is_finite() || (!dem && cam_up_eff <= ground_up_m) {
+        return None;
     }
-    if !dem && p.cam_up_m <= ground_up_m {
-        return false;
-    }
-    true
+    Some((
+        CameraPose {
+            roll_rad: p.roll_rad,
+            pitch_rad: p.pitch_rad,
+            yaw_rad: p.yaw_rad,
+            cam_up_m: cam_up_eff,
+        },
+        [de, dn],
+    ))
 }
 
 /// # Safety
@@ -403,30 +431,37 @@ pub unsafe extern "C" fn sightline_engine_step_pose(
     out_n: *mut usize,
 ) -> i32 {
     guard(|| {
-        if e.is_null() || pose.is_null() {
+        if e.is_null()
+            || pose.is_null()
+            || out_n.is_null()
+            || (n > 0 && dets.is_null())
+            || (cap > 0 && out.is_null())
+        {
             return SIGHTLINE_ERR_NULL;
         }
-        if !pointer_is_aligned(e) || !pointer_is_aligned(pose) {
+        if !pointer_is_aligned(e)
+            || !pointer_is_aligned(pose)
+            || !pointer_is_aligned(out_n)
+            || !layout_ok(dets, n)
+            || !layout_ok(out, cap)
+            || !dt_s.is_finite()
+            || dt_s <= 0.0
+        {
             return SIGHTLINE_ERR_INVALID;
         }
         let p = &*pose;
         let eng = &mut *e;
-        if !pose_valid(p, eng.dem.is_some(), eng.cfg.ground_up_m) {
-            return SIGHTLINE_ERR_INVALID;
-        }
-        eng.pose = CameraPose {
-            roll_rad: p.roll_rad,
-            pitch_rad: p.pitch_rad,
-            yaw_rad: p.yaw_rad,
-            cam_up_m: p.cam_up_m,
+        let (pose_eff, offset_enu) = match pose_valid(
+            p,
+            eng.dem.is_some(),
+            eng.cfg.ground_up_m,
+            (eng.cfg.ref_lat_deg, eng.cfg.ref_lon_deg, eng.cfg.ref_hae_m),
+        ) {
+            Some(res) => res,
+            None => return SIGHTLINE_ERR_INVALID,
         };
-        eng.cfg.roll_rad = p.roll_rad;
-        eng.cfg.pitch_rad = p.pitch_rad;
-        eng.cfg.yaw_rad = p.yaw_rad;
-        eng.cfg.cam_up_m = p.cam_up_m;
-        eng.cfg.ref_lat_deg = p.ref_lat_deg;
-        eng.cfg.ref_lon_deg = p.ref_lon_deg;
-        eng.cfg.ref_hae_m = p.ref_hae_m;
+        eng.pose = pose_eff;
+        eng.cam_offset_enu = offset_enu;
         step_impl((e, dets, n), dt_s, (out, cap, out_n))
     })
 }
