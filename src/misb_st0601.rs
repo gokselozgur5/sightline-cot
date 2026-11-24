@@ -412,6 +412,21 @@ fn encode_tlv(tag: u64, val: &[u8], out: &mut Vec<u8>) {
     out.extend_from_slice(val);
 }
 
+/// Encode a complete MISB ST 0601 packet including Universal Key, payload, and BCC-16 checksum.
+pub fn encode_st0601_packet(frame: &Misb0601Frame) -> Vec<u8> {
+    let payload = frame.encode_local_set();
+    let body_len = payload.len() + 4;
+    let mut packet = Vec::with_capacity(16 + 4 + body_len);
+    packet.extend_from_slice(&MISB_0601_UNIVERSAL_KEY);
+    encode_ber_length(body_len, &mut packet);
+    packet.extend_from_slice(&payload);
+    packet.extend_from_slice(&[0x01, 0x02]);
+    let ck = crate::stanag4609::compute_st0601_checksum(&packet);
+    packet.extend_from_slice(&ck.to_be_bytes());
+    packet
+}
+
+
 
 
 
