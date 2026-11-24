@@ -57,11 +57,17 @@ pub fn decode_ber_length(bytes: &[u8]) -> Result<(usize, usize), MisbError> {
     }
     let mut len: usize = 0;
     for &b in &bytes[1..=n] {
+        if len > (usize::MAX >> 8) {
+            return Err(MisbError::InvalidBerLength);
+        }
         len = len
             .checked_shl(8)
             .ok_or(MisbError::InvalidBerLength)?
             .checked_add(b as usize)
             .ok_or(MisbError::InvalidBerLength)?;
+    }
+    if len > (isize::MAX as usize) {
+        return Err(MisbError::InvalidBerLength);
     }
     Ok((len, 1 + n))
 }
@@ -89,7 +95,10 @@ pub fn decode_ber_oid_tag(bytes: &[u8]) -> Result<(u64, usize), MisbError> {
     let mut consumed = 0;
     for &b in bytes {
         consumed += 1;
-        if consumed > 10 {
+        if consumed > 10 || (consumed == 1 && b == 0x80) {
+            return Err(MisbError::InvalidBerOidTag);
+        }
+        if tag > (u64::MAX >> 7) {
             return Err(MisbError::InvalidBerOidTag);
         }
         tag = tag
@@ -282,12 +291,13 @@ impl Misb0601Frame {
                 return Err(MisbError::BufferTooShort);
             }
             let (len, len_len) = decode_ber_length(&payload[idx..])?;
-            idx += len_len;
-            if payload.len() < idx + len {
+            idx = idx.checked_add(len_len).ok_or(MisbError::BufferTooShort)?;
+            let end = idx.checked_add(len).ok_or(MisbError::BufferTooShort)?;
+            if payload.len() < end {
                 return Err(MisbError::BufferTooShort);
             }
-            let val = &payload[idx..idx + len];
-            idx += len;
+            let val = &payload[idx..end];
+            idx = end;
 
             frame.parse_tag(tag, val)?;
         }
@@ -337,10 +347,10 @@ pub fn parse_st0601_packet(packet: &[u8]) -> Result<Misb0601Frame, MisbError> {
     }
     let (body_len, len_bytes) = decode_ber_length(&packet[16..])?;
     let offset = 16 + len_bytes;
-    if packet.len() < offset + body_len || body_len < 4 {
+    let full_len = offset.checked_add(body_len).ok_or(MisbError::BufferTooShort)?;
+    if packet.len() < full_len || body_len < 4 {
         return Err(MisbError::BufferTooShort);
     }
-    let full_len = offset + body_len;
     let expected_ck = crate::stanag4609::compute_st0601_checksum(&packet[..full_len - 2]);
     let packet_ck = u16::from_be_bytes([packet[full_len - 2], packet[full_len - 1]]);
     if expected_ck != packet_ck {
