@@ -16,6 +16,39 @@ fn test_repro_overflow_and_ber_guards() {
 }
 
 #[test]
+fn test_repro_tags_18_20_u32_wire_encoding() {
+    // Tag 18 (Sensor Relative Azimuth) and Tag 20 (Sensor Relative Roll) MUST be 4-byte u32 in ST 0601!
+    // Known byte vector:
+    // Tag 18: 0x12, Len: 0x04, Val: 0x80000000 -> 180.0 deg (half of 360)
+    let tlv18 = [0x12, 0x04, 0x80, 0x00, 0x00, 0x00];
+    let frame18 = Misb0601Frame::decode_local_set(&tlv18).expect("decode u32 rel_az");
+    assert!(
+        (frame18.sensor_rel_az_deg.unwrap() - 180.0).abs() < 1e-4,
+        "Tag 18 0x80000000 should decode to 180.0 deg, got {:?}",
+        frame18.sensor_rel_az_deg
+    );
+
+    // Tag 20: 0x14, Len: 0x04, Val: 0x40000000 -> 90.0 deg (quarter of 360)
+    let tlv20 = [0x14, 0x04, 0x40, 0x00, 0x00, 0x00];
+    let frame20 = Misb0601Frame::decode_local_set(&tlv20).expect("decode u32 rel_roll");
+    assert!(
+        (frame20.sensor_rel_roll_deg.unwrap() - 90.0).abs() < 1e-4,
+        "Tag 20 0x40000000 should decode to 90.0 deg, got {:?}",
+        frame20.sensor_rel_roll_deg
+    );
+
+    // Verify encode produces 4-byte payload (Tag, Len=4, 4 bytes value = 6 bytes total)
+    let frame_enc = Misb0601Frame {
+        sensor_rel_az_deg: Some(180.0),
+        sensor_rel_roll_deg: Some(90.0),
+        ..Default::default()
+    };
+    let encoded = frame_enc.encode_local_set();
+    assert_eq!(&encoded[0..6], &tlv18);
+    assert_eq!(&encoded[6..12], &tlv20);
+}
+
+#[test]
 fn test_repro_hfov_vfov_180_deg_scaling() {
     // Tag 16 (HFOV) with 0xFFFF should decode to 180.0 deg per MISB ST 0601, NOT 360.0 deg
     let hfov_max = [0x10, 0x02, 0xFF, 0xFF];
