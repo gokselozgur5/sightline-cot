@@ -4,15 +4,24 @@ use sightline_cot::misb_st0601::*;
 fn test_repro_overflow_and_ber_guards() {
     // Crafted BER length with huge byte count that would wrap
     let crafted_len = [0x88, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
-    assert_eq!(decode_ber_length(&crafted_len), Err(MisbError::InvalidBerLength));
+    assert_eq!(
+        decode_ber_length(&crafted_len),
+        Err(MisbError::InvalidBerLength)
+    );
 
     // Leading 0x80 in BER-OID tag is non-minimal
     let non_minimal_oid = [0x80, 0x01];
-    assert_eq!(decode_ber_oid_tag(&non_minimal_oid), Err(MisbError::InvalidBerOidTag));
+    assert_eq!(
+        decode_ber_oid_tag(&non_minimal_oid),
+        Err(MisbError::InvalidBerOidTag)
+    );
 
     // Shift overflow in BER-OID tag
     let huge_oid = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F];
-    assert_eq!(decode_ber_oid_tag(&huge_oid), Err(MisbError::InvalidBerOidTag));
+    assert_eq!(
+        decode_ber_oid_tag(&huge_oid),
+        Err(MisbError::InvalidBerOidTag)
+    );
 }
 
 #[test]
@@ -193,7 +202,7 @@ fn test_error_cases_and_sentinels() {
     let mut missing_tag1 = packet.clone();
     let n = missing_tag1.len();
     missing_tag1[n - 4] = 0x02; // replace Tag 1 with Tag 2
-    // recompute checksum so checksum check itself passes
+                                // recompute checksum so checksum check itself passes
     let new_ck = sightline_cot::stanag4609::compute_st0601_checksum(&missing_tag1[..n - 2]);
     missing_tag1[n - 2..].copy_from_slice(&new_ck.to_be_bytes());
     assert_eq!(

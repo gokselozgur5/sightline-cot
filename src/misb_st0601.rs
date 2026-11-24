@@ -371,7 +371,9 @@ pub fn parse_st0601_packet(packet: &[u8]) -> Result<Misb0601Frame, MisbError> {
     }
     let (body_len, len_bytes) = decode_ber_length(&packet[16..])?;
     let offset = 16 + len_bytes;
-    let full_len = offset.checked_add(body_len).ok_or(MisbError::BufferTooShort)?;
+    let full_len = offset
+        .checked_add(body_len)
+        .ok_or(MisbError::BufferTooShort)?;
     if packet.len() < full_len || body_len < 4 {
         return Err(MisbError::BufferTooShort);
     }
@@ -518,11 +520,7 @@ impl Misb0601Frame {
             rot_x(roll.to_radians()),
         );
 
-        let r_cam_to_gimbal = [
-            [0.0, 0.0, 1.0],
-            [1.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0],
-        ];
+        let r_cam_to_gimbal = [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]];
         let r_gimbal_body = mat3_mult(
             mat3_mult(
                 mat3_mult(rot_z(rel_az.to_radians()), rot_y(rel_el.to_radians())),
@@ -532,18 +530,10 @@ impl Misb0601Frame {
         );
 
         let r_cam_ned = mat3_mult(r_ned_platform, r_gimbal_body);
-        let c_ned_to_enu = [
-            [0.0, 1.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [0.0, 0.0, -1.0],
-        ];
+        let c_ned_to_enu = [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]];
         let r_cam_enu = mat3_mult(c_ned_to_enu, r_cam_ned);
 
-        let r_base_t = [
-            [1.0, 0.0, 0.0],
-            [0.0, -1.0, 0.0],
-            [0.0, 0.0, -1.0],
-        ];
+        let r_base_t = [[1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]];
         let m = mat3_mult(r_cam_enu, r_base_t);
 
         let pitch_rad = m[2][1].clamp(-1.0, 1.0).asin();
