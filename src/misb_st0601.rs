@@ -220,6 +220,55 @@ fn encode_i32_angle(deg: f64, max_deg: f64) -> [u8; 4] {
     val.to_be_bytes()
 }
 
+fn decode_alt_16(bytes: &[u8]) -> Result<f64, MisbError> {
+    if bytes.len() != 2 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = u16::from_be_bytes([bytes[0], bytes[1]]);
+    let alt = (val as f64) * 19900.0 / 65535.0 - 900.0;
+    Ok(alt)
+}
+
+fn encode_alt_16(alt_m: f64) -> [u8; 2] {
+    let clamped = alt_m.clamp(-900.0, 19000.0);
+    let norm = (clamped + 900.0) / 19900.0;
+    let val = (norm * 65535.0).round() as u16;
+    val.to_be_bytes()
+}
+
+fn decode_range_32(bytes: &[u8]) -> Result<f64, MisbError> {
+    if bytes.len() != 4 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+    let range = (val as f64) * 5000000.0 / 4294967295.0;
+    Ok(range)
+}
+
+fn encode_range_32(range_m: f64) -> [u8; 4] {
+    let clamped = range_m.clamp(0.0, 5000000.0);
+    let norm = clamped / 5000000.0;
+    let val = (norm * 4294967295.0).round() as u32;
+    val.to_be_bytes()
+}
+
+fn decode_width_16(bytes: &[u8]) -> Result<f64, MisbError> {
+    if bytes.len() != 2 {
+        return Err(MisbError::BufferTooShort);
+    }
+    let val = u16::from_be_bytes([bytes[0], bytes[1]]);
+    let width = (val as f64) * 10000.0 / 65535.0;
+    Ok(width)
+}
+
+fn encode_width_16(width_m: f64) -> [u8; 2] {
+    let clamped = width_m.clamp(0.0, 10000.0);
+    let norm = clamped / 10000.0;
+    let val = (norm * 65535.0).round() as u16;
+    val.to_be_bytes()
+}
+
+
 
 
 
