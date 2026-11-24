@@ -17,7 +17,9 @@ fn test_typed_cot_and_tak_proto_ffi() {
 
     let cot_type = sightline_cot_type_from_class(1, 0); // Hostile Vehicle -> a-h-G-E-V
     assert!(!cot_type.is_null());
-    let type_str = unsafe { std::ffi::CStr::from_ptr(cot_type) }.to_str().unwrap();
+    let type_str = unsafe { std::ffi::CStr::from_ptr(cot_type) }
+        .to_str()
+        .unwrap();
     assert_eq!(type_str, "a-h-G-E-V");
 
     let mut xml_buf = [0 as c_char; 2048];
@@ -31,7 +33,9 @@ fn test_typed_cot_and_tak_proto_ffi() {
         )
     };
     assert_eq!(rc_xml, SIGHTLINE_OK);
-    let xml_str = unsafe { std::ffi::CStr::from_ptr(xml_buf.as_ptr()) }.to_str().unwrap();
+    let xml_str = unsafe { std::ffi::CStr::from_ptr(xml_buf.as_ptr()) }
+        .to_str()
+        .unwrap();
     assert!(xml_str.contains("type=\"a-h-G-E-V\""));
 
     let mut proto_buf = [0u8; 1024];

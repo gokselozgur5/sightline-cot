@@ -455,7 +455,8 @@ impl MultiTargetTracker {
                 }
             }
         }
-        let res = crate::track_assoc::solve_nearest_neighbor(&mat, self.assoc_config.gate_threshold);
+        let res =
+            crate::track_assoc::solve_nearest_neighbor(&mat, self.assoc_config.gate_threshold);
         let matches = res
             .matches
             .into_iter()
