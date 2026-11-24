@@ -19,3 +19,91 @@ grid = ["geodesy"]
 xml-tools = []
 experimental = ["geodesy"]
 full = ["geodesy", "grid", "xml-tools", "experimental"]
+[[test]]
+name = "geo_unified"
+required-features = ["grid"]
+
+[[test]]
+name = "geo_ups"
+required-features = ["grid"]
+
+[[test]]
+name = "geohash"
+required-features = ["grid"]
+
+[[test]]
+name = "geohash_neighbors"
+required-features = ["grid"]
+
+[[test]]
+name = "maidenhead"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_10figure_zone_chars"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_decode"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_encode"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_exceptions"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_parse"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_roundtrip"
+required-features = ["grid"]
+
+[[test]]
+name = "mgrs_truncate"
+required-features = ["grid"]
+
+[[test]]
+name = "non_ascii_symbol_aliasing"
+required-features = ["grid"]
+
+[[test]]
+name = "pipeline_mgrs_tracks"
+required-features = ["grid"]
+
+[[test]]
+name = "utm_forced"
+required-features = ["grid"]
+
+[[test]]
+name = "utm_mgrs"
+required-features = ["grid"]
+
+[[test]]
+name = "utm_string"
+required-features = ["grid"]
+
+[[test]]
+name = "xml_canonicalizer"
+required-features = ["xml-tools"]
+
+[[test]]
+name = "xml_canonicalizer_control_refs"
+required-features = ["xml-tools"]
+
+[[test]]
+name = "xml_canonicalizer_nesting_depth"
+required-features = ["xml-tools"]
+
+[[test]]
+name = "xml_canonicalizer_text_entities"
+required-features = ["xml-tools"]
+
