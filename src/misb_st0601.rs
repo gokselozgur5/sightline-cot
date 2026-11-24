@@ -32,3 +32,48 @@ impl core::fmt::Display for MisbError {
 }
 
 impl std::error::Error for MisbError {}
+
+/// Decode a BER length field according to ITU-T X.690 / MISB ST 0601 rules.
+/// Returns `(length_value, bytes_consumed)`.
+pub fn decode_ber_length(bytes: &[u8]) -> Result<(usize, usize), MisbError> {
+    if bytes.is_empty() {
+        return Err(MisbError::BufferTooShort);
+    }
+    let first = bytes[0];
+    if first < 0x80 {
+        return Ok((first as usize, 1));
+    }
+    if first == 0x80 {
+        return Err(MisbError::InvalidBerLength);
+    }
+    let n = (first & 0x7F) as usize;
+    if n > std::mem::size_of::<usize>() {
+        return Err(MisbError::InvalidBerLength);
+    }
+    if bytes.len() < 1 + n {
+        return Err(MisbError::BufferTooShort);
+    }
+    let mut len: usize = 0;
+    for &b in &bytes[1..=n] {
+        len = len
+            .checked_shl(8)
+            .ok_or(MisbError::InvalidBerLength)?
+            .checked_add(b as usize)
+            .ok_or(MisbError::InvalidBerLength)?;
+    }
+    Ok((len, 1 + n))
+}
+
+/// Encode a length value into BER length format.
+pub fn encode_ber_length(len: usize, out: &mut Vec<u8>) {
+    if len < 0x80 {
+        out.push(len as u8);
+    } else {
+        let be = len.to_be_bytes();
+        let first_non_zero = be.iter().position(|&b| b != 0).unwrap_or(be.len() - 1);
+        let active_bytes = &be[first_non_zero..];
+        out.push(0x80 | (active_bytes.len() as u8));
+        out.extend_from_slice(active_bytes);
+    }
+}
+
