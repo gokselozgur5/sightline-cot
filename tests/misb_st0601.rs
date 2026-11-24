@@ -16,6 +16,27 @@ fn test_repro_overflow_and_ber_guards() {
 }
 
 #[test]
+fn test_repro_hfov_vfov_180_deg_scaling() {
+    // Tag 16 (HFOV) with 0xFFFF should decode to 180.0 deg per MISB ST 0601, NOT 360.0 deg
+    let hfov_max = [0x10, 0x02, 0xFF, 0xFF];
+    let frame = Misb0601Frame::decode_local_set(&hfov_max).expect("valid hfov decode");
+    assert!(
+        (frame.sensor_hfov_deg.unwrap() - 180.0).abs() < 0.01,
+        "Tag 16 should scale to 180.0 deg, got {}",
+        frame.sensor_hfov_deg.unwrap()
+    );
+
+    // Tag 17 (VFOV) with 0xFFFF should decode to 180.0 deg per MISB ST 0601, NOT 360.0 deg
+    let vfov_max = [0x11, 0x02, 0xFF, 0xFF];
+    let frame_v = Misb0601Frame::decode_local_set(&vfov_max).expect("valid vfov decode");
+    assert!(
+        (frame_v.sensor_vfov_deg.unwrap() - 180.0).abs() < 0.01,
+        "Tag 17 should scale to 180.0 deg, got {}",
+        frame_v.sensor_vfov_deg.unwrap()
+    );
+}
+
+#[test]
 fn test_ber_length_short_and_long() {
     let mut buf = Vec::new();
     encode_ber_length(10, &mut buf);
