@@ -73,6 +73,9 @@ fn test_engine_step_pose_and_dem() {
         let rc_dem = sightline_engine_set_dem(eng, -100.0, -100.0, 100.0, 3, 3, elevs.as_ptr());
         assert_eq!(rc_dem, SIGHTLINE_OK);
 
+        let rc_dem_zero = sightline_engine_set_dem(eng, 0.0, 0.0, 10.0, 0, 0, std::ptr::null());
+        assert_eq!(rc_dem_zero, SIGHTLINE_ERR_INVALID);
+
         let rc2 = sightline_engine_step_pose(
             eng,
             0.033,

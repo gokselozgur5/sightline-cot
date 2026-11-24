@@ -406,7 +406,7 @@ pub unsafe extern "C" fn sightline_engine_step_pose(
         if e.is_null() || pose.is_null() {
             return SIGHTLINE_ERR_NULL;
         }
-        if !pointer_is_aligned(pose) {
+        if !pointer_is_aligned(e) || !pointer_is_aligned(pose) {
             return SIGHTLINE_ERR_INVALID;
         }
         let p = &*pose;
@@ -444,13 +444,22 @@ pub unsafe extern "C" fn sightline_engine_set_dem(
     elevations: *const f64,
 ) -> i32 {
     guard(|| {
-        if e.is_null() || (rows > 0 && cols > 0 && elevations.is_null()) {
+        if e.is_null() {
             return SIGHTLINE_ERR_NULL;
+        }
+        if !pointer_is_aligned(e) {
+            return SIGHTLINE_ERR_INVALID;
         }
         let total = match rows.checked_mul(cols) {
             Some(n) => n,
             None => return SIGHTLINE_ERR_INVALID,
         };
+        if total == 0 {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        if elevations.is_null() {
+            return SIGHTLINE_ERR_NULL;
+        }
         if !layout_ok(elevations, total) {
             return SIGHTLINE_ERR_INVALID;
         }
@@ -479,6 +488,9 @@ pub unsafe extern "C" fn sightline_engine_clear_dem(e: *mut SightlineEngine) -> 
     guard(|| {
         if e.is_null() {
             return SIGHTLINE_ERR_NULL;
+        }
+        if !pointer_is_aligned(e) {
+            return SIGHTLINE_ERR_INVALID;
         }
         (*e).dem = None;
         SIGHTLINE_OK
