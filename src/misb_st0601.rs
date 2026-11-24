@@ -347,6 +347,72 @@ pub fn parse_st0601_packet(packet: &[u8]) -> Result<Misb0601Frame, MisbError> {
     Misb0601Frame::decode_local_set(&packet[offset..full_len - 4])
 }
 
+impl Misb0601Frame {
+    /// Encode UAS Datalink Local Set into raw TLV payload bytes (without Tag 1 checksum).
+    pub fn encode_local_set(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        if let Some(ts) = self.timestamp_micros {
+            encode_tlv(2, &ts.to_be_bytes(), &mut out);
+        }
+        if let Some(v) = self.platform_heading_deg {
+            encode_tlv(5, &encode_u16_angle_360(v), &mut out);
+        }
+        if let Some(v) = self.platform_pitch_deg {
+            encode_tlv(6, &encode_i16_angle(v, 20.0), &mut out);
+        }
+        if let Some(v) = self.platform_roll_deg {
+            encode_tlv(7, &encode_i16_angle(v, 50.0), &mut out);
+        }
+        if let Some(v) = self.sensor_lat_deg {
+            encode_tlv(13, &encode_i32_angle(v, 90.0), &mut out);
+        }
+        if let Some(v) = self.sensor_lon_deg {
+            encode_tlv(14, &encode_i32_angle(v, 180.0), &mut out);
+        }
+        if let Some(v) = self.sensor_true_alt_m {
+            encode_tlv(15, &encode_alt_16(v), &mut out);
+        }
+        if let Some(v) = self.sensor_hfov_deg {
+            encode_tlv(16, &encode_u16_angle_360(v), &mut out);
+        }
+        if let Some(v) = self.sensor_vfov_deg {
+            encode_tlv(17, &encode_u16_angle_360(v), &mut out);
+        }
+        if let Some(v) = self.sensor_rel_az_deg {
+            encode_tlv(18, &encode_u16_angle_360(v), &mut out);
+        }
+        if let Some(v) = self.sensor_rel_el_deg {
+            encode_tlv(19, &encode_i32_angle(v, 180.0), &mut out);
+        }
+        if let Some(v) = self.sensor_rel_roll_deg {
+            encode_tlv(20, &encode_u16_angle_360(v), &mut out);
+        }
+        if let Some(v) = self.slant_range_m {
+            encode_tlv(21, &encode_range_32(v), &mut out);
+        }
+        if let Some(v) = self.target_width_m {
+            encode_tlv(22, &encode_width_16(v), &mut out);
+        }
+        if let Some(v) = self.frame_center_lat_deg {
+            encode_tlv(23, &encode_i32_angle(v, 90.0), &mut out);
+        }
+        if let Some(v) = self.frame_center_lon_deg {
+            encode_tlv(24, &encode_i32_angle(v, 180.0), &mut out);
+        }
+        if let Some(v) = self.frame_center_elev_m {
+            encode_tlv(25, &encode_alt_16(v), &mut out);
+        }
+        out
+    }
+}
+
+fn encode_tlv(tag: u64, val: &[u8], out: &mut Vec<u8>) {
+    encode_ber_oid_tag(tag, out);
+    encode_ber_length(val.len(), out);
+    out.extend_from_slice(val);
+}
+
+
 
 
 
