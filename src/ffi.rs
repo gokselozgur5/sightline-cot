@@ -2,7 +2,9 @@
 
 use crate::camera::{enu_to_geodetic, estimate_covariance_ce_le, intersect_ground};
 use crate::camera::{CameraPose, DemGrid, Intrinsics};
+use crate::classifier::{MilStdClassifier, TacticalAffiliation, TargetCategory};
 use crate::cot::CotEvent;
+use crate::proto::{encode_tak_packet, TakCotEvent};
 use crate::tracker::{BoundingBox, Detection, MultiTargetTracker, Track};
 use std::os::raw::c_char;
 
@@ -469,10 +471,10 @@ pub unsafe extern "C" fn sightline_engine_clear_dem(e: *mut SightlineEngine) -> 
 
 const STALE_OFFSET_MS: i64 = 30_000;
 
-fn to_cot(t: &SightlineTrackC) -> CotEvent {
+fn to_cot(t: &SightlineTrackC, cot_type: &str) -> CotEvent {
     CotEvent {
         uid: format!("sightline-{}", t.id),
-        cot_type: "a-u-G".to_string(),
+        cot_type: cot_type.to_string(),
         how: "m-g".to_string(),
         time_ms: 0,
         start_ms: 0,
@@ -500,6 +502,60 @@ fn track_valid(t: &SightlineTrackC) -> bool {
     f.iter().all(|x| x.is_finite())
 }
 
+fn cot_type_valid(cot_type: &str) -> bool {
+    let trimmed = cot_type.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    for c in trimmed.chars() {
+        if c == '<' || c == '>' || c == '&' || c == '"' || c == '\'' || c.is_control() {
+            return false;
+        }
+        if !c.is_ascii_alphanumeric() && c != '-' && c != '.' && c != '_' {
+            return false;
+        }
+    }
+    true
+}
+
+/// Returns a static NUL-terminated CoT type string for the given affiliation and category.
+#[no_mangle]
+pub extern "C" fn sightline_cot_type_from_class(affiliation: u32, category: u32) -> *const c_char {
+    let aff = match affiliation {
+        0 => TacticalAffiliation::Friendly,
+        1 => TacticalAffiliation::Hostile,
+        2 => TacticalAffiliation::Neutral,
+        _ => TacticalAffiliation::Unknown,
+    };
+    let cat = match category {
+        0 => TargetCategory::Vehicle,
+        1 => TargetCategory::Person,
+        2 => TargetCategory::Drone,
+        3 => TargetCategory::Aircraft,
+        4 => TargetCategory::Vessel,
+        _ => TargetCategory::Unknown,
+    };
+    let cls = MilStdClassifier::new(aff, cat);
+    let s = cls.to_cot_type();
+    // Static null-terminated strings
+    match s {
+        "a-f-G-E-V-C" => b"a-f-G-E-V-C\0".as_ptr().cast::<c_char>(),
+        "a-h-G-E-V" => b"a-h-G-E-V\0".as_ptr().cast::<c_char>(),
+        "a-f-G-E-S" => b"a-f-G-E-S\0".as_ptr().cast::<c_char>(),
+        "a-h-G-E-S" => b"a-h-G-E-S\0".as_ptr().cast::<c_char>(),
+        "a-f-A-M-F" => b"a-f-A-M-F\0".as_ptr().cast::<c_char>(),
+        "a-h-A-M-F" => b"a-h-A-M-F\0".as_ptr().cast::<c_char>(),
+        "a-f-A" => b"a-f-A\0".as_ptr().cast::<c_char>(),
+        "a-h-A" => b"a-h-A\0".as_ptr().cast::<c_char>(),
+        "a-f-S" => b"a-f-S\0".as_ptr().cast::<c_char>(),
+        "a-h-S" => b"a-h-S\0".as_ptr().cast::<c_char>(),
+        "a-n-G-E-V" => b"a-n-G-E-V\0".as_ptr().cast::<c_char>(),
+        "a-n-G-E-S" => b"a-n-G-E-S\0".as_ptr().cast::<c_char>(),
+        "a-n-G" => b"a-n-G\0".as_ptr().cast::<c_char>(),
+        _ => b"a-u-G\0".as_ptr().cast::<c_char>(),
+    }
+}
+
 /// # Safety
 /// `t` must be valid; `buf` must be writable for `cap` bytes.
 #[no_mangle]
@@ -509,14 +565,34 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
     buf: *mut c_char,
     cap: usize,
 ) -> i32 {
+    sightline_track_to_cot_xml_typed(t, time_ms, b"a-u-G\0".as_ptr().cast::<c_char>(), buf, cap)
+}
+
+/// # Safety
+/// `t` and `cot_type` must be valid; `buf` must be writable for `cap` bytes.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_track_to_cot_xml_typed(
+    t: *const SightlineTrackC,
+    time_ms: i64,
+    cot_type: *const c_char,
+    buf: *mut c_char,
+    cap: usize,
+) -> i32 {
     guard(|| {
-        if t.is_null() || buf.is_null() {
+        if t.is_null() || buf.is_null() || cot_type.is_null() {
             return SIGHTLINE_ERR_NULL;
         }
         if !pointer_is_aligned(t) || !track_valid(&*t) {
             return SIGHTLINE_ERR_INVALID;
         }
-        let mut ev = to_cot(&*t);
+        let ty_str = match std::ffi::CStr::from_ptr(cot_type).to_str() {
+            Ok(s) => s,
+            Err(_) => return SIGHTLINE_ERR_INVALID,
+        };
+        if !cot_type_valid(ty_str) {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        let mut ev = to_cot(&*t, ty_str);
         ev.time_ms = time_ms;
         ev.start_ms = time_ms;
         ev.stale_ms = time_ms.saturating_add(STALE_OFFSET_MS);
@@ -526,6 +602,49 @@ pub unsafe extern "C" fn sightline_track_to_cot_xml(
         }
         std::ptr::copy_nonoverlapping(xml.as_ptr(), buf.cast::<u8>(), xml.len());
         *buf.add(xml.len()) = 0;
+        SIGHTLINE_OK
+    })
+}
+
+/// # Safety
+/// `t` and `cot_type` must be valid; `buf` must be writable for `cap` bytes; `out_len` must be writable.
+#[no_mangle]
+pub unsafe extern "C" fn sightline_track_to_tak_proto(
+    t: *const SightlineTrackC,
+    time_ms: i64,
+    cot_type: *const c_char,
+    buf: *mut u8,
+    cap: usize,
+    out_len: *mut usize,
+) -> i32 {
+    guard(|| {
+        if t.is_null() || cot_type.is_null() || out_len.is_null() || (cap > 0 && buf.is_null()) {
+            return SIGHTLINE_ERR_NULL;
+        }
+        if !pointer_is_aligned(t) || !pointer_is_aligned(out_len) || !track_valid(&*t) {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        let ty_str = match std::ffi::CStr::from_ptr(cot_type).to_str() {
+            Ok(s) => s,
+            Err(_) => return SIGHTLINE_ERR_INVALID,
+        };
+        if !cot_type_valid(ty_str) {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        let mut ev = to_cot(&*t, ty_str);
+        ev.time_ms = time_ms;
+        ev.start_ms = time_ms;
+        ev.stale_ms = time_ms.saturating_add(STALE_OFFSET_MS);
+        let tak_ev = TakCotEvent::from(&ev);
+        let mut packet = Vec::new();
+        if encode_tak_packet(&tak_ev, &mut packet).is_err() {
+            return SIGHTLINE_ERR_INVALID;
+        }
+        *out_len = packet.len();
+        if packet.len() > cap {
+            return SIGHTLINE_ERR_BUFFER;
+        }
+        std::ptr::copy_nonoverlapping(packet.as_ptr(), buf, packet.len());
         SIGHTLINE_OK
     })
 }
