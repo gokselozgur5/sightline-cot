@@ -415,7 +415,7 @@ impl MultiTargetTracker {
 }
 
 impl MultiTargetTracker {
-    fn score_candidate(trk: &Track, det: &Detection) -> Option<f64> {
+    fn score_candidate(&self, trk: &Track, det: &Detection) -> Option<f64> {
         let d2 = match trk.mahalanobis_d2(det) {
             Some(v) if v <= 5.991 => v,
             _ => return None,
@@ -428,7 +428,12 @@ impl MultiTargetTracker {
             (det.bbox.x2 - det.bbox.x1).max(0.0) * (det.bbox.y2 - det.bbox.y1).max(0.0) > 1e-12
                 || det.embedding.iter().any(|&x| x != 0.0);
         if !has_appearance || iou_val >= 0.1 || cos_dist <= 0.4 {
-            Some(d2 + cos_dist)
+            let cost = self.assoc_config.compute_cost(d2, iou_val, cos_dist);
+            if cost <= self.assoc_config.gate_threshold {
+                Some(cost)
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -442,12 +447,12 @@ impl MultiTargetTracker {
             crate::track_assoc::DistanceMatrix::new(self.tracks.len(), detections.len(), 1e9);
         for (t_idx, trk) in self.tracks.iter().enumerate() {
             for (d_idx, det) in detections.iter().enumerate() {
-                if let Some(cost) = Self::score_candidate(trk, det) {
+                if let Some(cost) = self.score_candidate(trk, det) {
                     let _ = mat.set(t_idx, d_idx, cost);
                 }
             }
         }
-        let res = crate::track_assoc::solve_nearest_neighbor(&mat, 5.991 + 2.0);
+        let res = crate::track_assoc::solve_nearest_neighbor(&mat, self.assoc_config.gate_threshold);
         let matches = res
             .matches
             .into_iter()
@@ -465,6 +470,9 @@ impl MultiTargetTracker {
     ) -> Result<(), TrackerError> {
         if !dt_s.is_finite() || dt_s <= 0.0 || !self.q_acc.is_finite() || self.q_acc < 0.0 {
             return Err(TrackerError::InvalidDeltaTime);
+        }
+        if self.assoc_config.validate().is_err() {
+            return Err(TrackerError::NonFiniteInput);
         }
         for d in detections {
             if !d.east_m.is_finite()
