@@ -36,11 +36,27 @@ flowchart LR
 ## Build and test
 
 ```sh
+# Lean core checks
 cargo fmt --all -- --check
 cargo clippy --all-targets -- -D warnings
-cargo test --all-targets
+cargo test
+
+# Full feature suite checks
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-features
 cargo run --release --example bench_pipeline
 ```
+
+## Cargo Features
+
+| Feature | Description | Dependencies |
+| :--- | :--- | :--- |
+| `default` | Minimal lean core (camera, tracker, track_assoc, CoT/TAK proto, MISB ST 0601, C-ABI) | None |
+| `geodesy` | Extended geodesic calculations, projections, ellipsoid models, and geoid undulations | None |
+| `grid` | MGRS, UTM zone conversions, UPS, Geohash, and Maidenhead locators | `geodesy` |
+| `xml-tools` | XML canonicalization, schema verification, and attribute sorting utilities | None |
+| `experimental` | Tactical tasks, shapes, sensors, sensor frustums, IMM filters, and LOS evaluation | `geodesy` |
+| `full` | Convenience metapackage activating all feature gates | `geodesy`, `grid`, `xml-tools`, `experimental` |
 
 ## C-ABI
 
