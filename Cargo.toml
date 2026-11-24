@@ -107,3 +107,119 @@ required-features = ["xml-tools"]
 name = "xml_canonicalizer_text_entities"
 required-features = ["xml-tools"]
 
+[[test]]
+name = "convex_hull_non_finite"
+required-features = ["geodesy"]
+
+[[test]]
+name = "destination_point_pole_round_trip"
+required-features = ["geodesy"]
+
+[[test]]
+name = "dms_seconds_rounding"
+required-features = ["geodesy"]
+
+[[test]]
+name = "egm96_geoid"
+required-features = ["geodesy"]
+
+[[test]]
+name = "egm96_new_invalid_step"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_aer"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_angle"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_area"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_bbox"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_bbox_antimeridian"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_centroid"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_compass"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_cross_track"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_crosstrack"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_ddm"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_destination"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_dms"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_enu"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_frame"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_great_circle"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_greatcircle"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_haversine"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_helmert"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_hull"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_interp"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_intersect"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_los_negative_hae"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_meridian_arc"
+required-features = ["geodesy"]
+
+[[test]]
+name = "geo_midpoint"
+required-features = ["geodesy"]
+
